@@ -5003,8 +5003,7 @@ const HT={ro:{title:'Adunări cu Stele ⭐',q:'Ce jucăm azi?',math:'Matematică
  en:{title:'Counting with Stars ⭐',q:'What shall we play today?',math:'Maths',world:'The world',read:'Reading',time:'Time',bday:'🎂 Child’s birthday',pname:'🗣️ How should the voice say “Pufi”? Tap to listen:',psample:'Hello! I am Pufi.',shapes:'Shapes',robo:'RoboPufi',chess:'Chess',pufi:'Pufi',par:'Parents',home:'🏠 Home',voice:'Voice',on:'🔊 Voice: ON',off:'🔇 Voice: OFF',close:'✖ Close',hello:'What shall we play today? Pick a card!'}};
 const H=()=>HT[lang]||HT.ro;
 /* pronunția numelui „Pufi”: părintele alege varianta care sună bine pe dispozitivul lui */
-const PUFI_VARS={ro:['Púfi','Pufy','Pu-fi','Puffi','Pufi'],de:['Pufi','Puffi','Pufy'],en:['Poofy','Pufi','Puffy']};
-function pufiVar(){ let v=null; try{ v=localStorage.getItem('pufi_say_'+lang); }catch(e){} return v||({ro:'Púfi',de:'Pufi',en:'Poofy'}[lang]||'Pufi'); }
+function pufiVar(){ return {ro:'Pu-fi',de:'Pufi',en:'Poofy'}[lang]||'Pufi'; }
 try{ if(window.speechSynthesis&&!speechSynthesis.__pufi){ const _sp=speechSynthesis.speak.bind(speechSynthesis); speechSynthesis.speak=u=>{ try{ const v=pufiVar(); if(u&&u.text&&v!=='Pufi') u.text=u.text.replace(/Pufi(?=s?\b)/g,v); }catch(e){} return _sp(u); }; speechSynthesis.__pufi=1; } }catch(e){}
 const CARDS=[['math','🔢','#FFE9A8'],['world','🌍','#CDEBFF'],['read','📖','#FFD9E2'],['time','⏳','#D8F3E3'],['shapes','📐','#FFE6C2'],['robo','🤖','#D9E4FF'],['chess','♟️','#E6E9F2'],['pufi','🦊','#FFE0C7'],['par','⚙️','#EEEEEE']];
 let mainReturn='home';
@@ -5030,11 +5029,6 @@ function parents(){ const ov=document.createElement('div'); ov.className='hm-par
   const lab=document.createElement('div'); lab.textContent=H().voice+':'; lab.style.fontWeight='800'; box.appendChild(lab); const ph=document.createElement('span'); if(v){ v.parentNode.insertBefore(ph,v); box.appendChild(v); }
   const mb=document.createElement('button'); mb.className='rb-b'; const upd=()=>mb.textContent=voiceOn?H().on:H().off; upd(); mb.onclick=()=>{ if(m) m.click(); upd(); }; box.appendChild(mb);
   const bl=document.createElement('div'); bl.textContent=H().bday; bl.style.fontWeight='800'; box.appendChild(bl); const bi=document.createElement('input'); bi.type='date'; bi.style.cssText='font:inherit;font-size:1.1rem;padding:6px;border-radius:12px;border:2px solid #24325F'; try{ bi.value=localStorage.getItem('tm_bday')||''; }catch(e){} bi.onchange=()=>{ try{ localStorage.setItem('tm_bday',bi.value); }catch(e){} }; box.appendChild(bi);
-  const pl=document.createElement('div'); pl.textContent=H().pname; pl.style.cssText='font-weight:800;text-align:center;max-width:420px'; box.appendChild(pl);
-  const pr=document.createElement('div'); pr.style.cssText='display:flex;gap:6px;flex-wrap:wrap;justify-content:center'; const cur=pufiVar();
-  PUFI_VARS[lang==='de'||lang==='en'?lang:'ro'].forEach(v=>{ const b=document.createElement('button'); b.className='rb-b'; b.textContent=v; b.setAttribute('aria-pressed',v===cur); if(v===cur) b.style.background='var(--sun)';
-    b.onclick=()=>{ try{ localStorage.setItem('pufi_say_'+lang,v); }catch(e){} pr.querySelectorAll('button').forEach(x=>{ x.style.background=''; }); b.style.background='var(--sun)'; try{ say(H().psample); }catch(e){} }; pr.appendChild(b); });
-  box.appendChild(pr);
   const cb=document.createElement('button'); cb.className='rb-b go'; cb.textContent=H().close; cb.onclick=()=>{ if(v) ph.replaceWith(v); ov.remove(); }; box.appendChild(cb);
   root.appendChild(ov); }
 document.querySelectorAll('#hm-langs button').forEach(b=>b.onclick=()=>{ const t=document.querySelector(`.langs button[data-lang="${b.dataset.l}"]`); if(t) t.click(); else lang=b.dataset.l; render(); try{ pickVoice(); }catch(e){} });
