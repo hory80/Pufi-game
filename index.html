@@ -646,6 +646,11 @@ const EN_SIGHTS={CH:'the Alps, cheese and chocolate',RO:'Bran Castle, the Carpat
  HR:'the sea, boats and castles',FI:'Santa Claus, snow and saunas',HU:'castles, paprika and thermal baths',MD:'grapes, orchards and sunflowers',
  CN:'pandas, the Great Wall and chopsticks',ZA:'lions, giraffes and elephants',IS:'volcanoes, ice and little horses'};
 /* pronunție: cum scriem pentru voce cuvintele pe care vocea le citește greșit */
+/* ===== limbi: pachete de traducere (L10N[modul][limbă]); rezerva este engleza ===== */
+window.L10N=window.L10N||{};
+const LANG_ALL=[['ro','🇷🇴','Română'],['de','🇩🇪','Deutsch'],['en','🇬🇧','English'],['fr','🇫🇷','Français'],['it','🇮🇹','Italiano'],['es','🇪🇸','Español'],['pt','🇧🇷','Português'],['nl','🇳🇱','Nederlands'],['pl','🇵🇱','Polski'],['hu','🇭🇺','Magyar'],['uk','🇺🇦','Українська'],['ru','🇷🇺','Русский']];
+function TR(mod,TX){ return TX[lang]||((window.L10N[mod]||{})[lang])||TX.en||TX.ro; }
+function langReady(l){ return ['ro','de','en'].includes(l)||!!(window.L10N.main&&window.L10N.main[l]); }
 const SAYFIX={
   ro:{'Dublin':'Dablin','Washington':'Uașington','Bruxelles':'Bruxel','Reykjavík':'Reikiavic','Beijing':'Beigin','Tokyo':'Tokio',
       'New Delhi':'Niu Deli','Ciudad de México':'Siudad de Mehico','Brasília':'Brasilia','Ottawa':'Otaua','Seul':'Seul','Du-l ':'Dul '},
@@ -820,9 +825,10 @@ const ANTHEMS=new Set(["AR", "AT", "AU", "BE", "BR", "CA", "CH", "CN", "DE", "DK
 const MON_UI={ro:{tap:'Atinge o poză ca să afli mai mult!',close:'✖ Închide',listen:'🔊 Ascultă',play:'🎵 Ascultă imnul',stop:'⏹ Oprește imnul',photo:'Foto'},
   de:{tap:'Tippe auf ein Bild, um mehr zu erfahren!',close:'✖ Schließen',listen:'🔊 Anhören',play:'🎵 Hymne anhören',stop:'⏹ Hymne stoppen',photo:'Foto'},
   en:{tap:'Tap a picture to learn more!',close:'✖ Close',listen:'🔊 Listen',play:'🎵 Play the anthem',stop:'⏹ Stop the anthem',photo:'Photo'}};
-const monL=()=>({ro:0,de:1,en:2}[lang]||0);
-function monName(m){ return m[3].split('|')[monL()]; }
-function monStory(m){ return m[4+monL()]; }
+const monL=()=>({ro:0,de:1,en:2}[lang]??2);
+function monName(m){ return (m._t&&m._t[lang])?m._t[lang][0]:m[3].split('|')[monL()]; }
+function monStory(m){ return (m._t&&m._t[lang])?m._t[lang][1]:m[4+monL()]; }
+const MONU=()=>TR('mon',MON_UI), FBU=()=>TR('fb',FB_UI);
 function monArt(m,big,key){ if(key&&PHOTOS.has(key)) return `<span class="mart photo${big?' big':''}"><img src="foto/${key}.jpg" alt=""></span>`;
   const bg=m[2].split(' ');
   return `<span class="mart bg-${bg[0]}${bg[1]?' '+bg[1]:''}${big?' big':''}"><span class="me${m[0]==='🔺'?' pyr':''}">${m[0]}</span>${m[1]?`<span class="ma">${m[1]}</span>`:''}</span>`; }
@@ -835,19 +841,19 @@ function showMons(c){
     b.onclick=()=>openMon(m,key); box.appendChild(b); });
   box.hidden=false;
   const ab=$('anthemBtn'); ab.hidden=!ANTHEMS.has(c[3]); ab.dataset.code=c[3]; updAnthemBtn();
-  const fbb=$('fbBtn'); fbb.hidden=!FB[c[3]]; fbb.textContent=FB_UI[lang].btn;
+  const fbb=$('fbBtn'); fbb.hidden=!FB[c[3]]; fbb.textContent=FBU().btn;
 }
 function openMon(m,key){
   stopAnthem(); $('monArt').innerHTML=monArt(m,true,key);
-  $('monCred').textContent=PHOTOS.has(key)?'📷 '+MON_UI[lang].photo+': '+(PHOTO_CRED[key]||'')+(PHOTO_CRED[key]?' · ':'')+'Wikimedia Commons':''; $('monTitle').textContent=monName(m); $('monText').textContent=monStory(m);
-  $('monClose').textContent=MON_UI[lang].close; $('monSay').textContent=MON_UI[lang].listen;
+  $('monCred').textContent=PHOTOS.has(key)?'📷 '+MONU().photo+': '+(PHOTO_CRED[key]||'')+(PHOTO_CRED[key]?' · ':'')+'Wikimedia Commons':''; $('monTitle').textContent=monName(m); $('monText').textContent=monStory(m);
+  $('monClose').textContent=MONU().close; $('monSay').textContent=MONU().listen;
   $('monPop').hidden=false; try{tick()}catch(e){}
   say(monName(m)+'. '+monStory(m));
   $('monSay').onclick=()=>say(monName(m)+'. '+monStory(m));
 }
 const anthemAudio=new Audio(); anthemAudio.preload='none';
 anthemAudio.onended=()=>updAnthemBtn();
-function updAnthemBtn(){ const ab=$('anthemBtn'); if(ab) ab.textContent=anthemAudio.paused?MON_UI[lang].play:MON_UI[lang].stop; }
+function updAnthemBtn(){ const ab=$('anthemBtn'); if(ab) ab.textContent=anthemAudio.paused?MONU().play:MONU().stop; }
 function stopAnthem(){ try{ anthemAudio.pause(); anthemAudio.currentTime=0; }catch(e){} updAnthemBtn(); }
 function toggleAnthem(){ const code=$('anthemBtn').dataset.code;
   if(!anthemAudio.paused){ stopAnthem(); return; }
@@ -973,10 +979,10 @@ const FB_UI={ro:{btn:'⚽ Fotbaliști',title:n=>`⚽ Fotbaliști celebri: ${n}`,
   de:{btn:'⚽ Fußballstars',title:n=>`⚽ Fußballstars: ${n}`,say:n=>`Das sind berühmte Fußballer aus ${n}! Tippe auf einen Spieler, um mehr zu erfahren.`},
   en:{btn:'⚽ Football stars',title:n=>`⚽ Football stars: ${n}`,say:n=>`Here are the most famous footballers from ${n}! Tap a player to learn more.`}};
 const fbName=p=>p[0].replace(/\s*\(.*\)$/,'');
-const fbFact=p=>p[1+monL()];
+const fbFact=p=>(p._t&&p._t[lang])||p[1+monL()];
 function openFb(c){
   const list=FB[c[3]]; if(!list) return; stopAnthem();
-  const nm=c[T().i]; $('fbTitle').textContent=FB_UI[lang].title(c[0]+' '+nm.charAt(0).toUpperCase()+nm.slice(1));
+  const nm=c[T().i]; $('fbTitle').textContent=FBU().title(c[0]+' '+nm.charAt(0).toUpperCase()+nm.slice(1));
   const box=$('fbList'); box.innerHTML='';
   list.forEach((p,i)=>{ const key=c[3]+'-'+(i+1), b=document.createElement('button'); b.className='fbCard'; b.id='fb'+i;
     b.style.animationDelay=(i*.15)+'s';
@@ -984,8 +990,8 @@ function openFb(c){
     b.innerHTML=`<span class="fbPic">${pic}<span class="fbBall">⚽</span></span><span class="fbNm">${fbName(p)}</span><span class="fbTx">${fbFact(p)}</span>${FB_CRED[key]?`<span class="fbCr">📷 ${FB_CRED[key]} · Wikimedia</span>`:''}`;
     b.onclick=()=>{ box.querySelectorAll('.fbCard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); say(fbName(p)+'. '+fbFact(p)); };
     box.appendChild(b); });
-  $('fbClose').textContent=MON_UI[lang].close; $('fbPop').hidden=false;
-  say(FB_UI[lang].say(nm));
+  $('fbClose').textContent=MONU().close; $('fbPop').hidden=false;
+  say(FBU().say(nm));
 }
 function closeFb(){ $('fbPop').hidden=true; try{ if(synth) synth.cancel(); }catch(e){} }
 
@@ -1065,8 +1071,8 @@ let lang='ro', game='num', flevel='easy', max=5, mode='add', op='add', stars=0, 
 try{ stars=+localStorage.getItem('stele')||0; max=+localStorage.getItem('nivel')||5; mode=localStorage.getItem('mod')||'add';
      lang=localStorage.getItem('limba')||'ro'; game=localStorage.getItem('joc')||'num'; flevel=localStorage.getItem('nivelSteag')||'easy'; sbMode=localStorage.getItem('modSoroban')||'show'; }catch(e){}
 if(!['num','abacus','flags'].includes(game)) game='num';
-if(!L[lang]) lang='ro';
-const T=()=>L[lang];
+if(!LANG_ALL.some(x=>x[0]===lang)) lang='ro';
+const T=()=>L[lang]||(L10N.main||{})[lang]||L.en;
 const $=id=>document.getElementById(id);
 const rnd=n=>Math.floor(Math.random()*n);
 const shuffle=arr=>arr.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
@@ -1246,7 +1252,7 @@ function flagWin(bt){
   bt.classList.remove('pop');void bt.offsetWidth;bt.classList.add('pop');
   setTimeout(()=>{
     showingMap=showMap(target);
-    const tg=target; speakLocked(T().flagRight(target[T().i])+' '+p+' '+whereLine()+(big?' '+T().bigSay:'')).then(()=>{ if(showingMap&&target===tg){ showMons(tg); say(MON_UI[lang].tap); } });
+    const tg=target; speakLocked(T().flagRight(target[T().i])+' '+p+' '+whereLine()+(big?' '+T().bigSay:'')).then(()=>{ if(showingMap&&target===tg){ showMons(tg); say(MONU().tap); } });
   },900);
 }
 $('nextBtn').onclick=()=>{ if(!document.body.classList.contains('waiting')) next(); };
@@ -1369,9 +1375,10 @@ document.getElementById('gRead').onclick=()=>{ if(synth) synth.cancel(); window.
 document.getElementById('gChess').onclick=()=>{ if(synth) synth.cancel(); window.openChess&&window.openChess(); };
 document.getElementById('gPufi').onclick=()=>{ if(synth) synth.cancel(); window.openPufi&&window.openPufi(lang); };
 document.querySelectorAll('.tabs button[data-game]').forEach(btn=>btn.onclick=()=>{ game=btn.dataset.game; store('joc',game); syncChips(); next(); });
-document.querySelectorAll('.langs button').forEach(btn=>btn.onclick=()=>{
-  lang=btn.dataset.lang; store('limba',lang); applyLang(); if(game==='abacus'){ next(); return; }
-  if(game==='flags') showFlagQ(); else setMsg(); if(started) speakLocked(question()); });
+function setLang(l){ lang=l; store('limba',lang); applyLang(); if(game==='abacus'){ next(); return; }
+  if(game==='flags') showFlagQ(); else setMsg(); if(started) speakLocked(question()); }
+window.__setLang=setLang;
+document.querySelectorAll('.langs button').forEach(btn=>btn.onclick=()=>setLang(btn.dataset.lang));
 document.querySelectorAll('.levels button').forEach(btn=>btn.onclick=()=>{ max=+btn.dataset.max; store('nivel',max); syncChips(); next(); });
 document.querySelectorAll('#abModes button').forEach(btn=>btn.onclick=()=>{ sbMode=btn.dataset.sb; store('modSoroban',sbMode); syncChips(); next(); });
 document.querySelectorAll('#numModes button').forEach(btn=>btn.onclick=()=>{ mode=btn.dataset.mode; store('mod',mode); syncChips(); next(); });
@@ -1782,7 +1789,7 @@ CH.en={ tab:'♟️ Chess', title:'Chess School', back:'⬅ Back', menu:'⬅ Men
   pawnsLose:'The robot won this time. Shall we try again?', botStuck:'The robot cannot move any more. You won!',
   youStuck:'You cannot move any more. The robot wins this time.', botThinks:'The robot is thinking…', yourTurn:'Your turn!',
   cant:n=>`${n} cannot go there.`, kingBad:'The king would be attacked there!' };
-const C=()=>CH[lang]||CH.ro;
+const C=()=>TR('ch',CH);
 const GAMES=['learn','stars','capture','escape','mate','pawns'];
 
 /* ---------- motor de șah ---------- */
@@ -1980,7 +1987,7 @@ function showMenu(){
   view='menu'; busy=false; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='♟️ '+C().title; updTop();
   const m=$('menu'); m.innerHTML='';
   if(window.openChessGame){ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-game'; b.style.background='#FFE9A8'; b.style.boxShadow='0 8px 0 #E8C66A';
-    b.innerHTML=`<span class="ic">🤖♟️</span><span class="nm">${{ro:'Joacă o partidă',de:'Partie spielen',en:'Play a game'}[lang]||'Joacă o partidă'}</span><span class="lv">${{ro:'cu robotul sau cu un prieten',de:'gegen Roboter oder Freund',en:'vs robot or a friend'}[lang]||''}</span>`;
+    b.innerHTML=`<span class="ic">🤖♟️</span><span class="nm">${(({ro:'Joacă o partidă',de:'Partie spielen',en:'Play a game'})[lang]||((L10N.misc||{})[lang]||{}).playGame||'Play a game')}</span><span class="lv">${(({ro:'cu robotul sau cu un prieten',de:'gegen Roboter oder Freund',en:'vs robot or a friend'})[lang]||((L10N.misc||{})[lang]||{}).vsRobot||'vs robot or a friend')}</span>`;
     b.onclick=()=>{ root.hidden=true; try{ speechSynthesis.cancel(); }catch(e){} window.openChessGame(); }; m.appendChild(b); }
   GAMES.forEach(g=>{ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-'+g;
     b.innerHTML=`<span class="ic">${C().games[g][0]}</span><span class="nm">${C().games[g][1]}</span><span class="lv">${C().lvl(L(g))}</span>`;
@@ -2085,8 +2092,8 @@ const TX={
   sylQ:w=>`How many syllables does ${w} have?`,sylN:n=>n===1?'one syllable':n+' syllables',sylSay:(w,n,x)=>`Yes! ${w} has ${n}: ${x}.`,sylWrong:'Try again! Clap for each syllable. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'syllable':'syllables'} 👏`,
   mPick:'🔤 Pick the letters',mFree:'✏️ Write on the outline',mGuide:'✍️ Write with help',clear:'🧽 Clear',freeHint:'Write the letter over the grey outline.',freeBad:'Try to write on the outline 🙂',writeLetter:l=>`Write the letter ${l}.`}
 };
-const R=()=>TX[lang]||TX.ro;
-const LG=()=>TX[lang]?lang:'ro';
+const R=()=>TR('rd',TX);
+const LG=()=>(TX[lang]||((L10N.rd||{})[lang]))?lang:'en';
 const GAMES=['alpha','fish','train','build','read','story','write'];
 
 /* ---------- stare ---------- */
@@ -2461,7 +2468,8 @@ const HUNTLONG={ ro:['CHE','CHI','GHE','GHI','CE','CI','GE','GI'], de:['SCH','ST
 const HUNTL={ ro:'ABCDFGILMNOPRSTUVȘȚ', de:'ABDEFGHKLMNPRSTWZ', en:'BCDFHLMNPRSTW' };
 const FAM={ ro:[['CE','CI'],['CHE','CHI'],['GE','GI'],['GHE','GHI']], de:[['AU'],['EI'],['SCH'],['IE'],['EU'],['CH'],['CK']], en:[['SH'],['CH'],['TH'],['EE'],['OO'],['CK'],['AI'],['OA']] };
 const POSL={ ro:'MLTNRPBSDF', de:'MLNPFKT', en:'MLTNPBFDSK' };
-function toks(W,lg){ const G=GRA[lg]||[], out=[]; let i=0; while(i<W.length){ const g=G.find(x=>W.startsWith(x,i)); if(g){ out.push(g); i+=g.length; } else { out.push(W[i]); i++; } } return out; }
+const GRANB={}, POSDROP={en:['E']};
+function toks(W,lg){ const G=GRA[lg]||[], NB=GRANB[lg]||{}, out=[]; let i=0; while(i<W.length){ const g=G.find(x=>W.startsWith(x,i)&&!(NB[x]&&NB[x].includes(W[i+x.length]||'#'))); if(g){ out.push(g); i+=g.length; } else { out.push(W[i]); i++; } } return out; }
 function startsUnit(W,u,lg){ if(!W.startsWith(u)) return false; return !HUNTLONG[lg].some(L=>L.length>u.length&&L.startsWith(u)&&W.startsWith(L)); }
 const unitCase=u=>upper?u:(LG()==='de'?u.charAt(0)+u.slice(1).toLowerCase():u.toLowerCase());
 function tokHTML(W,lg,mark){ const d=cs(W), t=toks(W,lg); let i=0, h=''; t.forEach((x,k)=>{ const s=d.slice(i,i+x.length); i+=x.length; h+=mark(k,x)?`<b>${s}</b>`:s; }); return h; }
@@ -2516,7 +2524,7 @@ function gHunt(){
 }
 
 /* 9. unde auzi sunetul: început / mijloc / sfârșit */
-function posInfo(W,lg){ let t=toks(W,lg); if(lg==='en'&&t.length>3&&t[t.length-1]==='E') t=t.slice(0,-1); return t; }
+function posInfo(W,lg){ let t=toks(W,lg); const D=POSDROP[lg]; if(D){ let n=0; while(n<2&&t.length>3&&D.includes(t[t.length-1])){ t=t.slice(0,-1); n++; } } return t; }
 function gPos(){
   const lg=LG(), V=VOC[lg], stg=$('stage'); stg.innerHTML=''; msg('');
   const want=rnd2(3); let pickd=null;
@@ -2587,13 +2595,14 @@ function updTop(){ $('stars').textContent='⭐ '+stars; $('caseBtn').textContent
 function showMenu(){ view='menu'; busy=false; storyTok++; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='📖 '+R().title; updTop();
   const m=$('menu'); m.innerHTML='';
   MENU.forEach((grp,gi)=>{ m.appendChild(el('div','rd-mhead',R2().groups[gi]));
-    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; if(NEWG.includes(g)) b.dataset.new={ro:'NOU',de:'NEU',en:'NEW'}[LG()]; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
+    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
 function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=GN(g)[0]+' '+GN(g)[1]; updTop(); RUN[g](); }
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
 $('task').onclick=()=>{ if(task.say) speak(task.say); };
 window.openReading=()=>{ root.hidden=false; showMenu(); };
 window.__rd={glyph,parseStroke,ALPHA,WORDS};
+window.__rdData={AQTX,ALPHA,WORDS,STORIES,STX,FISHTX,VOC,GRA,GRANB,POSDROP,HUNTLONG,HUNTL,FAM,POSL,X2,GU,GL,GD,MARKS};
 })();
 
 </script>
@@ -2691,7 +2700,7 @@ const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
 const spW=(t,ms)=>Promise.all([sp(t),wait(ms)]);
-const one=(s,l)=>({ro:s===1?'o stea':s===2?'două stele':s===3?'trei stele':`${s} stele`,de:s===1?'einen Stern':`${s} Sterne`,en:s===1?'1 star':`${s} stars`})[l];
+const one=(s,l)=>((window.L10N.sa||{})[l]&&L10N.sa[l].one?L10N.sa[l].one(s):null)||({ro:s===1?'o stea':s===2?'două stele':s===3?'trei stele':`${s} stele`,de:s===1?'einen Stern':`${s} Sterne`,en:s===1?'1 star':`${s} stars`})[l];
 const TX={
  ro:{title:'🧮 Academia Soroban',back:'⬅ Înapoi',map:'⬅ Hartă',hint:'💡 Ajutor',check:'✔ Gata',clear:'🧹 Șterge',eyeOn:'👀 Număr: DA',eyeOff:'👀 Număr: NU',
   unlockOn:'🔓 Toate: DA',unlockOff:'🔓 Toate: NU',worlds:['🌱 Lumea unităților','🌳 Lumea zecilor','🚀 Maeștrii sorobanului'],extra:'🎁 Mai mult',
@@ -2763,7 +2772,7 @@ const TX={
   done:s=>`Level complete! You earned ${one(s,'en')}!`,next:'▶ Next level',again2:'↺ Again',locked:'Finish the level before first.',
   freeTask:'Move the beads however you like. I will tell you the number!',acad:'🧮 Academy'}
 };
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('sa',TX);
 /* niveluri: lume, icon, tije, tip, ochi(număr vizibil) */
 const LV=[
  {w:0,ic:'🐣',rods:1,type:'show',eye:1},{w:0,ic:'🍓',rods:1,type:'show',eye:1},{w:0,ic:'👀',rods:1,type:'read',eye:0},
@@ -2991,6 +3000,414 @@ try{
   window.saLabel();
 }catch(e){}
 window.__sa={gen,direct,stateOf,LV};
+})();
+</script>
+<script>
+/* semne diacritice pentru scrisul cu degetul în toate limbile cu alfabet latin */
+(()=>{ const M=window.__rdData&&window.__rdData.MARKS; if(!M) return;
+const AC='L 46 4 58 -7', GR='L 42 -7 54 4', CI='L 40 4 50 -5 L 60 4', DI=['D 38 0','D 62 0'], TI='L 37 2 44 -4 L 56 3 L 63 -3', DA=['L 38 4 44 -7','L 54 4 60 -7'], DOT='D 50 -3', CED='L 52 80 52 88 L 45 95', OG='L 66 80 58 90 L 66 96';
+const ac='L 46 33 57 22', gr='L 43 22 54 33', ci='L 41 32 50 24 L 59 32', di=['D 40 28','D 60 28'], ti='L 38 30 44 25 L 56 31 L 62 26', da=['L 39 33 45 22','L 55 33 61 22'], dot='D 50 26', ced='L 52 80 52 87 L 46 94', og='L 64 80 56 89 L 64 95';
+const add=(k,base,...m)=>{ if(!M[k]) M[k]=[base,...m]; };
+'AEIOUY'.split('').forEach(V=>{ add(V==='Y'?'Ý':({A:'Á',E:'É',I:'Í',O:'Ó',U:'Ú'})[V],V,AC); });
+[['À','A'],['È','E'],['Ì','I'],['Ò','O'],['Ù','U']].forEach(([k,b])=>add(k,b,GR));
+[['Ê','E'],['Ô','O'],['Û','U']].forEach(([k,b])=>add(k,b,CI));
+[['Ë','E'],['Ï','I'],['Ÿ','Y']].forEach(([k,b])=>add(k,b,...DI));
+[['Ã','A'],['Õ','O'],['Ñ','N']].forEach(([k,b])=>add(k,b,TI));
+add('Ç','C',CED); add('Ő','O',...DA); add('Ű','U',...DA); add('Ą','A',OG); add('Ę','E',OG); add('Ł','L','L 18 56 44 40');
+[['Ś','S'],['Ź','Z'],['Ć','C'],['Ń','N']].forEach(([k,b])=>add(k,b,AC)); add('Ż','Z',DOT);
+[['á','a'],['é','e'],['í','ı'],['ó','o'],['ú','u'],['ý','y'],['ś','s'],['ź','z'],['ć','c'],['ń','n']].forEach(([k,b])=>add(k,b,ac));
+[['à','a'],['è','e'],['ì','ı'],['ò','o'],['ù','u']].forEach(([k,b])=>add(k,b,gr));
+[['ê','e'],['ô','o'],['û','u']].forEach(([k,b])=>add(k,b,ci));
+[['ë','e'],['ï','ı'],['ÿ','y']].forEach(([k,b])=>add(k,b,...di));
+[['ã','a'],['õ','o'],['ñ','n']].forEach(([k,b])=>add(k,b,ti));
+add('ç','c',ced); add('ő','o',...da); add('ű','u',...da); add('ą','a',og); add('ę','e',og); add('ł','l','L 36 64 62 48'); add('ż','z',dot);
+})();
+</script>
+
+<script>
+/* ===== Français — jeu principal, monde, monuments, footballeurs ===== */
+(()=>{ const lg='fr', IDX=6;
+L10N.main=L10N.main||{};
+L10N.main[lg]={ code:'fr', speech:'fr-FR', title:'Compter les étoiles ⭐', start:'▶ C’est parti', i:IDX,
+  gNum:'🔢 Nombres', gFlag:'🚩 Drapeaux', gAb:'🧮 Boulier',
+  sbShow:'👆 Montre', sbAdd:'➕ Ajoute', sbTen:'🍒 Fais 10', tens:'Dizaines', ones:'Unités', check:'✔ Fini',
+  sbHint:'La perle rouge en haut vaut 5. Chaque perle jaune en bas vaut 1.',
+  showSay:n=>`Montre le nombre ${n} sur le boulier.`, showTxt:n=>`Montre : <b>${n}</b>`, showRight:n=>`Oui ! C’est ${n}.`,
+  showWrong:(v,n)=>`Le boulier montre ${v}. On cherche ${n}.`,
+  addSay:(a,b)=>`Le boulier montre ${a}. Ajoute ${b}. Ça fait combien ?`, addWrong:v=>`Le boulier montre ${v}. Essaie encore !`,
+  tenQ1:a=>`Combien manque-t-il à ${a} pour faire 10 ?`,
+  tenR1:(a,n,b,r)=>`Oui ! ${a} plus ${n} font 10. On partage ${b} en ${n} et ${r}.`,
+  tenQ2:r=>`Maintenant : 10 plus ${r}. Ça fait combien ?`, tenWin:(a,b,v)=>`${a} plus ${b} font ${v}.`, easy:'Facile', all:'Tous les pays',
+  add:'➕ Addition', sub:'➖ Soustraction', mix:'🔀 Mélange', upto:n=>`jusqu’à ${n}`,
+  plus:'plus', minus:'moins', q:(a,s,b)=>`Combien font ${a} ${s} ${b} ?`, res:(a,s,b,v)=>`${a} ${s} ${b} font ${v}.`,
+  msgAdd:'Combien y en a-t-il en tout ?', msgSub:n=>`${n} ${n===1?'s’en va':'s’en vont'}. Combien en reste-t-il ?`,
+  findSay:n=>`Trouve le drapeau : ${n} !`, findShow:n=>`Trouve : <b>${n}</b>`,
+  flagRight:n=>`Oui ! C’est ${n}.`, flagWrong:(x,n)=>`Ça, c’est ${x}. Cherche ${n} !`, flagTry:'Cherche encore ! 🔍',
+  cont:{eu:'Europe',as:'Asie',af:'Afrique',na:'Amérique du Nord',sa:'Amérique du Sud',oc:'Océanie'},
+  where:(n,c)=>`${n.charAt(0).toUpperCase()+n.slice(1)} se trouve en ${c}.`, capSay:k=>`La capitale est ${k}.`, capLbl:'Capitale', sightSay:x=>`Là-bas, il y a ${x}.`, nextBtn:'▶ Suivant',
+  praise:['Bravo !','Super !','Excellent !','Génial !','Parfait !','Très bien !'],
+  bigMsg:'🏅 Tu as gagné 10 étoiles !', bigSay:'Tu as gagné dix étoiles ! Tu es un champion !',
+  tryMsg:'Essaie encore ! Compte une nouvelle fois 🙂', wrongSay:v=>`Pas ${v}. Essaie encore !`,
+  listen:'🔊 Écouter', on:'🗣️ Voix : oui', off:'🔇 Voix : non', defVoice:'Voix par défaut',
+  sample:'Bonjour ! Voici ma voix.', hello:'On joue ! ', names:/thomas|amelie|amélie|aurelie|aurélie|marie|daniel|audrey/ };
+L10N.misc=L10N.misc||{}; L10N.misc[lg]={playGame:'Jouer une partie',vsRobot:'contre le robot ou un ami',newB:'NOUVEAU'};
+L10N.mon=L10N.mon||{}; L10N.mon[lg]={tap:'Touche une image pour en savoir plus !',close:'✖ Fermer',listen:'🔊 Écouter',play:'🎵 Écouter l’hymne',stop:'⏹ Arrêter l’hymne',photo:'Photo'};
+L10N.fb=L10N.fb||{}; L10N.fb[lg]={btn:'⚽ Footballeurs',title:n=>`⚽ Footballeurs célèbres : ${n}`,say:n=>`Voici les footballeurs les plus célèbres de ce pays : ${n} ! Touche un joueur pour en savoir plus.`};
+let dn=null; try{ dn=new Intl.DisplayNames(['fr'],{type:'region'}); }catch(e){}
+const NAMES={CH:'la Suisse',RO:'la Roumanie',DE:'l’Allemagne',FR:'la France',IT:'l’Italie',AT:'l’Autriche',ES:'l’Espagne',GB:'le Royaume-Uni',US:'les États-Unis',JP:'le Japon',BR:'le Brésil',CA:'le Canada',GR:'la Grèce',PT:'le Portugal',NL:'les Pays-Bas',SE:'la Suède',NO:'la Norvège',TR:'la Turquie',IN:'l’Inde',AU:'l’Australie',MX:'le Mexique',AR:'l’Argentine',PL:'la Pologne',UA:'l’Ukraine',BE:'la Belgique',DK:'le Danemark',KR:'la Corée du Sud',EG:'l’Égypte',IE:'l’Irlande',HR:'la Croatie',FI:'la Finlande',HU:'la Hongrie',MD:'la Moldavie',CN:'la Chine',ZA:'l’Afrique du Sud',IS:'l’Islande'};
+COUNTRIES.forEach(c=>{ c[IDX]=NAMES[c[3]]||(dn?dn.of(c[3]):c[5]); });
+const CAPS_FR={CH:'Berne',RO:'Bucarest',DE:'Berlin',FR:'Paris',IT:'Rome',AT:'Vienne',ES:'Madrid',GB:'Londres',US:'Washington',JP:'Tokyo',BR:'Brasilia',CA:'Ottawa',GR:'Athènes',PT:'Lisbonne',NL:'Amsterdam',SE:'Stockholm',NO:'Oslo',TR:'Ankara',IN:'New Delhi',AU:'Canberra',MX:'Mexico',AR:'Buenos Aires',PL:'Varsovie',UA:'Kiev',BE:'Bruxelles',DK:'Copenhague',KR:'Séoul',EG:'Le Caire',IE:'Dublin',HR:'Zagreb',FI:'Helsinki',HU:'Budapest',MD:'Chișinău',CN:'Pékin',ZA:'Pretoria',IS:'Reykjavik'};
+for(const k in CAPS) CAPS[k][IDX-1]=CAPS_FR[k]||CAPS[k][4];
+const SIGHT_FR={CH:'les Alpes, le fromage et le chocolat',RO:'le château de Bran, les Carpates et les ours',DE:'des châteaux, des bretzels et des voitures',FR:'la tour Eiffel, les croissants et le fromage',IT:'la pizza, le Colisée et les pâtes',AT:'la musique, les montagnes et les gâteaux',ES:'le flamenco, le soleil et la paella',GB:'les gardes royaux, le London Eye et le thé',US:'la statue de la Liberté, le football américain et les hot-dogs',JP:'le mont Fuji, les sushis et les cerisiers en fleurs',BR:'le football, les perroquets et la forêt amazonienne',CA:'les feuilles d’érable, les ours polaires et le hockey sur glace',GR:'des temples anciens, des olives et la mer',PT:'l’océan, le poisson et les tramways jaunes',NL:'les tulipes, les vélos et les moulins à vent',SE:'les élans, la neige et les maisons rouges',NO:'les baleines, les fjords et les aurores boréales',TR:'les mosquées, le thé et les montgolfières',IN:'les éléphants, le Taj Mahal et la cuisine épicée',AU:'les kangourous, les koalas et le surf',MX:'les tacos, les cactus et les fêtes',AR:'le tango, la viande grillée et le football',PL:'des châteaux, des raviolis et l’hiver',UA:'les tournesols, le blé et les raviolis',BE:'le chocolat, les gaufres et les frites',DK:'le Lego, la Petite Sirène et les vélos',KR:'des palais, des nouilles et de la musique',EG:'les chameaux, les pyramides et le désert',IE:'les trèfles, les moutons et la pluie',HR:'la mer, les bateaux et les châteaux',FI:'le Père Noël, la neige et les saunas',HU:'des châteaux, le paprika et les bains thermaux',MD:'le raisin, les vergers et les tournesols',CN:'les pandas, la Grande Muraille et les baguettes',ZA:'les lions, les girafes et les éléphants',IS:'les volcans, la glace et les petits chevaux'};
+for(const k in SIGHTS) SIGHTS[k][IDX]=SIGHT_FR[k]||SIGHTS[k][5];
+const MONT={
+CH:[['Le Cervin','Le Cervin est une très haute montagne avec un sommet pointu comme un triangle. Il mesure presque 4 500 mètres !'],['Le Glacier Express','Un train rouge qui traverse de hauts ponts et passe à travers les montagnes. On l’appelle le train express le plus lent du monde !'],['Le jet d’eau de Genève','Une fontaine géante dans le lac Léman qui projette l’eau à 140 mètres de haut, aussi haut qu’un gratte-ciel !']],
+RO:[['Le château de Bran','Un château sur une colline. On dit que c’est le château de Dracula, le vampire des histoires.'],['Les monastères peints de Bucovine','De vieilles églises peintes aussi à l’extérieur, avec des saints et des histoires. Le monastère de Voroneț a un bleu célèbre dans le monde entier.'],['Le delta du Danube','C’est ici que le Danube se jette dans la mer Noire. Des milliers d’oiseaux y vivent, même des pélicans !']],
+DE:[['Le château de Neuschwanstein','Un château de conte de fées construit par un roi qui rêvait de chevaliers. Il a inspiré les châteaux des films de princesses.'],['La porte de Brandebourg','Une grande porte à Berlin avec un char tiré par quatre chevaux tout en haut. C’est le symbole d’une Allemagne réunie.'],['La cathédrale de Cologne','Une immense cathédrale avec deux tours très hautes. Il a fallu plus de 600 ans pour la construire !']],
+FR:[['La tour Eiffel','Une tour en fer à Paris, haute de plus de 300 mètres. La nuit, elle scintille de milliers de lumières !'],['Le Louvre','Le musée le plus visité du monde, avec une pyramide de verre à l’entrée. Le tableau de la Joconde est ici.'],['Le Mont-Saint-Michel','Une abbaye sur une petite île. À marée haute, la mer l’entoure. À marée basse, on peut y aller à pied.']],
+IT:[['Le Colisée','Une arène géante à Rome, vieille de presque 2 000 ans. Des milliers de personnes venaient ici voir des spectacles.'],['La tour de Pise','Une tour qui penche parce que le sol en dessous est mou. Sur les photos, les touristes font semblant de la retenir !'],['Venise','Une ville construite sur l’eau, avec des canaux à la place des rues. On s’y déplace en bateaux appelés gondoles.']],
+AT:[['Le château de Schönbrunn','Un immense palais à Vienne avec plus de 1 000 pièces et le plus vieux zoo du monde.'],['La maison natale de Mozart','La maison jaune de Salzbourg où Mozart est né. Il écrivait déjà de la musique à 5 ans !'],['Le Grossglockner','La plus haute montagne d’Autriche, avec un grand glacier à ses pieds.']],
+ES:[['La Sagrada Família','Une église géante à Barcelone avec des tours comme des châteaux de sable. On la construit depuis plus de 140 ans !'],['L’Alhambra','Un vieux palais à Grenade avec des jardins, des fontaines et des murs décorés comme de la dentelle.'],['Le parc Güell','Un parc coloré à Barcelone avec un lézard en morceaux de carrelage et des bancs ondulés.']],
+GB:[['Big Ben','Une grande tour d’horloge à Londres. Sa cloche géante s’appelle Big Ben.'],['Stonehenge','Un cercle de pierres géantes posées il y a presque 5 000 ans. Personne ne sait vraiment pourquoi !'],['Le palais de Buckingham','La maison du roi britannique à Londres. Devant, des gardes portent de grands chapeaux noirs.']],
+US:[['La statue de la Liberté','Une statue verte géante à New York qui tient une torche. C’était un cadeau de la France.'],['Le Grand Canyon','Une vallée immense et profonde creusée par une rivière pendant des millions d’années. Les roches sont rouges et orange.'],['Le Golden Gate Bridge','Un très long pont rouge à San Francisco. Le brouillard en cache souvent la moitié.']],
+JP:[['Le mont Fuji','Un volcan couvert de neige au sommet, la plus haute montagne du Japon.'],['Le sanctuaire Fushimi Inari','Un lieu sacré à Kyoto avec des milliers de portails orange, les uns après les autres, comme un tunnel qui monte la montagne.'],['Le château de Himeji','Un château blanc appelé le château du Héron blanc, car il ressemble à un oiseau qui s’envole.']],
+BR:[['Le Christ Rédempteur','Une statue géante aux bras ouverts sur une montagne au-dessus de Rio de Janeiro.'],['La forêt amazonienne','La plus grande forêt tropicale du monde. Des jaguars, des perroquets et des singes y vivent.'],['Les chutes d’Iguaçu','Des centaines de cascades côte à côte à la frontière avec l’Argentine. L’eau gronde comme le tonnerre !']],
+CA:[['Les chutes du Niagara','Des cascades géantes entre le Canada et l’Amérique. On peut s’en approcher en bateau et on est tout mouillé !'],['Les montagnes Rocheuses','De hautes montagnes avec des lacs turquoise, où vivent des ours et des élans.'],['La tour CN','Une très haute tour à Toronto avec un sol en verre : on voit la ville sous ses pieds.']],
+GR:[['L’Acropole','Une colline à Athènes avec des temples de marbre vieux de 2 500 ans. Le plus célèbre est le Parthénon.'],['Santorin','Une île aux maisons blanches et aux toits bleus, construite au bord d’un volcan.'],['Olympie','L’endroit où les Jeux olympiques ont commencé, il y a presque 3 000 ans.']],
+PT:[['La tour de Belém','Une tour comme un petit château au bord du fleuve à Lisbonne. Les marins partaient d’ici pour explorer le monde.'],['Le tram 28 de Lisbonne','Un vieux tram jaune qui monte et descend des rues très étroites.'],['Le palais de Pena','Un palais rouge et jaune tout coloré, en haut d’une colline à Sintra. On dirait un château de dessin animé.']],
+NL:[['Les moulins de Kinderdijk','19 vieux moulins à vent alignés. Ils pompaient l’eau des champs pour que la terre ne soit pas inondée.'],['Les jardins du Keukenhof','Un immense jardin avec des millions de tulipes de toutes les couleurs qui fleurissent au printemps.'],['Les canaux d’Amsterdam','Une ville avec beaucoup de canaux et de ponts, où il y a plus de vélos que d’habitants !']],
+SE:[['La vieille ville de Stockholm','De vieilles ruelles et des maisons colorées sur une île. Stockholm est construite sur 14 îles !'],['L’hôtel de glace','Un hôtel entièrement fait de glace et de neige, même les lits ! Il fond au printemps et on le reconstruit chaque hiver.'],['Le musée Vasa','Un vieux navire en bois qui a coulé il y a presque 400 ans et qu’on a sorti de la mer presque entier.']],
+NO:[['Les fjords','De longs bras de mer étroits entre de hautes montagnes, avec des cascades qui tombent directement dans l’eau.'],['Les aurores boréales','Des lumières vertes et violettes qui dansent dans le ciel en hiver, dans le nord de la Norvège.'],['L’église en bois de Borgund','Une église en bois vieille de presque 850 ans, avec des têtes de dragon sur ses toits.']],
+TR:[['Sainte-Sophie','Un immense bâtiment à Istanbul avec une énorme coupole, vieux de presque 1 500 ans.'],['La Cappadoce','Un pays de rochers en forme de cheminées. Le matin, des centaines de montgolfières flottent au-dessus.'],['Pamukkale','Des terrasses blanches comme la neige, remplies d’eau chaude turquoise. Mais ce n’est pas de la neige, c’est de la pierre !']],
+IN:[['Le Taj Mahal','Un bâtiment de marbre blanc qu’un empereur a construit par amour pour sa femme.'],['Les tigres du Bengale','Des tigres rayés d’orange et de noir vivent dans les forêts de l’Inde. Chaque tigre a des rayures différentes !'],['Le Fort Rouge','Une grande forteresse en pierre rouge à Delhi, où vivaient les empereurs.']],
+AU:[['L’Opéra de Sydney','Un bâtiment blanc avec des toits comme des voiles, juste au bord de la mer.'],['Uluru','Un rocher rouge géant au milieu du désert. Il change de couleur au coucher du soleil !'],['La Grande Barrière de corail','Le plus grand récif de corail du monde, si grand qu’on le voit depuis l’espace. Des poissons colorés et des tortues y nagent.']],
+MX:[['Chichén Itzá','Une pyramide à degrés construite par les Mayas. Si tu tapes dans tes mains devant elle, l’écho ressemble au chant d’un oiseau !'],['La pyramide du Soleil','Une pyramide géante dans une très vieille ville appelée Teotihuacan. On peut monter des centaines de marches jusqu’en haut.'],['Les cenotes','Des lacs cachés dans des grottes, avec une eau bleue et claire où l’on peut nager.']],
+AR:[['Le glacier Perito Moreno','Un glacier géant qui continue de grandir. De temps en temps, d’énormes blocs de glace tombent dans le lac avec un grand bruit !'],['Le tango à Buenos Aires','Le tango est une danse inventée ici. On danse même dans les rues du quartier coloré de La Boca.'],['Les manchots de Patagonie','Des milliers de manchots vivent sur les plages du sud et se dandinent jusqu’à la mer.']],
+PL:[['Le château du Wawel','Un château à Cracovie. La légende dit qu’un dragon vivait en dessous, et aujourd’hui une statue de dragon y crache du vrai feu !'],['La mine de sel de Wieliczka','Une mine de sel sous la terre avec une église entière taillée dans le sel, même les lustres !'],['La vieille ville de Varsovie','Des maisons colorées autour d’une place, avec une statue de sirène qui protège la ville.']],
+UA:[['La laure des Grottes de Kiev','Un monastère aux coupoles dorées avec des grottes souterraines où vivaient des moines.'],['Le tunnel de l’amour','Une voie ferrée dans la forêt où les arbres ont formé un tunnel vert.'],['Les champs de tournesols','En été, des champs entiers deviennent jaunes. Le tournesol est la fleur nationale de l’Ukraine.']],
+BE:[['L’Atomium','Un bâtiment étrange à Bruxelles fait de neuf grosses boules de métal, comme un atome géant.'],['La Grand-Place','Une place à Bruxelles avec des bâtiments dorés. Tous les deux ans, elle est couverte d’un tapis de fleurs.'],['Le chocolat belge','La Belgique est célèbre pour son chocolat. Les chocolats fourrés appelés pralines ont été inventés ici !']],
+DK:[['La Petite Sirène','Une petite statue sur un rocher à Copenhague, d’après le conte de Hans Christian Andersen.'],['Legoland','Le Lego a été inventé au Danemark ! À Legoland, on voit des villes entières construites en briques Lego.'],['Nyhavn','Un port avec des maisons colorées comme des bonbons et de vieux bateaux en bois.']],
+KR:[['Le palais Gyeongbokgung','Un palais royal à Séoul où les gardes portent des costumes colorés comme autrefois.'],['L’île de Jeju','Une île créée par un volcan, avec des plages, des cascades et des statues de pierre souriantes.'],['La N Seoul Tower','Une tour sur une montagne au milieu de la ville. On y accroche des cadenas colorés de l’amitié.']],
+EG:[['Les pyramides de Gizeh','Des tombeaux géants pour les pharaons, construits il y a 4 500 ans avec des millions de blocs de pierre.'],['Le grand Sphinx','Une statue géante avec un corps de lion et une tête d’homme, qui garde les pyramides.'],['La Vallée des Rois','Une vallée où les pharaons étaient enterrés dans des tombeaux cachés dans la montagne. Le trésor de Toutânkhamon a été trouvé ici.']],
+IE:[['Les falaises de Moher','Des falaises géantes qui tombent tout droit dans l’océan. Des macareux au bec coloré y font leur nid.'],['Le château de Blarney','Un château avec une pierre magique : la légende dit que celui qui l’embrasse saura bien parler.'],['La Saint-Patrick','Une fête avec des défilés où tout le monde s’habille en vert et porte des trèfles.']],
+HR:[['Dubrovnik','Une vieille ville entourée de murs épais sur lesquels on peut se promener, au bord de la mer.'],['Les lacs de Plitvice','16 lacs turquoise reliés par des cascades, avec des chemins en bois au-dessus de l’eau.'],['Les dalmatiens','Les chiens dalmatiens à taches doivent leur nom à la Dalmatie, une région de Croatie.']],
+FI:[['Le village du Père Noël','À Rovaniemi, sur le cercle polaire, il y a un village où l’on peut rencontrer le Père Noël toute l’année.'],['Les rennes de Laponie','Beaucoup de rennes vivent dans le nord de la Finlande. Ils tirent des traîneaux dans la neige.'],['Le pays des mille lacs','La Finlande a plus de 180 000 lacs ! C’est pour cela qu’on l’appelle le pays des mille lacs.']],
+HU:[['Le Parlement hongrois','Un immense et beau bâtiment au bord du Danube qui brille comme de l’or la nuit.'],['Les bains Széchenyi','Des piscines d’eau chaude qui vient du sous-sol. En hiver, on y joue même aux échecs dans l’eau !'],['Le bastion des Pêcheurs','Un mur avec sept tours blanches comme des tentes, d’où l’on voit toute la ville.']],
+MD:[['Le Vieil Orhei','Un monastère creusé dans une falaise au-dessus d’une rivière qui fait une grande boucle.'],['La forteresse de Soroca','Une forteresse ronde en pierre au bord du Dniestr, commencée par Étienne le Grand.'],['Vergers et vignes','La Moldavie a une terre très riche où poussent le raisin, les pommes et les noix.']],
+CN:[['La Grande Muraille de Chine','Un mur très, très long construit pour protéger la Chine. Il mesure des milliers de kilomètres !'],['Les pandas géants','Les pandas géants vivent dans les montagnes de Chine et mangent du bambou presque toute la journée.'],['La Cité interdite','Un énorme palais à Pékin aux toits jaunes. Autrefois, seuls l’empereur et ses proches pouvaient y entrer.']],
+ZA:[['La montagne de la Table','Une montagne au sommet plat comme une table au-dessus du Cap. Parfois, un nuage s’y pose comme une nappe !'],['Le parc Kruger','Un immense parc où l’on voit des lions, des éléphants, des girafes et des zèbres en liberté.'],['La plage de Boulders','Une plage où les manchots du Cap se promènent au milieu des gens.']],
+IS:[['Les volcans d’Islande','L’Islande a plus de 30 volcans actifs. Parfois, on voit couler de la lave rouge !'],['Le geyser Strokkur','Une source chaude qui projette de l’eau en l’air toutes les quelques minutes, comme une fontaine de la nature.'],['La cascade de Skógafoss','Une grande cascade blanche. Les jours de soleil, on voit presque toujours un arc-en-ciel dans ses gouttelettes !']]};
+for(const k in MONT) (MON[k]||[]).forEach((m,i)=>{ if(MONT[k][i]) (m._t=m._t||{})[lg]=MONT[k][i]; });
+const FBT={
+CH:['Petit mais très rapide, célèbre pour ses buts spectaculaires avec la Suisse.','Milieu de terrain et capitaine de la Suisse, avec plus de 100 matchs en équipe nationale.','Un gardien qui a arrêté beaucoup de penalties importants, même au Championnat d’Europe.'],
+RO:['Surnommé « le Roi », il a été le plus grand footballeur roumain, avec un pied gauche magique.','Un attaquant qui a marqué beaucoup de buts pour la Roumanie et a joué en Italie et en Angleterre.','Un défenseur solide, capitaine de Barcelone, qui a joué trois Coupes du monde.'],
+DE:['Surnommé « le Kaiser », il a gagné la Coupe du monde comme joueur et comme entraîneur.','L’un des plus grands buteurs de tous les temps, champion du monde en 1974.','Un gardien qui sort souvent comme un défenseur. Champion du monde en 2014.'],
+FR:['Un joueur très élégant qui a mené la France à la victoire en Coupe du monde 1998.','L’un des footballeurs les plus rapides du monde. Champion du monde en 2018.','Un attaquant élégant qui a marqué beaucoup de buts pour la France et Arsenal.'],
+IT:['Célèbre pour sa queue de cheval et ses beaux buts, on l’appelait « le Divin Codino ».','Un défenseur légendaire qui a joué plus de 900 matchs pour l’AC Milan.','Un gardien légendaire, champion du monde en 2006, qui a joué jusqu’à 45 ans.'],
+AT:['Il peut jouer à beaucoup de postes et a gagné plusieurs fois la Ligue des champions.','Il a marqué les buts qui ont battu l’Allemagne à la Coupe du monde 1978.','Un attaquant puissant et l’un des meilleurs buteurs de l’histoire de l’Autriche.'],
+ES:['Il a marqué le but qui a fait gagner la Coupe du monde 2010 à l’Espagne.','Un défenseur et capitaine, champion du monde en 2010, qui marquait souvent de la tête.','Un très jeune talent : il a gagné le Championnat d’Europe 2024 à seulement 17 ans.'],
+GB:['Il a gagné la Coupe du monde avec l’Angleterre en 1966 et était célèbre pour ses tirs puissants.','Célèbre pour ses coups francs qui tournaient comme une banane.','Le meilleur buteur de l’histoire de l’équipe d’Angleterre.'],
+US:['Surnommé « Captain America », c’est la star de l’équipe des États-Unis.','L’un des meilleurs buteurs de l’histoire de l’équipe des États-Unis.','Une attaquante qui a gagné deux fois la Coupe du monde féminine avec les États-Unis.'],
+JP:['L’une des premières grandes stars japonaises à briller en Europe, en Italie.','La capitaine qui a mené le Japon à la victoire en Coupe du monde féminine 2011.','Un ailier très rapide, célèbre pour ses dribbles.'],
+BR:['Surnommé « le Roi du football », il a gagné trois fois la Coupe du monde.','Le meilleur buteur de l’histoire du Brésil, célèbre pour ses dribbles.','L’une des meilleures footballeuses de tous les temps, élue six fois meilleure joueuse du monde.'],
+CA:['Un défenseur extrêmement rapide et l’une des stars du Canada.','Elle a marqué plus de buts internationaux que n’importe qui au monde, hommes et femmes compris !','Un attaquant qui marque beaucoup de buts pour le Canada.'],
+GR:['Capitaine de la Grèce lors de sa victoire surprise au Championnat d’Europe 2004.','Il a marqué le but de la finale du Championnat d’Europe 2004.','Un milieu de terrain qui a joué plus de matchs pour la Grèce que n’importe qui.'],
+PT:['Le meilleur buteur de l’histoire du football international.','Surnommé « la Panthère noire », il a été le meilleur buteur de la Coupe du monde 1966.','Un ailier talentueux élu meilleur joueur du monde en 2001.'],
+NL:['Un génie du football. Un geste porte son nom : la feinte de Cruyff.','Un attaquant qui a marqué une reprise de volée fantastique en finale de l’Euro 1988.','Un défenseur grand et calme, capitaine des Pays-Bas.'],
+SE:['Un grand attaquant célèbre pour ses buts acrobatiques, comme des coups de karaté.','Un attaquant très aimé qui a marqué beaucoup de buts pour la Suède et le Celtic.','Un jeune attaquant élégant, l’une des stars actuelles de la Suède.'],
+NO:['Un attaquant géant et très rapide qui marque sans arrêt.','Un milieu créatif et capitaine de la Norvège, devenu professionnel à 15 ans.','Il a marqué le but de la victoire à la dernière minute de la finale de la Ligue des champions 1999.'],
+TR:['Il a marqué le but le plus rapide de l’histoire de la Coupe du monde, après seulement 11 secondes !','Un jeune talent au pied gauche magique, surnommé « le Messi turc ».','Le capitaine de la Turquie, célèbre pour ses coups francs.'],
+IN:['Le meilleur buteur de l’Inde et l’un des meilleurs buteurs internationaux du monde.','L’une des premières grandes stars du football indien et capitaine pendant de longues années.','Un très grand gardien, le premier Indien à jouer dans un grand championnat européen, en Norvège.'],
+AU:['Célèbre pour ses buts de la tête et pour boxer le drapeau de corner après avoir marqué.','Un attaquant qui fait des saltos arrière après ses buts !','Un attaquant costaud, capitaine de l’Australie à la Coupe du monde 2006.'],
+MX:['Célèbre pour ses buts acrobatiques et sa célébration en salto.','Un défenseur et capitaine qui a joué cinq Coupes du monde.','Un gardien aux cheveux bouclés, célèbre pour ses arrêts incroyables en Coupe du monde.'],
+AR:['L’un des meilleurs footballeurs de tous les temps, champion du monde en 2022.','Un génie du dribble qui a gagné la Coupe du monde en 1986.','Il a marqué en finale de la Coupe du monde 2022 et en finale de la Copa América.'],
+PL:['Un attaquant qui a marqué un jour 5 buts en seulement 9 minutes !','Un milieu rapide, la star de la Pologne à la Coupe du monde 1982.','Un gardien qui a arrêté des penalties en Coupe du monde.'],
+UA:['Un attaquant célèbre qui a gagné le Ballon d’or en 2004.','Un attaquant très rapide qui a gagné le Ballon d’or en 1975.','Il peut jouer au milieu et en défense, c’est l’une des stars de l’Ukraine.'],
+BE:['Un dribbleur fantastique, capitaine de la Belgique troisième de la Coupe du monde 2018.','Un milieu aux passes incroyables, l’un des meilleurs du monde.','Un très grand gardien, qui mesure presque deux mètres.'],
+DK:['Considéré comme le meilleur footballeur danois, célèbre pour ses passes magiques.','Un gardien géant qui a gagné l’Euro 1992 avec le Danemark.','Un milieu créatif célèbre pour ses passes et ses coups francs.'],
+KR:['Le capitaine de la Corée du Sud, qui a été meilleur buteur du championnat d’Angleterre.','Surnommé « Trois poumons » parce qu’il pouvait courir sans se fatiguer.','Une légende du football coréen qui a marqué beaucoup de buts en Allemagne.'],
+EG:['Surnommé « le Roi égyptien », un attaquant très rapide qui marque beaucoup de buts.','Un milieu aimé dans toute l’Égypte, qui a gagné deux fois la Coupe d’Afrique des nations.','Un attaquant aux nombreux buts qui a joué plus de 170 matchs pour l’Égypte.'],
+IE:['Un milieu coriace et capitaine, célèbre parce qu’il n’abandonnait jamais.','Le meilleur buteur de l’Irlande, célèbre pour sa roue après ses buts.','Un défenseur calme et élégant, très aimé des supporters irlandais.'],
+HR:['Un milieu brillant, élu meilleur joueur de la Coupe du monde 2018.','Meilleur buteur de la Coupe du monde 1998, quand la Croatie a fini troisième.','Un milieu qui a joué la finale de la Coupe du monde 2018 avec la Croatie.'],
+FI:['Surnommé « le Roi » en Finlande, il a gagné la Ligue des champions avec l’Ajax.','Le meilleur buteur de la Finlande, qui l’a menée à son premier Championnat d’Europe.','Un défenseur grand et fort, capitaine de Liverpool.'],
+HU:['L’un des plus grands buteurs de l’histoire. Le plus beau but de chaque année reçoit le prix Puskás.','Le capitaine de la Hongrie, célèbre pour ses tirs puissants de loin.','Il a gagné le Ballon d’or en 1967, le seul Hongrois à l’avoir fait.'],
+MD:['Le meilleur buteur de l’histoire de la Moldavie.','Un défenseur et capitaine, le joueur avec le plus de matchs pour la Moldavie.','L’un des joueurs avec le plus de matchs pour la Moldavie.'],
+CN:['Un attaquant chinois qui a joué en Espagne, l’un des meilleurs buteurs de la Chine.','Le premier joueur chinois à marquer dans le championnat d’Angleterre.','L’une des meilleures joueuses du siècle, qui a mené la Chine en finale de la Coupe du monde 1999.'],
+ZA:['Le meilleur buteur de l’histoire de l’Afrique du Sud.','Défenseur et capitaine de l’Afrique du Sud, très aimé à Leeds United.','Un milieu talentueux qui a joué en Angleterre et à la Coupe du monde 2010, à domicile en Afrique du Sud.'],
+IS:['Un milieu célèbre pour ses coups francs, l’un des meilleurs buteurs de l’Islande.','Pour son premier match avec l’Islande, il est entré en jeu à la place… de son propre père !','Un gardien qui a arrêté un penalty de Messi à la Coupe du monde 2018. Il est aussi réalisateur de films !']};
+for(const k in FBT) (FB[k]||[]).forEach((p,i)=>{ if(FBT[k][i]) (p._t=p._t||{})[lg]=FBT[k][i]; });
+})();
+</script>
+
+<script>
+/* ===== Français — lecture (alphabet, mots, histoires, sons) ===== */
+(()=>{ const lg='fr', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Lire',title:'Lire et écrire',back:'⬅ Retour',menu:'⬅ Menu',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','L’alphabet'],fish:['🎣','La pêche aux lettres'],train:['🚂','Le train des syllabes'],build:['🧩','Le mot magique'],read:['👀','Lis et choisis'],story:['📚','Histoires'],write:['✍️','Écris avec le doigt']},
+  alphaTask:'Touche une lettre pour l’entendre !',album:(n,t)=>`🏅 Autocollants : ${n} / ${t}`,alphaSay:(l,w)=>`${l}, comme dans ${w}.`,
+  fishSay:(l,w)=>`Attrape la lettre ${l}, comme dans ${w} !`,fishWrong:l=>`C’est la lettre ${l}. Essaie encore !`,fishRight:l=>`Bravo ! Tu as attrapé le ${l}.`,
+  trainSay:w=>`Fais le mot ${w} ! Mets les wagons dans l’ordre.`,trainDone:w=>`Bravo ! ${w} !`,
+  buildSay:w=>`Écris le mot ${w} !`,buildDone:w=>`Super ! Tu as écrit ${w}.`,
+  readTask:'Lis le mot et choisis l’image !',readWrong:'Essaie encore !',readRight:w=>`Oui ! ${w} !`,
+  storyTask:'Choisis une histoire !',readMe:'▶ Lis-moi',readSelf:'Touche un mot pour l’entendre.',storyDone:'Bravo ! Tu as fini l’histoire.',
+  writeTask:l=>`Écris ${l}. Commence au point vert.`,writeDone:l=>`Bravo ! Tu as écrit ${l} !`,offTrack:'Suis la ligne grise 🙂',
+  letters:'🔤 Lettres',digits:'🔢 Chiffres',next:'▶ Suivant',again:'↺ Encore',listen:'🔊 Écouter',
+  sylQ:w=>`Combien de syllabes a le mot ${w} ?`,sylN:n=>n===1?'une syllabe':n+' syllabes',sylSay:(w,n,x)=>`Oui ! ${w} a ${n} : ${x}.`,sylWrong:'Essaie encore ! Tape dans tes mains à chaque syllabe. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'syllabe':'syllabes'} 👏`,
+  mPick:'🔤 Choisis les lettres',mFree:'✏️ Écris sur le contour',mGuide:'✍️ Écris avec de l’aide',clear:'🧽 Effacer',freeHint:'Écris la lettre sur le contour gris.',freeBad:'Essaie d’écrire sur le contour 🙂',writeLetter:l=>`Écris la lettre ${l}.`,
+  praise:['Bravo !','Super !','Excellent !','Génial !','Parfait !','Très bien !']};
+D.AQTX[lg]={btn:'🐠 Mon aquarium',title:'🐠 Mon aquarium',empty:'Attrape des poissons pour remplir ton aquarium !',slow:'🐢 Lent',fast:'🐇 Rapide',close:'✖ Fermer'};
+D.STX[lg]={syl:'🎨 Syllabes en couleur',listen:'🔊 Lis-moi',self:'👆 Je lis seul',next:'Mot suivant ▶',selfHint:'Lis le mot jaune à voix haute, puis appuie sur ▶. Si tu ne connais pas un mot, touche-le.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, comme dans ${w} !`,(l,w)=>`Où est le ${l} ? ${l}, comme dans ${w}.`,(l,w)=>`Trouve le ${l}, comme dans ${w} !`,(l,w)=>`Le poisson avec le ${l}, comme dans ${w} !`,(l,w)=>`Vas-y, le ${l}, comme dans ${w} !`],
+  pic:w=>`Par quelle lettre commence ${w} ?`, ok:['Attrapé !','Super !','Belle prise !','Waouh !','Oui !','Quel poisson !'], no:['Pas celui-là !','Oups, un autre poisson !','Cherche encore !',x=>`C’est ${x}.`],
+  gold:'Le poisson doré ! Trois étoiles !', lvl:n=>`Niveau ${n} ! De nouveaux animaux marins arrivent !`, bucket:'Seau'};
+D.ALPHA[lg]=[['A','🐝','ABEILLE'],['B','⚽','BALLON'],['C','🥕','CAROTTE'],['D','🐬','DAUPHIN'],['E','🐘','ÉLÉPHANT'],['F','🌸','FLEUR'],['G','🎂','GÂTEAU'],['H','🦔','HÉRISSON'],['I','🏝️','ÎLE'],['J','🧃','JUS'],['K','🐨','KOALA'],['L','🦁','LION'],['M','🐑','MOUTON'],
+  ['N','☁️','NUAGE'],['O','🍊','ORANGE'],['P','🐧','PINGOUIN'],['Q','🎳','QUILLE'],['R','🦊','RENARD'],['S','☀️','SOLEIL'],['T','🐯','TIGRE'],['U','🏭','USINE'],['V','🚲','VÉLO'],['W','🚃','WAGON'],['X','🎹','XYLOPHONE'],['Y','🪀','YOYO'],['Z','🦓','ZÈBRE']];
+D.WORDS[lg]=[['👩','MA-MAN'],['👨','PA-PA'],['🐱','CHAT'],['🐶','CHIEN'],['🏠','MAI-SON'],['🍎','POM-ME'],['🚗','VOI-TU-RE'],['☀️','SO-LEIL'],['🌙','LU-NE'],['🐟','POIS-SON'],['🦆','CA-NARD'],['🎈','BAL-LON'],['🌸','FLEUR'],['🦁','LI-ON'],
+  ['🍌','BA-NA-NE'],['🐸','GRE-NOUIL-LE'],['🦋','PA-PIL-LON'],['🍓','FRAI-SE'],['🥕','CA-ROT-TE'],['🐭','SOU-RIS'],['🐄','VA-CHE'],['🌳','AR-BRE'],['🍉','PAS-TÈ-QUE'],['🐢','TOR-TUE'],['🚂','TRAIN'],['🐻','OURS'],['☁️','NU-A-GE'],['🎂','GÂ-TEAU'],['🐰','LA-PIN'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi et le ballon','Pu·fi a un bal·lon rou·ge. Le bal·lon sau·te haut, haut, haut. Pu·fi court der·riè·re lui. Quel·le joie!'],
+ ['🐱','La chatte Mimi','Mi·mi est u·ne pe·ti·te chat·te. El·le boit du lait. Puis el·le dort au so·leil. Mi·aou, dit Mi·mi.'],
+ ['🏖️','Une journée à la mer','Au·jour·d’hui, nous al·lons à la mer. L’eau est bleu·e. Je fais un châ·teau de sa·ble. Quel·le bel·le jour·née!'],
+ ['🚂','Le train','Le train va vi·te. Tchou tchou, fait le train. Ma·man et pa·pa sont à la fe·nê·tre. Nous al·lons chez ma·mie.'],
+ ['⛄','Le bonhomme de neige','De·hors, il nei·ge. Pu·fi fait un bon·hom·me de nei·ge. Il lui met un nez en ca·rot·te. Le bon·hom·me de nei·ge sou·rit.'],
+ ['🍯','L’ours et le miel','Un gros ours cher·che du miel. Les a·beil·les vo·lent: bzz, bzz! L’ours trou·ve un pot de miel. Miam, c’est bon!'],
+ ['🎂','L’anniversaire de Pufi','Au·jour·d’hui, c’est l’an·ni·ver·sai·re de Pu·fi. Il y a six bou·gies sur le gâ·teau. Les a·mis chan·tent u·ne chan·son. Pu·fi souf·fle et rit.'],
+ ['🚀','La fusée','Pu·fi vo·le dans u·ne fu·sée. Haut, tou·jours plus haut! Il voit la Lu·ne et les é·toi·les. Puis il ren·tre à la mai·son pour le dî·ner.'],
+ ['🌈','La pluie','Il pleut et Pu·fi a un pa·ra·pluie jau·ne. Il sau·te dans les fla·ques: plouf, plouf! Puis le so·leil re·vient. Dans le ciel, il y a un arc-en-ciel.'],
+ ['🥕','Le jardin','Ma·mie a un jar·din. Des to·ma·tes et des ca·rot·tes y pous·sent. Pu·fi ar·ro·se les fleurs. Un pe·tit es·car·got a·van·ce len·te·ment.']];
+D.X2[lg]={ groups:['🔤 Lettres et sons','✍️ Écrire','📚 Lire'],
+  games:{hunt:['👂','La chasse aux sons'],pos:['📍','Où est le son ?'],bubble:['🫧','Les bulles de lettres'],twins:['🔍','Les mots jumeaux']},
+  huntSay:(u,ex,multi)=>multi?`Touche toutes les images qui commencent comme ${ex} !`:`Touche toutes les images qui commencent par ${u}, comme ${ex} !`, huntTask:u=>`Qu’est-ce qui commence par ${u} ?`,
+  huntNo:w=>`${w} ? Non, ça ne va pas avec les autres.`, huntDone:'Bravo ! Tu les as toutes trouvées ! Les autres ne vont pas ensemble.',
+  posSay:(l,w)=>`Où entends-tu ${l} dans ${w} ? Au début, au milieu ou à la fin ?`, posTask:l=>`Où entends-tu ${l} ?`,
+  posLbl:['Au début','Au milieu','À la fin'], posRight:(l,w,p)=>`Oui ! Dans ${w}, on entend ${l} ${p.toLowerCase()}.`, posWrong:'Écoute encore une fois !',
+  bubbleSay:w=>`Éclate les bulles dans l’ordre et écris ${w} !`, bubbleTask:f=>`Des mots avec ${f}`, bubbleDone:w=>`Super ! Tu as écrit ${w}.`,
+  twinsSay:'Quel mot va avec l’image ?', twinsWrong:w=>`Ici, c’est écrit ${w}. Essaie encore !`, twinsRight:w=>`Oui ! ${w} !`, listen:'🔊 Écouter' };
+const RAW='SOLEIL☀️ LUNE🌙 MAISON🏠 CHAT🐱 CHIEN🐶 POISSON🐟 GRENOUILLE🐸 OURS🐻 LION🦁 VACHE🐄 MOUTON🐑 ESCARGOT🐌 TORTUE🐢 BATEAU⛵ PARAPLUIE☂️ ARBRE🌳 LIVRE📖 VASE🏺 BALLON⚽ PAIN🍞 LAIT🥛 BEURRE🧈 POMME🍎 BANANE🍌 FLEUR🌸 CANARD🦆 HÉRISSON🦔 NEZ👃 ROSE🌹 TIGRE🐯 TRAIN🚂 FUSÉE🚀 CHAMPIGNON🍄 FROMAGE🧀 BALEINE🐳 SOURIS🐭 POULE🐔 CHEVAL🐴 CYGNE🦢 CUILLÈRE🥄 TOMATE🍅 CERISE🍒 CAROTTE🥕 POIRE🍐 CITRON🍋 BOUCHE👄 COURONNE👑 CLOCHE🔔 BOUGIE🕯️ PINCEAU🖌️ BALAI🧹 TASSE☕ LUNETTES👓 CHAMEAU🐪 FOURMI🐜 ARAIGNÉE🕷️ ÉLÉPHANT🐘 CROCODILE🐊 VOITURE🚗 ABEILLE🐝 SERPENT🐍 CISEAUX✂️ CHAUSSURE👟 CLÉ🔑 PAPILLON🦋 ÉTOILE⭐ CHAISE🪑 CRAYON✏️ CHAUSSETTE🧦 PIERRE🪨 GLACE🍦 SEAU🪣 HIBOU🦉 CHÈVRE🐐 SINGE🐒 COCHON🐷 GUITARE🎸 HORLOGE⏰ MARTEAU🔨 POUSSIN🐤 MAMAN👩 PAPA👨 NUAGE☁️ PASTÈQUE🍉 FRAISE🍓 DAUPHIN🐬 GIRAFE🦒 ZÈBRE🦓 LOUP🐺 RENARD🦊 PINGOUIN🐧 LAPIN🐰 AVION✈️ VÉLO🚲 FEU🔥 SAPIN🎄 CADEAU🎁 GÂTEAU🎂 DÉ🎲 MAIN✋ PIED🦶 DENT🦷 OREILLE👂 COUTEAU🔪 COQ🐓 CHOCOLAT🍫 VIOLON🎻 TAMBOUR🥁 CADENAS🔒 LETTRE✉️ DRAPEAU🚩 SEL🧂 MIEL🍯 TÉLÉPHONE📱 OIGNON🧅 CERF🦌 SAC👜 FENÊTRE🪟 MIROIR🪞 MANTEAU🧥 ROBOT🤖 PIEUVRE🐙 REINE👸 CAMION🚚 CHAPEAU🎩 PIZZA🍕 ORANGE🍊 RAISIN🍇 OISEAU🐦 KOALA🐨 LIT🛏️ BAIGNOIRE🛁 MOUCHE🪰 PANDA🐼';
+D.VOC[lg]=RAW.split(' ').map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; });
+D.GRA[lg]=['EAU','OU','ON','AN','EN','IN','OI','AI','EI','AU','EU','CH','GN','PH','QU'];
+D.GRANB[lg]={ON:'AEIOUYÉÈÊNM',AN:'AEIOUYÉÈÊNM',EN:'AEIOUYÉÈÊNM',IN:'AEIOUYÉÈÊNM'};
+D.POSDROP[lg]=['E','S','T','D','X','P','Z'];
+D.HUNTLONG[lg]=['CH','PH','QU','GN','OU','ON','AN','EN','IN','OI','AU','EAU','AI','CE','CI','GE','GI'];
+D.HUNTL[lg]='BCDFGLMNPRSTV';
+D.FAM[lg]=[['OU'],['ON'],['AN','EN'],['CH'],['OI'],['AU','EAU'],['IN'],['AI'],['GN']];
+D.POSL[lg]='MLNBFR';
+})();
+</script>
+
+<script>
+/* ===== Français — boulier, échecs, maths, accueil, temps, Pufi, application ===== */
+(()=>{ const lg='fr'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+const one=s=>s===1?'une étoile':`${s} étoiles`;
+S('sa',{title:'🧮 Académie du boulier',back:'⬅ Retour',map:'⬅ Carte',hint:'💡 Aide',check:'✔ Fini',clear:'🧹 Effacer',eyeOn:'👀 Nombre : oui',eyeOff:'👀 Nombre : non',
+  unlockOn:'🔓 Tout : oui',unlockOff:'🔓 Tout : non',worlds:['🌱 Le monde des unités','🌳 Le monde des dizaines','🚀 Les maîtres du boulier'],extra:'🎁 Plus',
+  free:['🎨','Jeu libre'],ten:['🍒','Fais 10'],lvl:n=>`Niveau ${n}`,place:['Unités','Dizaines','Centaines'],
+  names:['Les perles de 1','La perle de 5','Lis les perles','Additions faciles','Les amis de 5','Dizaines et unités','Grands nombres','Les amis de 10','Enlever','Grandes additions','Flash','Anzan'],
+  intro:['Chaque perle jaune en bas vaut 1. Pousse-les vers la barre du milieu.','La perle rouge en haut vaut 5. Descends-la vers la barre.','Regarde le boulier et dis-moi quel nombre il montre.','Il y a déjà un nombre sur le boulier. Ajoute des perles et regarde combien ça fait.','Quand il n’y a plus de perles de 1, appelle ton amie : la perle de 5 !','La tige de gauche montre les dizaines. La tige de droite montre les unités.','Lis d’abord les dizaines, puis les unités.','Quand les unités ne suffisent pas, ajoute une dizaine et enlève l’ami.','Pour enlever, on éloigne les perles de la barre.','Ajoute d’abord les dizaines, puis les unités.','Un nombre apparaît juste un instant. Retiens-le et montre-le sur le boulier !','Écoute les nombres et ajoute-les sur le boulier, l’un après l’autre.'],
+  show:n=>`Montre ${n}.`,add:(a,b)=>`Le boulier montre ${a}. Ajoute ${b}.`,sub:(a,b)=>`Le boulier montre ${a}. Enlève ${b}.`,
+  read:'Quel nombre montre le boulier ?',flash1:'Retiens le nombre !',flash2:'Maintenant, montre-le sur le boulier.',again:'👁 Montrer encore',
+  anz1:'Écoute et ajoute !',anz2:'Combien as-tu maintenant sur le boulier ?',plus:'plus',
+  hintBlink:'Bouge les perles qui clignotent.',f5a:b=>`Ajoute la perle de 5 et enlève ${5-b}.`,f10a:b=>`Ajoute une dizaine et enlève ${10-b} unités.`,f5s:b=>`Enlève la perle de 5 et ajoute ${5-b}.`,
+  right:n=>`Oui ! ${n} !`,have:v=>`Le boulier montre ${v}. Essaie encore !`,readWrong:'Regarde encore les perles.',
+  done:s=>`Niveau réussi ! Tu as gagné ${one(s)} !`,next:'▶ Niveau suivant',again2:'↺ Encore',locked:'Termine d’abord le niveau d’avant.',
+  freeTask:'Bouge les perles comme tu veux. Je te dis le nombre !',acad:'🧮 Académie',one});
+S('ch',{ tab:'♟️ Échecs', title:'L’école des échecs', back:'⬅ Retour', menu:'⬅ Menu', hintsOn:'💡 Aide : oui', hintsOff:'💡 Aide : non',
+  lvl:n=>`Niveau ${n}`, next:'🔄 Nouvel exercice', again:'↺ Rejouer', listen:'🔊 Écouter', moves:n=>`Coups : ${n}`,
+  names:{K:'Le roi',Q:'La dame',R:'La tour',B:'Le fou',N:'Le cavalier',P:'Le pion'},
+  short:{K:'Roi',Q:'Dame',R:'Tour',B:'Fou',N:'Cavalier',P:'Pion'},
+  nom:{K:'le roi',Q:'la dame',R:'la tour',B:'le fou',N:'le cavalier',P:'le pion'},
+  dat:{K:'le roi',Q:'la dame',R:'la tour',B:'le fou',N:'le cavalier',P:'le pion'},
+  blackAcc:{Q:'la dame noire',R:'la tour noire',B:'le fou noir',N:'le cavalier noir',P:'le pion noir'},
+  games:{learn:['🎓','Les pièces'],stars:['⭐','Ramasse les étoiles'],capture:['🍽️','Attrape la pièce'],escape:['🛡️','Sauve le roi'],mate:['👑','Échec et mat !'],pawns:['⚔️','La bataille des pions']},
+  desc:{K:'Le roi est la pièce la plus importante. Il avance d’une seule case, dans toutes les directions.',
+        Q:'La dame est la pièce la plus forte. Elle va tout droit et en diagonale, aussi loin qu’elle veut.',
+        R:'La tour va tout droit : en avant, en arrière, à gauche et à droite, aussi loin qu’elle veut.',
+        B:'Le fou va seulement en diagonale et reste toujours sur la même couleur.',
+        N:'Le cavalier saute en forme de L : deux cases tout droit et une sur le côté. Il peut sauter par-dessus les autres pièces !',
+        P:'Le pion avance d’une case. La première fois, il peut avancer de deux cases. Quand il arrive au bout, il devient une dame !'},
+  learnTask:'Touche la pièce et déplace-la 3 fois.', learnDone:n=>`Super ! Maintenant tu sais comment se déplace ${n}.`,
+  promo:'Waouh ! Le pion est arrivé au bout et s’est transformé en dame !',
+  starsTask:(n,k)=>`Ramasse les ${k} étoiles avec ${n}.`, starsDone:m=>`Tu as ramassé toutes les étoiles en ${m} coups !`,
+  captureTask:x=>`Attrape ${x} !`, gotIt:x=>`Tu as attrapé ${x} !`, notTarget:x=>`Oups ! Tu dois attraper ${x}.`,
+  escapeTask:'Ton roi est en échec ! Mets-le sur une case sûre.', safe:'Le roi est en sécurité !',
+  mateTask:'Fais échec et mat en un seul coup !', mate:'Échec et mat ! Tu as gagné !', notMate:'Ce n’est pas échec et mat. Essaie encore !', mateHint:'Indice : essaie avec la pièce qui clignote.',
+  pawnsTask:'Amène un pion blanc de l’autre côté ! Le robot joue les noirs.', pawnsWin:'Ton pion est arrivé au bout ! Tu as gagné !',
+  pawnsLose:'Le robot a gagné cette fois. On réessaie ?', botStuck:'Le robot ne peut plus bouger. Tu as gagné !',
+  youStuck:'Tu ne peux plus bouger. Le robot gagne cette fois.', botThinks:'Le robot réfléchit…', yourTurn:'À toi !',
+  cant:n=>`${n} ne peut pas aller là.`, kingBad:'Là, le roi serait attaqué !' });
+S('cg',{ title:'Partie d’échecs', back:'⬅ Retour', menu:'⬅ Menu', hintsOn:'💡 Aide : oui', hintsOff:'💡 Aide : non',
+  who:'Contre qui joues-tu ?', color:'Tu joues :', white:'⚪ Les blancs', black:'⚫ Les noirs', rand:'🎲 Au hasard',
+  opp:{easy:['🐣','Robo-Poussin','facile'],mid:['🦊','Robo-Renard','moyen'],hard:['🦉','Robo-Hibou','difficile'],two:['👫','Deux joueurs','sur la même tablette']},
+  cont:'▶ Continuer la partie', wins:n=>`Victoires : ${n}`,
+  intro:(me)=>`On joue ! Tu as ${me===1?'les blancs, tu commences':'les noirs. Le robot commence'}.`, intro2:'On joue ! Les blancs commencent.',
+  yourTurn:'À toi !', thinks:n=>`${n} réfléchit…`, turnW:'Aux blancs ⚪', turnB:'Aux noirs ⚫',
+  N:{1:'le pion',2:'le cavalier',3:'le fou',4:'la tour',5:'la dame',6:'le roi'},
+  NA:{1:'le pion',2:'le cavalier',3:'le fou',4:'la tour',5:'la dame',6:'le roi'},
+  NY:{1:'ton pion',2:'ton cavalier',3:'ton fou',4:'ta tour',5:'ta dame',6:'ton roi'},
+  ND:{1:'le pion',2:'le cavalier',3:'le fou',4:'la tour',5:'la dame',6:'le roi'},
+  botMoved:(n,p)=>`${n} a joué ${p}.`, botTook:(n,p)=>`${n} a pris ${p}.`, youTook:p=>`Bravo ! Tu as pris ${p}.`,
+  castle:'Roque ! Le roi se cache derrière la tour.', check:'Échec !', checkYou:'Échec ! Ton roi est attaqué. Sauve-le !',
+  mateWin:'Échec et mat ! Tu as gagné ! Bravo, champion !', mateLose:n=>`Échec et mat. ${n} a gagné cette fois. On rejoue ?`,
+  mateW:'Échec et mat ! Les blancs ont gagné !', mateB:'Échec et mat ! Les noirs ont gagné !',
+  stale:'Pat ! Le roi ne peut plus bouger, mais il n’est pas en échec. Match nul.', rep:'Trois fois la même position. Match nul !',
+  fifty:'Cinquante coups sans prise. Match nul !', insuf:'Il reste trop peu de pièces pour faire mat. Match nul !',
+  undo:'↶ Annuler', tip:'💡 Conseil', newg:'🔄 Nouvelle partie', listen:'🔊',
+  tipSay:p=>`Essaie de jouer ${p} !`, promoQ:'En quoi le pion se transforme-t-il ?', promo:'Le pion est arrivé au bout et s’est transformé !',
+  cant:n=>`${n} ne peut pas aller là.`, kingBad:'Alors ton roi serait en échec !', notYours:'C’est la pièce de l’autre joueur.',
+  danger:'Attention ! La pièce avec le cercle rouge peut être prise.' });
+S('mw',{title:'🔢 Le monde des nombres',back:'⬅ Retour',allOn:'🔓 Tout : oui',allOff:'🔓 Tout : non',hint:'💡 Aide',lvl:n=>`Niveau ${n}`,
+ hello:'Bienvenue dans le monde des nombres ! Choisis un jeu.',done:s=>`Fini ! Tu as gagné ${['','une étoile','deux étoiles','trois étoiles'][s]} !`,next:'▶ Niveau suivant',again:'↺ Encore',toMenu:'⬅ Niveaux',locked:'Termine d’abord le niveau d’avant.',
+ games:{add:['➕','Additions et soustractions'],cmp:['🐊','Le crocodile gourmand'],nb:['🏠','La rue des voisins'],ord:['🐧','Les pingouins en ordre'],box:['🎁','La boîte secrète'],sb:['🧮','Boulier'],ten:['🍒','Fais 10']},
+ lvAdd:['Additions jusqu’à 5','Additions jusqu’à 10','Soustractions jusqu’à 10','Additions jusqu’à 20','Soustractions jusqu’à 20','Mélange jusqu’à 20','Dizaines entières','Jusqu’à 100'],
+ lvCmp:['Compare les tas','Les signes < > =','Nombres jusqu’à 20','Nombres jusqu’à 100','Compare des sommes'],
+ lvNb:['Le voisin de droite','Le voisin de gauche','Les deux voisins jusqu’à 20','Les deux voisins jusqu’à 100','Le nombre du milieu'],
+ lvOrd:['Trois nombres, ordre croissant','Quatre nombres, ordre décroissant','Jusqu’à 20, mélangé','Jusqu’à 100, croissant','Jusqu’à 100, mélangé'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mélange jusqu’à 20','Mélange jusqu’à 100'],
+ plus:'plus',minus:'moins',make:'font',addQ:(a,o,b)=>`Combien font ${a} ${o} ${b} ?`,addA:(a,o,b,c)=>`${a} ${o} ${b} font ${c} !`,
+ addStory:(a,b,e)=>`Tu as ${a} ${e}. Il en arrive ${b}. Combien y en a-t-il ?`,subStory:(a,b)=>`Il y en a ${a}. ${b} s’en vont. Combien en reste-t-il ?`,
+ frog:'La grenouille saute sur la ligne des nombres. Compte les sauts !',
+ cmpPile:'Le crocodile gourmand veut le plus gros tas ! Touche-le !',cmpSym:'Quel signe va ici ? Le crocodile ouvre la bouche vers le plus grand nombre !',cmpBad:'Le crocodile veut toujours plus !',
+ gt:(a,b)=>`${a} est plus grand que ${b}.`,lt:(a,b)=>`${a} est plus petit que ${b}.`,eq:(a,b)=>`${a} est égal à ${b}.`,chomp:'Miam !',
+ nbR:n=>`Qui habite à droite de ${n} ? Le voisin de droite, c’est un de plus.`,nbL:n=>`Qui habite à gauche de ${n} ? Le voisin de gauche, c’est un de moins.`,nbLR:n=>`Trouve les deux voisins de ${n} !`,nbB:(a,b)=>`Quel nombre habite entre ${a} et ${b} ?`,
+ nbOk:s=>`${s}. Bravo, les voisins sont à leur place !`,nbNo:'Celui-là n’habite pas ici. Essaie encore !',
+ ordUp:'Range les pingouins dans l’ordre croissant : du plus petit au plus grand. Fais un escalier qui monte !',ordDown:'Range les pingouins dans l’ordre décroissant : du plus grand au plus petit. Fais un toboggan !',
+ ordOk:'Parfait ! L’ordre est juste !',ordNo:'Oups, l’ordre n’est pas juste ici. Essaie encore !',up:'🪜 Croissant',down:'🛝 Décroissant',
+ boxQ:'Combien de pommes y a-t-il dans la boîte secrète ? Mets des pommes dans la boîte jusqu’à ce que la balance soit droite !',boxQ100:'Quel nombre est dans la boîte secrète ? Ajoute des pommes jusqu’à ce que la balance soit droite !',boxOk:(e)=>`La balance est droite ! ${e}`,heavyL:'Le côté gauche est plus lourd.',heavyR:'Le côté droit est plus lourd.'});
+S('hm',{title:'Compter les étoiles ⭐',q:'À quoi on joue aujourd’hui ?',math:'Maths',world:'Le monde',read:'Lire',time:'Le temps',bday:'🎂 Anniversaire de l’enfant',shapes:'Formes',robo:'RoboPufi',chess:'Échecs',pufi:'Pufi',par:'Parents',home:'🏠 Accueil',voice:'Voix',on:'🔊 Voix : oui',off:'🔇 Voix : non',close:'✖ Fermer',hello:'À quoi on joue aujourd’hui ? Choisis une carte !'});
+const FR_H=['douze','une','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze'];
+const hr=h=>{ const k=h%12; if(k===0) return h%24===12?'midi':'minuit'; return `${FR_H[k]} heure${k===1?'':'s'}`; };
+const hr12=h=>{ const k=h%12; return k===0?'midi':`${FR_H[k]} heure${k===1?'':'s'}`; };
+S('tm',{title:'⏳ Le temps de Pufi',back:'⬅ Retour',allOn:'🔓 Tout : oui',allOff:'🔓 Tout : non',lvl:n=>`Niveau ${n}`,ok:'✔ Fini',listen:'🔊 Écouter',help:'💡 Aide',first:a=>`D’abord : ${a}.`,nextIs:(a,b)=>`Après ${a}, il y a : ${b}.`,
+ done:s=>`Fini ! Tu as gagné ${['','une étoile','deux étoiles','trois étoiles'][s]} !`,next:'▶ Niveau suivant',again:'↺ Encore',toMenu:'⬅ Retour',locked:'Termine d’abord le niveau d’avant.',
+ ladder:['🕰️ des heures','🌅 un jour','🚃 7 jours = une semaine','🎡 12 mois = une année'],
+ worlds:{clock:['🕰️','L’horloge'],day:['🌅','La journée'],cal:['📅','La semaine et le calendrier'],seas:['🌳','Les saisons']},
+ games:{explore:['🕰️','L’horloge magique'],cuckoo:['🐦','Le coucou'],pizza:['🍕','L’horloge pizza'],station:['🚂','La gare'],memo:['🧩','Les paires'],oven:['⏳','Combien de temps ?'],
+  order:['🧸','Range la journée'],dayclk:['🌞','Une journée avec Pufi'],moments:['🌗','Les moments de la journée'],ytm:['📆','Hier, aujourd’hui, demain'],
+  week:['🚃','Le train de la semaine'],calm:['📅','Mon calendrier'],months:['🎡','La roue des mois'],
+  tree:['🌳','L’arbre des saisons'],dress:['🦊','Habille Pufi'],sort:['🧺','Range par saison']},
+ lv:{cuckoo:['Compte les coucous','Lis l’horloge','Règle l’horloge'],pizza:['Et demie','Montre la demie','Et quart','Moins le quart','Montre les quarts'],
+  station:['Heures pile','Et demie','Les quarts','De 5 en 5 minutes','N’importe quelle minute','L’horloge de 24 heures'],memo:['Heures et demies','Les quarts','De 5 en 5 minutes'],
+  oven:['Une heure','Deux heures','Une demi-heure','Un quart d’heure','Mélange'],order:['Le matin','Toute la journée'],dayclk:['Heures pile','Et demie'],ytm:['L’histoire de Pufi','Les jours de la semaine'],
+  week:['Range les jours','Quel jour vient après ?','Quel jour était avant ?'],calm:['Aujourd’hui, hier, demain','Les jours de la semaine','Compte les jours'],months:['Les mois dans l’ordre','Quel mois vient après ?','Les mois et les saisons']},
+ days:['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
+ months:['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],
+ seas:['le printemps','l’été','l’automne','l’hiver'], seasT:['Printemps','Été','Automne','Hiver'],
+ parts:['le matin','à midi','l’après-midi','le soir','la nuit'],
+ today:(wd,d,mo,s)=>`Aujourd’hui, nous sommes ${wd} ${d===1?'premier':d} ${mo}. C’est ${s} !`,
+ time:(h,m)=>{ const H=hr12(h), H1=hr12(h+1); if(m===0) return H; if(m===15) return `${H} et quart`; if(m===30) return `${H} et demie`; if(m===45) return `${H1} moins le quart`; return m<30?`${H} ${m}`:`${H1} moins ${60-m}`; },
+ short:null, itIs:t=>`Il est ${t}.`, hourOnly:h=>hr12(h),
+ hands:'La grande aiguille montre les minutes. La petite aiguille montre l’heure.',
+ exHi:'Tourne les aiguilles avec ton doigt et regarde passer la journée !', now:'⏰ Maintenant', gears:'⚙️ Engrenages', pz:'🍕 Pizza',
+ cuCount:'Écoute le coucou ! Combien de fois chante-t-il ?', cuRead:'Quelle heure est-il ?', cuSet:h=>`Règle l’horloge sur ${hr12(h)} ! Bouge la petite aiguille.`,
+ pzRead:'Quelle heure est-il ? Regarde quelle partie de la pizza est colorée.', pzSet:t=>`Montre ${t} ! Bouge la grande aiguille.`, pzHalf:'Une demi-pizza, c’est une demi-heure : 30 minutes.', pzQuar:'Une part de pizza, c’est un quart d’heure : 15 minutes.',
+ dest:[['🏔️','la montagne'],['🏖️','la mer'],['👵','chez mamie'],['🏰','le château'],['🦁','le zoo'],['🌲','la forêt']],
+ stTask:(t,d)=>`Le train pour ${d} part à ${t}. Règle l’horloge sur l’heure du départ !`, go:'🚂 Départ !', stWrong:'Oups ! L’horloge montre une autre heure. Essaie encore !', st24:(d,t,p)=>`${d}, ça veut dire ${t}, ${p}.`,
+ memoTask:'Retourne les cartes et trouve les paires : l’horloge et son heure !',
+ ovItems:[['🎂','le gâteau'],['🍕','la pizza'],['🍪','les biscuits'],['🍞','le pain']], dur:m=>({60:'une heure',120:'deux heures',30:'une demi-heure',15:'un quart d’heure',45:'trois quarts d’heure',90:'une heure et demie'})[m],
+ ovTask:(it,t,d)=>`Pufi met ${it} au four à ${t}. Il doit cuire ${d}. Tourne la grande aiguille en avant et appuie sur Fini !`, ovEarly:'Ce n’est pas encore prêt ! Tourne encore.', ovBurn:'Oups, trop longtemps ! C’est un peu brûlé. Essaie encore !', ovDone:t=>`Ding ! C’est prêt ! Il est ${t}.`,
+ acts:[['⏰','Pufi se réveille',420],['🪥','se brosser les dents',430],['🥣','le petit-déjeuner',450],['🎒','aller à l’école',480],['🍽️','le déjeuner',720],['😴','la sieste',780],['🛝','jouer au parc',960],['🍝','le dîner',1080],['🛁','le bain',1140],['📖','l’histoire du soir',1170],['🌙','aller au lit',1200]],
+ ordTask:'Range la journée de Pufi dans l’ordre : du matin jusqu’au soir !',
+ dcTask:(a,t)=>`${a} ! Règle l’horloge sur ${t}.`,
+ mom:[[0,'🥣','prenons-nous le petit-déjeuner'],[0,'🐓','le coq chante-t-il et le soleil se lève-t-il'],[1,'🍝','mangeons-nous à midi'],[1,'☀️','le soleil est-il tout en haut dans le ciel'],[2,'🍪','prenons-nous le goûter après la sieste'],[2,'🛝','jouons-nous au parc l’après-midi'],[3,'🌇','le soleil se couche-t-il'],[3,'🛁','prenons-nous un bain avant d’aller au lit'],[4,'😴','dormons-nous'],[4,'🦉','le hibou chasse-t-il quand les étoiles brillent']],
+ moTask:a=>`Quand ${a} ?`,
+ ytmL:['HIER','AUJOURD’HUI','DEMAIN'], places:[['👵','chez mamie'],['🛝','au parc'],['🏊','à la piscine'],['🦁','au zoo'],['🏫','à l’école'],['🎂','à une fête'],['🏖️','à la mer'],['🚒','chez les pompiers']],
+ ytmStory:(a,b,c)=>`Hier, Pufi était ${a}. Aujourd’hui, il est ${b}. Demain, il ira ${c}.`, ytmQ:['Où était Pufi hier ?','Où est Pufi aujourd’hui ?','Où ira Pufi demain ?'],
+ ytmD:(k,d)=>[`Aujourd’hui, c’est ${d}. Quel jour était-ce hier ?`,`Aujourd’hui, c’est ${d}. Quel jour serons-nous demain ?`][k],
+ weekTask:'Range les wagons dans l’ordre : commence par lundi !', weekAfter:d=>`Quel jour vient après ${d} ?`, weekBefore:d=>`Quel jour vient avant ${d} ?`, weekend:'Le samedi et le dimanche, c’est le week-end : pas d’école !',
+ calToday:'Touche aujourd’hui !', calTom:'Touche demain !', calYes:'Touche hier !', calWd:n=>`Quel jour de la semaine est le ${n} ?`, calCount:n=>`Combien de jours reste-t-il jusqu’au ${n} ? Touche les jours un par un, en commençant par demain !`, calHow:'Combien de jours as-tu comptés ?',
+ bday:n=>n===0?'🎂 C’est ton anniversaire aujourd’hui ! Joyeux anniversaire !':`🎂 Jusqu’à ton anniversaire : ${n===1?'un jour':n+' jours'}`,
+ moOrder:'Touche les mois dans l’ordre, en commençant par janvier !', moAfter:m=>`Quel mois vient après ${m} ?`, moSeas:m=>`En quelle saison est ${m} ?`,
+ treeHi:['Au printemps, l’arbre fleurit. Touche les bourgeons !','En été, l’arbre est plein de fruits. Cueille les cerises !','En automne, les feuilles jaunissent et tombent. Secoue l’arbre !','En hiver, l’arbre dort sous la neige. Fais un bonhomme de neige !'],
+ dressTask:s=>`C’est ${s} ! Qu’est-ce que Pufi met ? Choisis trois choses qui vont bien.`, dressNo:['Hmm, ça ne va pas maintenant.','Ouf, en été il fait trop chaud pour ça !','Hmm, ça ne va pas maintenant.','Brrr ! En hiver il fait trop froid pour ça !'],
+ sortTask:'En quelle saison utilise-t-on ça ? Mets-le dans le bon panier !'});
+S('pq',{title:'L’aventure de Pufi',sub:'Choisis un monde ! Ramasse les étoiles et les 3 étoiles arc-en-ciel 🌟 de chaque niveau.',help:'◀ ▶ marcher · ⬆ sauter (deux fois !) · ⬇ entrer dans le tuyau',exit:'⬅ Retour',lvl:n=>`Niveau ${n}`,
+ names:['La prairie','La forêt d’automne','La grotte de cristal','Dans les nuages','La plage','Le pays de la neige','La nuit des lucioles','Le château de lave'],
+ start:(n,t)=>`Niveau ${n} : ${t}. Allez, Pufi !`, won:'Bravo ! Pufi est rentré à la maison !', winS:(s,m)=>`⭐ ${s} étoiles · 🌟 ${m} étoiles arc-en-ciel sur 3`, next:'▶ Continuer', again:'↺ Encore', map:'🗺️ Carte',
+ grow:'Waouh ! Pufi est devenu grand !', shrink:'Aïe ! Pufi est redevenu petit. Tu as encore une chance !', hurt:'Aïe ! Tu as perdu un cœur.', over:'Oups ! On recommence au drapeau.', rainbow:'L’étoile arc-en-ciel ! Tu es invincible !', medal:'Une étoile arc-en-ciel !', check:'Le drapeau est à toi ! Tu continueras d’ici.', heart:'Un cœur en plus !',
+ secret:'Une salle secrète !', allDone:'Tu as fini tous les mondes ! Tu es un champion !',
+ signs:{move:'Marche avec les flèches et saute avec le bouton jaune !',box:'Tape la boîte avec le point d’interrogation avec ta tête !',stomp:'Saute sur l’escargot ! Puis pousse sa coquille.',grow:'L’étoile te fait grandir ! Quand tu es grand, tu peux casser les briques.',pipe:'Mets-toi sur le tuyau et appuie sur la flèche du bas ! Il y a une salle secrète.',hog:'Le hérisson a des piquants ! Ne saute pas dessus, contourne-le.',spring:'Saute sur le trampoline pour aller très haut !',flag:'Touche le drapeau ! Si tu te cognes, tu continueras d’ici.',goal:'Saute le plus haut possible sur le drapeau de l’arrivée !',bee:'Les abeilles volent en haut et en bas. Saute dessus !',lava:'Attention à la lave ! Prends les plateformes.',fish:'Les poissons sautent hors de l’eau ! Attends, puis passe.'}});
+S('nt',{recT:'🎙️ La voix des parents',recH:'Enregistrez des félicitations avec votre voix. Votre enfant les entend quand il réussit.',slot:i=>`Bravo ${i}`,rec:'⏺ Enregistrer',stop:'⏹ Fini',play:'▶',del:'🗑',
+   buyT:'💎 Version complète',buy:p=>`Tout débloquer ${p||''}`,restore:'Restaurer les achats',owned:'✅ Vous avez la version complète. Merci !',voice:q=>`Voix : ${q}`,
+   mic:'🎤 Je lis à voix haute',micHint:'Lis à voix haute ! Chaque mot lu devient vert. Si tu ne connais pas un mot, touche-le.',micNo:'Le micro n’est pas disponible. Essaie « Je lis seul ».',listenMe:'🔊 Écoute-toi',micRead:n=>`Tu as lu ${n} mots tout seul !`,listening:'Je t’écoute…'});
+})();
+</script>
+
+<script>
+/* ===== Français — formes, RoboPufi, aquarium ===== */
+(()=>{ const lg='fr'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+S('gm',{title:'📐 Le monde des formes',back:'⬅ Retour',hello:'Bienvenue dans le monde des formes ! Choisis un jeu.',hint:'💡 Aide',undo:'↩ Annuler',clear:'🗑️ Effacer',
+ games:{geo:['📌','Le géoplan'],tan:['🧩','Le puzzle des formes'],cube:['🧊','Les cubes en 3D'],meas:['📏','Devine et mesure']},
+ done:s=>`Fini ! Tu as gagné ${['','une étoile','deux étoiles','trois étoiles'][s]} !`,next:'▶ Suivant',again:'↺ Encore',toMenu:'⬅ Jeux',
+ shapes:{3:'un triangle',4:'un quadrilatère',5:'un pentagone',6:'un hexagone',sq:'un carré',rect:'un rectangle'},
+ geoIntro:'Touche les clous l’un après l’autre pour tendre l’élastique. Pour fermer la forme, touche encore le premier clou !',
+ geoT:['Fais un triangle !','Fais un carré !','Fais un rectangle qui n’est pas un carré !','Fais un carré avec des côtés de trois carreaux !','Combien de petits carreaux y a-t-il dans la forme ?','Fais une forme avec exactement quatre petits carreaux à l’intérieur !','Combien de morceaux de clôture faut-il autour du jardin ?','Fais un grand triangle avec six petits carreaux à l’intérieur !'],
+ made:s=>`Tu as fait ${s} !`,corners:n=>`Il a ${n} coins.`,notTri:'Un triangle a trois coins. Essaie encore !',notSq:'Un carré a quatre côtés égaux et des coins droits.',isSq:'C’est un carré ! Fais un côté plus long.',notRect:'Un rectangle a quatre coins droits.',
+ notSq3:'Chaque côté doit mesurer trois carreaux.',areaIs:n=>`Ta forme a ${n} petits carreaux à l’intérieur.`,cross:'L’élastique se croise ! Essaie encore.',
+ geoHint:['Un triangle a trois coins. Touche les clous jaunes dans l’ordre : un, deux, trois, puis encore le premier !','Un carré a quatre côtés de la même longueur. Touche les clous jaunes dans l’ordre !','Un rectangle est plus long que haut. Touche les clous jaunes dans l’ordre !','Chaque côté mesure trois carreaux. Touche les clous jaunes dans l’ordre !','Compte les carreaux rangée par rangée. Il y en a quatre dans la première rangée. Combien y a-t-il de rangées ?','Deux carreaux en ligne et deux autres en dessous, ça fait quatre ! Touche les clous jaunes !','Compte chaque morceau de clôture, d’un point au suivant, tout autour.','Un côté de quatre carreaux et un côté de trois carreaux font un grand triangle. Touche les clous jaunes !'],areaQ:'Combien de petits carreaux y a-t-il à l’intérieur ? Compte !',perimQ:'Combien de morceaux de clôture faut-il tout autour ?',areaA:n=>`Il y a ${n} carreaux. C’est l’aire !`,perimA:n=>`Il faut ${n} morceaux de clôture. C’est le périmètre !`,
+ tanIntro:'Fais glisser les pièces sur l’ombre. Touche une pièce pour la tourner !',tanT:['Fais un carré avec deux triangles !','Construis une maison !','Fais un poisson !','Fais un voilier !','Construis une fusée !','Fais un chat !'],
+ rotate:'Presque ! Touche la pièce pour la tourner.',tanOk:['Deux triangles font un carré !','Quelle jolie maison !','Un poisson !','Un bateau prêt à naviguer !','La fusée décolle !','Miaou ! Un chat !'],
+ cubeIntro:'Regarde bien les cubes ! Certains sont cachés derrière ou en dessous.',cubeCount:'Combien y a-t-il de cubes ?',cubeTop:'À quoi ça ressemble vu d’en haut ? Choisis !',cubeBuild:'Construis la même chose ! Touche un endroit pour ajouter un cube.',
+ cubeA:n=>`Il y a ${n} cubes !`,cubeTopA:'Exactement ! C’est la vue d’en haut.',cubeBuildA:'Pareil ! Tu es un architecte !',cubeNo:'Regarde encore. N’oublie pas les cubes cachés !',model:'Modèle',yours:'Le tien',
+ measIntro:'Devinons des distances et mesurons-les !',estQ:'Combien de pas fait le petit renard jusqu’à la carotte ? Devine !',estRef:'En haut, tu vois la taille d’un pas. Tu peux le faire glisser avec ton doigt !',u1:'1 pas',penRef:'En haut, il y a un crayon. Tu peux le faire glisser avec ton doigt pour mesurer !',u2:'1 crayon',steps:n=>`${n} pas !`,exact:'Parfait ! Tu as deviné juste !',close:'Très près !',far:(g,n)=>`Tu as dit ${g}, mais c’est ${n} pas.`,
+ cmpQ:'Quel chemin est le plus long ?',blue:'🟦 Bleu',orange:'🟧 Orange',same:'🟰 Pareil',cmpA:(a,b)=>`Le chemin bleu fait ${a} pas, l’orange en fait ${b}.`,
+ penQ:'Combien de crayons mesure le tronc ?',penA:n=>`Il mesure ${n} crayons !`,rugQ:'Quel tapis est le plus grand ?',rugA:(a,b)=>`Le tapis bleu a ${a} carreaux, l’orange en a ${b}.`});
+S('rb',{back:'⬅ Retour',allOn:'🔓 Tout : oui',allOff:'🔓 Tout : non',
+ hello:'Salut ! Je suis RoboPufi, le renard robot. Construisons et programmons ensemble !',
+ zones:{prog:['🧭','Programme RoboPufi'],mech:['⚙️','Les machines simples'],circ:['⚡','Les circuits'],sens:['👀','Les capteurs'],gar:['🔧','Le garage']},
+ zoneSay:{prog:'Dis à RoboPufi où aller, avec des flèches !',mech:'Découvrons comment marchent les machines !',circ:'Faisons circuler l’électricité !',sens:'Les robots sentent le monde avec des capteurs. Essayons-les !',gar:'Ici, tu peux changer ma couleur et mes pièces !'},
+ lvl:n=>`Niveau ${n}`,
+ progIntro:'Range les flèches dans l’ordre et appuie sur Départ. Emmène RoboPufi jusqu’à la pile !',
+ loopIntro:'Tu n’as que quelques cartes ! Touche une flèche dans le programme pour la répéter.',
+ starIntro:'Ramasse aussi les étoiles en chemin !',
+ run:'▶ Départ',clear:'🗑️ Effacer',hint:'💡 Aide',
+ edge:'Oups ! C’est le bord.',bump:'Boum ! RoboPufi a heurté un rocher. Essaie encore !',water:'Plouf ! RoboPufi ne sait pas nager !',short:'RoboPufi n’est pas arrivé à la pile. Ajoute des flèches !',full:'Plus de place ! Touche une flèche pour la répéter.',empty:'Mets d’abord des flèches !',
+ progWin:'Je suis arrivé à la pile ! Merci !',
+ done:s=>`Fini ! Tu as gagné ${s===1?'une étoile':s+' étoiles'} !`,next:'▶ Suivant',again:'↺ Encore',toZone:'⬅ Retour',locked:'Termine d’abord le niveau d’avant.',
+ mech:{lever:['⚖️','La balançoire'],gears:['⚙️','Les engrenages'],ramp:['🛝','La rampe']},
+ leverIntro:'Une balançoire est un levier. Fais glisser des animaux à droite pour qu’elle soit droite !',
+ leverTip:'Tu as vu ? Un animal léger loin du milieu peut soulever un animal lourd !',
+ leverOk:'Équilibre parfait !',leverHint:(a,d)=>`Essaie ${a} sur la place ${d}.`,
+ ani:{1:'la souris',2:'le lapin',3:'le chien',4:'l’éléphant'},
+ gearsIntro:'La roue rouge a un moteur. Regarde comment elle fait tourner les autres ! Tu peux aussi la tourner avec ton doigt.',
+ qFast:'Quelle roue tourne le plus vite ? Touche-la !',qDir:c=>`La roue rouge tourne comme ça ↻. Dans quel sens tourne la roue ${c} ?`,cname:{blue:'bleue',green:'verte'},
+ whyFast:'Oui ! La petite roue fait plus de tours, donc elle tourne plus vite.',whyDir:'Oui ! Deux roues qui se touchent tournent dans des sens opposés.',whyChain:'Oui ! La roue du milieu change le sens, et la troisième le change encore.',gearWrong:'Regarde encore bien les roues.',motor:'⚡ Moteur',
+ rampIntro:'Fais glisser le point en haut pour monter ou baisser la rampe. La balle doit s’arrêter au drapeau !',
+ drop:'🔴 Lâche !',far:'Trop loin ! Baisse la rampe.',near:'Trop court ! Monte la rampe.',rampOk:'Juste au drapeau !',rampTip:'Plus la rampe est haute, plus la balle roule loin !',
+ circIntro:'Tire un fil d’un point blanc à un autre. L’électricité a besoin d’un chemin complet, du plus au moins.',
+ cgoal:['Allume l’ampoule !','Allume l’ampoule avec l’interrupteur !','Fais marcher le ventilateur !','Allume les deux ampoules !','Fais sonner la sonnette !','Allume l’ampoule et fais marcher le ventilateur !'],
+ shortC:'Court-circuit ! Un fil relie le plus directement au moins. La pile chauffe !',swNow:'Le circuit est prêt. Maintenant, appuie sur l’interrupteur !',circOk:'Le circuit est fermé. L’électricité circule !',tapWire:'Touche un fil pour l’enlever.',
+ sens:{light:['🔦','Le capteur de lumière'],line:['✏️','Suis la ligne'],touch:['🖐️','Le capteur tactile']},
+ lightIntro:'RoboPufi a un capteur de lumière. Bouge la lampe de poche et il la suivra jusqu’au chargeur !',lightOk:'La pile se recharge ! Merci !',
+ lineIntro:'RoboPufi a un capteur qui voit la ligne noire. Dessine un chemin de lui jusqu’à la pile et appuie sur Départ !',
+ lineStart:'Commence à dessiner juste à côté de RoboPufi.',lineRock:'Boum ! Le chemin passe sur un rocher.',lineEnd:'Le chemin n’arrive pas jusqu’à la pile.',erase:'🧽 Effacer',
+ touchIntro:'RoboPufi a des capteurs tactiles. Touche la partie que je te dis !',
+ parts:{head:'la tête',ant:'l’antenne',belly:'le ventre',arm:'la main',wheels:'la roue',tracks:'la chenille',legs:'la jambe'},
+ touchAsk:p=>`Touche ${p} !`,touchWrong:p=>`Ça, c’est ${p}. Cherche encore !`,touchOk:p=>`Oui, ${p} !`,
+ gar:{color:'🎨 Couleur',wheels:'🛞 Roues',ant:'📡 Antenne',arms:'🦾 Bras',eyes:'👀 Yeux'},
+ dance:'💃 Danse !',need:n=>`${n} ⭐`,needSay:n=>`Il te faut ${n} étoiles. Joue et ramasse des étoiles !`,cool:'Je suis trop beau !',
+ garIntro:'Choisis ma couleur et mes pièces ! De nouvelles pièces s’ouvrent quand tu gagnes des étoiles dans tous les jeux.'});
+S('rbg',{intro:'L’atelier des engrenages ! Le moteur rouge tourne. Ajoute des roues pour que le mouvement arrive jusqu’à la machine.',
+  t:['Le bateau a besoin de force ! Ajoute une roue qui relie le moteur à l’hélice.','L’horloge s’est arrêtée ! Remplis le trou avec deux roues.','La voiture doit aller vite ! Quelle roue mets-tu au bout ?','La grue doit soulever le lourd éléphant ! Quelle roue mets-tu au bout ?','Oh non, le bateau recule ! Ajoute ou enlève des roues pour qu’il avance.'],
+  why:['Bravo ! Le moteur fait tourner les roues, et les roues font tourner l’hélice du bateau.','Dans une horloge, des petites et des grandes roues se poussent et font bouger les aiguilles.','Une petite roue au bout tourne très vite. C’est comme ça que la voiture va vite ! Un vélo marche pareil.','La grande roue au bout tourne lentement, mais elle est très forte. C’est comme ça qu’une grue soulève des choses lourdes !','Chaque nouvelle roue change le sens. Maintenant, l’hélice pousse le bateau en avant !'],
+  noFit:'Ça ne rentre pas ! Essaie une autre taille.',gap:'Les roues ne se touchent pas encore.',noRoom:'Plus de place !',slow:'La voiture est trop lente. Essaie une roue plus petite au bout.',weak:'C’est trop lourd ! Essaie une roue plus grande au bout.',back:'Le bateau recule encore.',
+  undo:'↩ Enlever',sz:{S:'Petite',M:'Moyenne',L:'Grande'}});
+S('rbc',{zone:['🎨','Le labo des couleurs'],zoneSay:'Mélangeons les couleurs, comme de vrais scientifiques !',
+ col:{tubes:['🧪','Les éprouvettes'],shirts:['👕','La teinturerie des t-shirts'],guess:['🔮','Devine la couleur']},
+ n:{R:'rouge',Y:'jaune',B:'bleu',W:'blanc',K:'noir',orange:'orange',green:'vert',purple:'violet',pink:'rose',lblue:'bleu clair',brown:'marron',lgreen:'vert clair',grey:'gris'},
+ and:' et ',make:(a,c)=>`${a} donnent ${c} !`,
+ tubesIntro:'Mélange les couleurs des éprouvettes dans le bécher pour obtenir la couleur demandée. Touche une éprouvette pour verser !',
+ tubeTask:c=>`Fais du ${c} !`,more:c=>`Ajoute encore un peu de ${c}.`,extra:c=>`Tu as ajouté du ${c}, mais ça ne va pas. Vide le bécher et recommence !`,full:'Le bécher est plein ! Vide-le et recommence.',empty:'🫗 Vider',
+ shirtsIntro:'Bienvenue à la teinturerie ! Les clients veulent des t-shirts colorés. Mélange la peinture dans la bassine, puis touche le t-shirt pour le teindre.',
+ want:(c,o)=>`Je veux un t-shirt ${c}, comme ${o} !`,noPaint:'Mets d’abord de la peinture dans la bassine !',notMine:'Ce n’est pas ma couleur ! On le lave et on recommence.',thanks:'Merci ! Il est trop joli !',
+ guessIntro:'Quelle couleur obtient-on en mélangeant ? Devine !',guessQ:a=>`${a} donnent… ?`,guessNo:'Pas tout à fait. Regarde ce qui sort !',
+ obj:{orange:'une orange',green:'une grenouille',purple:'du raisin',pink:'une fleur',lblue:'le ciel',brown:'un ours',lgreen:'un kiwi',grey:'un éléphant'}});
+{ const r=L10N.rb[lg], c=L10N.rbc[lg]; r.zones.col=c.zone; r.zoneSay.col=c.zoneSay; r.col=c.col; }
+S('aq',{title:'🐠 Mes aquariums',main:'🌿 Aquarium',pred:'🦈 Bassin des prédateurs',close:'✖ Fermer',eatOn:'🐟➜🦈 Les prédateurs mangent : oui',eatOff:'🐟➜🦈 Les prédateurs mangent : non',
+  pantry:'Garde-manger',empty:'Attrape des lettres pour apporter des poissons et de la nourriture !',hungry:n=>`${n} poissons ont faim ! Attrape des lettres pour leur apporter à manger.`,hungry1:'Un poisson a faim ! Attrape des lettres pour lui apporter à manger.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)} : mangés par ${who}.`,nobody:f=>`Personne ici n’a faim de ${f}.`,full:'Repus !',hungryS:'Faim',happy:'Repu et content',
+  diet:'Mange :',size:['bébé','jeune','grand'],move2pred:'➜ 🦈 Bassin des prédateurs',move2main:'➜ 🌿 Aquarium',ok:'👍',
+  warn:n=>`Attention ! ${n} chasse les petits poissons. Mets-le dans le bassin des prédateurs !`,ate:(p,v)=>`${p} a mangé ${v} !`,got:(e,f)=>`Tu as attrapé ${f} pour les poissons ! ${e}`,newFish:n=>`Un nouveau poisson dans l’aquarium : ${n} !`,more:n=>`+${n} dans la rivière`,sated:'Les poissons sont repus ! Réessaie demain.',night:'🌙 Nuit',day:'☀️ Jour',nightSay:'Bonne nuit, les poissons ! La nuit, le silure part à la chasse.',daySay:'Bonjour, les poissons !',album:'📖 Album',albumT:'L’album des poissons',albumSay:(n,t)=>`Tu as trouvé ${n} espèces sur ${t}. Attrape des lettres pour les trouver toutes !`,dirty:'La vitre est sale ! Essuie-la avec ton doigt.',clean:'L’aquarium brille ! Les poissons sont contents !',come:'Regarde, ils viennent manger !'});
+
 })();
 </script>
 
@@ -3241,7 +3658,7 @@ en:{back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',
  dance:'💃 Dance!',need:n=>`${n} ⭐`,needSay:n=>`You need ${n} stars. Play and collect stars!`,cool:'I look great!',
  garIntro:'Choose my colour and parts! New parts open when you collect stars in all the games.'}
 };
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('rb',TX);
 
 /* ================= date + salvare ================= */
 let data={prog:{},look:{color:'orange',wheels:'wheels',ant:'ball',arms:'arms',eyes:'round'},all:false,hello:false};
@@ -3588,7 +4005,7 @@ const GL=[
  {m:'crane',start:[]},
  {m:'ship',start:['M'],dir:true}];
 function gears(){
-  stopAll(); view='gears'; setTop(false); back=zoneMech; curRestart=gears; const myGen=gen; const GT_=()=>GTX[lang]||GTX.ro;
+  stopAll(); view='gears'; setTop(false); back=zoneMech; curRestart=gears; const myGen=gen; const GT_=()=>TR('rbg',GTX);
   let ti=0, errs=0, busy=false, chain=[], a0=0, last=performance.now(), svg, mx=0, lift=0, okAt=0, dragM=null, said='';
   const F=frame(GT_().intro,5); F.bub.onclick=()=>sp(F.bub.textContent);
   const nT=r=>Math.max(5,Math.round(2*Math.PI*r/36));
@@ -4002,7 +4419,7 @@ en:{zone:['🎨','The colour lab'],zoneSay:'Let’s mix colours, like real scien
  guessIntro:'What colour do we get when we mix? Guess!',guessQ:a=>`${a} make…?`,guessNo:'Not quite. Look what comes out!',
  obj:{orange:'an orange',green:'a frog',purple:'grapes',pink:'a flower',lblue:'the sky',brown:'a bear',lgreen:'a kiwi',grey:'an elephant'}}};
 for(const l in CTX){ TX[l].zones.col=CTX[l].zone; TX[l].zoneSay.col=CTX[l].zoneSay; TX[l].col=CTX[l].col; }
-const C_=()=>CTX[lang]||CTX.ro;
+const C_=()=>TR('rbc',CTX);
 const PIGS={R:'#E5262B',Y:'#FFD21F',B:'#2A6FD6',W:'#FFFFFF',K:'#262626'};
 const RECIPES={orange:{R:1,Y:1},green:{Y:1,B:1},purple:{R:1,B:1},pink:{R:1,W:1},lblue:{B:1,W:1},brown:{R:1,Y:1,B:1},lgreen:{Y:2,B:1},grey:{W:1,K:1}};
 const OBJ={orange:'🍊',green:'🐸',purple:'🍇',pink:'🌸',lblue:'☁️',brown:'🐻',lgreen:'🥝',grey:'🐘'};
@@ -4245,7 +4662,7 @@ en:{title:'📐 World of shapes',back:'⬅ Back',hello:'Welcome to the world of 
  cmpQ:'Which path is longer?',blue:'🟦 Blue',orange:'🟧 Orange',same:'🟰 The same',cmpA:(a,b)=>`The blue path has ${a} steps, the orange one has ${b}.`,
  penQ:'How many pencils long is the log?',penA:n=>`It is ${n} pencils long!`,rugQ:'Which rug is bigger?',rugA:(a,b)=>`The blue rug has ${a} squares, the orange one has ${b}.`}
 };
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('gm',TX);
 
 /* ================= cadru ================= */
 let data={prog:{}}; try{ const d=JSON.parse(localStorage.getItem('gm_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
@@ -4497,7 +4914,7 @@ window.__gm={GEO,TAN,BASE,rotN,classify,area2,simple,clean};
 const NS_ID={n:0};
 const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-const L_=()=>({de:'de',en:'en'})[lang]||'ro';
+const L_=()=>({ro:'ro',de:'de',en:'en'})[lang]||lang;
 const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
 function snd(f,d,type,vol){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime; o.type=type||'sine'; o.frequency.value=f; g.gain.setValueAtTime(vol||.1,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.12)); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+(d||.12)+.03);}catch(e){} }
 const R=n=>Math.floor(Math.random()*n);
@@ -4522,7 +4939,9 @@ const SP={
   fact:['Țestoasa de apă își poartă casa în spinare.','Die Wasserschildkröte trägt ihr Haus auf dem Rücken.','The water turtle carries its house on its back.']},
  plev:{c:'#C9D3E0',d:'#8D99AB',f:'#AEB8C8',h:10,L:.6,sz:.45,food:1,n:['plevușca','die Laube','the minnow'],N:['Plevușcă','Laube','Minnow']}
 };
+window.__aqData=null;
 const FOOD={alg:{em:'🌿',n:['alge','Algen','algae']},worm:{em:'🪱',n:['viermi','Würmer','worms']},ins:{em:'🦟',n:['insecte','Insekten','insects']},plev:{em:'',n:['peștișori','kleine Fische','little fish']}};
+window.__aqData={SP,FOOD};
 const KINDS=Object.keys(SP).filter(k=>!SP[k].food);
 const TX={
  ro:{title:'🐠 Acvariile mele',main:'🌿 Acvariul',pred:'🦈 Bazinul răpitorilor',close:'✖ Închide',eatOn:'🐟➜🦈 Răpitorii mănâncă: DA',eatOff:'🐟➜🦈 Răpitorii mănâncă: NU',
@@ -4540,8 +4959,8 @@ const TX={
   eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)} are eaten by: ${who}.`,nobody:f=>`Nobody here is hungry for ${f}.`,full:'Full!',hungryS:'Hungry',happy:'Full and happy',
   diet:'Eats:',size:['baby','young','big'],move2pred:'➜ 🦈 Predator tank',move2main:'➜ 🌿 Aquarium',ok:'👍',
   warn:n=>`Careful! ${n} hunts the little fish. Move it to the predator tank!`,ate:(p,v)=>`${p} ate ${v}!`,got:(e,f)=>`You caught ${f} for the fish! ${e}`,newFish:n=>`A new fish in the aquarium: ${n}!`,more:n=>`+${n} in the river`,sated:'The fish are full! Try again tomorrow.',night:'🌙 Night',day:'☀️ Day',nightSay:'Good night, fish! At night the catfish goes hunting.',daySay:'Good morning, fish!',album:'📖 Album',albumT:'Fish album',albumSay:(n,t)=>`You found ${n} of ${t} species. Catch letters to find them all!`,dirty:'The glass is dirty! Wipe it with your finger.',clean:'The aquarium is sparkling! The fish are happy!',come:'Look, they are coming to eat!'}};
-const T=()=>TX[L_()];
-const li=()=>({ro:0,de:1,en:2})[L_()];
+const T=()=>TR('aq',TX);
+const li=()=>({ro:0,de:1,en:2})[L_()]??(((L10N.aq||{})[lang]||{}).li||2);
 
 /* ---------- desen pește ---------- */
 function body(s){ const L=s.L, h=s.h; const nose=s.snout?62*L:48*L; return `M ${nose} 0 C ${30*L} ${-h*1.25} ${-30*L} ${-h*1.1} ${-42*L} 0 C ${-30*L} ${h*1.1} ${30*L} ${h*1.25} ${nose} 0 Z`; }
@@ -4724,7 +5143,7 @@ window.RDAQ={open,close,add,pool,iconSVG,hungryCount,T:()=>T(),SP,fishSVG};
 .mw-blink{animation:rbAnt .5s infinite}
 </style>
 <div id="hm-root">
-  <div class="hm-head"><h1 id="hm-title"></h1><div class="hm-langs" id="hm-langs"><button data-l="ro">🇷🇴 RO</button><button data-l="de">🇩🇪 DE</button><button data-l="en">🇬🇧 EN</button></div><div class="ch-pill" id="hm-stars">⭐ 0</div></div>
+  <div class="hm-head"><h1 id="hm-title"></h1><div class="hm-langs" id="hm-langs"></div><div class="ch-pill" id="hm-stars">⭐ 0</div></div>
   <div class="hm-q" id="hm-q"></div>
   <div class="hm-grid" id="hm-grid"></div>
 </div>
@@ -4805,7 +5224,7 @@ en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'�
  ordUp:'Put the penguins in ascending order: from smallest to biggest. Make stairs that go up!',ordDown:'Put the penguins in descending order: from biggest to smallest. Make a slide!',
  ordOk:'Perfect! The order is right!',ordNo:'Oops, the order is not right here. Try again!',up:'🪜 Ascending',down:'🛝 Descending',
  boxQ:'How many apples are in the secret box? Put apples in the box until the scale is level!',boxQ100:'What number is in the secret box? Put apples in until the scale is level!',boxOk:(e)=>`The scale is level! ${e}`,heavyL:'The left side is heavier.',heavyR:'The right side is heavier.'}};
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('mw',TX);
 
 /* ================= date + cadru ================= */
 let data={prog:{},all:false}; try{ const d=JSON.parse(localStorage.getItem('mw_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
@@ -5005,15 +5424,15 @@ const $=id=>document.getElementById('hm-'+id), root=$('root');
 const HT={ro:{title:'Adunări cu Stele ⭐',q:'Ce jucăm azi?',math:'Matematică',world:'Lumea',read:'Citește',time:'Timpul',bday:'🎂 Ziua de naștere a copilului',pname:'🗣️ Cum să spună vocea „Pufi”? Atinge și ascultă:',psample:'Bună! Eu sunt Pufi.',shapes:'Forme',robo:'RoboPufi',chess:'Șah',pufi:'Pufi',par:'Părinți',home:'🏠 Acasă',voice:'Vocea',on:'🔊 Vocea: DA',off:'🔇 Vocea: NU',close:'✖ Închide',hello:'Ce jucăm azi? Alege un card!'},
  de:{title:'Rechnen mit Sternen ⭐',q:'Was spielen wir heute?',math:'Mathe',world:'Die Welt',read:'Lesen',time:'Die Zeit',bday:'🎂 Geburtstag des Kindes',pname:'🗣️ Wie soll die Stimme „Pufi“ sagen? Tippen und anhören:',psample:'Hallo! Ich bin Pufi.',shapes:'Formen',robo:'RoboPufi',chess:'Schach',pufi:'Pufi',par:'Eltern',home:'🏠 Start',voice:'Stimme',on:'🔊 Stimme: AN',off:'🔇 Stimme: AUS',close:'✖ Schließen',hello:'Was spielen wir heute? Such dir eine Karte aus!'},
  en:{title:'Counting with Stars ⭐',q:'What shall we play today?',math:'Maths',world:'The world',read:'Reading',time:'Time',bday:'🎂 Child’s birthday',pname:'🗣️ How should the voice say “Pufi”? Tap to listen:',psample:'Hello! I am Pufi.',shapes:'Shapes',robo:'RoboPufi',chess:'Chess',pufi:'Pufi',par:'Parents',home:'🏠 Home',voice:'Voice',on:'🔊 Voice: ON',off:'🔇 Voice: OFF',close:'✖ Close',hello:'What shall we play today? Pick a card!'}};
-const H=()=>HT[lang]||HT.ro;
+const H=()=>TR('hm',HT);
 /* pronunția numelui „Pufi”: părintele alege varianta care sună bine pe dispozitivul lui */
-function pufiVar(){ return {ro:'Pu-fi',de:'Pufi',en:'Poofy'}[lang]||'Pufi'; }
+function pufiVar(){ return {ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',it:'Pufi',es:'Pufi',pt:'Pufi',nl:'Poefie',pl:'Pufi',hu:'Pufi',uk:'Пуфі',ru:'Пуфи'}[lang]||'Pufi'; }
 try{ if(window.speechSynthesis&&!speechSynthesis.__pufi){ const _sp=speechSynthesis.speak.bind(speechSynthesis); speechSynthesis.speak=u=>{ try{ const v=pufiVar(); if(u&&u.text&&v!=='Pufi') u.text=u.text.replace(/Pufi(?=s?\b)/g,v); }catch(e){} return _sp(u); }; speechSynthesis.__pufi=1; } }catch(e){}
 const CARDS=[['math','🔢','#FFE9A8'],['world','🌍','#CDEBFF'],['read','📖','#FFD9E2'],['time','⏳','#D8F3E3'],['shapes','📐','#FFE6C2'],['robo','🤖','#D9E4FF'],['chess','♟️','#E6E9F2'],['pufi','🦊','#FFE0C7'],['par','⚙️','#EEEEEE']];
 let mainReturn='home';
 function ensureStart(){ if(typeof started!=='undefined'&&!started){ started=true; const s=document.getElementById('start'); if(s) s.hidden=true; try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
 function render(){ $('title').textContent=H().title; $('q').textContent=H().q; $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0);
-  document.querySelectorAll('#hm-langs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lang));
+  paintLangs();
   const g=$('grid'); g.innerHTML=''; CARDS.forEach(([k,ic,bg])=>{ const c=document.createElement('button'); c.className='hm-card'; c.style.background=bg; c.innerHTML=`<span class="ic">${ic}</span><span class="t">${H()[k]}</span>`; c.onclick=()=>openCard(k); g.appendChild(c); });
   const hb=document.getElementById('gHome'); if(hb) hb.textContent=H().home; }
 function openCard(k){ ensureStart(); try{ if(synth) synth.cancel(); }catch(e){}
@@ -5035,7 +5454,11 @@ function parents(){ const ov=document.createElement('div'); ov.className='hm-par
   const bl=document.createElement('div'); bl.textContent=H().bday; bl.style.fontWeight='800'; box.appendChild(bl); const bi=document.createElement('input'); bi.type='date'; bi.style.cssText='font:inherit;font-size:1.1rem;padding:6px;border-radius:12px;border:2px solid #24325F'; try{ bi.value=localStorage.getItem('tm_bday')||''; }catch(e){} bi.onchange=()=>{ try{ localStorage.setItem('tm_bday',bi.value); }catch(e){} }; box.appendChild(bi);
   const cb=document.createElement('button'); cb.className='rb-b go'; cb.textContent=H().close; cb.onclick=()=>{ if(v) ph.replaceWith(v); ov.remove(); }; box.appendChild(cb);
   root.appendChild(ov); if(window.__parentsExtra) window.__parentsExtra(box); }
-document.querySelectorAll('#hm-langs button').forEach(b=>b.onclick=()=>{ const t=document.querySelector(`.langs button[data-lang="${b.dataset.l}"]`); if(t) t.click(); else lang=b.dataset.l; render(); try{ pickVoice(); }catch(e){} });
+function paintLangs(){ const box=$('langs'); const cur=LANG_ALL.find(x=>x[0]===lang)||LANG_ALL[0]; box.innerHTML=''; const b=document.createElement('button'); b.textContent=cur[1]+' '+cur[2]+' ▾'; b.setAttribute('aria-pressed','true'); b.onclick=langPicker; box.appendChild(b); }
+function langPicker(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); box.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-width:640px;width:92%'; ov.appendChild(box);
+  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='rb-b'+(c===lang?' go':''); b.style.fontSize='1.2rem'; b.textContent=f+' '+n; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
+function setAppLang(c){ if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
 /* buton Acasă în pagina principală */
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gHome')){ const b=document.createElement('button'); b.id='gHome'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} if(mainReturn==='math'&&window.openMath){ window.openMath(); root.hidden=false; } else root.hidden=false; render(); }; tabs.insertBefore(b,tabs.firstChild); } }catch(e){}
 /* la pornire nu mai începe matematica: ecranul cu carduri e primul */
@@ -5177,7 +5600,7 @@ const TX={
   cant:n=>`${n} cannot go there.`, kingBad:'Then your king would be in check!', notYours:"That is the other player's piece.",
   danger:'Careful! The piece with the red circle can be taken.' }
 };
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('cg',TX);
 const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const sp=t=>{ try{ return (typeof say==='function')?say(t):null; }catch(e){} };
 
@@ -5669,7 +6092,7 @@ en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 
  sortTask:'Which season do we use this in? Put it in the right basket!'}
 };
 function ord(n){ return (n%100>=11&&n%100<=13)?'th':['th','st','nd','rd'][n%10]||'th'; }
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('tm',TX);
 const tSay=(h,m)=>X().time(h,m);
 const tShort=(h,m)=>(X().short||X().time)(h,m);
 const digi=(t,h24)=>{ const h=Math.floor(t/60)%24, m=t%60; return `${h24?h:h12(h)}:${String(m).padStart(2,'0')}`; };
@@ -6148,7 +6571,7 @@ en:{title:"Pufi's Adventure",sub:'Pick a world! Collect stars and the 3 rainbow 
  secret:'A secret room!', allDone:'You finished all the worlds! You are a champion!',
  signs:{move:'Walk with the arrows and jump with the yellow button!',box:'Bump the question box with your head!',stomp:'Jump on the snail! Then kick the shell.',grow:'The star makes you big! When you are big you can break bricks.',pipe:'Stand on the pipe and press the down arrow! There is a secret room.',hog:'The hedgehog is spiky! Don’t jump on it, go around it.',spring:'Jump on the trampoline to fly high!',flag:'Touch the flag! If you get hurt, you continue from here.',goal:'Jump as high as you can on the goal flag!',bee:'The bees fly up and down. Jump on them!',lava:'Watch out for the lava! Use the platforms.',fish:'The fish jump out of the water! Wait, then go.'}}
 };
-const X=()=>TX[lang]||TX.ro;
+const X=()=>TR('pq',TX);
 let muted=false; try{ muted=localStorage.getItem('pq_mute')==='1'; }catch(e){}
 const sp=t=>{ if(muted) return; try{ if(typeof say==='function') say(t); }catch(e){} };
 let ac=null;
@@ -6486,8 +6909,8 @@ const NT={ro:{recT:'🎙️ Vocea părintelui',recH:'Înregistrează laude cu vo
  en:{recT:'🎙️ Parent’s voice',recH:'Record praise in your own voice. Your child hears it after a success.',slot:i=>`Praise ${i}`,rec:'⏺ Record',stop:'⏹ Done',play:'▶',del:'🗑',
    buyT:'💎 Full version',buy:p=>`Unlock everything ${p||''}`,restore:'Restore purchases',owned:'✅ You have the full version. Thank you!',voice:q=>`Voice: ${q}`,
    mic:'🎤 I read aloud',micHint:'Read out loud! Every word you read turns green. If you don’t know a word, tap it.',micNo:'The microphone is not available. Try “I read myself”.',listenMe:'🔊 Listen to yourself',micRead:n=>`You read ${n} words by yourself!`,listening:'Listening…'}};
-const Y=()=>NT[lang]||NT.en;
-const PUFI={ro:'Pu-fi',de:'Pufi',en:'Poofy'};
+const Y=()=>TR('nt',NT);
+const PUFI={ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',nl:'Poefie',uk:'Пуфі',ru:'Пуфи'};
 window.__micLabel=()=>Y().mic; window.__premium=false; N.call('iap.status').then(v=>{ window.__premium=!!v; });
 let recs=[]; const refreshRecs=()=>N.call('rec.list').then(l=>{ recs=Array.isArray(l)?l:[]; }); refreshRecs();
 
@@ -6552,6 +6975,20 @@ const snap=()=>{ const o={}; try{ for(let k=0;k<localStorage.length;k++){ const 
 N.call('store.get').then(s=>{ try{ if(s&&localStorage.length<2){ const o=JSON.parse(s); const keys=Object.keys(o); if(keys.length>1){ keys.forEach(k=>localStorage.setItem(k,o[k])); location.reload(); } } }catch(e){} });
 setInterval(()=>N.call('store.set',{snapshot:snap()}),20000); document.addEventListener('visibilitychange',()=>{ if(document.hidden) N.call('store.set',{snapshot:snap()}); });
 })();
+</script>
+<script>
+/* Français — date din modulele încărcate după pachete (acvariu) */
+(()=>{ const lg='fr';
+const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
+  const NM={caras:['le carassin','Carassin','Le carassin est un poisson doré et calme. Il aime les plantes et les vers.'],crap:['la carpe','Carpe','La carpe a de petites moustaches pour chercher à manger dans la vase.'],pastrav:['la truite','Truite','La truite vit dans les ruisseaux froids des montagnes. Elle a des points noirs et une bande rose.'],biban:['la perche','Perche','La perche a des rayures sur le dos et des nageoires rouges. Elle chasse les petits poissons.'],somn:['le silure','Silure','Le silure a de longues moustaches et mange presque tout. Il chasse la nuit.'],stiuca:['le brochet','Brochet','Le brochet est le grand chasseur des rivières. Il se cache et attaque très vite !'],rac:['l’écrevisse','Écrevisse','L’écrevisse a des pinces et marche à reculons. Elle nettoie le fond.'],testoasa:['la tortue','Tortue','La tortue d’eau porte sa maison sur son dos.'],plev:['le vairon','Vairon','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'des algues',worm:'des vers',ins:'des insectes',plev:'des petits poissons'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k]; }
+})();
+</script>
+<style>.langs{display:none!important}</style>
+<script>
+/* după încărcarea pachetelor de limbă: reaplică textele paginii principale */
+try{ if(typeof applyLang==='function') applyLang(); }catch(e){}
 </script>
 
 </body>
