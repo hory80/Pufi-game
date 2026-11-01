@@ -3025,6 +3025,389 @@ add('ç','c',ced); add('ő','o',...da); add('ű','u',...da); add('ą','a',og); a
 </script>
 
 <script>
+/* ===== Español — juego principal, mundo, monumentos, futbolistas ===== */
+(()=>{ const lg='es', IDX=8;
+L10N.main=L10N.main||{};
+L10N.main[lg]={ code:'es', speech:'es-ES', title:'Cuenta estrellas ⭐', start:'▶ ¡Vamos!', i:IDX,
+  gNum:'🔢 Números', gFlag:'🚩 Banderas', gAb:'🧮 Ábaco',
+  sbShow:'👆 Muestra', sbAdd:'➕ Suma', sbTen:'🍒 Haz 10', tens:'Decenas', ones:'Unidades', check:'✔ Listo',
+  sbHint:'La bolita roja de arriba vale 5. Cada bolita amarilla de abajo vale 1.',
+  showSay:n=>`Muestra el número ${n} en el ábaco.`, showTxt:n=>`Muestra: <b>${n}</b>`, showRight:n=>`¡Sí! Es ${n}.`,
+  showWrong:(v,n)=>`El ábaco muestra ${v}. Buscamos ${n}.`,
+  addSay:(a,b)=>`El ábaco muestra ${a}. Suma ${b}. ¿Cuánto es?`, addWrong:v=>`El ábaco muestra ${v}. ¡Inténtalo otra vez!`,
+  tenQ1:a=>`¿Cuánto le falta a ${a} para llegar a 10?`,
+  tenR1:(a,n,b,r)=>`¡Sí! ${a} más ${n} son 10. Partimos ${b} en ${n} y ${r}.`,
+  tenQ2:r=>`Ahora: 10 más ${r}. ¿Cuánto es?`, tenWin:(a,b,v)=>`${a} más ${b} son ${v}.`, easy:'Fácil', all:'Todos los países',
+  add:'➕ Sumar', sub:'➖ Restar', mix:'🔀 Mezcla', upto:n=>`hasta ${n}`,
+  plus:'más', minus:'menos', q:(a,s,b)=>`¿Cuánto es ${a} ${s} ${b}?`, res:(a,s,b,v)=>`${a} ${s} ${b} son ${v}.`,
+  msgAdd:'¿Cuántos hay en total?', msgSub:n=>`${n} se ${n===1?'va':'van'}. ¿Cuántos quedan?`,
+  findSay:n=>`¡Busca la bandera: ${n}!`, findShow:n=>`Busca: <b>${n}</b>`,
+  flagRight:n=>`¡Sí! Es ${n}.`, flagWrong:(x,n)=>`Esa es ${x}. ¡Busca ${n}!`, flagTry:'¡Sigue buscando! 🔍',
+  cont:{eu:'Europa',as:'Asia',af:'África',na:'América del Norte',sa:'América del Sur',oc:'Oceanía'},
+  where:(n,c)=>`${n.charAt(0).toUpperCase()+n.slice(1)} está en ${c}.`, capSay:k=>`La capital es ${k}.`, capLbl:'Capital', sightSay:x=>`Allí hay ${x}.`, nextBtn:'▶ Siguiente',
+  praise:['¡Muy bien!','¡Súper!','¡Excelente!','¡Genial!','¡Perfecto!','¡Fantástico!'],
+  bigMsg:'🏅 ¡Has ganado 10 estrellas!', bigSay:'¡Has ganado diez estrellas! ¡Eres un campeón!',
+  tryMsg:'¡Inténtalo otra vez! Cuenta de nuevo 🙂', wrongSay:v=>`No es ${v}. ¡Inténtalo otra vez!`,
+  listen:'🔊 Escuchar', on:'🗣️ Voz: sí', off:'🔇 Voz: no', defVoice:'Voz predeterminada',
+  sample:'¡Hola! Así suena mi voz.', hello:'¡A jugar! ', names:/monica|mónica|jorge|paulina|marisol|diego/ };
+L10N.misc=L10N.misc||{}; L10N.misc[lg]={playGame:'Jugar una partida',vsRobot:'contra el robot o un amigo',newB:'NUEVO'};
+L10N.mon=L10N.mon||{}; L10N.mon[lg]={tap:'¡Toca una imagen para saber más!',close:'✖ Cerrar',listen:'🔊 Escuchar',play:'🎵 Escuchar el himno',stop:'⏹ Parar el himno',photo:'Foto'};
+L10N.fb=L10N.fb||{}; L10N.fb[lg]={btn:'⚽ Futbolistas',title:n=>`⚽ Futbolistas famosos: ${n}`,say:n=>`¡Estos son los futbolistas más famosos de este país: ${n}! Toca a un jugador para saber más.`};
+const NAMES={CH:'Suiza',RO:'Rumanía',DE:'Alemania',FR:'Francia',IT:'Italia',AT:'Austria',ES:'España',GB:'el Reino Unido',US:'Estados Unidos',JP:'Japón',BR:'Brasil',CA:'Canadá',GR:'Grecia',PT:'Portugal',NL:'los Países Bajos',SE:'Suecia',NO:'Noruega',TR:'Turquía',IN:'la India',AU:'Australia',MX:'México',AR:'Argentina',PL:'Polonia',UA:'Ucrania',BE:'Bélgica',DK:'Dinamarca',KR:'Corea del Sur',EG:'Egipto',IE:'Irlanda',HR:'Croacia',FI:'Finlandia',HU:'Hungría',MD:'Moldavia',CN:'China',ZA:'Sudáfrica',IS:'Islandia'};
+COUNTRIES.forEach(c=>{ c[IDX]=NAMES[c[3]]||c[5]; });
+const CAPS_L={CH:'Berna',RO:'Bucarest',DE:'Berlín',FR:'París',IT:'Roma',AT:'Viena',ES:'Madrid',GB:'Londres',US:'Washington',JP:'Tokio',BR:'Brasilia',CA:'Ottawa',GR:'Atenas',PT:'Lisboa',NL:'Ámsterdam',SE:'Estocolmo',NO:'Oslo',TR:'Ankara',IN:'Nueva Delhi',AU:'Canberra',MX:'Ciudad de México',AR:'Buenos Aires',PL:'Varsovia',UA:'Kiev',BE:'Bruselas',DK:'Copenhague',KR:'Seúl',EG:'El Cairo',IE:'Dublín',HR:'Zagreb',FI:'Helsinki',HU:'Budapest',MD:'Chisináu',CN:'Pekín',ZA:'Pretoria',IS:'Reikiavik'};
+for(const k in CAPS) CAPS[k][IDX-1]=CAPS_L[k]||CAPS[k][4];
+const SIGHT={CH:'los Alpes, el queso y el chocolate',RO:'el castillo de Bran, los Cárpatos y los osos',DE:'castillos, pretzels y coches',FR:'la torre Eiffel, los cruasanes y el queso',IT:'la pizza, el Coliseo y la pasta',AT:'la música, las montañas y las tartas',ES:'el flamenco, el sol y la paella',GB:'los guardias reales, el London Eye y el té',US:'la Estatua de la Libertad, el fútbol americano y los perritos calientes',JP:'el monte Fuji, el sushi y los cerezos en flor',BR:'el fútbol, los loros y la selva amazónica',CA:'las hojas de arce, los osos polares y el hockey sobre hielo',GR:'templos antiguos, aceitunas y el mar',PT:'el océano, el pescado y los tranvías amarillos',NL:'los tulipanes, las bicicletas y los molinos de viento',SE:'los alces, la nieve y las casas rojas',NO:'las ballenas, los fiordos y la aurora boreal',TR:'las mezquitas, el té y los globos aerostáticos',IN:'los elefantes, el Taj Mahal y la comida picante',AU:'los canguros, los koalas y el surf',MX:'los tacos, los cactus y las fiestas',AR:'el tango, la carne asada y el fútbol',PL:'castillos, empanadillas y el invierno',UA:'los girasoles, el trigo y las empanadillas',BE:'el chocolate, los gofres y las patatas fritas',DK:'el Lego, la Sirenita y las bicicletas',KR:'palacios, fideos y música',EG:'los camellos, las pirámides y el desierto',IE:'los tréboles, las ovejas y la lluvia',HR:'el mar, los barcos y los castillos',FI:'Papá Noel, la nieve y las saunas',HU:'castillos, el pimentón y los baños termales',MD:'las uvas, los huertos y los girasoles',CN:'los pandas, la Gran Muralla y los palillos',ZA:'los leones, las jirafas y los elefantes',IS:'los volcanes, el hielo y los caballitos'};
+for(const k in SIGHTS) SIGHTS[k][IDX]=SIGHT[k]||SIGHTS[k][5];
+const MONT={
+CH:[['El Cervino','El Cervino es una montaña altísima con la cima en punta, como un triángulo. ¡Mide casi 4.500 metros!'],['El Glacier Express','Un tren rojo que cruza puentes muy altos y pasa entre las montañas. ¡Lo llaman el tren expreso más lento del mundo!'],['El chorro de agua de Ginebra','¡Una fuente gigante en el lago de Ginebra que lanza el agua a 140 metros de altura, tan alta como un rascacielos!']],
+RO:[['El castillo de Bran','Un castillo en una colina. Dicen que es el castillo de Drácula, el vampiro de los cuentos.'],['Los monasterios pintados de Bucovina','Iglesias antiguas pintadas también por fuera, con santos e historias. El monasterio de Voroneț tiene un azul famoso en todo el mundo.'],['El delta del Danubio','Aquí el Danubio llega al mar Negro. ¡Viven miles de pájaros, hasta pelícanos!']],
+DE:[['El castillo de Neuschwanstein','Un castillo de cuento construido por un rey que soñaba con caballeros. Inspiró los castillos de las películas de princesas.'],['La Puerta de Brandeburgo','Una gran puerta en Berlín con un carro tirado por cuatro caballos encima. Es el símbolo de una Alemania unida.'],['La catedral de Colonia','Una catedral enorme con dos torres altísimas. ¡Tardaron más de 600 años en construirla!']],
+FR:[['La torre Eiffel','Una torre de hierro en París de más de 300 metros de altura. ¡De noche brilla con miles de luces!'],['El Louvre','El museo más visitado del mundo, con una pirámide de cristal en la entrada. Aquí está el cuadro de la Mona Lisa.'],['El Mont-Saint-Michel','Una abadía en una isla pequeña. Con la marea alta, el mar la rodea. Con la marea baja, se puede llegar andando.']],
+IT:[['El Coliseo','Un estadio gigante en Roma, de casi 2.000 años. Miles de personas venían aquí a ver espectáculos.'],['La torre de Pisa','Una torre que se inclina porque el suelo de abajo es blando. ¡En las fotos, los turistas hacen como que la sujetan!'],['Venecia','Una ciudad construida sobre el agua, con canales en vez de calles. La gente va en barcas llamadas góndolas.']],
+AT:[['El palacio de Schönbrunn','Un palacio enorme en Viena con más de 1.000 habitaciones y el zoo más antiguo del mundo.'],['La casa natal de Mozart','La casa amarilla de Salzburgo donde nació Mozart. ¡Ya escribía música con 5 años!'],['El Grossglockner','La montaña más alta de Austria, con un gran glaciar a sus pies.']],
+ES:[['La Sagrada Família','Una iglesia gigante en Barcelona con torres como castillos de arena. ¡La están construyendo desde hace más de 140 años!'],['La Alhambra','Un palacio antiguo en Granada con jardines, fuentes y paredes decoradas como encaje.'],['El Park Güell','Un parque de colores en Barcelona con un lagarto hecho de trocitos de azulejo y bancos ondulados.']],
+GB:[['El Big Ben','Una gran torre con reloj en Londres. Su campana gigante se llama Big Ben.'],['Stonehenge','Un círculo de piedras gigantes colocadas hace casi 5.000 años. ¡Nadie sabe seguro por qué!'],['El palacio de Buckingham','La casa del rey británico en Londres. Delante hay guardias con altos sombreros negros.']],
+US:[['La Estatua de la Libertad','Una estatua verde gigante en Nueva York que sostiene una antorcha. Fue un regalo de Francia.'],['El Gran Cañón','Un valle enorme y profundo excavado por un río durante millones de años. Las rocas son rojas y naranjas.'],['El puente Golden Gate','Un puente rojo larguísimo en San Francisco. La niebla a menudo esconde la mitad.']],
+JP:[['El monte Fuji','Un volcán con nieve en la cima, la montaña más alta de Japón.'],['El santuario Fushimi Inari','Un lugar sagrado en Kioto con miles de puertas naranjas, una detrás de otra, como un túnel que sube la montaña.'],['El castillo de Himeji','Un castillo blanco llamado castillo de la Garza Blanca, porque parece un pájaro que echa a volar.']],
+BR:[['El Cristo Redentor','Una estatua gigante con los brazos abiertos sobre una montaña encima de Río de Janeiro.'],['La selva amazónica','La selva tropical más grande del mundo. Viven jaguares, loros y monos.'],['Las cataratas del Iguazú','Cientos de cascadas una al lado de otra en la frontera con Argentina. ¡El agua ruge como un trueno!']],
+CA:[['Las cataratas del Niágara','Cascadas gigantes entre Canadá y Estados Unidos. ¡Puedes acercarte en barco y mojarte entero!'],['Las Montañas Rocosas','Montañas altas con lagos turquesa, donde viven osos y alces.'],['La Torre CN','Una torre altísima en Toronto con el suelo de cristal: ves la ciudad bajo tus pies.']],
+GR:[['La Acrópolis','Una colina en Atenas con templos de mármol de 2.500 años. El más famoso es el Partenón.'],['Santorini','Una isla con casas blancas y tejados azules, construida en el borde de un volcán.'],['Olimpia','El lugar donde empezaron los Juegos Olímpicos, hace casi 3.000 años.']],
+PT:[['La torre de Belém','Una torre como un castillito a la orilla del río en Lisboa. Desde aquí salían los marineros a descubrir el mundo.'],['El tranvía 28 de Lisboa','Un viejo tranvía amarillo que sube y baja por calles muy estrechas.'],['El palacio da Pena','Un palacio rojo y amarillo de muchos colores en lo alto de una colina en Sintra. Parece un castillo de dibujos animados.']],
+NL:[['Los molinos de Kinderdijk','19 molinos de viento antiguos en fila. Sacaban el agua de los campos para que la tierra no se inundara.'],['Los jardines de Keukenhof','Un jardín enorme con millones de tulipanes de todos los colores que florecen en primavera.'],['Los canales de Ámsterdam','¡Una ciudad con muchos canales y puentes, donde hay más bicicletas que personas!']],
+SE:[['El casco antiguo de Estocolmo','Callejuelas antiguas y casas de colores en una isla. ¡Estocolmo está construida sobre 14 islas!'],['El hotel de hielo','¡Un hotel hecho todo de hielo y nieve, hasta las camas! En primavera se derrite y cada invierno lo vuelven a construir.'],['El museo Vasa','Un viejo barco de madera que se hundió hace casi 400 años y lo sacaron del mar casi entero.']],
+NO:[['Los fiordos','Brazos de mar largos y estrechos entre montañas altísimas, con cascadas que caen directamente al agua.'],['La aurora boreal','Luces verdes y moradas que bailan en el cielo en invierno, en el norte de Noruega.'],['La iglesia de madera de Borgund','Una iglesia de madera de casi 850 años, con cabezas de dragón en los tejados.']],
+TR:[['Santa Sofía','Un edificio enorme en Estambul con una cúpula gigantesca, de casi 1.500 años.'],['La Capadocia','Una tierra de rocas con forma de chimenea. Por la mañana, cientos de globos flotan sobre ellas.'],['Pamukkale','Terrazas blancas como la nieve llenas de agua caliente turquesa. ¡Pero no es nieve, es piedra!']],
+IN:[['El Taj Mahal','Un edificio de mármol blanco que un emperador construyó por amor a su esposa.'],['Los tigres de Bengala','En los bosques de la India viven tigres con rayas naranjas y negras. ¡Cada tigre tiene rayas diferentes!'],['El Fuerte Rojo','Una gran fortaleza de piedra roja en Delhi, donde vivían los emperadores.']],
+AU:[['La Ópera de Sídney','Un edificio blanco con tejados como velas, justo al lado del mar.'],['Uluru','Una roca roja gigante en medio del desierto. ¡Cambia de color al atardecer!'],['La Gran Barrera de Coral','El arrecife de coral más grande del mundo, tan grande que se ve desde el espacio. Nadan peces de colores y tortugas.']],
+MX:[['Chichén Itzá','Una pirámide escalonada construida por los mayas. ¡Si aplaudes delante, el eco suena como un pájaro!'],['La Pirámide del Sol','Una pirámide gigante en una ciudad antiquísima llamada Teotihuacan. Puedes subir cientos de escalones hasta arriba.'],['Los cenotes','Lagos escondidos dentro de cuevas, con agua azul y transparente donde se puede nadar.']],
+AR:[['El glaciar Perito Moreno','Un glaciar gigante que sigue creciendo. ¡De vez en cuando caen enormes bloques de hielo al lago con mucho ruido!'],['El tango en Buenos Aires','El tango es un baile inventado aquí. Se baila hasta en las calles del colorido barrio de La Boca.'],['Los pingüinos de la Patagonia','Miles de pingüinos viven en las playas del sur y caminan balanceándose hasta el mar.']],
+PL:[['El castillo de Wawel','Un castillo en Cracovia. La leyenda dice que debajo vivía un dragón, ¡y hoy hay una estatua de dragón que echa fuego de verdad!'],['La mina de sal de Wieliczka','¡Una mina de sal bajo tierra con una iglesia entera tallada en sal, hasta las lámparas!'],['El casco antiguo de Varsovia','Casas de colores alrededor de una plaza, con una estatua de sirena que protege la ciudad.']],
+UA:[['El monasterio de las Cuevas de Kiev','Un monasterio con cúpulas doradas y cuevas bajo tierra donde vivían monjes.'],['El túnel del amor','Una vía de tren en el bosque donde los árboles han formado un túnel verde.'],['Los campos de girasoles','En verano, campos enteros se vuelven amarillos. El girasol es la flor nacional de Ucrania.']],
+BE:[['El Atomium','Un edificio raro en Bruselas hecho de nueve bolas grandes de metal, como un átomo gigante.'],['La Grand-Place','Una plaza en Bruselas con edificios dorados. Cada dos años se cubre con una alfombra de flores.'],['El chocolate belga','Bélgica es famosa por su chocolate. ¡Los bombones rellenos llamados pralinés se inventaron aquí!']],
+DK:[['La Sirenita','Una estatua pequeña sobre una roca en Copenhague, basada en el cuento de Hans Christian Andersen.'],['Legoland','¡El Lego se inventó en Dinamarca! En Legoland se ven ciudades enteras hechas con piezas de Lego.'],['Nyhavn','Un puerto con casas de colores como caramelos y viejos barcos de madera.']],
+KR:[['El palacio Gyeongbokgung','Un palacio real en Seúl donde los guardias llevan trajes de colores como antiguamente.'],['La isla de Jeju','Una isla creada por un volcán, con playas, cascadas y estatuas de piedra sonrientes.'],['La N Seoul Tower','Una torre en una montaña en medio de la ciudad. Allí se cuelgan candados de colores de la amistad.']],
+EG:[['Las pirámides de Guiza','Tumbas gigantes para los faraones, construidas hace 4.500 años con millones de bloques de piedra.'],['La Gran Esfinge','Una estatua gigante con cuerpo de león y cabeza de persona que vigila las pirámides.'],['El Valle de los Reyes','Un valle donde enterraban a los faraones en tumbas escondidas dentro de la montaña. Aquí encontraron el tesoro de Tutankamón.']],
+IE:[['Los acantilados de Moher','Acantilados gigantes que caen rectos al océano. Allí anidan los frailecillos de pico colorido.'],['El castillo de Blarney','Un castillo con una piedra mágica: la leyenda dice que quien la besa sabrá hablar muy bien.'],['El día de San Patricio','Una fiesta con desfiles en la que todos se visten de verde y llevan tréboles.']],
+HR:[['Dubrovnik','Una ciudad antigua rodeada de murallas gruesas por las que puedes pasear, junto al mar.'],['Los lagos de Plitvice','16 lagos turquesa unidos por cascadas, con caminos de madera sobre el agua.'],['Los dálmatas','Los perros dálmatas con manchas se llaman así por Dalmacia, una región de Croacia.']],
+FI:[['La aldea de Papá Noel','En Rovaniemi, en el Círculo Polar Ártico, hay una aldea donde puedes ver a Papá Noel todo el año.'],['Los renos de Laponia','En el norte de Finlandia viven muchos renos. Tiran de trineos por la nieve.'],['El país de los mil lagos','¡Finlandia tiene más de 180.000 lagos! Por eso la llaman el país de los mil lagos.']],
+HU:[['El Parlamento húngaro','Un edificio enorme y precioso junto al Danubio que de noche brilla como el oro.'],['Los baños Széchenyi','Piscinas de agua caliente que sale de debajo de la tierra. ¡En invierno hasta se juega al ajedrez en el agua!'],['El Bastión de los Pescadores','Una muralla con siete torres blancas como tiendas de campaña, desde donde se ve toda la ciudad.']],
+MD:[['Orheiul Vechi','Un monasterio excavado en una roca sobre un río que hace una gran curva.'],['La fortaleza de Soroca','Una fortaleza redonda de piedra junto al río Dniéster, empezada por Esteban el Grande.'],['Huertos y viñedos','Moldavia tiene una tierra muy rica donde crecen uvas, manzanas y nueces.']],
+CN:[['La Gran Muralla china','Un muro larguísimo construido para proteger China. ¡Mide miles de kilómetros!'],['Los pandas gigantes','Los pandas gigantes viven en las montañas de China y comen bambú casi todo el día.'],['La Ciudad Prohibida','Un palacio enorme en Pekín con tejados amarillos. Hace mucho tiempo, solo el emperador y su gente podían entrar.']],
+ZA:[['La Montaña de la Mesa','Una montaña con la cima plana como una mesa sobre Ciudad del Cabo. ¡A veces una nube se posa encima como un mantel!'],['El parque Kruger','Un parque enorme donde ves leones, elefantes, jirafas y cebras en libertad.'],['La playa de Boulders','Una playa donde los pingüinos africanos pasean entre la gente.']],
+IS:[['Los volcanes de Islandia','Islandia tiene más de 30 volcanes activos. ¡A veces se ve correr lava roja!'],['El géiser Strokkur','Una fuente caliente que lanza agua al aire cada pocos minutos, como una fuente de la naturaleza.'],['La cascada Skógafoss','Una gran cascada blanca. ¡Los días de sol casi siempre se ve un arcoíris en sus gotitas!']]};
+for(const k in MONT) (MON[k]||[]).forEach((m,i)=>{ if(MONT[k][i]) (m._t=m._t||{})[lg]=MONT[k][i]; });
+const FBT={
+CH:['Bajito pero rapidísimo, famoso por sus goles espectaculares con Suiza.','Centrocampista y capitán de Suiza, con más de 100 partidos con la selección.','Un portero que paró muchos penaltis importantes, incluso en la Eurocopa.'],
+RO:['Apodado «el Rey», fue el mejor futbolista rumano, con una zurda mágica.','Un delantero que marcó muchos goles con Rumanía y jugó en Italia e Inglaterra.','Un defensa fuerte, capitán del Barcelona, que jugó tres Mundiales.'],
+DE:['Llamado «el Káiser», ganó el Mundial como jugador y como entrenador.','Uno de los mayores goleadores de la historia, campeón del mundo en 1974.','Un portero que sale a menudo como un defensa. Campeón del mundo en 2014.'],
+FR:['Un jugador muy elegante que llevó a Francia a ganar el Mundial de 1998.','Uno de los futbolistas más rápidos del mundo. Campeón del mundo en 2018.','Un delantero elegante que marcó muchos goles con Francia y el Arsenal.'],
+IT:['Famoso por su coleta y sus goles preciosos, lo llamaban «la Divina Coleta».','Un defensa legendario que jugó más de 900 partidos con el AC Milan.','Un portero legendario, campeón del mundo en 2006, que jugó hasta los 45 años.'],
+AT:['Puede jugar en muchas posiciones y ha ganado varias veces la Champions League.','Marcó los goles que ganaron a Alemania en el Mundial de 1978.','Un delantero potente y uno de los máximos goleadores de la historia de Austria.'],
+ES:['Marcó el gol que le dio a España el Mundial de 2010.','Un defensa y capitán, campeón del mundo en 2010, que marcaba muchos goles de cabeza.','Un talento muy joven: ganó la Eurocopa de 2024 con solo 17 años.'],
+GB:['Ganó el Mundial con Inglaterra en 1966 y era famoso por sus disparos potentes.','Famoso por sus tiros libres que giraban como un plátano.','El máximo goleador de la historia de la selección de Inglaterra.'],
+US:['Apodado «Capitán América», es la estrella de la selección de Estados Unidos.','Uno de los máximos goleadores de la historia de la selección estadounidense.','Una delantera que ganó dos veces el Mundial femenino con Estados Unidos.'],
+JP:['Una de las primeras grandes estrellas japonesas en brillar en Europa, en Italia.','La capitana que llevó a Japón a ganar el Mundial femenino de 2011.','Un extremo rapidísimo, famoso por sus regates.'],
+BR:['Llamado «el Rey del fútbol», ganó tres veces el Mundial.','El máximo goleador de la historia de Brasil, famoso por sus regates.','Una de las mejores futbolistas de la historia, elegida seis veces mejor jugadora del mundo.'],
+CA:['Un defensa rapidísimo y una de las estrellas de Canadá.','¡Marcó más goles con su selección que nadie en el mundo, hombres y mujeres!','Un delantero que marca muchos goles con Canadá.'],
+GR:['Capitán de Grecia cuando ganó por sorpresa la Eurocopa de 2004.','Marcó el gol de la final de la Eurocopa de 2004.','Un centrocampista que jugó más partidos con Grecia que nadie.'],
+PT:['El máximo goleador de la historia del fútbol de selecciones.','Llamado «la Pantera Negra», fue el máximo goleador del Mundial de 1966.','Un extremo con mucho talento, elegido mejor jugador del mundo en 2001.'],
+NL:['Un genio del fútbol. Un regate lleva su nombre: el giro de Cruyff.','Un delantero que marcó una volea fantástica en la final de la Eurocopa de 1988.','Un defensa alto y tranquilo, capitán de los Países Bajos.'],
+SE:['Un delantero altísimo, famoso por goles acrobáticos como patadas de kárate.','Un delantero muy querido que marcó muchos goles con Suecia y el Celtic.','Un delantero joven y elegante, una de las estrellas actuales de Suecia.'],
+NO:['Un delantero gigante y rapidísimo que no para de marcar goles.','Un centrocampista creativo y capitán de Noruega, que se hizo profesional a los 15 años.','Marcó el gol de la victoria en el último minuto de la final de la Champions de 1999.'],
+TR:['¡Marcó el gol más rápido de la historia de los Mundiales, a los 11 segundos!','Un joven talento con una zurda mágica, llamado «el Messi turco».','El capitán de Turquía, famoso por sus tiros libres.'],
+IN:['El máximo goleador de la India y uno de los máximos goleadores internacionales del mundo.','Una de las primeras grandes estrellas del fútbol indio y capitán durante muchos años.','Un portero altísimo, el primer indio en jugar en una gran liga europea, en Noruega.'],
+AU:['Famoso por sus goles de cabeza y por dar puñetazos al banderín de córner al marcar.','¡Un delantero que hace volteretas hacia atrás después de marcar!','Un delantero fuerte, capitán de Australia en el Mundial de 2006.'],
+MX:['Famoso por sus goles acrobáticos y su celebración con voltereta.','Un defensa y capitán que jugó cinco Mundiales.','Un portero de pelo rizado, famoso por sus paradas increíbles en los Mundiales.'],
+AR:['Uno de los mejores futbolistas de todos los tiempos, campeón del mundo en 2022.','Un genio del regate que ganó el Mundial de 1986.','Marcó en la final del Mundial de 2022 y en una final de la Copa América.'],
+PL:['¡Un delantero que una vez marcó 5 goles en solo 9 minutos!','Un centrocampista rápido, la estrella de Polonia en el Mundial de 1982.','Un portero que paró penaltis en el Mundial.'],
+UA:['Un delantero famoso que ganó el Balón de Oro en 2004.','Un delantero rapidísimo que ganó el Balón de Oro en 1975.','Puede jugar en el centro del campo y en defensa, y es una de las estrellas de Ucrania.'],
+BE:['Un regateador fantástico, capitán de Bélgica, tercera en el Mundial de 2018.','Un centrocampista con pases increíbles, de los mejores del mundo.','Un portero altísimo, de casi dos metros.'],
+DK:['Considerado el mejor futbolista danés, famoso por sus pases mágicos.','Un portero gigante que ganó la Eurocopa de 1992 con Dinamarca.','Un centrocampista creativo famoso por sus pases y tiros libres.'],
+KR:['El capitán de Corea del Sur, que fue máximo goleador de la Premier League inglesa.','Apodado «Tres pulmones» porque podía correr sin cansarse.','Una leyenda del fútbol coreano que marcó muchos goles en Alemania.'],
+EG:['Llamado «el Rey egipcio», un delantero rapidísimo que marca muchísimos goles.','Un centrocampista querido en todo Egipto, que ganó dos veces la Copa de África.','Un delantero con muchos goles que jugó más de 170 partidos con Egipto.'],
+IE:['Un centrocampista duro y capitán, famoso por no rendirse nunca.','El máximo goleador de Irlanda, famoso por hacer la rueda al celebrar.','Un defensa tranquilo y elegante, muy querido por la afición irlandesa.'],
+HR:['Un centrocampista brillante, elegido mejor jugador del Mundial de 2018.','Máximo goleador del Mundial de 1998, cuando Croacia quedó tercera.','Un centrocampista que jugó la final del Mundial de 2018 con Croacia.'],
+FI:['Llamado «el Rey» en Finlandia, ganó la Champions League con el Ajax.','El máximo goleador de Finlandia, que la llevó a su primera Eurocopa.','Un defensa alto y fuerte, capitán del Liverpool.'],
+HU:['Uno de los mayores goleadores de la historia. El gol más bonito de cada año gana el Premio Puskás.','El capitán de Hungría, famoso por sus potentes disparos de lejos.','Ganó el Balón de Oro en 1967, el único húngaro que lo ha conseguido.'],
+MD:['El máximo goleador de la historia de Moldavia.','Un defensa y capitán, el jugador con más partidos con Moldavia.','Uno de los jugadores con más partidos con Moldavia.'],
+CN:['Un delantero chino que jugó en España, uno de los máximos goleadores de China.','El primer jugador chino en marcar en la Premier League inglesa.','Una de las mejores jugadoras del siglo, que llevó a China a la final del Mundial de 1999.'],
+ZA:['El máximo goleador de la historia de Sudáfrica.','Defensa y capitán de Sudáfrica, muy querido en el Leeds United.','Un centrocampista con talento que jugó en Inglaterra y en el Mundial de 2010, en casa, en Sudáfrica.'],
+IS:['Un centrocampista famoso por sus tiros libres, uno de los máximos goleadores de Islandia.','¡En su primer partido con Islandia entró en lugar… de su propio padre!','Un portero que le paró un penalti a Messi en el Mundial de 2018. ¡También es director de cine!']};
+for(const k in FBT) (FB[k]||[]).forEach((p,i)=>{ if(FBT[k][i]) (p._t=p._t||{})[lg]=FBT[k][i]; });
+})();
+</script>
+
+<script>
+/* ===== Español — lectura ===== */
+(()=>{ const lg='es', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Leer',title:'Leer y escribir',back:'⬅ Atrás',menu:'⬅ Menú',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','El abecedario'],fish:['🎣','Pesca la letra'],train:['🚂','El tren de las sílabas'],build:['🧩','La palabra mágica'],read:['👀','Lee y elige'],story:['📚','Cuentos'],write:['✍️','Escribe con el dedo']},
+  alphaTask:'¡Toca una letra para oírla!',album:(n,t)=>`🏅 Pegatinas: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, de ${w}.`,
+  fishSay:(l,w)=>`¡Pesca la letra ${l}, de ${w}!`,fishWrong:l=>`Esta es la letra ${l}. ¡Inténtalo otra vez!`,fishRight:l=>`¡Muy bien! Has pescado la ${l}.`,
+  trainSay:w=>`¡Forma la palabra ${w}! Pon los vagones en orden.`,trainDone:w=>`¡Muy bien! ¡${w}!`,
+  buildSay:w=>`¡Escribe la palabra ${w}!`,buildDone:w=>`¡Súper! Has escrito ${w}.`,
+  readTask:'¡Lee la palabra y elige la imagen!',readWrong:'¡Inténtalo otra vez!',readRight:w=>`¡Sí! ¡${w}!`,
+  storyTask:'¡Elige un cuento!',readMe:'▶ Léemelo',readSelf:'Toca una palabra para oírla.',storyDone:'¡Muy bien! Has terminado el cuento.',
+  writeTask:l=>`Escribe ${l}. Empieza en el punto verde.`,writeDone:l=>`¡Muy bien! ¡Has escrito ${l}!`,offTrack:'Sigue la línea gris 🙂',
+  letters:'🔤 Letras',digits:'🔢 Números',next:'▶ Siguiente',again:'↺ Otra vez',listen:'🔊 Escuchar',
+  sylQ:w=>`¿Cuántas sílabas tiene la palabra ${w}?`,sylN:n=>n===1?'una sílaba':n+' sílabas',sylSay:(w,n,x)=>`¡Sí! ${w} tiene ${n}: ${x}.`,sylWrong:'¡Inténtalo otra vez! Da una palmada en cada sílaba. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'sílaba':'sílabas'} 👏`,
+  mPick:'🔤 Elige las letras',mFree:'✏️ Escribe sobre el contorno',mGuide:'✍️ Escribe con ayuda',clear:'🧽 Borrar',freeHint:'Escribe la letra encima del contorno gris.',freeBad:'Intenta escribir sobre el contorno 🙂',writeLetter:l=>`Escribe la letra ${l}.`};
+D.AQTX[lg]={btn:'🐠 Mi acuario',title:'🐠 Mi acuario',empty:'¡Pesca peces para llenar tu acuario!',slow:'🐢 Despacio',fast:'🐇 Rápido',close:'✖ Cerrar'};
+D.STX[lg]={syl:'🎨 Sílabas de colores',listen:'🔊 Léemelo',self:'👆 Leo yo',next:'Siguiente palabra ▶',selfHint:'Lee en voz alta la palabra amarilla y pulsa ▶. Si no conoces una palabra, tócala.'};
+D.FISHTX[lg]={ask:[(l,w)=>`¡${l}, de ${w}!`,(l,w)=>`¿Dónde está la ${l}? ${l}, de ${w}.`,(l,w)=>`¡Busca la ${l}, de ${w}!`,(l,w)=>`¡El pez con la ${l}, de ${w}!`,(l,w)=>`¡Vamos, la ${l}, de ${w}!`],
+  pic:w=>`¿Con qué letra empieza ${w}?`, ok:['¡Lo tienes!','¡Súper!','¡Buena pesca!','¡Guau!','¡Sí!','¡Qué pez!'], no:['¡Ese no!','¡Uy, otro pez!','¡Sigue buscando!',x=>`Esta es la ${x}.`],
+  gold:'¡El pez de oro! ¡Tres estrellas!', lvl:n=>`¡Nivel ${n}! ¡Llegan nuevos animales del mar!`, bucket:'Cubo'};
+D.ALPHA[lg]=[['A','🐝','ABEJA'],['B','⛵','BARCO'],['C','🏠','CASA'],['D','🐬','DELFÍN'],['E','🐘','ELEFANTE'],['F','🌸','FLOR'],['G','🐱','GATO'],['H','🍦','HELADO'],['I','🏝️','ISLA'],['J','🦒','JIRAFA'],['K','🐨','KOALA'],['L','🦁','LEÓN'],['M','🍎','MANZANA'],
+  ['N','☁️','NUBE'],['Ñ','🪅','PIÑATA'],['O','🐻','OSO'],['P','🐶','PERRO'],['Q','🧀','QUESO'],['R','🐭','RATÓN'],['S','☀️','SOL'],['T','🐢','TORTUGA'],['U','🍇','UVAS'],['V','🐄','VACA'],['W','🧇','WAFLE'],['X','🎹','XILÓFONO'],['Y','🪀','YOYÓ'],['Z','🦊','ZORRO']];
+D.WORDS[lg]=[['👩','MA-MÁ'],['👨','PA-PÁ'],['🐱','GA-TO'],['🐶','PE-RRO'],['🏠','CA-SA'],['🍎','MAN-ZA-NA'],['🚗','CO-CHE'],['☀️','SOL'],['🌙','LU-NA'],['🐟','PEZ'],['🦆','PA-TO'],['🎈','GLO-BO'],['🌸','FLOR'],['🦁','LE-ÓN'],
+  ['🍌','PLÁ-TA-NO'],['🐸','RA-NA'],['🦋','MA-RI-PO-SA'],['🍓','FRE-SA'],['🥕','ZA-NA-HO-RIA'],['🐭','RA-TÓN'],['🐄','VA-CA'],['🌳','ÁR-BOL'],['🍉','SAN-DÍ-A'],['🐢','TOR-TU-GA'],['🚂','TREN'],['🐻','O-SO'],['☁️','NU-BE'],['🎂','TAR-TA'],['🐰','CO-NE-JO'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi y la pelota','Pu·fi tie·ne u·na pe·lo·ta ro·ja. La pe·lo·ta sal·ta a·rri·ba, a·rri·ba, a·rri·ba. Pu·fi co·rre de·trás. ¡Qué di·ver·ti·do!'],
+ ['🐱','La gata Mimí','Mi·mí es u·na ga·ti·ta pe·que·ña. Be·be le·che. Lue·go duer·me al sol. Miau, di·ce Mi·mí.'],
+ ['🏖️','Un día en la playa','Hoy va·mos a la pla·ya. El a·gua es a·zul. Ha·go un cas·ti·llo de a·re·na. ¡Qué día tan bo·ni·to!'],
+ ['🚂','El tren','El tren va rá·pi·do. Chu chu, ha·ce el tren. Ma·má y pa·pá mi·ran por la ven·ta·na. Va·mos a ca·sa de la a·bue·la.'],
+ ['⛄','El muñeco de nieve','Fue·ra nie·va. Pu·fi ha·ce un mu·ñe·co de nie·ve. Le po·ne u·na na·riz de za·na·ho·ria. El mu·ñe·co de nie·ve son·ríe.'],
+ ['🍯','El oso y la miel','Un o·so gran·de bus·ca miel. Las a·be·jas vue·lan: ¡bzz, bzz! El o·so en·cuen·tra un ta·rro de miel. ¡Mmm, qué ri·ca!'],
+ ['🎂','El cumpleaños de Pufi','Hoy es el cum·ple·a·ños de Pu·fi. En la tar·ta hay seis ve·las. Los a·mi·gos can·tan u·na can·ción. Pu·fi so·pla y se rí·e.'],
+ ['🚀','El cohete','Pu·fi vue·la en un co·he·te. ¡A·rri·ba, ca·da vez más a·rri·ba! Ve la Lu·na y las es·tre·llas. Lue·go vuel·ve a ca·sa pa·ra ce·nar.'],
+ ['🌈','La lluvia','Llue·ve y Pu·fi tie·ne un pa·ra·guas a·ma·ri·llo. Sal·ta en los char·cos: ¡plas, plas! Lue·go sa·le el sol. En el cie·lo hay un ar·co·í·ris.'],
+ ['🥕','El huerto','La a·bue·la tie·ne un huer·to. Allí cre·cen to·ma·tes y za·na·ho·rias. Pu·fi rie·ga las flo·res. Un ca·ra·co·li·to an·da des·pa·ci·to.']];
+D.X2[lg]={ groups:['🔤 Letras y sonidos','✍️ Escribir','📚 Leer'],
+  games:{hunt:['👂','La caza de sonidos'],pos:['📍','¿Dónde oyes el sonido?'],bubble:['🫧','Burbujas de letras'],twins:['🔍','Palabras gemelas']},
+  huntSay:(u,ex)=>`¡Toca todas las imágenes que empiezan por ${u}, como ${ex}!`, huntTask:u=>`¿Qué empieza por ${u}?`,
+  huntNo:w=>`¿${w}? No, este no va.`, huntDone:'¡Muy bien! ¡Las has encontrado todas! Las otras no van.',
+  posSay:(l,w)=>`¿Dónde oyes la ${l} en ${w}? ¿Al principio, en el medio o al final?`, posTask:l=>`¿Dónde oyes la ${l}?`,
+  posLbl:['Al principio','En el medio','Al final'], posRight:(l,w,p)=>`¡Sí! En ${w}, la ${l} se oye ${p.toLowerCase()}.`, posWrong:'¡Escucha otra vez!',
+  bubbleSay:w=>`¡Revienta las burbujas en orden y escribe ${w}!`, bubbleTask:f=>`Palabras con ${f}`, bubbleDone:w=>`¡Súper! Has escrito ${w}.`,
+  twinsSay:'¿Qué palabra va con la imagen?', twinsWrong:w=>`Aquí pone ${w}. ¡Inténtalo otra vez!`, twinsRight:w=>`¡Sí! ¡${w}!`, listen:'🔊 Escuchar' };
+const RAW='SOL☀️ LUNA🌙 CASA🏠 GATO🐱 PERRO🐶 PEZ🐟 RANA🐸 OSO🐻 LEÓN🦁 VACA🐄 OVEJA🐑 CARACOL🐌 TORTUGA🐢 BARCO🚢 PARAGUAS☂️ ÁRBOL🌳 LIBRO📖 PELOTA⚽ PAN🍞 LECHE🥛 MANTEQUILLA🧈 MANZANA🍎 PLÁTANO🍌 FLOR🌸 PATO🦆 ERIZO🦔 NARIZ👃 ROSA🌹 TIGRE🐯 TREN🚂 VELERO⛵ COHETE🚀 SETA🍄 CORAZÓN❤️ QUESO🧀 BALLENA🐳 RATÓN🐭 GALLINA🐔 CABALLO🐴 CISNE🦢 CUCHARA🥄 TOMATE🍅 CEREZA🍒 ZANAHORIA🥕 PERA🍐 LIMÓN🍋 BOCA👄 CORONA👑 CAMPANA🔔 VELA🕯️ PINCEL🖌️ ESCOBA🧹 TAZA☕ GAFAS👓 CAMELLO🐪 HORMIGA🐜 ARAÑA🕷️ ELEFANTE🐘 COCODRILO🐊 COCHE🚗 OJO👁️ ABEJA🐝 SERPIENTE🐍 TIJERAS✂️ ZAPATO👟 LLAVE🔑 MARIPOSA🦋 ESTRELLA⭐ SILLA🪑 LÁPIZ✏️ CALCETÍN🧦 PIEDRA🪨 HELADO🍦 CUBO🪣 BÚHO🦉 CABRA🐐 MONO🐒 CERDO🐷 GUITARRA🎸 RELOJ⏰ MARTILLO🔨 POLLITO🐤 MAMÁ👩 NUBE☁️ SANDÍA🍉 FRESA🍓 DELFÍN🐬 JIRAFA🦒 CEBRA🦓 LOBO🐺 ZORRO🦊 PINGÜINO🐧 CONEJO🐰 AVIÓN✈️ BICICLETA🚲 FUEGO🔥 REGALO🎁 TARTA🎂 DADO🎲 MANO✋ PIE🦶 DIENTE🦷 OREJA👂 CUCHILLO🔪 GALLO🐓 CHOCOLATE🍫 VIOLÍN🎻 TAMBOR🥁 CANDADO🔒 CARTA✉️ BANDERA🚩 SAL🧂 MIEL🍯 TELÉFONO📱 CEBOLLA🧅 CIERVO🦌 BOLSO👜 VENTANA🪟 ESPEJO🪞 ABRIGO🧥 ROBOT🤖 PULPO🐙 REINA👸 CAMIÓN🚚 SOMBRERO🎩 PIZZA🍕 NARANJA🍊 UVAS🍇 PÁJARO🐦 KOALA🐨 CAMA🛏️ BELLOTA🌰 BUFANDA🧣 HOJA🍃 AJO🧄 PUÑO👊 BURRO🫏 GORRO🧢 TORRE🗼 CHAQUETA🧥 CHUPETE🍼 NOCHE🌃 GUISANTE🫛 MOSQUITO🦟 PAQUETE📦 HUEVO🥚 GUSANO🪱 PIÑA🍍 MUÑECA🪆 CEREBRO🧠 GIGANTE🧌 GELATINA🍮 HAMBURGUESA🍔';
+D.VOC[lg]=RAW.split(' ').map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; });
+D.GRA[lg]=['GUE','GUI','QU','CH','LL','RR'];
+D.HUNTLONG[lg]=['CH','LL','QU','CE','CI','GE','GI'];
+D.HUNTL[lg]='BCDFGLMNPRSTV';
+D.FAM[lg]=[['CH'],['LL'],['RR'],['QU'],['GUE','GUI']];
+D.POSL[lg]='MLNPBFTD';
+})();
+</script>
+
+<script>
+/* ===== Español — ábaco, ajedrez, matemáticas, inicio, tiempo, Pufi, app ===== */
+(()=>{ const lg='es'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+const one=s=>s===1?'una estrella':`${s} estrellas`;
+S('sa',{title:'🧮 Academia del ábaco',back:'⬅ Atrás',map:'⬅ Mapa',hint:'💡 Ayuda',check:'✔ Listo',clear:'🧹 Borrar',eyeOn:'👀 Número: sí',eyeOff:'👀 Número: no',
+  unlockOn:'🔓 Todos: sí',unlockOff:'🔓 Todos: no',worlds:['🌱 El mundo de las unidades','🌳 El mundo de las decenas','🚀 Maestros del ábaco'],extra:'🎁 Más',
+  free:['🎨','Juego libre'],ten:['🍒','Haz 10'],lvl:n=>`Nivel ${n}`,place:['Unidades','Decenas','Centenas'],
+  names:['Las bolitas de 1','La bolita de 5','Lee las bolitas','Sumas fáciles','Los amigos del 5','Decenas y unidades','Números grandes','Los amigos del 10','Restar','Sumas grandes','Flash','Anzan'],
+  intro:['Cada bolita amarilla de abajo vale 1. Súbelas hacia la barra del medio.','La bolita roja de arriba vale 5. Bájala hacia la barra.','Mira el ábaco y dime qué número muestra.','En el ábaco ya hay un número. Añade bolitas y mira cuánto es.','Cuando se acaban las bolitas de 1, llama a tu amiga: ¡la bolita de 5!','La varilla de la izquierda muestra las decenas. La de la derecha muestra las unidades.','Lee primero las decenas y luego las unidades.','Cuando no bastan las unidades, añade una decena y quita al amigo.','Cuando restamos, alejamos las bolitas de la barra.','Suma primero las decenas y luego las unidades.','Un número aparece solo un momento. ¡Recuérdalo y muéstralo en el ábaco!','Escucha los números y súmalos en el ábaco, uno tras otro.'],
+  show:n=>`Muestra ${n}.`,add:(a,b)=>`El ábaco muestra ${a}. Suma ${b}.`,sub:(a,b)=>`El ábaco muestra ${a}. Quita ${b}.`,
+  read:'¿Qué número muestra el ábaco?',flash1:'¡Recuerda el número!',flash2:'Ahora muéstralo en el ábaco.',again:'👁 Mostrar otra vez',
+  anz1:'¡Escucha y suma!',anz2:'¿Cuánto tienes ahora en el ábaco?',plus:'más',
+  hintBlink:'Mueve las bolitas que parpadean.',f5a:b=>`Añade la bolita de 5 y quita ${5-b}.`,f10a:b=>`Añade una decena y quita ${10-b} unidades.`,f5s:b=>`Quita la bolita de 5 y añade ${5-b}.`,
+  right:n=>`¡Sí! ¡${n}!`,have:v=>`El ábaco muestra ${v}. ¡Inténtalo otra vez!`,readWrong:'Mira otra vez las bolitas.',
+  done:s=>`¡Nivel terminado! ¡Has ganado ${one(s)}!`,next:'▶ Siguiente nivel',again2:'↺ Otra vez',locked:'Primero termina el nivel anterior.',
+  freeTask:'Mueve las bolitas como quieras. ¡Yo te digo el número!',acad:'🧮 Academia',one});
+S('ch',{ tab:'♟️ Ajedrez', title:'La escuela de ajedrez', back:'⬅ Atrás', menu:'⬅ Menú', hintsOn:'💡 Ayuda: sí', hintsOff:'💡 Ayuda: no',
+  lvl:n=>`Nivel ${n}`, next:'🔄 Nuevo ejercicio', again:'↺ Jugar otra vez', listen:'🔊 Escuchar', moves:n=>`Movimientos: ${n}`,
+  names:{K:'El rey',Q:'La reina',R:'La torre',B:'El alfil',N:'El caballo',P:'El peón'},
+  short:{K:'Rey',Q:'Reina',R:'Torre',B:'Alfil',N:'Caballo',P:'Peón'},
+  nom:{K:'el rey',Q:'la reina',R:'la torre',B:'el alfil',N:'el caballo',P:'el peón'},
+  dat:{K:'el rey',Q:'la reina',R:'la torre',B:'el alfil',N:'el caballo',P:'el peón'},
+  blackAcc:{Q:'la reina negra',R:'la torre negra',B:'el alfil negro',N:'el caballo negro',P:'el peón negro'},
+  games:{learn:['🎓','Las piezas'],stars:['⭐','Recoge las estrellas'],capture:['🍽️','Captura la pieza'],escape:['🛡️','Salva al rey'],mate:['👑','¡Jaque mate!'],pawns:['⚔️','La batalla de los peones']},
+  desc:{K:'El rey es la pieza más importante. Se mueve una sola casilla, en todas las direcciones.',
+        Q:'La reina es la pieza más fuerte. Va recto y en diagonal, tan lejos como quiera.',
+        R:'La torre va recto: adelante, atrás, a la izquierda y a la derecha, tan lejos como quiera.',
+        B:'El alfil va solo en diagonal y siempre se queda en el mismo color.',
+        N:'El caballo salta en forma de L: dos casillas rectas y una de lado. ¡Puede saltar por encima de otras piezas!',
+        P:'El peón avanza una casilla. La primera vez puede avanzar dos. Cuando llega al final, ¡se convierte en reina!'},
+  learnTask:'Toca la pieza y muévela 3 veces.', learnDone:n=>`¡Súper! Ya sabes cómo se mueve ${n}.`,
+  promo:'¡Guau! El peón ha llegado al final y se ha convertido en reina.',
+  starsTask:(n,k)=>`Recoge las ${k} estrellas con ${n}.`, starsDone:m=>`¡Has recogido todas las estrellas en ${m} movimientos!`,
+  captureTask:x=>`¡Captura ${x}!`, gotIt:x=>`¡Has capturado ${x}!`, notTarget:x=>`¡Uy! Tienes que capturar ${x}.`,
+  escapeTask:'¡Tu rey está en jaque! Ponlo en una casilla segura.', safe:'¡El rey está a salvo!',
+  mateTask:'¡Da jaque mate en un solo movimiento!', mate:'¡Jaque mate! ¡Has ganado!', notMate:'No es jaque mate. ¡Inténtalo otra vez!', mateHint:'Pista: prueba con la pieza que parpadea.',
+  pawnsTask:'¡Lleva un peón blanco al otro lado! El robot juega con las negras.', pawnsWin:'¡Tu peón ha llegado al final! ¡Has ganado!',
+  pawnsLose:'Esta vez ha ganado el robot. ¿Lo intentamos otra vez?', botStuck:'El robot ya no puede moverse. ¡Has ganado!',
+  youStuck:'Ya no puedes moverte. Esta vez gana el robot.', botThinks:'El robot está pensando…', yourTurn:'¡Te toca!',
+  cant:n=>`${n} no puede ir allí.`, kingBad:'¡Allí atacarían al rey!' });
+S('cg',{ title:'Partida de ajedrez', back:'⬅ Atrás', menu:'⬅ Menú', hintsOn:'💡 Ayuda: sí', hintsOff:'💡 Ayuda: no',
+  who:'¿Contra quién juegas?', color:'Juegas con:', white:'⚪ Las blancas', black:'⚫ Las negras', rand:'🎲 Al azar',
+  opp:{easy:['🐣','Robo-Pollito','fácil'],mid:['🦊','Robo-Zorro','medio'],hard:['🦉','Robo-Búho','difícil'],two:['👫','Dos jugadores','en la misma tableta']},
+  cont:'▶ Seguir la partida', wins:n=>`Victorias: ${n}`,
+  intro:(me)=>`¡A jugar! ${me===1?'Tienes las blancas y empiezas tú':'Tienes las negras. Empieza el robot'}.`, intro2:'¡A jugar! Empiezan las blancas.',
+  yourTurn:'¡Te toca!', thinks:n=>`${n} está pensando…`, turnW:'Les toca a las blancas ⚪', turnB:'Les toca a las negras ⚫',
+  N:{1:'el peón',2:'el caballo',3:'el alfil',4:'la torre',5:'la reina',6:'el rey'},
+  NA:{1:'el peón',2:'el caballo',3:'el alfil',4:'la torre',5:'la reina',6:'el rey'},
+  NY:{1:'tu peón',2:'tu caballo',3:'tu alfil',4:'tu torre',5:'tu reina',6:'tu rey'},
+  ND:{1:'el peón',2:'el caballo',3:'el alfil',4:'la torre',5:'la reina',6:'el rey'},
+  botMoved:(n,p)=>`${n} ha movido ${p}.`, botTook:(n,p)=>`${n} te ha comido ${p}.`, youTook:p=>`¡Muy bien! Has comido ${p}.`,
+  castle:'¡Enroque! El rey se esconde detrás de la torre.', check:'¡Jaque!', checkYou:'¡Jaque! Atacan a tu rey. ¡Sálvalo!',
+  mateWin:'¡Jaque mate! ¡Has ganado! ¡Bravo, campeón!', mateLose:n=>`Jaque mate. Esta vez ha ganado ${n}. ¿Jugamos otra partida?`,
+  mateW:'¡Jaque mate! ¡Ganan las blancas!', mateB:'¡Jaque mate! ¡Ganan las negras!',
+  stale:'¡Ahogado! El rey no puede moverse, pero no está en jaque. Es tablas.', rep:'La misma posición tres veces. ¡Tablas!',
+  fifty:'Cincuenta movimientos sin capturas. ¡Tablas!', insuf:'Quedan muy pocas piezas para dar mate. ¡Tablas!',
+  undo:'↶ Deshacer', tip:'💡 Consejo', newg:'🔄 Nueva partida', listen:'🔊',
+  tipSay:p=>`¡Prueba a mover ${p}!`, promoQ:'¿En qué se convierte el peón?', promo:'¡El peón ha llegado al final y se ha transformado!',
+  cant:n=>`${n} no puede ir allí.`, kingBad:'¡Así tu rey quedaría en jaque!', notYours:'Esta es una pieza del otro jugador.',
+  danger:'¡Cuidado! La pieza con el círculo rojo puede ser capturada.' });
+S('mw',{title:'🔢 El mundo de los números',back:'⬅ Atrás',allOn:'🔓 Todos: sí',allOff:'🔓 Todos: no',hint:'💡 Ayuda',lvl:n=>`Nivel ${n}`,
+ hello:'¡Bienvenido al mundo de los números! Elige un juego.',done:s=>`¡Listo! ¡Has ganado ${['','una estrella','dos estrellas','tres estrellas'][s]}!`,next:'▶ Siguiente nivel',again:'↺ Otra vez',toMenu:'⬅ Niveles',locked:'Primero termina el nivel anterior.',
+ games:{add:['➕','Sumas y restas'],cmp:['🐊','El cocodrilo glotón'],nb:['🏠','La calle de los vecinos'],ord:['🐧','Pingüinos en orden'],box:['🎁','La caja secreta'],sb:['🧮','Ábaco'],ten:['🍒','Haz 10']},
+ lvAdd:['Sumas hasta 5','Sumas hasta 10','Restas hasta 10','Sumas hasta 20','Restas hasta 20','Mezcla hasta 20','Decenas enteras','Hasta 100'],
+ lvCmp:['Compara los montones','Los signos < > =','Números hasta 20','Números hasta 100','Compara las sumas'],
+ lvNb:['El vecino de la derecha','El vecino de la izquierda','Los dos vecinos hasta 20','Los dos vecinos hasta 100','El número del medio'],
+ lvOrd:['Tres números, de menor a mayor','Cuatro números, de mayor a menor','Hasta 20, mezcla','Hasta 100, de menor a mayor','Hasta 100, mezcla'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mezcla hasta 20','Mezcla hasta 100'],
+ plus:'más',minus:'menos',make:'son',addQ:(a,o,b)=>`¿Cuánto es ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`¡${a} ${o} ${b} son ${c}!`,
+ addStory:(a,b,e)=>`Tienes ${a} ${e}. Llegan ${b} más. ¿Cuántos hay ahora?`,subStory:(a,b)=>`Hay ${a}. ${b} se van. ¿Cuántos quedan?`,
+ frog:'La rana salta por la recta numérica. ¡Cuenta los saltos!',
+ cmpPile:'¡El cocodrilo glotón quiere el montón más grande! ¡Tócalo!',cmpSym:'¿Qué signo va aquí? ¡El cocodrilo abre la boca hacia el número más grande!',cmpBad:'¡El cocodrilo siempre quiere más!',
+ gt:(a,b)=>`${a} es mayor que ${b}.`,lt:(a,b)=>`${a} es menor que ${b}.`,eq:(a,b)=>`${a} es igual a ${b}.`,chomp:'¡Ñam!',
+ nbR:n=>`¿Quién vive a la derecha del ${n}? El vecino de la derecha es uno más.`,nbL:n=>`¿Quién vive a la izquierda del ${n}? El vecino de la izquierda es uno menos.`,nbLR:n=>`¡Busca los dos vecinos del ${n}!`,nbB:(a,b)=>`¿Qué número vive entre ${a} y ${b}?`,
+ nbOk:s=>`${s}. ¡Muy bien, los vecinos están en su sitio!`,nbNo:'Ese no vive aquí. ¡Inténtalo otra vez!',
+ ordUp:'Pon los pingüinos de menor a mayor: del más pequeño al más grande. ¡Haz una escalera que sube!',ordDown:'Pon los pingüinos de mayor a menor: del más grande al más pequeño. ¡Haz un tobogán!',
+ ordOk:'¡Perfecto! ¡El orden es correcto!',ordNo:'¡Uy! Aquí el orden no está bien. ¡Inténtalo otra vez!',up:'🪜 De menor a mayor',down:'🛝 De mayor a menor',
+ boxQ:'¿Cuántas manzanas hay en la caja secreta? ¡Pon manzanas en la caja hasta que la balanza esté recta!',boxQ100:'¿Qué número hay en la caja secreta? ¡Añade manzanas hasta que la balanza esté recta!',boxOk:(e)=>`¡La balanza está recta! ${e}`,heavyL:'El lado izquierdo pesa más.',heavyR:'El lado derecho pesa más.'});
+S('hm',{title:'Cuenta estrellas ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',bday:'🎂 Cumpleaños del niño',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
+const ES_H=['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once'];
+const hr=h=>{ const k=h%12; return k===1?'la una':`las ${ES_H[k]}`; };
+const itIs=t=>(t.startsWith('la una')?`Es ${t}.`:`Son ${t}.`);
+const al=t=>'a '+t;
+S('tm',{title:'⏳ El tiempo de Pufi',back:'⬅ Atrás',allOn:'🔓 Todos: sí',allOff:'🔓 Todos: no',lvl:n=>`Nivel ${n}`,ok:'✔ Listo',listen:'🔊 Escuchar',help:'💡 Ayuda',first:a=>`Primero: ${a}.`,nextIs:(a,b)=>`Después de ${a} viene: ${b}.`,
+ done:s=>`¡Listo! ¡Has ganado ${['','una estrella','dos estrellas','tres estrellas'][s]}!`,next:'▶ Siguiente nivel',again:'↺ Otra vez',toMenu:'⬅ Atrás',locked:'Primero termina el nivel anterior.',
+ ladder:['🕰️ las horas','🌅 un día','🚃 7 días = una semana','🎡 12 meses = un año'],
+ worlds:{clock:['🕰️','El reloj'],day:['🌅','El día'],cal:['📅','La semana y el calendario'],seas:['🌳','Las estaciones']},
+ games:{explore:['🕰️','El reloj mágico'],cuckoo:['🐦','El reloj de cuco'],pizza:['🍕','El reloj pizza'],station:['🚂','La estación'],memo:['🧩','Las parejas'],oven:['⏳','¿Cuánto dura?'],
+  order:['🧸','Ordena el día'],dayclk:['🌞','Un día con Pufi'],moments:['🌗','Los momentos del día'],ytm:['📆','Ayer, hoy, mañana'],
+  week:['🚃','El tren de la semana'],calm:['📅','Mi calendario'],months:['🎡','La rueda de los meses'],
+  tree:['🌳','El árbol de las estaciones'],dress:['🦊','Viste a Pufi'],sort:['🧺','Ordena por estaciones']},
+ lv:{cuckoo:['Cuenta los cucús','Lee el reloj','Pon el reloj en hora'],pizza:['Y media','Muestra la media','Y cuarto','Menos cuarto','Muestra los cuartos'],
+  station:['Horas en punto','Y media','Los cuartos','De 5 en 5 minutos','Cualquier minuto','El reloj de 24 horas'],memo:['Horas y medias','Los cuartos','De 5 en 5 minutos'],
+  oven:['Una hora','Dos horas','Media hora','Un cuarto de hora','Mezcla'],order:['La mañana','Todo el día'],dayclk:['Horas en punto','Y media'],ytm:['La historia de Pufi','Los días de la semana'],
+  week:['Ordena los días','¿Qué día viene después?','¿Qué día viene antes?'],calm:['Hoy, ayer, mañana','Los días de la semana','Cuenta los días'],months:['Los meses en orden','¿Qué mes viene después?','Los meses y las estaciones']},
+ days:['lunes','martes','miércoles','jueves','viernes','sábado','domingo'],
+ months:['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
+ seas:['primavera','verano','otoño','invierno'], seasT:['Primavera','Verano','Otoño','Invierno'],
+ parts:['por la mañana','al mediodía','por la tarde','al anochecer','por la noche'],
+ today:(wd,d,mo,s)=>`Hoy es ${wd}, ${d} de ${mo}. ¡Es ${s}!`,
+ time:(h,m)=>{ const H=hr(h), H1=hr(h+1); if(m===0) return H; if(m===15) return `${H} y cuarto`; if(m===30) return `${H} y media`; if(m===45) return `${H1} menos cuarto`; return m<30?`${H} y ${m}`:`${H1} menos ${60-m}`; },
+ short:null, itIs, hourOnly:h=>hr(h),
+ hands:'La aguja larga muestra los minutos. La aguja corta muestra las horas.',
+ exHi:'¡Gira las agujas con el dedo y mira cómo pasa el día!', now:'⏰ Ahora', gears:'⚙️ Engranajes', pz:'🍕 Pizza',
+ cuCount:'¡Escucha el cuco! ¿Cuántas veces canta?', cuRead:'¿Qué hora es?', cuSet:h=>`¡Pon el reloj ${al(hr(h))}! Mueve la aguja corta.`,
+ pzRead:'¿Qué hora es? Mira cuánta pizza está pintada.', pzSet:t=>`¡Muestra ${t}! Mueve la aguja larga.`, pzHalf:'Media pizza es media hora: 30 minutos.', pzQuar:'Un trozo de pizza es un cuarto de hora: 15 minutos.',
+ dest:[['🏔️','la montaña'],['🏖️','la playa'],['👵','casa de la abuela'],['🏰','el castillo'],['🦁','el zoo'],['🌲','el bosque']],
+ stTask:(t,d)=>`El tren a ${d} sale ${al(t)}. ¡Pon el reloj a la hora de salida!`, go:'🚂 ¡Salida!', stWrong:'¡Uy! El reloj muestra otra hora. ¡Inténtalo otra vez!', st24:(d,t,p)=>`${d} quiere decir ${t}, ${p}.`,
+ memoTask:'Da la vuelta a las cartas y busca las parejas: ¡el reloj y su hora!',
+ ovItems:[['🎂','la tarta'],['🍕','la pizza'],['🍪','las galletas'],['🍞','el pan']], dur:m=>({60:'una hora',120:'dos horas',30:'media hora',15:'un cuarto de hora',45:'tres cuartos de hora',90:'una hora y media'})[m],
+ ovTask:(it,t,d)=>`Pufi mete ${it} en el horno ${al(t)}. Tiene que hornearse ${d}. ¡Gira la aguja larga hacia delante y pulsa Listo!`, ovEarly:'¡Todavía no está listo! Sigue girando.', ovBurn:'¡Uy, demasiado! Se ha quemado un poco. ¡Inténtalo otra vez!', ovDone:t=>`¡Din! ¡Ya está listo! Ahora ${itIs(t).charAt(0).toLowerCase()+itIs(t).slice(1)}`,
+ acts:[['⏰','Pufi se despierta',420],['🪥','lavarse los dientes',430],['🥣','el desayuno',450],['🎒','ir a la guardería',480],['🍽️','la comida',720],['😴','la siesta',780],['🛝','jugar en el parque',960],['🍝','la cena',1080],['🛁','el baño',1140],['📖','el cuento de buenas noches',1170],['🌙','irse a la cama',1200]],
+ ordTask:'Ordena el día de Pufi: ¡de la mañana a la noche!',
+ dcTask:(a,t)=>`¡${a.charAt(0).toUpperCase()+a.slice(1)}! Pon el reloj ${al(t)}.`,
+ mom:[[0,'🥣','desayunamos'],[0,'🐓','canta el gallo y sale el sol'],[1,'🍝','comemos'],[1,'☀️','el sol está más alto en el cielo'],[2,'🍪','merendamos después de la siesta'],[2,'🛝','jugamos en el parque por la tarde'],[3,'🌇','se pone el sol'],[3,'🛁','nos bañamos antes de dormir'],[4,'😴','dormimos'],[4,'🦉','el búho sale a cazar y brillan las estrellas']],
+ moTask:a=>`¿Cuándo ${a}?`,
+ ytmL:['AYER','HOY','MAÑANA'], places:[['👵','en casa de la abuela'],['🛝','en el parque'],['🏊','en la piscina'],['🦁','en el zoo'],['🏫','en la guardería'],['🎂','en una fiesta'],['🏖️','en la playa'],['🚒','con los bomberos']],
+ ytmStory:(a,b,c)=>`Ayer Pufi estuvo ${a}. Hoy está ${b}. Mañana estará ${c}.`, ytmQ:['¿Dónde estuvo Pufi ayer?','¿Dónde está Pufi hoy?','¿Dónde estará Pufi mañana?'],
+ ytmD:(k,d)=>[`Hoy es ${d}. ¿Qué día fue ayer?`,`Hoy es ${d}. ¿Qué día será mañana?`][k],
+ weekTask:'Pon los vagones en orden: ¡empieza por el lunes!', weekAfter:d=>`¿Qué día viene después del ${d}?`, weekBefore:d=>`¿Qué día viene antes del ${d}?`, weekend:'El sábado y el domingo son el fin de semana: ¡no hay guardería!',
+ calToday:'¡Toca hoy!', calTom:'¡Toca mañana!', calYes:'¡Toca ayer!', calWd:n=>`¿Qué día de la semana es el ${n}?`, calCount:n=>`¿Cuántos días faltan para el ${n}? ¡Toca los días uno a uno, empezando por mañana!`, calHow:'¿Cuántos días has contado?',
+ bday:n=>n===0?'🎂 ¡Hoy es tu cumpleaños! ¡Feliz cumpleaños!':`🎂 Para tu cumpleaños faltan: ${n===1?'un día':n+' días'}`,
+ moOrder:'¡Toca los meses en orden, empezando por enero!', moAfter:m=>`¿Qué mes viene después de ${m}?`, moSeas:m=>`¿En qué estación está ${m}?`,
+ treeHi:['En primavera el árbol florece. ¡Toca los capullos!','En verano el árbol está lleno de fruta. ¡Recoge las cerezas!','En otoño las hojas se vuelven amarillas y caen. ¡Sacude el árbol!','En invierno el árbol duerme bajo la nieve. ¡Haz un muñeco de nieve!'],
+ dressTask:s=>`¡Es ${s}! ¿Qué se pone Pufi? Elige tres cosas que vayan bien.`, dressNo:['Mmm, esto ahora no va bien.','¡Uf, en verano hace demasiado calor para esto!','Mmm, esto ahora no va bien.','¡Brrr! En invierno hace demasiado frío para esto.'],
+ sortTask:'¿En qué estación usamos esto? ¡Ponlo en la cesta correcta!'});
+S('pq',{title:'La aventura de Pufi',sub:'¡Elige un mundo! Recoge las estrellas y las 3 estrellas arcoíris 🌟 de cada nivel.',help:'◀ ▶ andar · ⬆ saltar (¡dos veces!) · ⬇ entrar en el tubo',exit:'⬅ Atrás',lvl:n=>`Nivel ${n}`,
+ names:['La pradera','El bosque de otoño','La cueva de cristal','Entre las nubes','La playa','El país de la nieve','La noche de las luciérnagas','El castillo de lava'],
+ start:(n,t)=>`Nivel ${n}: ${t}. ¡Vamos, Pufi!`, won:'¡Muy bien! ¡Pufi ha llegado a casa!', winS:(s,m)=>`⭐ ${s} estrellas · 🌟 ${m} estrellas arcoíris de 3`, next:'▶ Siguiente', again:'↺ Otra vez', map:'🗺️ Mapa',
+ grow:'¡Guau! ¡Pufi se ha hecho grande!', shrink:'¡Ay! Pufi vuelve a ser pequeño. ¡Todavía tienes otra oportunidad!', hurt:'¡Ay! Has perdido un corazón.', over:'¡Uy! Volvemos a intentarlo desde la bandera.', rainbow:'¡La estrella arcoíris! ¡Nadie te para!', medal:'¡Una estrella arcoíris!', check:'¡La bandera es tuya! Si te haces daño, vuelves aquí.', heart:'¡Un corazón más!',
+ secret:'¡Una habitación secreta!', allDone:'¡Has terminado todos los mundos! ¡Eres un campeón!',
+ signs:{move:'¡Anda con las flechas y salta con el botón amarillo!',box:'¡Golpea con la cabeza la caja del signo de interrogación!',stomp:'¡Salta encima del caracol! Luego da una patada a la concha.',grow:'¡La estrella te hace grande! Cuando eres grande puedes romper ladrillos.',pipe:'¡Ponte encima del tubo y pulsa la flecha hacia abajo! Hay una habitación secreta.',hog:'¡El erizo tiene púas! No saltes encima, rodéalo.',spring:'¡Salta en el trampolín para volar alto!',flag:'¡Toca la bandera! Si te haces daño, vuelves aquí.',goal:'¡Salta lo más alto que puedas a la bandera de llegada!',bee:'Las abejas vuelan arriba y abajo. ¡Salta encima!',lava:'¡Cuidado con la lava! Usa las plataformas.',fish:'¡Los peces saltan fuera del agua! Espera y luego pasa.'}});
+S('nt',{recT:'🎙️ La voz de los padres',recH:'Graba elogios con tu voz. El niño los oye cuando lo hace bien.',slot:i=>`Elogio ${i}`,rec:'⏺ Grabar',stop:'⏹ Listo',play:'▶',del:'🗑',
+   buyT:'💎 Versión completa',buy:p=>`Desbloquear todo ${p||''}`,restore:'Restaurar compras',owned:'✅ Tienes la versión completa. ¡Gracias!',voice:q=>`Voz: ${q}`,
+   mic:'🎤 Leo en voz alta',micHint:'¡Lee en voz alta! Cada palabra leída se pone verde. Si no conoces una palabra, tócala.',micNo:'El micrófono no está disponible. Prueba «Leo yo».',listenMe:'🔊 Escúchate',micRead:n=>`¡Has leído tú solo ${n} palabras!`,listening:'Te escucho…'});
+})();
+</script>
+
+<script>
+/* ===== Español — formas, RoboPufi, acuario ===== */
+(()=>{ const lg='es'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+S('gm',{title:'📐 El mundo de las formas',back:'⬅ Atrás',hello:'¡Bienvenido al mundo de las formas! Elige un juego.',hint:'💡 Ayuda',undo:'↩ Deshacer',clear:'🗑️ Borrar',
+ games:{geo:['📌','El geoplano'],tan:['🧩','El puzle de formas'],cube:['🧊','Cubos en 3D'],meas:['📏','Adivina y mide']},
+ done:s=>`¡Listo! ¡Has ganado ${['','una estrella','dos estrellas','tres estrellas'][s]}!`,next:'▶ Siguiente',again:'↺ Otra vez',toMenu:'⬅ Juegos',
+ shapes:{3:'un triángulo',4:'un cuadrilátero',5:'un pentágono',6:'un hexágono',sq:'un cuadrado',rect:'un rectángulo'},
+ geoIntro:'Toca los clavos uno tras otro para estirar la goma. Para cerrar la forma, ¡toca otra vez el primer clavo!',
+ geoT:['¡Haz un triángulo!','¡Haz un cuadrado!','¡Haz un rectángulo que no sea un cuadrado!','¡Haz un cuadrado con lados de tres cuadritos!','¿Cuántos cuadritos hay dentro de la forma?','¡Haz una forma con exactamente cuatro cuadritos dentro!','¿Cuántos trozos de valla hacen falta alrededor del jardín?','¡Haz un triángulo grande con seis cuadritos dentro!'],
+ made:s=>`¡Has hecho ${s}!`,corners:n=>`Tiene ${n} esquinas.`,notTri:'Un triángulo tiene tres esquinas. ¡Inténtalo otra vez!',notSq:'Un cuadrado tiene cuatro lados iguales y esquinas rectas.',isSq:'¡Esto es un cuadrado! Haz un lado más largo.',notRect:'Un rectángulo tiene cuatro esquinas rectas.',
+ notSq3:'Cada lado tiene que medir tres cuadritos.',areaIs:n=>`Tu forma tiene ${n} cuadritos dentro.`,cross:'¡La goma se cruza! Inténtalo otra vez.',
+ geoHint:['Un triángulo tiene tres esquinas. Toca los clavos amarillos en orden: uno, dos, tres y luego otra vez el primero.','Un cuadrado tiene cuatro lados del mismo largo. ¡Toca los clavos amarillos en orden!','Un rectángulo es más largo que alto. ¡Toca los clavos amarillos en orden!','Cada lado mide tres cuadritos. ¡Toca los clavos amarillos en orden!','Cuenta los cuadritos fila por fila. En la primera fila hay cuatro. ¿Cuántas filas hay?','¡Dos cuadritos en fila y otros dos debajo son cuatro! ¡Toca los clavos amarillos!','Cuenta cada trozo de valla, de un punto al siguiente, todo alrededor.','Un lado de cuatro cuadritos y otro de tres hacen un triángulo grande. ¡Toca los clavos amarillos!'],areaQ:'¿Cuántos cuadritos hay dentro? ¡Cuenta!',perimQ:'¿Cuántos trozos de valla hacen falta alrededor?',areaA:n=>`Hay ${n} cuadritos. ¡Esto es el área!`,perimA:n=>`Hacen falta ${n} trozos de valla. ¡Esto es el perímetro!`,
+ tanIntro:'Arrastra las piezas a la sombra. ¡Toca una pieza para girarla!',tanT:['¡Haz un cuadrado con dos triángulos!','¡Construye una casa!','¡Haz un pez!','¡Haz un velero!','¡Construye un cohete!','¡Haz un gato!'],
+ rotate:'¡Casi! Toca la pieza para girarla.',tanOk:['¡Dos triángulos hacen un cuadrado!','¡Qué casa tan bonita!','¡Un pez!','¡Un velero listo para zarpar!','¡El cohete despega!','¡Miau! ¡Un gato!'],
+ cubeIntro:'¡Mira bien los cubos! Algunos están escondidos detrás o debajo.',cubeCount:'¿Cuántos cubos hay?',cubeTop:'¿Cómo se ve desde arriba? ¡Elige!',cubeBuild:'¡Construye uno igual! Toca un sitio para añadir un cubo.',
+ cubeA:n=>`¡Hay ${n} cubos!`,cubeTopA:'¡Exacto! Esta es la vista desde arriba.',cubeBuildA:'¡Idéntico! ¡Eres un arquitecto!',cubeNo:'Mira otra vez. ¡No olvides los cubos escondidos!',model:'Modelo',yours:'El tuyo',
+ measIntro:'¡Adivinemos las distancias y midámoslas!',estQ:'¿Cuántos pasos da la zorrita hasta la zanahoria? ¡Adivina!',estRef:'Arriba ves cuánto mide un paso. ¡Puedes arrastrarlo con el dedo!',u1:'1 paso',penRef:'Arriba hay un lápiz. ¡Puedes arrastrarlo con el dedo para medir!',u2:'1 lápiz',steps:n=>`¡${n} pasos!`,exact:'¡Perfecto! ¡Lo has adivinado exactamente!',close:'¡Muy cerca!',far:(g,n)=>`Has dicho ${g}, pero son ${n} pasos.`,
+ cmpQ:'¿Qué camino es más largo?',blue:'🟦 Azul',orange:'🟧 Naranja',same:'🟰 Iguales',cmpA:(a,b)=>`El camino azul tiene ${a} pasos, el naranja ${b}.`,
+ penQ:'¿Cuántos lápices mide el tronco?',penA:n=>`¡Mide ${n} lápices!`,rugQ:'¿Qué alfombra es más grande?',rugA:(a,b)=>`La alfombra azul tiene ${a} cuadritos, la naranja ${b}.`});
+S('rb',{back:'⬅ Atrás',allOn:'🔓 Todos: sí',allOff:'🔓 Todos: no',
+ hello:'¡Hola! Soy RoboPufi, el zorro robot. ¡Construyamos y programemos juntos!',
+ zones:{prog:['🧭','Programa a RoboPufi'],mech:['⚙️','Máquinas simples'],circ:['⚡','Circuitos'],sens:['👀','Sensores'],gar:['🔧','El taller']},
+ zoneSay:{prog:'¡Dile a RoboPufi adónde ir, con las flechas!',mech:'¡Descubramos cómo funcionan las máquinas!',circ:'¡Hagamos correr la electricidad!',sens:'Los robots sienten el mundo con sensores. ¡Probémoslos!',gar:'¡Aquí puedes cambiar mi color y mis piezas!'},
+ lvl:n=>`Nivel ${n}`,
+ progIntro:'Pon las flechas en orden y pulsa Vamos. ¡Lleva a RoboPufi hasta la batería!',
+ loopIntro:'¡Tienes pocas cartas! Toca una flecha del programa para repetirla.',
+ starIntro:'¡Recoge también las estrellas por el camino!',
+ run:'▶ Vamos',clear:'🗑️ Borrar',hint:'💡 Ayuda',
+ edge:'¡Uy! Ese es el borde.',bump:'¡Pum! RoboPufi ha chocado con una piedra. ¡Inténtalo otra vez!',water:'¡Chof! ¡RoboPufi no sabe nadar!',short:'RoboPufi no ha llegado a la batería. ¡Añade más flechas!',full:'¡No queda sitio! Toca una flecha para repetirla.',empty:'¡Primero pon flechas!',
+ progWin:'¡He llegado a la batería! ¡Gracias!',
+ done:s=>`¡Listo! ¡Has ganado ${s===1?'una estrella':s+' estrellas'}!`,next:'▶ Siguiente',again:'↺ Otra vez',toZone:'⬅ Atrás',locked:'Primero termina el nivel anterior.',
+ mech:{lever:['⚖️','El balancín'],gears:['⚙️','Los engranajes'],ramp:['🛝','La rampa']},
+ leverIntro:'El balancín es una palanca. ¡Arrastra los animales al lado derecho para ponerlo recto!',
+ leverTip:'¿Lo has visto? ¡Un animal ligero lejos del centro puede levantar a uno pesado!',
+ leverOk:'¡Equilibrio perfecto!',leverHint:(a,d)=>`Prueba ${a} en el sitio ${d}.`,
+ ani:{1:'el ratón',2:'el conejo',3:'el perro',4:'el elefante'},
+ gearsIntro:'La rueda roja tiene un motor. ¡Mira cómo hace girar a las otras! También puedes girarla con el dedo.',
+ qFast:'¿Qué rueda gira más rápido? ¡Tócala!',qDir:c=>`La rueda roja gira así ↻. ¿Hacia dónde gira la rueda ${c}?`,cname:{blue:'azul',green:'verde'},
+ whyFast:'¡Sí! La rueda pequeña da más vueltas, así que gira más rápido.',whyDir:'¡Sí! Dos ruedas que se tocan giran en sentidos contrarios.',whyChain:'¡Sí! La rueda del medio cambia el sentido y la tercera lo cambia otra vez.',gearWrong:'Mira otra vez bien las ruedas.',motor:'⚡ Motor',
+ rampIntro:'Arrastra el punto de arriba para subir o bajar la rampa. ¡La pelota tiene que pararse en la banderita!',
+ drop:'🔴 ¡Suelta!',far:'¡Demasiado lejos! Baja la rampa.',near:'¡Demasiado corto! Sube la rampa.',rampOk:'¡Justo en la banderita!',rampTip:'¡Cuanto más alta es la rampa, más lejos rueda la pelota!',
+ circIntro:'Arrastra un cable de un punto blanco a otro. La electricidad necesita un camino completo, del más al menos.',
+ cgoal:['¡Enciende la bombilla!','¡Enciende la bombilla con el interruptor!','¡Pon en marcha el ventilador!','¡Enciende las dos bombillas!','¡Haz sonar el timbre!','¡Enciende la bombilla y pon en marcha el ventilador!'],
+ shortC:'¡Cortocircuito! Un cable une el más directamente con el menos. ¡La batería se calienta!',swNow:'El circuito está listo. ¡Ahora pulsa el interruptor!',circOk:'El circuito está cerrado. ¡La electricidad corre!',tapWire:'Toca un cable para quitarlo.',
+ sens:{light:['🔦','El sensor de luz'],line:['✏️','Sigue la línea'],touch:['🖐️','El sensor táctil']},
+ lightIntro:'RoboPufi tiene un sensor de luz. ¡Mueve la linterna y te seguirá hasta el cargador!',lightOk:'¡La batería se está cargando! ¡Gracias!',
+ lineIntro:'RoboPufi tiene un sensor que ve la línea negra. ¡Dibuja un camino desde él hasta la batería y pulsa Vamos!',
+ lineStart:'Empieza a dibujar justo desde RoboPufi.',lineRock:'¡Pum! El camino pasa por una piedra.',lineEnd:'El camino no llega a la batería.',erase:'🧽 Borrar',
+ touchIntro:'RoboPufi tiene sensores táctiles. ¡Toca la parte que te digo!',
+ parts:{head:'la cabeza',ant:'la antena',belly:'la barriga',arm:'la mano',wheels:'la rueda',tracks:'la oruga',legs:'la pierna'},
+ touchAsk:p=>`¡Toca ${p}!`,touchWrong:p=>`Esta es ${p}. ¡Sigue buscando!`,touchOk:p=>`¡Sí, ${p}!`,
+ gar:{color:'🎨 Color',wheels:'🛞 Ruedas',ant:'📡 Antena',arms:'🦾 Brazos',eyes:'👀 Ojos'},
+ dance:'💃 ¡Baila!',need:n=>`${n} ⭐`,needSay:n=>`Necesitas ${n} estrellas. ¡Juega y recoge estrellas!`,cool:'¡Qué guapo estoy!',
+ garIntro:'¡Elige mi color y mis piezas! Las piezas nuevas se desbloquean cuando recoges estrellas en todos los juegos.'});
+S('rbg',{intro:'¡El taller de engranajes! El motor rojo gira. Añade ruedas para que el movimiento llegue a la máquina.',
+  t:['¡El barco necesita fuerza! Añade una rueda que una el motor con la hélice.','¡El reloj se ha parado! Llena el hueco con dos ruedas.','¡El coche tiene que ir rápido! ¿Qué rueda pones al final?','¡La grúa tiene que levantar al elefante pesado! ¿Qué rueda pones al final?','¡Oh, no, el barco va hacia atrás! Añade o quita ruedas para que vaya hacia delante.'],
+  why:['¡Muy bien! El motor hace girar las ruedas y las ruedas hacen girar la hélice del barco.','En un reloj, ruedas pequeñas y grandes se empujan y mueven las agujas.','Una rueda pequeña al final gira rapidísimo. ¡Así el coche va rápido! Una bicicleta funciona igual.','La rueda grande al final gira despacio, pero es muy fuerte. ¡Así una grúa levanta cosas pesadas!','Cada rueda nueva cambia el sentido. ¡Ahora la hélice empuja el barco hacia delante!'],
+  noFit:'¡No cabe! Prueba otro tamaño.',gap:'Las ruedas todavía no se tocan.',noRoom:'¡No queda sitio!',slow:'El coche va demasiado despacio. Prueba una rueda más pequeña al final.',weak:'¡Pesa demasiado! Prueba una rueda más grande al final.',back:'El barco sigue yendo hacia atrás.',
+  undo:'↩ Quitar',sz:{S:'Pequeña',M:'Mediana',L:'Grande'}});
+S('rbc',{zone:['🎨','El laboratorio de colores'],zoneSay:'¡Mezclemos colores, como científicos de verdad!',
+ col:{tubes:['🧪','Las probetas'],shirts:['👕','La tintorería de camisetas'],guess:['🔮','Adivina el color']},
+ n:{R:'rojo',Y:'amarillo',B:'azul',W:'blanco',K:'negro',orange:'naranja',green:'verde',purple:'morado',pink:'rosa',lblue:'celeste',brown:'marrón',lgreen:'verde claro',grey:'gris'},
+ and:' y ',make:(a,c)=>`¡${a} dan ${c}!`,
+ tubesIntro:'Mezcla los colores de las probetas en el vaso para conseguir el color que hace falta. ¡Toca una probeta para echar!',
+ tubeTask:c=>`¡Haz el ${c}!`,more:c=>`Añade un poco más de ${c}.`,extra:c=>`Has añadido ${c}, pero no va. ¡Vacía el vaso e inténtalo otra vez!`,full:'¡El vaso está lleno! Vacíalo e inténtalo otra vez.',empty:'🫗 Vaciar',
+ shirtsIntro:'¡Bienvenido a la tintorería! Los clientes quieren camisetas de colores. Mezcla la pintura en la cubeta y luego toca la camiseta para teñirla.',
+ want:(c,o)=>`¡Quiero una camiseta ${c}, como ${o}!`,noPaint:'¡Primero pon pintura en la cubeta!',notMine:'¡Ese no es mi color! La lavamos y lo intentamos otra vez.',thanks:'¡Gracias! ¡Es preciosa!',
+ guessIntro:'¿Qué color sale al mezclar? ¡Adivina!',guessQ:a=>`${a} dan…?`,guessNo:'No exactamente. ¡Mira lo que sale!',
+ obj:{orange:'una naranja',green:'una rana',purple:'las uvas',pink:'una flor',lblue:'el cielo',brown:'un oso',lgreen:'un kiwi',grey:'un elefante'}});
+{ const r=L10N.rb[lg], c=L10N.rbc[lg]; r.zones.col=c.zone; r.zoneSay.col=c.zoneSay; r.col=c.col; }
+S('aq',{title:'🐠 Mis acuarios',main:'🌿 Acuario',pred:'🦈 Pecera de depredadores',close:'✖ Cerrar',eatOn:'🐟➜🦈 Los depredadores comen: sí',eatOff:'🐟➜🦈 Los depredadores comen: no',
+  pantry:'Despensa',empty:'¡Pesca letras para traer peces y comida!',hungry:n=>`¡${n} peces tienen hambre! Pesca letras para traerles comida.`,hungry1:'¡Un pez tiene hambre! Pesca letras para traerle comida.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)}: se los come ${who}.`,nobody:f=>`Aquí nadie tiene hambre de ${f}.`,full:'¡Lleno!',hungryS:'Hambre',happy:'Lleno y feliz',
+  diet:'Come:',size:['pequeño','joven','grande'],move2pred:'➜ 🦈 Pecera de depredadores',move2main:'➜ 🌿 Acuario',ok:'👍',
+  warn:n=>`¡Cuidado! ${n} caza pececitos. ¡Llévalo a la pecera de depredadores!`,ate:(p,v)=>`¡${p} se ha comido ${v}!`,got:(e,f)=>`¡Has pescado ${f} para los peces! ${e}`,newFish:n=>`¡Un pez nuevo en el acuario: ${n}!`,more:n=>`+${n} en el río`,sated:'¡Los peces están llenos! Vuelve mañana.',night:'🌙 Noche',day:'☀️ Día',nightSay:'¡Buenas noches, peces! Por la noche el siluro sale a cazar.',daySay:'¡Buenos días, peces!',album:'📖 Álbum',albumT:'El álbum de peces',albumSay:(n,t)=>`Has encontrado ${n} especies de ${t}. ¡Pesca letras para encontrarlas todas!`,dirty:'¡El cristal está sucio! Límpialo con el dedo.',clean:'¡El acuario brilla! ¡Los peces están contentos!',come:'¡Mira, vienen a comer!'});
+})();
+</script>
+
+<script>
 /* ===== Français — jeu principal, monde, monuments, footballeurs ===== */
 (()=>{ const lg='fr', IDX=6;
 L10N.main=L10N.main||{};
@@ -7358,6 +7741,14 @@ window.__parentsExtra=async box=>{ const s=document.createElement('div'); s.clas
 const snap=()=>{ const o={}; try{ for(let k=0;k<localStorage.length;k++){ const key=localStorage.key(k); o[key]=localStorage.getItem(key); } }catch(e){} return JSON.stringify(o); };
 N.call('store.get').then(s=>{ try{ if(s&&localStorage.length<2){ const o=JSON.parse(s); const keys=Object.keys(o); if(keys.length>1){ keys.forEach(k=>localStorage.setItem(k,o[k])); location.reload(); } } }catch(e){} });
 setInterval(()=>N.call('store.set',{snapshot:snap()}),20000); document.addEventListener('visibilitychange',()=>{ if(document.hidden) N.call('store.set',{snapshot:snap()}); });
+})();
+</script>
+<script>
+/* Español — nombres de los peces */
+(()=>{ const lg='es', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['el carpín','Carpín','El carpín es un pez dorado y tranquilo. Le gustan las plantas y los gusanos.'],crap:['la carpa','Carpa','La carpa tiene bigotitos para buscar comida en el barro.'],pastrav:['la trucha','Trucha','La trucha vive en los arroyos fríos de montaña. Tiene manchas negras y una raya rosa.'],biban:['la perca','Perca','La perca tiene rayas en el lomo y aletas rojas. Caza pececitos.'],somn:['el siluro','Siluro','El siluro tiene bigotes largos y come casi de todo. Caza de noche.'],stiuca:['el lucio','Lucio','El lucio es el gran cazador de los ríos. ¡Se esconde y ataca rapidísimo!'],rac:['el cangrejo de río','Cangrejo','El cangrejo de río tiene pinzas y anda hacia atrás. Limpia el fondo.'],testoasa:['la tortuga','Tortuga','La tortuga de agua lleva su casa a la espalda.'],plev:['el pececito','Pececito','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'las algas',worm:'los gusanos',ins:'los insectos',plev:'los pececitos'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
 })();
 </script>
 <script>
