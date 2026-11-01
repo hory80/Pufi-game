@@ -5455,6 +5455,9 @@ window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){re
 .tm-tile{font:inherit;border:none;border-radius:18px;background:#fff;box-shadow:0 6px 0 #B9D9F2;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:8px 12px;min-width:clamp(84px,13vw,150px);font-weight:800;font-size:clamp(1rem,2.4vw,1.3rem);color:var(--ink)}
 .tm-tile .e{font-size:clamp(2.6rem,7.5vh,4.2rem);line-height:1.1}
 .tm-tile.used{visibility:hidden}
+.tm-tile.hl{outline:5px solid var(--sun);transform:scale(1.06)}
+.tm-tile.tm-hint{animation:tmHint .6s ease-in-out infinite alternate;outline:5px solid var(--plum)}
+@keyframes tmHint{to{transform:scale(1.1)}}
 .tm-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%;max-width:760px;margin:0 auto}
 .tm-cal .hd{font-weight:800;text-align:center;font-size:clamp(.8rem,2vw,1.05rem);padding:2px;border-radius:10px;background:#fff}
 .tm-cal .hd.we{background:#FFE1E7}
@@ -5526,7 +5529,7 @@ const roMin=n=>n===1?'un minut':n<20?roF(n)+' minute':roF(n)+' de minute';
 const DE_H=['zwölf','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf'];
 const h12=h=>(h%12)||12;
 const TX={
-ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff:'🔓 Toate: NU',lvl:n=>`Nivelul ${n}`,ok:'✔ Gata',listen:'🔊 Ascultă',
+ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff:'🔓 Toate: NU',lvl:n=>`Nivelul ${n}`,ok:'✔ Gata',listen:'🔊 Ascultă',help:'💡 Ajutor',first:a=>`Prima dată: ${a}.`,nextIs:(a,b)=>`După ${a} urmează: ${b}.`,
  done:s=>`Gata! Ai câștigat ${['','o stea','două stele','trei stele'][s]}!`,next:'▶ Nivelul următor',again:'↺ Din nou',toMenu:'⬅ Înapoi',locked:'Termină întâi nivelul de dinainte.',
  ladder:['🕰️ ore','🌅 o zi','🚃 7 zile = o săptămână','🎡 12 luni = un an'],
  worlds:{clock:['🕰️','Ceasul'],day:['🌅','Ziua'],cal:['📅','Săptămâna și calendarul'],seas:['🌳','Anotimpurile']},
@@ -5570,7 +5573,7 @@ ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff
  treeHi:['Primăvara copacul înflorește. Atinge mugurii!','Vara copacul e plin de fructe. Culege cireșele!','Toamna frunzele se îngălbenesc și cad. Scutură copacul!','Iarna copacul doarme sub zăpadă. Fă un om de zăpadă!'],
  dressTask:s=>`E ${s}! Ce îmbracă Pufi? Alege trei lucruri potrivite.`, dressNo:['Hmm, asta nu se potrivește acum.','Uff, vara e prea cald pentru asta!','Hmm, asta nu se potrivește acum.','Brrr! Iarna e prea frig pentru asta!'],
  sortTask:'În ce anotimp folosim asta? Pune-l în coșul potrivit!'},
-de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',lvl:n=>`Level ${n}`,ok:'✔ Fertig',listen:'🔊 Anhören',
+de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',lvl:n=>`Level ${n}`,ok:'✔ Fertig',listen:'🔊 Anhören',help:'💡 Hilfe',first:a=>`Zuerst: ${a}.`,nextIs:(a,b)=>`Nach ${a} kommt: ${b}.`,
  done:s=>`Geschafft! Du hast ${['','einen Stern','zwei Sterne','drei Sterne'][s]} gewonnen!`,next:'▶ Nächstes Level',again:'↺ Nochmal',toMenu:'⬅ Zurück',locked:'Schaffe zuerst das Level davor.',
  ladder:['🕰️ Stunden','🌅 ein Tag','🚃 7 Tage = eine Woche','🎡 12 Monate = ein Jahr'],
  worlds:{clock:['🕰️','Die Uhr'],day:['🌅','Der Tag'],cal:['📅','Woche und Kalender'],seas:['🌳','Die Jahreszeiten']},
@@ -5614,7 +5617,7 @@ de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓
  treeHi:['Im Frühling blüht der Baum. Tippe auf die Knospen!','Im Sommer hängen viele Früchte am Baum. Pflück die Kirschen!','Im Herbst werden die Blätter bunt und fallen. Schüttel den Baum!','Im Winter schläft der Baum unter dem Schnee. Bau einen Schneemann!'],
  dressTask:s=>`Es ist ${s}! Was zieht Pufi an? Such drei passende Sachen aus.`, dressNo:['Hmm, das passt gerade nicht.','Puh, im Sommer ist es dafür zu warm!','Hmm, das passt gerade nicht.','Brrr! Im Winter ist es dafür zu kalt!'],
  sortTask:'In welcher Jahreszeit brauchen wir das? Leg es in den richtigen Korb!'},
-en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',lvl:n=>`Level ${n}`,ok:'✔ Done',listen:'🔊 Listen',
+en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',lvl:n=>`Level ${n}`,ok:'✔ Done',listen:'🔊 Listen',help:'💡 Help',first:a=>`First: ${a}.`,nextIs:(a,b)=>`After ${a} comes: ${b}.`,
  done:s=>`Done! You won ${['','one star','two stars','three stars'][s]}!`,next:'▶ Next level',again:'↺ Again',toMenu:'⬅ Back',locked:'Finish the level before first.',
  ladder:['🕰️ hours','🌅 a day','🚃 7 days = a week','🎡 12 months = a year'],
  worlds:{clock:['🕰️','The clock'],day:['🌅','The day'],cal:['📅','Week and calendar'],seas:['🌳','The seasons']},
@@ -5752,6 +5755,11 @@ function opts(ctrl,list,fn,cls,after){ const box=el('div','tm-ans'+(cls?' '+cls:
     if(say_){ const w=el('div','tm-opt'); const s=el('button','tm-say','🔊'); s.onclick=e=>{ e.stopPropagation(); box.dataset.stop=1; sp(say_); }; w.append(b,s); box.appendChild(w); items.push([b,say_]); }
     else box.appendChild(b); });
   ctrl.appendChild(box); if(after&&items.length) readAll(items,box,after); return box; }
+/* carduri cu 🔊 (pentru copiii care încă nu citesc) */
+function sayTile(tl,b,text,items){ const w=el('div','tm-opt'); const s=el('button','tm-say','🔊'); s.onclick=e=>{ e.stopPropagation(); tl.dataset.stop=1; sp(text); }; w.append(b,s); tl.appendChild(w); items.push([b,text]); b._w=w; }
+function hideTile(b){ b.classList.add('used'); if(b._w) b._w.style.visibility='hidden'; }
+function helpBtn(F,fn){ const h=btn(X().help,'',fn); F.ctrl.appendChild(h); return h; }
+function blinkHint(b){ document.querySelectorAll('.tm-hint').forEach(x=>x.classList.remove('tm-hint')); b.classList.add('tm-hint'); }
 async function readAll(items,box,after){ const my=gen; await after; await wait(250); for(const [b,t] of items){ if(my!==gen||box.dataset.stop||!document.body.contains(b)) return; b.classList.add('hl'); await sp(t); b.classList.remove('hl'); await wait(150); } }
 const hmOf=t=>[Math.floor(t/60)%24,t%60];
 
@@ -5871,12 +5879,15 @@ function gOrder(li){ let round=0, errs=0; const ROUNDS=3; const F=frame(X().ordT
     const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:18px;align-items:center;width:100%';
     const sl=el('div','tm-slots'); const slots=idx.map(i=>{ const s=el('div','tm-slot'); const [c1,c2]=skyCols(A[i][2]); s.style.background=`linear-gradient(${c1},${c2})`; s.style.borderColor='rgba(255,255,255,.7)'; sl.appendChild(s); return s; });
     const tl=el('div','tm-tiles'); let k=0;
-    shuf(idx).forEach(i=>{ const b=el('button','tm-tile',`<span class="e">${A[i][0]}</span>${A[i][1]}`); b.onclick=()=>{ if(b.classList.contains('used')) return;
-      if(i===idx[k]){ b.classList.add('used'); const s=slots[k]; s.classList.add('full'); s.innerHTML=`<span class="e">${A[i][0]}</span>${A[i][1]}<small>${digi(A[i][2])}</small>`; s.style.background=''; blip(); sp(A[i][1]); k++;
+    const items=[], tiles={};
+    shuf(idx).forEach(i=>{ const b=el('button','tm-tile',`<span class="e">${A[i][0]}</span>${A[i][1]}`); tiles[i]=b; b.onclick=()=>{ if(b.classList.contains('used')) return; tl.dataset.stop=1;
+      if(i===idx[k]){ hideTile(b); b.classList.remove('tm-hint'); const s=slots[k]; s.classList.add('full'); s.innerHTML=`<span class="e">${A[i][0]}</span>${A[i][1]}<small>${digi(A[i][2])}</small>`; s.style.background=''; blip(); sp(A[i][1]); k++;
         if(k===idx.length){ chime(); award(); round++; F.dot(round); setTimeout(()=>{ if(myGen!==gen) return; if(round>=ROUNDS) levelDone('order',li,errs); else show(); },1600); } }
-      else { errs++; boing(); b.classList.remove('rd-shake'); void b.offsetWidth; b.classList.add('rd-shake'); } }; tl.appendChild(b); });
-    wrap.append(sl,tl); F.stage.appendChild(wrap); }
-  show(); sp(X().ordTask); }
+      else { errs++; boing(); sp(A[i][1]); b.classList.remove('rd-shake'); void b.offsetWidth; b.classList.add('rd-shake'); } }; sayTile(tl,b,A[i][1],items); });
+    wrap.append(sl,tl); F.stage.appendChild(wrap);
+    helpBtn(F,()=>{ if(k>=idx.length) return; errs++; tl.dataset.stop=1; const i=idx[k]; blinkHint(tiles[i]); sp(k===0?X().first(A[i][1]):X().nextIs(A[idx[k-1]][1],A[i][1])); });
+    readAll(items,tl,round===0?sp(X().ordTask):Promise.resolve()); }
+  show(); }
 
 /* ---------- 8. o zi cu Pufi (ceas + cer) ---------- */
 function gDayClk(li){ const A=X().acts; const SEQ=li===0?[[0,420],[3,480],[4,720],[6,960],[7,1080],[10,1200]]:[[0,420],[2,450],[4,750],[6,990],[8,1170],[10,1230]];
@@ -5919,11 +5930,11 @@ function gWeek(li){ let ti=0, errs=0, busy=false; const N=li===0?2:PER; const F=
   function train(filled,hi){ const w=el('div','tm-slots'); w.style.alignItems='flex-end'; w.style.flexWrap='nowrap'; w.appendChild(el('div',null,'<span style="font-size:clamp(3rem,9vh,5rem);display:inline-block;transform:scaleX(-1)">🚂</span>'));
     return [w,D.map((n,i)=>{ const s=el('div','tm-slot'+(filled?' full':''),filled?`<span class="e">${i>=5?'🎈':'📘'}</span>${n}`:''); s.style.minWidth='clamp(46px,10.5vw,124px)'; s.style.flex='1 1 0'; if(i>=5) s.style.background=filled?'#FFE1E7':'rgba(255,93,122,.08)'; if(hi===i) s.style.outline='4px solid var(--sun)'; w.appendChild(s); return s; })]; }
   function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:18px;align-items:center;width:100%';
-    if(li===0){ const [w,slots]=train(false); const tl=el('div','tm-tiles'); let k=0; F.say(X().weekTask);
-      shuf([...D.keys()]).forEach(i=>{ const b=el('button','tm-tile',`<span class="e" style="font-size:2rem">${D[i][0].toUpperCase()}</span>${D[i]}`); b.onclick=async()=>{ if(busy||b.classList.contains('used')) return;
-        if(i!==k){ errs++; boing(); sp(D[i]); return; } b.classList.add('used'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
-        if(k===7){ busy=true; toot(); chime(); award(); F.dot(ti+1); w.style.transition='transform 2.4s ease-in'; await spW(X().weekend,1200); w.style.transform='translateX(-120vw)'; await wait(1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); } }; tl.appendChild(b); });
-      wrap.append(w,tl); }
+    if(li===0){ const [w,slots]=train(false); const tl=el('div','tm-tiles'); let k=0; const qq=F.say(X().weekTask); const items=[], tiles={};
+      shuf([...D.keys()]).forEach(i=>{ const b=el('button','tm-tile',`<span class="e" style="font-size:2rem">${D[i][0].toUpperCase()}</span>${D[i]}`); tiles[i]=b; b.onclick=async()=>{ if(busy||b.classList.contains('used')) return; tl.dataset.stop=1;
+        if(i!==k){ errs++; boing(); sp(D[i]); return; } hideTile(b); b.classList.remove('tm-hint'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
+        if(k===7){ busy=true; toot(); chime(); award(); F.dot(ti+1); w.style.transition='transform 2.4s ease-in'; await spW(X().weekend,1200); w.style.transform='translateX(-120vw)'; await wait(1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); } }; sayTile(tl,b,D[i],items); });
+      wrap.append(w,tl); helpBtn(F,()=>{ if(k>=7||busy) return; errs++; tl.dataset.stop=1; blinkHint(tiles[k]); sp(k===0?X().first(D[0]):X().nextIs(D[k-1],D[k])); }); readAll(items,tl,qq); }
     else { const d=R(7), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); const qq=F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
       const set=new Set([ans]); while(set.size<3){ const v=R(7); if(v!==d) set.add(v); }
       opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],900); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); },null,qq);
