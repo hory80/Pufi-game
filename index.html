@@ -250,7 +250,7 @@ button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 .rd-big{font:inherit;font-weight:800;font-size:clamp(1.3rem,min(4vw,3.6vh),2rem);background:var(--leaf);color:#fff;border:none;border-radius:24px;padding:6px 26px;box-shadow:0 7px 0 #24935F;cursor:pointer}
 .rd-big.alt{background:var(--plum);box-shadow:0 7px 0 #5B3FC4}
 .rd-big:active{transform:translateY(5px);box-shadow:0 2px 0 #24935F}
-.rd-menu{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px;align-content:center;max-width:980px;width:100%;margin:0 auto;overflow:auto}
+.rd-menu{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px;align-content:safe center;max-width:980px;width:100%;margin:0 auto;overflow:auto}
 .rd-card{font:inherit;background:var(--card);border:none;border-radius:24px;box-shadow:0 8px 0 #B9D9F2;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--ink)}
 .rd-card:active{transform:translateY(6px);box-shadow:0 2px 0 #B9D9F2}
 .rd-card .ic{font-size:clamp(2.4rem,min(7vw,8vh),3.8rem);line-height:1.1}
@@ -261,6 +261,42 @@ button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 .rd-msg{font-size:clamp(1.05rem,min(3vw,3vh),1.6rem);font-weight:800;min-height:1.3em;text-align:center}
 .rd-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .rd-shake{animation:rdShake .35s}
+.rd-mhead{grid-column:1/-1;font-size:clamp(1.1rem,2.8vw,1.5rem);font-weight:800;margin:6px 0 -4px 6px;opacity:.85}
+.rd-card.new::after{content:attr(data-new);position:absolute;top:8px;right:10px;background:var(--berry);color:#fff;font-size:.75rem;font-weight:800;border-radius:999px;padding:1px 8px}
+.rd-card{position:relative}
+.rd-hhead{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:24px;padding:4px 22px;box-shadow:0 6px 0 #B9D9F2}
+.rd-hhead .u{font-size:clamp(2.6rem,min(9vw,10vh),4.6rem);font-weight:800;color:var(--berry);line-height:1.1}
+.rd-hhead .ex{font-size:clamp(2rem,min(7vw,8vh),3.4rem)}
+.rd-hgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.6vw,16px);width:100%;max-width:760px}
+.rd-hcard{font:inherit;position:relative;border:none;border-radius:22px;background:var(--card);box-shadow:0 6px 0 #B9D9F2;padding:6px;display:flex;flex-direction:column;align-items:center;cursor:pointer;color:var(--ink);min-height:clamp(96px,17vh,170px);justify-content:center}
+.rd-hcard .e{font-size:clamp(2.8rem,min(9vw,10vh),5rem);line-height:1.1}
+.rd-hcard .w{font-size:clamp(1.05rem,2.6vw,1.6rem);font-weight:800;min-height:1.2em;letter-spacing:.03em}
+.rd-hcard .w b{color:var(--berry)}
+.rd-hcard.yes{background:#D7F5E6;box-shadow:0 6px 0 #3BC48A}
+.rd-hcard.yes::after{content:"✓";position:absolute;top:4px;right:10px;font-size:1.6rem;font-weight:800;color:#24935F}
+.rd-hcard.no{opacity:.55}
+.rd-hcard.no::after{content:"✖";position:absolute;top:4px;right:10px;font-size:1.4rem;font-weight:800;color:var(--berry)}
+.rd-posw b{color:var(--berry)}
+.rd-posrow{display:flex;gap:clamp(8px,2vw,18px);flex-wrap:wrap;justify-content:center}
+.rd-posb{font:inherit;font-weight:800;font-size:clamp(1rem,2.6vw,1.4rem);border:none;border-radius:20px;background:var(--card);box-shadow:0 6px 0 #B9D9F2;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:var(--ink);min-width:clamp(100px,22vw,190px)}
+.rd-posb .bx{font-size:clamp(1.8rem,5vw,2.8rem);letter-spacing:.1em;color:var(--plum);line-height:1}
+.rd-posb.right{background:#D7F5E6;box-shadow:0 6px 0 #3BC48A}
+.rd-fam{font-size:clamp(1.3rem,3.4vw,2rem);font-weight:800;color:#fff;background:var(--plum);border-radius:999px;padding:2px 20px}
+.rd-slot.big{width:clamp(72px,12vw,120px);color:var(--plum)}
+.rd-bblArea{display:flex;flex-wrap:wrap;gap:clamp(10px,2.4vw,26px);justify-content:center;align-items:center;max-width:820px;padding:10px}
+.rd-bbl{font:inherit;font-weight:800;font-size:clamp(1.8rem,min(5.5vw,6.5vh),3rem);width:2em;height:2em;border-radius:50%;cursor:pointer;color:var(--ink);border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle at 30% 28%,#fff 0 9%,rgba(255,255,255,.55) 16%,hsla(var(--h),90%,78%,.65) 55%,hsla(var(--h),85%,62%,.85) 100%);box-shadow:0 6px 14px rgba(36,50,95,.18),inset -6px -8px 14px rgba(255,255,255,.35);animation:rdFloat var(--d,3s) ease-in-out infinite alternate}
+.rd-bbl.big{width:2.6em;height:2.6em;font-size:clamp(1.9rem,min(5.8vw,6.8vh),3.2rem)}
+.rd-bbl.pop{animation:rdBblPop .35s forwards;pointer-events:none}
+.rd-bbl.hint{outline:5px solid var(--sun);outline-offset:3px}
+@keyframes rdFloat{0%{transform:translateY(-8px) rotate(-4deg)}100%{transform:translateY(8px) rotate(4deg)}}
+@keyframes rdBblPop{40%{transform:scale(1.3);opacity:.8}100%{transform:scale(.1);opacity:0}}
+.rd-twins{display:flex;align-items:center;gap:clamp(16px,4vw,48px);flex-wrap:wrap;justify-content:center}
+.rd-twcol{display:flex;flex-direction:column;border:4px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--card)}
+.rd-tw{font:inherit;font-weight:800;font-size:clamp(1.8rem,min(5.5vw,6.5vh),3rem);border:none;border-bottom:3px solid var(--ink);background:none;padding:8px clamp(20px,4vw,44px);cursor:pointer;color:var(--ink);letter-spacing:.03em;min-width:5em}
+.rd-tw:last-child{border-bottom:none}
+.rd-tw.right{background:#D7F5E6;color:#24935F}
+.rd-tw.wrong{background:#FFE1E7;color:var(--berry);text-decoration:line-through}
+@media (prefers-reduced-motion:reduce){.rd-bbl{animation:none}}
 @keyframes rdShake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @keyframes rdPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}}
 /* alfabet */
@@ -2407,12 +2443,148 @@ function freeTrace(svg,mk,strokes,stg,onDone){
 }
 
 /* ---------- ecrane ---------- */
-const RUN={alpha:gAlpha,fish:gFish,train:gTrain,build:gBuild,read:gRead,story:gStory,write:gWrite};
+/* ---------- 8–11. jocuri noi: sunete, poziție, bule, cuvinte gemene ---------- */
+const VOC_RAW={
+ ro:'SOARE☀️ LUNĂ🌙 CASĂ🏠 PISICĂ🐱 CÂINE🐶 PEȘTE🐟 BROASCĂ🐸 URS🐻 LEU🦁 VACĂ🐄 OAIE🐑 MELC🐌 ȚESTOASĂ🐢 VAPOR🚢 UMBRELĂ☂️ COPAC🌳 CARTE📖 VAZĂ🏺 MINGE⚽ PÂINE🍞 LAPTE🥛 OU🥚 UNT🧈 MĂR🍎 BANANĂ🍌 FLOARE🌸 RAȚĂ🦆 ARICI🦔 NAS👃 TRANDAFIR🌹 TIGRU🐯 TREN🚂 BARCĂ⛵ RACHETĂ🚀 CIUPERCĂ🍄 INIMĂ❤️ BRÂNZĂ🧀 BALENĂ🐳 ȘOARECE🐭 GĂINĂ🐔 CAL🐴 LEBĂDĂ🦢 LINGURĂ🥄 ROȘIE🍅 CIREAȘĂ🍒 MORCOV🥕 PARĂ🍐 LĂMÂIE🍋 SEMAFOR🚦 GURĂ👄 COROANĂ👑 CLOPOȚEL🔔 LUMÂNARE🕯️ PENSULĂ🖌️ MĂTURĂ🧹 CANĂ☕ OCHELARI👓 CĂMILĂ🐪 FURNICĂ🐜 PĂIANJEN🕷️ ELEFANT🐘 CROCODIL🐊 MAȘINĂ🚗 OCHI👁️ ALBINĂ🐝 ȘARPE🐍 FOARFECĂ✂️ PANTOF👟 CHEIE🔑 FLUTURE🦋 STEA⭐ SCAUN🪑 CREION✏️ CIORAP🧦 PIATRĂ🪨 ÎNGHEȚATĂ🍦 GĂLEATĂ🪣 BUFNIȚĂ🦉 CAPRĂ🐐 MAIMUȚĂ🐒 PORC🐷 CHITARĂ🎸 GHEAȚĂ🧊 CEAS⏰ CIOCAN🔨 GHIOZDAN🎒 CASTANĂ🌰 MAMA👩 TATA👨 NOR☁️ BALON🎈 PEPENE🍉 CĂPȘUNĂ🍓 DELFIN🐬 GIRAFĂ🦒 ZEBRĂ🦓 LUP🐺 VULPE🦊 PINGUIN🐧 IEPURE🐰 AVION✈️ BICICLETĂ🚲 FOC🔥 BRAD🎄 CADOU🎁 TORT🎂 ZAR🎲 MÂNĂ✋ PICIOR🦶 DINTE🦷 URECHE👂 CUȚIT🔪 COCOȘ🐓 CIOCOLATĂ🍫 GHEM🧶 VIOARĂ🎻 TOBĂ🥁 LACĂT🔒 PLIC✉️ STEAG🚩 SARE🧂 MIERE🍯 TELEFON📱 CEAPĂ🧅 CERB🦌 GEANTĂ👜 GEAM🪟 OGLINDĂ🪞 PALTON🧥 ROBOT🤖 ZMEU🪁 CARACATIȚĂ🐙',
+ de:'SONNE☀️ MOND🌙 HAUS🏠 KATZE🐱 HUND🐶 FISCH🐟 FROSCH🐸 BÄR🐻 LÖWE🦁 KUH🐄 SCHAF🐑 SCHNECKE🐌 SCHILDKRÖTE🐢 SCHIFF🚢 SCHIRM☂️ BAUM🌳 BUCH📖 VASE🏺 BALL⚽ BROT🍞 MILCH🥛 EI🥚 BUTTER🧈 APFEL🍎 BANANE🍌 BLUME🌸 ENTE🦆 IGEL🦔 NASE👃 ROSE🌹 TIGER🐯 ZUG🚂 BOOT⛵ RAKETE🚀 PILZ🍄 HERZ❤️ KÄSE🧀 WAL🐳 MAUS🐭 HUHN🐔 PFERD🐴 SCHWAN🦢 LÖFFEL🥄 TOMATE🍅 KIRSCHE🍒 KAROTTE🥕 BIRNE🍐 ZITRONE🍋 AMPEL🚦 MUND👄 KRONE👑 GLOCKE🔔 KERZE🕯️ PINSEL🖌️ BESEN🧹 TASSE☕ BRILLE👓 KAMEL🐪 AMEISE🐜 SPINNE🕷️ ELEFANT🐘 KROKODIL🐊 AUTO🚗 AUGE👁️ BIENE🐝 SCHLANGE🐍 SCHERE✂️ SCHUH👟 SCHLÜSSEL🔑 SCHMETTERLING🦋 STERN⭐ STUHL🪑 STIFT✏️ STRUMPF🧦 STEIN🪨 EIS🍦 EIMER🪣 EULE🦉 ZIEGE🐐 AFFE🐒 SCHWEIN🐷 GITARRE🎸 UHR⏰ HAMMER🔨 KÜKEN🐤 MAMA👩 PAPA👨 WOLKE☁️ BALLON🎈 MELONE🍉 ERDBEERE🍓 DELFIN🐬 GIRAFFE🦒 ZEBRA🦓 WOLF🐺 FUCHS🦊 PINGUIN🐧 HASE🐰 FLUGZEUG✈️ FAHRRAD🚲 FEUER🔥 TANNE🎄 GESCHENK🎁 TORTE🎂 WÜRFEL🎲 HAND✋ ZAHN🦷 OHR👂 MESSER🔪 HAHN🐓 SCHOKOLADE🍫 GEIGE🎻 TROMMEL🥁 SCHLOSS🔒 BRIEF✉️ FAHNE🚩 SALZ🧂 HONIG🍯 TELEFON📱 ZWIEBEL🧅 HIRSCH🦌 TASCHE👜 FENSTER🪟 SPIEGEL🪞 MANTEL🧥 ROBOTER🤖 DRACHEN🪁 KRAKE🐙',
+ en:'SUN☀️ MOON🌙 HOUSE🏠 CAT🐱 DOG🐶 FISH🐟 FROG🐸 BEAR🐻 LION🦁 COW🐄 SHEEP🐑 SNAIL🐌 TURTLE🐢 SHIP🚢 UMBRELLA☂️ TREE🌳 BOOK📖 VASE🏺 BALL⚽ BREAD🍞 MILK🥛 EGG🥚 BUTTER🧈 APPLE🍎 BANANA🍌 FLOWER🌸 DUCK🦆 NOSE👃 ROSE🌹 TIGER🐯 TRAIN🚂 BOAT⛵ ROCKET🚀 MUSHROOM🍄 HEART❤️ CHEESE🧀 WHALE🐳 MOUSE🐭 HEN🐔 HORSE🐴 SWAN🦢 SPOON🥄 TOMATO🍅 CHERRY🍒 CARROT🥕 PEAR🍐 LEMON🍋 MOUTH👄 CROWN👑 BELL🔔 CANDLE🕯️ BRUSH🖌️ BROOM🧹 CUP☕ GLASSES👓 CAMEL🐪 ANT🐜 SPIDER🕷️ ELEPHANT🐘 CROCODILE🐊 CAR🚗 EYE👁️ BEE🐝 SNAKE🐍 SCISSORS✂️ SHOE👟 KEY🔑 BUTTERFLY🦋 STAR⭐ CHAIR🪑 PENCIL✏️ SOCK🧦 STONE🪨 BUCKET🪣 OWL🦉 GOAT🐐 MONKEY🐒 PIG🐷 GUITAR🎸 CLOCK⏰ HAMMER🔨 CHICK🐤 THUMB👍 SHELL🐚 SHARK🦈 CHOCOLATE🍫 WATCH⌚ HAT🎩 MUM👩 DAD👨 CLOUD☁️ BALLOON🎈 MELON🍉 STRAWBERRY🍓 PIZZA🍕 DOLPHIN🐬 GIRAFFE🦒 ZEBRA🦓 WOLF🐺 FOX🦊 PENGUIN🐧 RABBIT🐰 PLANE✈️ BIKE🚲 FIRE🔥 GIFT🎁 CAKE🎂 HAND✋ FOOT🦶 TOOTH🦷 EAR👂 KNIFE🔪 VIOLIN🎻 DRUM🥁 LOCK🔒 LETTER✉️ FLAG🚩 SALT🧂 HONEY🍯 PHONE📱 ONION🧅 DEER🦌 BAG👜 WINDOW🪟 MIRROR🪞 COAT🧥 ROBOT🤖 KITE🪁 JUICE🧃 OCTOPUS🐙 QUEEN👸'
+};
+const VOC={}; for(const k in VOC_RAW) VOC[k]=VOC_RAW[k].split(' ').map(t=>{ const m=t.match(/^([A-ZĂÂÎȘȚÄÖÜ]+)(.+)$/); return [m[2],m[1]]; });
+/* grafeme (grupuri de litere citite ca un singur sunet) */
+const GRA={ ro:['CHE','CHI','GHE','GHI','CE','CI','GE','GI'], de:['SCH','CH','CK','AU','EI','EU','IE','PF'], en:['SH','CH','TH','CK','EE','OO','AI','OA','WH','PH','KN'] };
+/* începuturi speciale pentru vânătoarea de sunete */
+const HUNTLONG={ ro:['CHE','CHI','GHE','GHI','CE','CI','GE','GI'], de:['SCH','ST','SP','AU','EI','EU','PF','CH'], en:['SH','CH','TH','WH','PH','KN'] };
+const HUNTL={ ro:'ABCDFGILMNOPRSTUVȘȚ', de:'ABDEFGHKLMNPRSTWZ', en:'BCDFHLMNPRSTW' };
+const FAM={ ro:[['CE','CI'],['CHE','CHI'],['GE','GI'],['GHE','GHI']], de:[['AU'],['EI'],['SCH'],['IE'],['EU'],['CH'],['CK']], en:[['SH'],['CH'],['TH'],['EE'],['OO'],['CK'],['AI'],['OA']] };
+const POSL={ ro:'MLTNRPBSDF', de:'MLNPFKT', en:'MLTNPBFDSK' };
+function toks(W,lg){ const G=GRA[lg]||[], out=[]; let i=0; while(i<W.length){ const g=G.find(x=>W.startsWith(x,i)); if(g){ out.push(g); i+=g.length; } else { out.push(W[i]); i++; } } return out; }
+function startsUnit(W,u,lg){ if(!W.startsWith(u)) return false; return !HUNTLONG[lg].some(L=>L.length>u.length&&L.startsWith(u)&&W.startsWith(L)); }
+const unitCase=u=>upper?u:(LG()==='de'?u.charAt(0)+u.slice(1).toLowerCase():u.toLowerCase());
+function tokHTML(W,lg,mark){ const d=cs(W), t=toks(W,lg); let i=0, h=''; t.forEach((x,k)=>{ const s=d.slice(i,i+x.length); i+=x.length; h+=mark(k,x)?`<b>${s}</b>`:s; }); return h; }
+const X2={
+ ro:{ groups:['🔤 Litere și sunete','✍️ Scriem','📚 Citim'],
+  games:{hunt:['👂','Vânătoarea de sunete'],pos:['📍','Unde auzi sunetul?'],bubble:['🫧','Bule cu litere'],twins:['🔍','Cuvinte gemene']},
+  huntSay:(u,ex)=>`Atinge toate pozele care încep cu ${u}, ca în ${ex}!`, huntTask:u=>`Care încep cu ${u}?`,
+  huntNo:w=>`${w}? Nu, asta nu se potrivește.`, huntDone:'Bravo! Le-ai găsit pe toate! Celelalte nu se potrivesc.',
+  posSay:(l,w)=>`Unde auzi ${l} în cuvântul ${w}? La început, la mijloc sau la sfârșit?`, posTask:l=>`Unde auzi ${l}?`,
+  posLbl:['La început','La mijloc','La sfârșit'], posRight:(l,w,p)=>`Da! În ${w}, ${l} este ${p.toLowerCase()}.`, posWrong:'Mai ascultă o dată!',
+  bubbleSay:w=>`Sparge bulele în ordine și scrie ${w}!`, bubbleTask:f=>`Cuvinte cu ${f}`, bubbleDone:w=>`Super! Ai scris ${w}.`,
+  twinsSay:'Care cuvânt se potrivește cu poza?', twinsWrong:w=>`Aici scrie ${w}. Mai încearcă!`, twinsRight:w=>`Da! ${w}!`, listen:'🔊 Ascultă' },
+ de:{ groups:['🔤 Buchstaben und Laute','✍️ Schreiben','📚 Lesen'],
+  games:{hunt:['👂','Laute-Jagd'],pos:['📍','Wo hörst du den Laut?'],bubble:['🫧','Buchstaben-Blasen'],twins:['🔍','Wörter-Zwillinge']},
+  huntSay:(u,ex,multi)=>multi?`Tippe alle Bilder an, die so anfangen wie ${ex}!`:`Tippe alle Bilder an, die mit ${u} anfangen, wie ${ex}!`, huntTask:u=>`Was fängt mit ${u} an?`,
+  huntNo:w=>`${w}? Nein, das passt nicht dazu.`, huntDone:'Super! Du hast alle gefunden! Die anderen passen nicht dazu.',
+  posSay:(l,w)=>`Wo hörst du das ${l} in ${w}? Vorne, in der Mitte oder hinten?`, posTask:l=>`Wo hörst du das ${l}?`,
+  posLbl:['Vorne','In der Mitte','Hinten'], posRight:(l,w,p)=>`Ja! In ${w} hörst du das ${l} ${p==='In der Mitte'?'in der Mitte':p.toLowerCase()}.`, posWrong:'Hör noch einmal genau hin!',
+  bubbleSay:w=>`Lass die Blasen der Reihe nach platzen und schreibe ${w}!`, bubbleTask:f=>`Wörter mit ${f}`, bubbleDone:w=>`Super! Du hast ${w} geschrieben.`,
+  twinsSay:'Welches Wort passt zum Bild?', twinsWrong:w=>`Da steht ${w}. Versuch es nochmal!`, twinsRight:w=>`Ja! ${w}!`, listen:'🔊 Anhören' },
+ en:{ groups:['🔤 Letters and sounds','✍️ Writing','📚 Reading'],
+  games:{hunt:['👂','Sound hunt'],pos:['📍','Where is the sound?'],bubble:['🫧','Letter bubbles'],twins:['🔍','Word twins']},
+  huntSay:(u,ex,multi)=>multi?`Tap all the pictures that start like ${ex}!`:`Tap all the pictures that start with ${u}, like ${ex}!`, huntTask:u=>`Which start with ${u}?`,
+  huntNo:w=>`${w}? No, that one does not fit.`, huntDone:'Great! You found them all! The others do not fit.',
+  posSay:(l,w)=>`Where do you hear ${l} in ${w}? At the start, in the middle or at the end?`, posTask:l=>`Where do you hear ${l}?`,
+  posLbl:['At the start','In the middle','At the end'], posRight:(l,w,p)=>`Yes! In ${w}, you hear ${l} ${p.toLowerCase()}.`, posWrong:'Listen once more!',
+  bubbleSay:w=>`Pop the bubbles in order and write ${w}!`, bubbleTask:f=>`Words with ${f}`, bubbleDone:w=>`Super! You wrote ${w}.`,
+  twinsSay:'Which word goes with the picture?', twinsWrong:w=>`That says ${w}. Try again!`, twinsRight:w=>`Yes! ${w}!`, listen:'🔊 Listen' }
+};
+const R2=()=>X2[LG()];
+const sw=W=>spoken(W);
+
+/* 8. vânătoarea de sunete: care poze încep cu sunetul? ce nu se potrivește? */
+function gHunt(){
+  const lg=LG(), V=VOC[lg], stg=$('stage'); stg.innerHTML=''; msg('');
+  const cand=[...HUNTL[lg]].concat(HUNTLONG[lg]).filter(u=>V.filter(w=>startsUnit(w[1],u,lg)).length>=4);
+  const u=(task.lastU&&cand.length>1)?pick(cand.filter(x=>x!==task.lastU)):pick(cand); task.lastU=u;
+  const yes=mix(V.filter(w=>startsUnit(w[1],u,lg))), no=mix(V.filter(w=>!w[1].startsWith(u[0])));
+  const nYes=2+rnd2(3), set=mix(yes.slice(0,nYes).concat(no.slice(0,6-nYes))), ex=yes[nYes]||yes[0];
+  const head=el('div','rd-hhead',`<span class="u">${unitCase(u)}</span><span class="ex">${ex[0]}</span>`); stg.appendChild(head);
+  const g=el('div','rd-hgrid'); stg.appendChild(g); let found=0, errs=0;
+  set.forEach((w,i)=>{ const ok=startsUnit(w[1],u,lg), b=el('button','rd-hcard',`<span class="e">${w[0]}</span><span class="w"></span>`); b.id='rd-h'+i;
+    b.onclick=()=>{ if(busy||b.classList.contains('yes')||b.classList.contains('no')) return;
+      const d=cs(w[1]); b.querySelector('.w').innerHTML=ok?`<b>${d.slice(0,u.length)}</b>${d.slice(u.length)}`:d;
+      if(ok){ b.classList.add('yes'); try{tick()}catch(e){} speak(sw(w[1])); found++;
+        if(found===nYes){ g.querySelectorAll('.rd-hcard:not(.yes)').forEach((c,j)=>{ c.classList.add('no'); const ww=set[[...g.children].indexOf(c)]; c.querySelector('.w').innerHTML=cs(ww[1]); });
+          setTimeout(()=>win(R2().huntDone,gHunt),700); } }
+      else { b.classList.add('no'); errs++; oops(b,null); speak(R2().huntNo(sw(w[1]))); } };
+    g.appendChild(b); });
+  const multi=u.length>1;
+  setTask(R2().huntTask(unitCase(u)), R2().huntSay(multi&&lg!=='ro'?'':u, sw(ex[1]), multi&&lg!=='ro'));
+}
+
+/* 9. unde auzi sunetul: început / mijloc / sfârșit */
+function posInfo(W,lg){ let t=toks(W,lg); if(lg==='en'&&t.length>3&&t[t.length-1]==='E') t=t.slice(0,-1); return t; }
+function gPos(){
+  const lg=LG(), V=VOC[lg], stg=$('stage'); stg.innerHTML=''; msg('');
+  const want=rnd2(3); let pickd=null;
+  for(let k=0;k<400&&!pickd;k++){ const w=pick(V), t=posInfo(w[1],lg); if(t.length<3) continue;
+    const L=pick([...POSL[lg]]), idx=t.map((x,i)=>x===L?i:-1).filter(i=>i>=0); if(idx.length!==1) continue;
+    if(t.some(x=>x.length>1&&x.includes(L))) continue; if(w[1].split(L).length!==2) continue;
+    const p=idx[0]===0?0:idx[0]===t.length-1?2:1; if(p!==want&&k<300) continue; pickd={w,L,p,i:idx[0]}; }
+  if(!pickd) return gPos();
+  const {w,L,p,i}=pickd;
+  stg.appendChild(el('div','rd-emoji',w[0]));
+  const word=el('div','rd-word rd-posw','?'); word.style.visibility='hidden'; stg.appendChild(word);
+  const row=el('div','rd-posrow'); stg.appendChild(row);
+  R2().posLbl.forEach((lb,k)=>{ const b=el('button','rd-posb',`<span class="bx">${k===0?'●○○':k===1?'○●○':'○○●'}</span><span>${lb}</span>`); b.id='rd-pos'+k;
+    b.onclick=()=>{ if(busy) return;
+      if(k===p){ b.classList.add('right'); word.style.visibility='visible'; word.innerHTML=tokHTML(w[1],lg,(kk,x)=>x===L&&kk===i); win(R2().posRight(csL(L),sw(w[1]),lb),gPos); }
+      else { oops(b,R2().posWrong); setTimeout(()=>speak(sw(w[1])),900); } };
+    row.appendChild(b); });
+  const r2=el('div','rd-row'); const lb=el('button','rd-btn',R2().listen); lb.onclick=()=>speak(sw(w[1])); r2.appendChild(lb); stg.appendChild(r2);
+  setTask(R2().posTask(csL(L)), R2().posSay(L,sw(w[1])));
+}
+
+/* 10. bule cu litere: grupuri de litere (AU, SCH, CI, SH…) */
+function gBubble(){
+  const lg=LG(), V=VOC[lg], stg=$('stage'); stg.innerHTML=''; msg('');
+  const fams=FAM[lg].filter(f=>V.filter(w=>toks(w[1],lg).some(x=>f.includes(x))).length>=3);
+  if(!task.fam||task.famLeft<=0||!fams.includes(task.fam)){ task.fam=pick(fams.filter(f=>f!==task.fam))||fams[0]; task.famLeft=3; }
+  const f=task.fam; task.famLeft--;
+  const pool=V.filter(w=>{ const t=toks(w[1],lg); return t.some(x=>f.includes(x))&&t.length<=7; });
+  const w=pick(pool.filter(x=>x!==task.lastW))||pool[0]; task.lastW=w;
+  const t=toks(w[1],lg), disp=cs(w[1]); let off=0; const parts=t.map(x=>{ const s=disp.slice(off,off+x.length); off+=x.length; return {x,s,big:x.length>1}; });
+  stg.appendChild(el('div','rd-fam',f.map(unitCase).join(' · ')));
+  const em=el('div','rd-emoji',w[0]); stg.appendChild(em);
+  const sl=el('div','rd-slots'); const slots=parts.map(o=>{ const s=el('div','rd-slot'+(o.big?' big':'')); sl.appendChild(s); return s; }); stg.appendChild(sl);
+  const area=el('div','rd-bblArea'); stg.appendChild(area); let k=0, miss=0;
+  mix(parts.map((o,i)=>({...o,i}))).forEach((o,j)=>{ const b=el('button','rd-bbl'+(o.big?' big':''),o.s); b.id='rd-bb'+j;
+    b.style.setProperty('--h',[200,320,150,40,270,100][j%6]); b.style.setProperty('--d',(2.4+Math.random()*1.6)+'s'); b.style.animationDelay=(-Math.random()*3)+'s';
+    b.onclick=()=>{ if(busy||b.classList.contains('pop')) return;
+      if(o.s===parts[k].s){ b.classList.add('pop'); slots[k].textContent=o.s; slots[k].classList.add('on'); try{tick()}catch(e){} k++; miss=0;
+        area.querySelectorAll('.hint').forEach(x=>x.classList.remove('hint'));
+        if(k===parts.length){ em.classList.add('win'); win(R2().bubbleDone(sw(w[1])),gBubble); } }
+      else { oops(b,null); miss++; if(miss>=2){ const nx=[...area.children].find(x=>!x.classList.contains('pop')&&x.textContent===parts[k].s); if(nx) nx.classList.add('hint'); } } };
+    area.appendChild(b); });
+  const row=el('div','rd-row'); const lb=el('button','rd-btn',R2().listen); lb.onclick=()=>speak(sw(w[1])); row.appendChild(lb); stg.appendChild(row);
+  setTask(R2().bubbleTask(f.map(unitCase).join(' / ')), R2().bubbleSay(sw(w[1])));
+}
+
+/* 11. cuvinte gemene: poza + 3 cuvinte care arată la fel */
+function lev(a,b){ const d=[...Array(b.length+1).keys()]; for(let i=1;i<=a.length;i++){ let p=d[0]; d[0]=i; for(let j=1;j<=b.length;j++){ const t=d[j]; d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1)); p=t; } } return d[b.length]; }
+function gTwins(){
+  const lg=LG(), V=VOC[lg], stg=$('stage'); stg.innerHTML=''; msg('');
+  const w=pick(V.filter(x=>x!==task.lastW)); task.lastW=w;
+  const sc=V.filter(x=>x!==w).map(x=>({x,s:lev(x[1],w[1])-(x[1][0]===w[1][0]?2:0)-(x[1].slice(0,2)===w[1].slice(0,2)?1:0)+Math.random()*.9})).sort((a,b)=>a.s-b.s);
+  const opts=mix([w,sc[0].x,sc[1].x]);
+  const box=el('div','rd-twins'); box.appendChild(el('div','rd-emoji',w[0])); const col=el('div','rd-twcol'); box.appendChild(col); stg.appendChild(box);
+  let errs=0;
+  opts.forEach((x,i)=>{ const b=el('button','rd-tw',cs(x[1])); b.id='rd-tw'+i;
+    b.onclick=()=>{ if(busy||b.classList.contains('wrong')) return;
+      if(x===w){ b.classList.add('right'); win(R2().twinsRight(sw(w[1])),gTwins); }
+      else { b.classList.add('wrong'); errs++; oops(b,null); speak(R2().twinsWrong(sw(x[1]))); } };
+    col.appendChild(b); });
+  setTask(R2().twinsSay);
+}
+
+const RUN={alpha:gAlpha,fish:gFish,train:gTrain,build:gBuild,read:gRead,story:gStory,write:gWrite,hunt:gHunt,pos:gPos,bubble:gBubble,twins:gTwins};
+const GN=g=>R().games[g]||R2().games[g];
+const MENU=[['alpha','hunt','pos','fish'],['write','build'],['bubble','train','twins','read','story']], NEWG=['hunt','pos','bubble','twins'];
 function updTop(){ $('stars').textContent='⭐ '+stars; $('caseBtn').textContent=upper?R().upper+' → '+R().lower:R().lower+' → '+R().upper; $('backBtn').textContent=view==='menu'?R().back:R().menu; }
 function showMenu(){ view='menu'; busy=false; storyTok++; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='📖 '+R().title; updTop();
   const m=$('menu'); m.innerHTML='';
-  GAMES.forEach(g=>{ const b=el('button','rd-card',`<span class="ic">${R().games[g][0]}</span><span class="nm">${R().games[g][1]}</span>`); b.id='rd-g-'+g; b.onclick=()=>openGame(g); m.appendChild(b); }); }
-function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=R().games[g][0]+' '+R().games[g][1]; updTop(); RUN[g](); }
+  MENU.forEach((grp,gi)=>{ m.appendChild(el('div','rd-mhead',R2().groups[gi]));
+    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; if(NEWG.includes(g)) b.dataset.new={ro:'NOU',de:'NEU',en:'NEW'}[LG()]; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
+function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=GN(g)[0]+' '+GN(g)[1]; updTop(); RUN[g](); }
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
 $('task').onclick=()=>{ if(task.say) speak(task.say); };
