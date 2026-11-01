@@ -5433,6 +5433,12 @@ window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){re
 .tm-ans{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .tm-ans button{font:inherit;font-weight:800;font-size:clamp(1.15rem,3.6vh,1.9rem);min-width:2.6em;min-height:58px;border-radius:20px;border:3px solid var(--ink);background:#fff;cursor:pointer;padding:4px 14px;color:var(--ink)}
 .tm-ans button.ok{background:var(--leaf);color:#fff}.tm-ans button.no{background:#FFB3C0;opacity:.6}
+.tm-opt{position:relative;display:flex}
+.tm-say{position:absolute;top:-10px;right:-10px;width:34px!important;min-width:0!important;height:34px;min-height:0!important;padding:0!important;border-radius:50%!important;font-size:1rem!important;border:2px solid var(--ink)!important;background:var(--sun)!important;line-height:1}
+.tm-ans button.hl{outline:5px solid var(--sun);transform:scale(1.06)}
+.tm-ans button .dg{display:block;font-size:1.5em;line-height:1.1}
+.tm-ans button small{display:block;font-size:.62em;opacity:.8}
+.tm-ans.tm-wide button{min-width:5.5em}
 .tm-ans.big button{font-size:clamp(2rem,6vh,3rem)}
 .tm-read{font-weight:800;font-size:clamp(1.1rem,3vw,1.6rem);text-align:center;min-height:1.3em}
 .tm-read b{color:var(--berry)}
@@ -5739,7 +5745,14 @@ function updScene(svg,t,W,gy,x0,x1){ x0=x0==null?60:x0; x1=x1==null?W-60:x1; con
 
 function staticClock(t,id,r,o){ const s=clockSVG(id,r*1.2,r*1.2,r,o||{}); const ha=(t%720)/2, ma=(t%60)*6;
   return s.replace(`<g id="${id}-h">`,`<g id="${id}-h" transform="rotate(${ha} ${r*1.2} ${r*1.2})">`).replace(`<g id="${id}-m">`,`<g id="${id}-m" transform="rotate(${ma} ${r*1.2} ${r*1.2})">`); }
-function opts(ctrl,list,fn,cls){ const box=el('div','tm-ans'+(cls?' '+cls:'')); list.forEach(o=>{ const b=el('button',null,o.html||o.t); b.onclick=()=>fn(o,b); box.appendChild(b); }); ctrl.appendChild(box); return box; }
+/* butoane de răspuns: cele cu text au 🔊 ca să le poată auzi și un copil care încă nu citește */
+function opts(ctrl,list,fn,cls,after){ const box=el('div','tm-ans'+(cls?' '+cls:'')); const items=[];
+  list.forEach(o=>{ const b=el('button',null,o.html||o.t); b.onclick=()=>{ box.dataset.stop=1; fn(o,b); };
+    const say_=o.say||(o.t&&!/^\d+$/.test(o.t)?o.t:null);
+    if(say_){ const w=el('div','tm-opt'); const s=el('button','tm-say','🔊'); s.onclick=e=>{ e.stopPropagation(); box.dataset.stop=1; sp(say_); }; w.append(b,s); box.appendChild(w); items.push([b,say_]); }
+    else box.appendChild(b); });
+  ctrl.appendChild(box); if(after&&items.length) readAll(items,box,after); return box; }
+async function readAll(items,box,after){ const my=gen; await after; await wait(250); for(const [b,t] of items){ if(my!==gen||box.dataset.stop||!document.body.contains(b)) return; b.classList.add('hl'); await sp(t); b.classList.remove('hl'); await wait(150); } }
 const hmOf=t=>[Math.floor(t/60)%24,t%60];
 
 /* ---------- 1. ceasul magic ---------- */
@@ -5788,9 +5801,9 @@ function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'�
   const c=makeClock(svg,'tc',450,235,205,{pizza:true,step:15,only:'m'}); c.locked=read;
   const tip=()=>X()[tg%60===30?'pzHalf':'pzQuar'];
   async function show(){ F.ctrl.innerHTML=''; const h=RR(1,12), m=pick(ms); tg=h*60+m; const [H,M]=[h,m];
-    if(read){ await c.set(tg,true); if(myGen!==gen) return; F.say(X().pzRead);
-      const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>({t:tShort(a,b),v:((a%12)*60+b)%720}));
-      const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer); }
+    if(read){ await c.set(tg,true); if(myGen!==gen) return; const qq=F.say(X().pzRead);
+      const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>{ const v=((a%12)*60+b)%720; return {t:tShort(a,b),say:tShort(a,b),v,html:`<span class="dg">${digi(v||720)}</span><small>${tShort(a,b)}</small>`}; });
+      const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer,'tm-wide',qq); }
     else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:c.total%720},null))); } }
   async function answer(o,b){ if(busy) return; if(o.v!==tg%720){ errs++; if(b) b.classList.add('no'); boing(); F.say(tip()); return; }
     busy=true; c.locked=true; if(b) b.classList.add('ok'); chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('pizza',li,errs); show(); }
@@ -5896,8 +5909,8 @@ function gYtm(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📆'); c
       opts(F.ctrl,shuf(pl.map((p,i)=>({html:`<span style="font-size:1.6em">${p[0]}</span>`,i}))),async(o,b)=>{ if(busy) return; if(o.i!==q){ errs++; b.classList.add('no'); boing(); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; }); return; }
         busy=true; b.classList.add('ok'); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; d.querySelector('.s').textContent=pl[i][1]; }); chime(); award(); F.dot(ti+1); await spW(pl[q][1],900); next(); }); }
     else { const D=X().days, d=R(7), k=R(2), ans=(d+(k?1:6))%7; const strip=el('div','tm-tiles'); D.forEach((n,i)=>strip.appendChild(el('div','tm-tile',`<span class="e" style="font-size:1.6rem">${i===d?'⭐':i>=5?'🎈':'📘'}</span>${n}`))); F.stage.appendChild(strip);
-      F.say(X().ytmD(k,D[d])); const set=new Set([ans,d,(d+(k?6:1))%7]); while(set.size<3) set.add(R(7));
-      opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],800); next(); }); } }
+      const qq=F.say(X().ytmD(k,D[d])); const set=new Set([ans,d,(d+(k?6:1))%7]); while(set.size<3) set.add(R(7));
+      opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],800); next(); },null,qq); } }
   async function next(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('ytm',li,errs); show(); }
   show(); }
 
@@ -5908,13 +5921,13 @@ function gWeek(li){ let ti=0, errs=0, busy=false; const N=li===0?2:PER; const F=
   function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:18px;align-items:center;width:100%';
     if(li===0){ const [w,slots]=train(false); const tl=el('div','tm-tiles'); let k=0; F.say(X().weekTask);
       shuf([...D.keys()]).forEach(i=>{ const b=el('button','tm-tile',`<span class="e" style="font-size:2rem">${D[i][0].toUpperCase()}</span>${D[i]}`); b.onclick=async()=>{ if(busy||b.classList.contains('used')) return;
-        if(i!==k){ errs++; boing(); return; } b.classList.add('used'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
+        if(i!==k){ errs++; boing(); sp(D[i]); return; } b.classList.add('used'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
         if(k===7){ busy=true; toot(); chime(); award(); F.dot(ti+1); w.style.transition='transform 2.4s ease-in'; await spW(X().weekend,1200); w.style.transform='translateX(-120vw)'; await wait(1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); } }; tl.appendChild(b); });
       wrap.append(w,tl); }
-    else { const d=R(7), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
+    else { const d=R(7), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); const qq=F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
       const set=new Set([ans]); while(set.size<3){ const v=R(7); if(v!==d) set.add(v); }
-      const box=el('div','tm-ans'); shuf([...set]).forEach(i=>{ const b=el('button',null,D[i]); b.onclick=async()=>{ if(busy) return; if(i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],900); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); }; box.appendChild(b); });
-      F.ctrl.appendChild(box); }
+      opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],900); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); },null,qq);
+      }
     F.stage.appendChild(wrap); }
   show(); }
 
@@ -5938,8 +5951,8 @@ function gCal(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📅'); c
           opts(F.ctrl,shuf([...set]).map(v=>({t:String(v),v})),async(o,bb)=>{ if(o.v!==tgCount){ errs++; bb.classList.add('no'); boing(); return; } bb.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(String(tgCount),800); nx(); },'big'); } } });
     wrap.appendChild(cg.g); F.stage.appendChild(wrap);
     if(li===0){ const ks=[0,1,2].filter(k=>k===0||(k===1&&today<last)||(k===2&&today>1)); kind=pick(ks); target=today+[0,1,-1][kind]; F.say([X().calToday,X().calTom,X().calYes][kind]); }
-    else if(li===1){ const d=RR(1,last), wd=(cg.first+d-1)%7; F.say(X().calWd(d)); cg.bt[d].classList.add('mark'); const set=new Set([wd]); while(set.size<3) set.add(R(7));
-      opts(F.ctrl,shuf([...set]).map(i=>({t:X().days[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==wd){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(X().days[wd],800); nx(); }); }
+    else if(li===1){ const d=RR(1,last), wd=(cg.first+d-1)%7; const qq=F.say(X().calWd(d)); cg.bt[d].classList.add('mark'); const set=new Set([wd]); while(set.size<3) set.add(R(7));
+      opts(F.ctrl,shuf([...set]).map(i=>({t:X().days[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==wd){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(X().days[wd],800); nx(); },null,qq); }
     else { target=Math.min(last,today+RR(3,9)); tgCount=target-today; cg.bt[target].style.outline='4px dashed var(--berry)'; F.say(X().calCount(target)); } }
   async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('calm',li,errs); show(); }
   show(); }
@@ -5962,8 +5975,8 @@ function gMonths(li){ let ti=0, errs=0, busy=false, k=0; const N=li===0?1:PER; c
   function show(){ F.ctrl.innerHTML=''; for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).setAttribute('opacity','1');
     if(li===0){ F.say(X().moOrder); return; }
     const m=R(12); if(li===1){ tg=(m+1)%12; F.say(X().moAfter(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.7'); }
-    else { const s=seasonOf(m); F.say(X().moSeas(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.6');
-      opts(F.ctrl,[0,1,2,3].map(i=>({html:`${SEM[i]} ${X().seasT[i]}`,i})),async(o,b)=>{ if(busy) return; if(o.i!==s){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(`${M[m]}: ${X().seas[s]}`,900); nx(); }); } }
+    else { const s=seasonOf(m); const qq=F.say(X().moSeas(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.6');
+      opts(F.ctrl,[0,1,2,3].map(i=>({html:`${SEM[i]} ${X().seasT[i]}`,say:X().seasT[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==s){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(`${M[m]}: ${X().seas[s]}`,900); nx(); },null,qq); } }
   async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('months',li,errs); show(); }
   show(); }
 
