@@ -4733,7 +4733,7 @@ function gCmp(li){ const L=CMPL[li]; let ti=0, errs=0, busy=false, t=null; const
     const g=svg.querySelector('#mw-croc'); g.style.transition='transform .5s'; g.style.transform=`translateX(${k==='L'?-60:k==='R'?60:0}px)`;
     if(L.m==='pile'){ const p=svg.querySelector(k==='L'?'.mw-pa':'.mw-pb'); p.style.transition='opacity .6s'; await wait(250); p.style.opacity='.15'; }
     else svg.insertAdjacentHTML('beforeend',`<text x="450" y="350" font-size="70" font-weight="800" text-anchor="middle" fill="#FF5D7A">${t.ea} ${SYM[k]} ${t.eb}</text>`);
-    chime(); award(); F.dot(ti+1); const m=X().chomp+' '+(k==='L'?X().gt(t.ea,t.eb):k==='R'?X().lt(t.ea,t.eb):X().eq(t.ea,t.eb)); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+    chime(); award(); F.dot(ti+1); const m=(k==='L'?X().gt(t.ea,t.eb):k==='R'?X().lt(t.ea,t.eb):X().eq(t.ea,t.eb)); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
     ti++; busy=false; if(ti>=PER) return levelDone('cmp',li,errs); show(); }
   show(); }
 
