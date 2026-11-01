@@ -5477,7 +5477,7 @@ window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){re
 .tm-sky{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:900px}
 .tm-sky button{font:inherit;border:none;border-radius:20px;min-height:clamp(110px,24vh,200px);color:#fff;font-weight:800;font-size:clamp(.9rem,2.3vw,1.2rem);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
 .tm-sky button .e{font-size:clamp(2.2rem,6vh,3.4rem);text-shadow:none}
-.tm-sky button.no{opacity:.4}.tm-sky button.ok{outline:5px solid var(--sun)}
+.tm-sky button.no{opacity:.4}.tm-sky button.hl{outline:5px solid var(--sun);transform:scale(1.05)}.tm-sky button.tm-hint{animation:tmHint .6s ease-in-out infinite alternate;outline:6px solid var(--sun)}.tm-sky button.ok{outline:5px solid var(--sun)}
 .tm-panels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:900px}
 .tm-panel{padding:16px 8px!important}
 .tm-panel{background:#fff;border-radius:22px;box-shadow:0 6px 0 #B9D9F2;display:flex;flex-direction:column;align-items:center;padding:8px;gap:4px}
@@ -5907,9 +5907,12 @@ function gDayClk(li){ const A=X().acts; const SEQ=li===0?[[0,420],[3,480],[4,720
 
 /* ---------- 9. momentele zilei ---------- */
 function gMoments(){ let ti=0, errs=0, busy=false, last=-1; const F=frame('',PER,'🌗'); const myGen=gen; const REP=[480,750,960,1170,90], EM=['🌅','☀️','🌤️','🌇','🌙'];
-  const box=el('div','tm-sky'); const bs=X().parts.map((p,i)=>{ const [a,b]=skyCols(REP[i]); const x=el('button',null,`<span class="e">${EM[i]}</span>${p}`); x.style.background=`linear-gradient(${a},${b})`; if(i<3){ x.style.color='#24325F'; x.style.textShadow='0 1px 2px rgba(255,255,255,.7)'; } x.onclick=()=>answer(i,x); box.appendChild(x); return x; });
-  F.stage.appendChild(box); let cur=null;
-  function show(){ bs.forEach(b=>b.classList.remove('no','ok')); let k; do{ k=R(X().mom.length); }while(k===last); last=k; cur=X().mom[k]; F.say(cur[1]+' '+X().moTask(cur[2])); }
+  const box=el('div','tm-sky'); const bs=X().parts.map((p,i)=>{ const [a,b]=skyCols(REP[i]); const x=el('button',null,`<span class="e">${EM[i]}</span>${p}`); x.style.background=`linear-gradient(${a},${b})`; if(i<3){ x.style.color='#24325F'; x.style.textShadow='0 1px 2px rgba(255,255,255,.7)'; } x.onclick=()=>{ box.dataset.stop=1; answer(i,x); }; box.appendChild(x); return x; });
+  F.stage.appendChild(box); let cur=null, help=0; const items=bs.map((x,i)=>[x,X().parts[i]]);
+  helpBtn(F,()=>{ if(busy) return; errs++; help++; box.dataset.stop='';
+    if(help===1){ const wrong=shuf([0,1,2,3,4].filter(i=>i!==cur[0]&&!bs[i].classList.contains('no'))).slice(0,2); wrong.forEach(i=>bs[i].classList.add('no')); readAll(items.filter(([x])=>!x.classList.contains('no')),box,sp(cur[1]+' '+X().moTask(cur[2]))); }
+    else { blinkHint(bs[cur[0]]); sp(X().parts[cur[0]]); } });
+  function show(){ help=0; bs.forEach(b=>b.classList.remove('no','ok','tm-hint')); let k; do{ k=R(X().mom.length); }while(k===last); last=k; cur=X().mom[k]; box.dataset.stop=''; const qq=F.say(cur[1]+' '+X().moTask(cur[2])); if(ti===0) readAll(items,box,qq); }
   async function answer(i,b){ if(busy) return; if(i!==cur[0]){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1);
     await spW(cur[1]+' '+X().parts[i]+'!',1100); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('moments',0,errs); show(); }
   show(); }
