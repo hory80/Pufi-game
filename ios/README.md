@@ -1,0 +1,37 @@
+# Pufi — aplicația iOS (iPad + iPhone)
+
+Aplicație SwiftUI care împachetează jocul web (`../index.html` + `foto/`, `imn/`, `fotbal/`) într-un `WKWebView`, offline, plus funcții native:
+
+- **Voce nativă** (`AVSpeechSynthesizer`) — folosește vocile Premium/Enhanced instalate pe aparat; karaoke sincronizat pe cuvinte.
+- **🎤 Citesc cu voce** — recunoașterea vorbirii (`SFSpeechRecognizer`, pe aparat când limba o permite) colorează cuvintele citite de copil; la final „Ascultă-te”.
+- **🎙️ Vocea părintelui** — 5 laude înregistrate (rămân pe aparat), redate uneori după o reușită.
+- **IAP** prin RevenueCat — o singură cumpărare „Deblochează tot”.
+- **Poarta pentru părinți** înaintea panoului Părinți (deci și a cumpărării).
+- **Copie de siguranță a progresului** (localStorage → UserDefaults).
+
+## Pași (prima dată)
+
+```sh
+brew install xcodegen          # o singură dată
+cd ios
+./sync_web.sh                  # copiază jocul în PufiStars/WebContent
+xcodegen                       # generează PufiStars.xcodeproj
+open PufiStars.xcodeproj
+```
+
+În Xcode: **Signing & Capabilities → Team** (contul tău), schimbă Bundle ID dacă vrei (`ch.hory.pufistars`), adaugă o imagine 1024×1024 în `Assets.xcassets/AppIcon`, apoi Run pe iPad.
+
+La fiecare build, scriptul „Sync web game” recopiază automat `index.html` din rădăcina repo-ului — deci după `git pull` doar dai Run.
+
+## RevenueCat
+1. App Store Connect: produs **non-consumable** `unlock_all`.
+2. RevenueCat: entitlement `premium`, offering *current* cu un pachet ce conține `unlock_all`.
+3. Pune cheia publică iOS (`appl_…`) în `PufiStars/Services/PurchaseService.swift`.
+Fără cheie, în Debug totul e deblocat.
+
+## Limbi pentru voce/recunoaștere
+`SpeechService.locales`: ro, de, en, fr, it, es, pt, nl, pl, hu, uk, ru. Pentru voce mai bună: pe iPad, Setări → Accesibilitate → Conținut vorbit → Voci → descarcă varianta „Enhanced/Premium” pentru fiecare limbă.
+
+## De verificat pe aparat
+- Recunoașterea în **română**: `native.call('asr.available',{lang:'ro'})` → `onDevice`. Dacă e `false`, audio trece prin serverele Apple — de menționat în politica de confidențialitate.
+- Categoria **Kids**: fără analytics/ads terțe; linkurile externe sunt blocate în `GameWebView`.

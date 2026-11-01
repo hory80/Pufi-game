@@ -1,0 +1,4 @@
+PufiStars/WebContent/
+*.xcodeproj/
+xcuserdata/
+DerivedData/
