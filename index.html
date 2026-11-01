@@ -1942,6 +1942,9 @@ function updTop(){ $('hintBtn').textContent=hints?C().hintsOn:C().hintsOff; $('h
 function showMenu(){
   view='menu'; busy=false; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='♟️ '+C().title; updTop();
   const m=$('menu'); m.innerHTML='';
+  if(window.openChessGame){ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-game'; b.style.background='#FFE9A8'; b.style.boxShadow='0 8px 0 #E8C66A';
+    b.innerHTML=`<span class="ic">🤖♟️</span><span class="nm">${{ro:'Joacă o partidă',de:'Partie spielen',en:'Play a game'}[lang]||'Joacă o partidă'}</span><span class="lv">${{ro:'cu robotul sau cu un prieten',de:'gegen Roboter oder Freund',en:'vs robot or a friend'}[lang]||''}</span>`;
+    b.onclick=()=>{ root.hidden=true; try{ speechSynthesis.cancel(); }catch(e){} window.openChessGame(); }; m.appendChild(b); }
   GAMES.forEach(g=>{ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-'+g;
     b.innerHTML=`<span class="ic">${C().games[g][0]}</span><span class="nm">${C().games[g][1]}</span><span class="lv">${C().lvl(L(g))}</span>`;
     b.onclick=()=>openGame(g); m.appendChild(b); });
@@ -4859,6 +4862,382 @@ try{ const s=document.getElementById('start'); if(s) s.hidden=true; }catch(e){}
 document.querySelectorAll('.langs button').forEach(b=>b.addEventListener('click',()=>setTimeout(render,0)));
 const _ob=window.openMath; render();
 setInterval(()=>{ if(!root.hidden) $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); },1500);
+})();
+</script>
+
+<style>
+#cg-root{position:fixed;inset:0;z-index:52;background:var(--sky);color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:6px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 10px);overflow:hidden}
+#cg-root[hidden]{display:none}
+.cg-setup{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0}
+.cg-setup h3{margin:4px 0 0;font-size:clamp(1.2rem,3vw,1.7rem)}
+.cg-opps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:14px;width:100%;max-width:900px}
+.cg-opp{font:inherit;background:var(--card);border:none;border-radius:24px;box-shadow:0 8px 0 #B9D9F2;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--ink)}
+.cg-opp:active{transform:translateY(6px);box-shadow:0 2px 0 #B9D9F2}
+.cg-opp .ic{font-size:clamp(2.6rem,7vw,4rem);line-height:1.1}
+.cg-opp .nm{font-size:clamp(1.15rem,2.8vw,1.5rem);font-weight:800}
+.cg-opp .lv{font-size:1rem;font-weight:600;opacity:.75}
+.cg-opp.cont{background:#FFE9A8;max-width:420px;width:100%;flex-direction:row;justify-content:center;gap:12px}
+.cg-cols{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cg-cols button{font:inherit;font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);border:3px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 16px;cursor:pointer}
+.cg-cols button[aria-pressed="true"]{background:var(--sun)}
+.cg-play{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cg-play[hidden]{display:none}
+.cg-status{font-size:clamp(1.1rem,min(3.2vw,3.2vh),1.8rem);font-weight:800;text-align:center;line-height:1.15;min-height:1.2em;cursor:pointer}
+.cg-cap{display:flex;align-items:center;gap:2px;min-height:1.6em;font-family:"Apple Symbols","Segoe UI Symbol","DejaVu Sans","Noto Sans Symbols2",serif;font-size:clamp(1.2rem,3.4vh,1.8rem);line-height:1}
+.cg-cap .w{color:#fff;-webkit-text-stroke:1.5px #24325F;paint-order:stroke fill}
+.cg-cap .b{color:#24325F}
+.cg-cap .adv{font-family:var(--display);font-size:.7em;font-weight:800;margin-left:6px;opacity:.8}
+.cg-cap .who{font-family:var(--display);font-size:.75em;font-weight:800;margin-right:8px}
+.cg-wrap{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:center;position:relative}
+#cg-board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border:6px solid #6B4A2E;border-radius:10px;box-shadow:0 8px 0 rgba(36,50,95,.2);overflow:hidden;--pc:40px}
+.ch-sq.cg-danger::after{content:"";position:absolute;inset:6%;border-radius:50%;box-shadow:0 0 0 calc(var(--pc)*.07) rgba(255,93,122,.85);animation:cgPulse 1.2s ease-in-out infinite;pointer-events:none}
+.ch-sq.cg-check{background:radial-gradient(circle,rgba(255,60,90,.85) 0%,rgba(255,60,90,.35) 55%,transparent 75%)!important}
+.ch-sq.cg-tip{box-shadow:inset 0 0 0 calc(var(--pc)*.1) #7C5CFF;animation:chBlink 1s infinite}
+@keyframes cgPulse{50%{opacity:.35}}
+.cg-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cg-promo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(36,50,95,.35);z-index:3}
+.cg-promo>div{background:var(--card);border-radius:24px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 10px 0 rgba(36,50,95,.25)}
+.cg-promo b{font-size:clamp(1.1rem,3vw,1.5rem)}
+.cg-promo .row{display:flex;gap:10px}
+.cg-promo button{font-family:"Apple Symbols","Segoe UI Symbol","DejaVu Sans","Noto Sans Symbols2",serif;font-size:clamp(2.6rem,9vw,4rem);line-height:1;width:1.5em;height:1.5em;border-radius:18px;border:3px solid var(--ink);background:#FFF1D0;cursor:pointer;color:#fff;-webkit-text-stroke:2px #24325F;paint-order:stroke fill}
+.cg-promo button.b{color:#24325F;-webkit-text-stroke:0}
+@media (prefers-reduced-motion:reduce){.ch-sq.cg-danger::after,.ch-sq.cg-tip{animation:none}}
+</style>
+<div id="cg-root" hidden>
+  <div class="ch-top">
+    <button class="ch-btn" id="cg-back"></button>
+    <h2 id="cg-title"></h2>
+    <div class="ch-pill" id="cg-stars">⭐ 0</div>
+    <button class="ch-btn" id="cg-hint" aria-pressed="true"></button>
+  </div>
+  <div class="cg-setup" id="cg-setup"></div>
+  <div class="cg-play" id="cg-play" hidden>
+    <div class="cg-status" id="cg-status" aria-live="polite"></div>
+    <div class="cg-cap" id="cg-capT"></div>
+    <div class="cg-wrap" id="cg-wrap"><div id="cg-board" role="grid" aria-label="Chess board"></div></div>
+    <div class="cg-cap" id="cg-capB"></div>
+    <div class="cg-btns">
+      <button class="ch-btn" id="cg-undo"></button>
+      <button class="ch-btn" id="cg-tipB"></button>
+      <button class="ch-btn" id="cg-say"></button>
+      <button class="ch-btn" id="cg-new"></button>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById('cg-'+id), root=$('root');
+const GL={1:'♟︎',2:'♞',3:'♝',4:'♜',5:'♛',6:'♚'};
+const TX={
+ ro:{ title:'Partidă de șah', back:'⬅ Înapoi', menu:'⬅ Meniu', hintsOn:'💡 Ajutor: DA', hintsOff:'💡 Ajutor: NU',
+  who:'Cu cine joci?', color:'Joci cu:', white:'⚪ Albele', black:'⚫ Negrele', rand:'🎲 Oricare',
+  opp:{easy:['🐣','Robo-Pui','ușor'],mid:['🦊','Robo-Vulpe','mediu'],hard:['🦉','Robo-Bufniță','greu'],two:['👫','Doi jucători','pe aceeași tabletă']},
+  cont:'▶ Continuă partida', wins:n=>`Victorii: ${n}`,
+  intro:(me)=>`Hai să jucăm! Tu ai ${me===1?'albele și începi tu':'negrele. Robotul începe'}.`,
+  intro2:'Hai să jucăm! Albele încep.',
+  yourTurn:'Rândul tău!', thinks:n=>`${n} se gândește…`, turnW:'Rândul albelor ⚪', turnB:'Rândul negrelor ⚫',
+  N:{1:'pionul',2:'calul',3:'nebunul',4:'turnul',5:'regina',6:'regele'},
+  NA:{1:'pionul',2:'calul',3:'nebunul',4:'turnul',5:'regina',6:'regele'},
+  NY:{1:'pionul',2:'calul',3:'nebunul',4:'turnul',5:'regina',6:'regele'},
+  ND:{1:'pionul',2:'calul',3:'nebunul',4:'turnul',5:'regina',6:'regele'},
+  botMoved:(n,p)=>`${n} a mutat ${p}.`, botTook:(n,p)=>`${n} ți-a luat ${p}.`, youTook:p=>`Bravo! Ai luat ${p}.`,
+  castle:'Rocadă! Regele s-a ascuns după turn.',
+  check:'Șah!', checkYou:'Șah! Regele tău este atacat. Salvează-l!',
+  mateWin:'Șah mat! Ai câștigat! Bravo, campionule!', mateLose:n=>`Șah mat. ${n} a câștigat de data asta. Mai jucăm o partidă?`,
+  mateW:'Șah mat! Albele au câștigat!', mateB:'Șah mat! Negrele au câștigat!',
+  stale:'Pat! Regele nu mai poate muta, dar nu este în șah. Este remiză.', rep:'Aceeași poziție de trei ori. Remiză!',
+  fifty:'Cincizeci de mutări fără nicio captură. Remiză!', insuf:'Au rămas prea puține piese pentru mat. Remiză!',
+  undo:'↶ Înapoi o mutare', tip:'💡 Sfat', newg:'🔄 Partidă nouă', listen:'🔊',
+  tipSay:p=>`Încearcă să muți ${p}!`, promoQ:'În ce se transformă pionul?', promo:'Pionul a ajuns la capăt și s-a transformat!',
+  cant:n=>`${n} nu poate merge acolo.`, kingBad:'Așa regele tău ar rămâne în șah!', notYours:'Asta e piesa celuilalt jucător.',
+  danger:'Atenție! Piesa cu cerc roșu poate fi luată.' },
+ de:{ title:'Schachpartie', back:'⬅ Zurück', menu:'⬅ Menü', hintsOn:'💡 Hilfe: AN', hintsOff:'💡 Hilfe: AUS',
+  who:'Gegen wen spielst du?', color:'Du spielst:', white:'⚪ Weiß', black:'⚫ Schwarz', rand:'🎲 Egal',
+  opp:{easy:['🐣','Robo-Küken','leicht'],mid:['🦊','Robo-Fuchs','mittel'],hard:['🦉','Robo-Eule','schwer'],two:['👫','Zwei Spieler','auf einem Tablet']},
+  cont:'▶ Partie fortsetzen', wins:n=>`Siege: ${n}`,
+  intro:(me)=>`Los geht's! Du hast ${me===1?'Weiß und fängst an':'Schwarz. Der Roboter fängt an'}.`,
+  intro2:"Los geht's! Weiß fängt an.",
+  yourTurn:'Du bist dran!', thinks:n=>`${n} denkt nach…`, turnW:'Weiß ist dran ⚪', turnB:'Schwarz ist dran ⚫',
+  N:{1:'der Bauer',2:'der Springer',3:'der Läufer',4:'der Turm',5:'die Dame',6:'der König'},
+  NA:{1:'den Bauern',2:'den Springer',3:'den Läufer',4:'den Turm',5:'die Dame',6:'den König'},
+  NY:{1:'deinen Bauern',2:'deinen Springer',3:'deinen Läufer',4:'deinen Turm',5:'deine Dame',6:'deinen König'},
+  ND:{1:'dem Bauern',2:'dem Springer',3:'dem Läufer',4:'dem Turm',5:'der Dame',6:'dem König'},
+  botMoved:(n,p)=>`${n} zieht ${p}.`, botTook:(n,p)=>`${n} hat ${p} geschlagen.`, youTook:p=>`Super! Du hast ${p} geschlagen.`,
+  castle:'Rochade! Der König versteckt sich hinter dem Turm.',
+  check:'Schach!', checkYou:'Schach! Dein König wird angegriffen. Rette ihn!',
+  mateWin:'Schachmatt! Du hast gewonnen! Super, Champion!', mateLose:n=>`Schachmatt. ${n} hat diesmal gewonnen. Noch eine Partie?`,
+  mateW:'Schachmatt! Weiß hat gewonnen!', mateB:'Schachmatt! Schwarz hat gewonnen!',
+  stale:'Patt! Der König kann nicht ziehen, steht aber nicht im Schach. Unentschieden.', rep:'Dreimal dieselbe Stellung. Unentschieden!',
+  fifty:'Fünfzig Züge ohne Schlagen. Unentschieden!', insuf:'Zu wenige Figuren für ein Matt. Unentschieden!',
+  undo:'↶ Zug zurück', tip:'💡 Tipp', newg:'🔄 Neue Partie', listen:'🔊',
+  tipSay:p=>`Versuch es mit ${p}!`, promoQ:'Was soll der Bauer werden?', promo:'Der Bauer ist am Ende und verwandelt sich!',
+  cant:n=>`${n} kann da nicht hin.`, kingBad:'Dann stünde dein König im Schach!', notYours:'Das ist die Figur des anderen Spielers.',
+  danger:'Achtung! Die Figur mit dem roten Kreis kann geschlagen werden.' },
+ en:{ title:'Chess game', back:'⬅ Back', menu:'⬅ Menu', hintsOn:'💡 Help: ON', hintsOff:'💡 Help: OFF',
+  who:'Who do you want to play?', color:'You play:', white:'⚪ White', black:'⚫ Black', rand:'🎲 Any',
+  opp:{easy:['🐣','Robo-Chick','easy'],mid:['🦊','Robo-Fox','medium'],hard:['🦉','Robo-Owl','hard'],two:['👫','Two players','on one tablet']},
+  cont:'▶ Continue game', wins:n=>`Wins: ${n}`,
+  intro:(me)=>`Let's play! You have ${me===1?'white, so you start':'black. The robot starts'}.`,
+  intro2:"Let's play! White starts.",
+  yourTurn:'Your turn!', thinks:n=>`${n} is thinking…`, turnW:"White's turn ⚪", turnB:"Black's turn ⚫",
+  N:{1:'the pawn',2:'the knight',3:'the bishop',4:'the rook',5:'the queen',6:'the king'},
+  NA:{1:'the pawn',2:'the knight',3:'the bishop',4:'the rook',5:'the queen',6:'the king'},
+  NY:{1:'your pawn',2:'your knight',3:'your bishop',4:'your rook',5:'your queen',6:'your king'},
+  ND:{1:'the pawn',2:'the knight',3:'the bishop',4:'the rook',5:'the queen',6:'the king'},
+  botMoved:(n,p)=>`${n} moved ${p}.`, botTook:(n,p)=>`${n} took ${p}.`, youTook:p=>`Great! You took ${p}.`,
+  castle:'Castling! The king hides behind the rook.',
+  check:'Check!', checkYou:'Check! Your king is attacked. Save him!',
+  mateWin:'Checkmate! You won! Well done, champion!', mateLose:n=>`Checkmate. ${n} won this time. Another game?`,
+  mateW:'Checkmate! White wins!', mateB:'Checkmate! Black wins!',
+  stale:'Stalemate! The king cannot move but is not in check. It is a draw.', rep:'The same position three times. Draw!',
+  fifty:'Fifty moves without a capture. Draw!', insuf:'Too few pieces left for checkmate. Draw!',
+  undo:'↶ Undo', tip:'💡 Tip', newg:'🔄 New game', listen:'🔊',
+  tipSay:p=>`Try moving ${p}!`, promoQ:'What should the pawn become?', promo:'The pawn reached the end and transformed!',
+  cant:n=>`${n} cannot go there.`, kingBad:'Then your king would be in check!', notYours:"That is the other player's piece.",
+  danger:'Careful! The piece with the red circle can be taken.' }
+};
+const X=()=>TX[lang]||TX.ro;
+const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const sp=t=>{ try{ return (typeof say==='function')?say(t):null; }catch(e){} };
+
+/* ================= motor ================= */
+const PV=[0,100,320,330,500,900,0];
+const PST={
+1:[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0],
+2:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+3:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+4:[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0],
+5:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+6:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20]};
+const KEND=[-50,-30,-30,-30,-30,-30,-30,-50,-30,-10,0,0,0,0,-10,-30,-30,0,20,30,30,20,0,-30,-30,0,30,40,40,30,0,-30,-30,0,30,40,40,30,0,-30,-30,0,20,30,30,20,0,-30,-30,-20,0,0,0,0,-20,-30,-50,-30,-30,-30,-30,-30,-30,-50];
+const NO=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]], KO=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const RD=[[1,0],[-1,0],[0,1],[0,-1]], BD=[[1,1],[1,-1],[-1,1],[-1,-1]];
+const ok=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+function attacked(b,s,by){ const r=s>>3,c=s&7;
+  const pr=r+(by===1?1:-1); if(pr>=0&&pr<8){ if(c>0&&b[pr*8+c-1]===by) return true; if(c<7&&b[pr*8+c+1]===by) return true; }
+  for(const [a,d] of NO){ const rr=r+a,cc=c+d; if(ok(rr,cc)&&b[rr*8+cc]===2*by) return true; }
+  for(const [a,d] of KO){ const rr=r+a,cc=c+d; if(ok(rr,cc)&&b[rr*8+cc]===6*by) return true; }
+  for(const [a,d] of RD){ let rr=r+a,cc=c+d; while(ok(rr,cc)){ const p=b[rr*8+cc]; if(p){ if(p===4*by||p===5*by) return true; break; } rr+=a; cc+=d; } }
+  for(const [a,d] of BD){ let rr=r+a,cc=c+d; while(ok(rr,cc)){ const p=b[rr*8+cc]; if(p){ if(p===3*by||p===5*by) return true; break; } rr+=a; cc+=d; } }
+  return false; }
+const kpos=(b,s)=>b.indexOf(6*s);
+const inCheck=st=>attacked(st.b,kpos(st.b,st.side),-st.side);
+function gen(st,caps){
+  const b=st.b, s=st.side, out=[];
+  const add=(f,t,fl,promo)=>{ if(promo){ for(const p of (caps?[5]:[5,4,3,2])) out.push({f,t,fl:fl|16,pr:p}); } else out.push({f,t,fl}); };
+  for(let f=0;f<64;f++){ const p=b[f]; if(!p||(p>0?1:-1)!==s) continue; const t=p*s, r=f>>3, c=f&7;
+    if(t===1){ const d=s===1?-1:1, r1=r+d, lastR=s===1?0:7, start=s===1?6:1; if(r1<0||r1>7) continue; const to=r1*8+c;
+      if(!b[to]){ if(!caps||r1===lastR) add(f,to,0,r1===lastR); if(!caps&&r===start&&!b[to+8*d]) out.push({f,t:to+8*d,fl:8}); }
+      for(const dc of [-1,1]){ const cc=c+dc; if(cc<0||cc>7) continue; const t2=r1*8+cc;
+        if(b[t2]&&(b[t2]>0?1:-1)===-s) add(f,t2,1,r1===lastR); else if(t2===st.ep) out.push({f,t:t2,fl:3}); } }
+    else if(t===2||t===6){ for(const [a,d] of (t===2?NO:KO)){ const rr=r+a,cc=c+d; if(!ok(rr,cc)) continue; const to=rr*8+cc, q=b[to];
+        if(!q){ if(!caps) out.push({f,t:to,fl:0}); } else if((q>0?1:-1)===-s) out.push({f,t:to,fl:1}); }
+      if(t===6&&!caps){ const home=s===1?60:4, kb=s===1?1:4, qb=s===1?2:8;
+        if(f===home&&!attacked(b,f,-s)){
+          if((st.cr&kb)&&!b[f+1]&&!b[f+2]&&b[f+3]===4*s&&!attacked(b,f+1,-s)&&!attacked(b,f+2,-s)) out.push({f,t:f+2,fl:4});
+          if((st.cr&qb)&&!b[f-1]&&!b[f-2]&&!b[f-3]&&b[f-4]===4*s&&!attacked(b,f-1,-s)&&!attacked(b,f-2,-s)) out.push({f,t:f-2,fl:4}); } } }
+    else { const dirs=t===4?RD:t===3?BD:RD.concat(BD);
+      for(const [a,d] of dirs){ let rr=r+a,cc=c+d; while(ok(rr,cc)){ const to=rr*8+cc, q=b[to];
+        if(!q){ if(!caps) out.push({f,t:to,fl:0}); } else { if((q>0?1:-1)===-s) out.push({f,t:to,fl:1}); break; } rr+=a; cc+=d; } } }
+  }
+  return out; }
+function make(st,m){
+  const b=st.b.slice(), p=b[m.f], s=st.side; let cap=b[m.t];
+  b[m.t]=m.pr?m.pr*s:p; b[m.f]=0;
+  if(m.fl&2){ const e=(m.f&~7)|(m.t&7); cap=b[e]; b[e]=0; }
+  if(m.fl&4){ if(m.t===62){b[61]=b[63];b[63]=0;} else if(m.t===58){b[59]=b[56];b[56]=0;} else if(m.t===6){b[5]=b[7];b[7]=0;} else if(m.t===2){b[3]=b[0];b[0]=0;} }
+  let cr=st.cr; for(const q of [m.f,m.t]){ if(q===60) cr&=~3; if(q===4) cr&=~12; if(q===63) cr&=~1; if(q===56) cr&=~2; if(q===7) cr&=~4; if(q===0) cr&=~8; }
+  return {b,side:-s,cr,ep:(m.fl&8)?(m.f+m.t)>>1:-1,hm:(Math.abs(p)===1||cap)?0:st.hm+1,cap}; }
+const legalOK=(st,m)=>{ const n=make(st,m); return !attacked(n.b,kpos(n.b,st.side),-st.side); };
+const legal=st=>gen(st,false).filter(m=>legalOK(st,m));
+function isEnd(b){ let q=0; for(const p of b){ const t=Math.abs(p); if(t===5) q+=2; else if(t===4||t===3||t===2) q+=1; } return q<=4; }
+function evalS(st){ const b=st.b, end=isEnd(b); let sc=0;
+  for(let s=0;s<64;s++){ const p=b[s]; if(!p) continue; const t=p>0?p:-p, i=p>0?s:s^56;
+    const v=PV[t]+(t===6&&end?KEND[i]:PST[t][i]); sc+=p>0?v:-v; }
+  return sc*st.side; }
+const MATE=100000;
+const ordr=(b,m)=>(m.fl&1?10*PV[Math.abs(m.fl&2?1:b[m.t])]-PV[Math.abs(b[m.f])]:0)+(m.pr?800:0);
+let nodes=0;
+function qs(st,a,bt,qd){ nodes++; const stand=evalS(st); if(stand>=bt) return bt; if(stand>a) a=stand; if(qd>5) return a;
+  const ms=gen(st,true).sort((x,y)=>ordr(st.b,y)-ordr(st.b,x));
+  for(const m of ms){ const n=make(st,m); if(attacked(n.b,kpos(n.b,st.side),-st.side)) continue;
+    const v=-qs(n,-bt,-a,qd+1); if(v>=bt) return bt; if(v>a) a=v; }
+  return a; }
+function neg(st,d,a,bt,ply){ nodes++;
+  if(d<=0) return qs(st,a,bt,0);
+  const ms=gen(st,false).sort((x,y)=>ordr(st.b,y)-ordr(st.b,x)); let n0=0;
+  for(const m of ms){ const n=make(st,m); if(attacked(n.b,kpos(n.b,st.side),-st.side)) continue; n0++;
+    const v=-neg(n,d-1,-bt,-a,ply+1); if(v>=bt) return bt; if(v>a) a=v; if(nodes>120000) break; }
+  if(!n0) return inCheck(st)?-MATE+ply:0;
+  return a; }
+function rootScores(st,d){ nodes=0; const ms=legal(st);
+  return ms.map(m=>({m,v:-neg(make(st,m),d-1,-MATE*2,MATE*2,1)})); }
+function pick(st,lvl){
+  const ms=legal(st); if(!ms.length) return null;
+  if(lvl==='easy'){ /* jucător începător: mai ales întâmplător, uneori ia piese gratuite */
+    const free=ms.filter(m=>(m.fl&1)&&!attacked(make(st,m).b,m.t,-st.side));
+    if(free.length&&Math.random()<.45) return free[Math.floor(Math.random()*free.length)];
+    const mates=ms.filter(m=>{ const n=make(st,m); return inCheck(n)&&!legal(n).length; }); if(mates.length&&Math.random()<.5) return mates[0];
+    return ms[Math.floor(Math.random()*ms.length)]; }
+  const d=lvl==='mid'?1:3, noise=lvl==='mid'?60:12;
+  const sc=rootScores(st,d).map(o=>({m:o.m,v:o.v+(Math.abs(o.v)>MATE/2?0:Math.random()*noise)}));
+  sc.sort((x,y)=>y.v-x.v); return sc[0].m; }
+function startPos(){ const b=Array(64).fill(0), back=[4,2,3,5,6,3,2,4];
+  for(let c=0;c<8;c++){ b[c]=-back[c]; b[8+c]=-1; b[48+c]=1; b[56+c]=back[c]; }
+  return {b,side:1,cr:15,ep:-1,hm:0}; }
+const key=st=>st.b.join('')+st.side+st.cr+st.ep;
+function insufficient(b){ const o=b.filter(p=>p&&Math.abs(p)!==6); if(!o.length) return true;
+  if(o.length===1&&(Math.abs(o[0])===2||Math.abs(o[0])===3)) return true; return false; }
+
+/* ================= stare UI ================= */
+let G=null, H=[], K=[], opp='easy', me=1, colPick=1, sel=-1, lm=[], last=null, over=false, busy=false, tip=null, hints=true, gen_=0, view='setup', D={wins:{},save:null};
+try{ D=Object.assign(D,JSON.parse(localStorage.getItem('cg_data')||'{}')); hints=localStorage.getItem('cg_hints')!=='0'; colPick=+(localStorage.getItem('cg_col')||1); }catch(e){}
+const save=()=>{ try{ localStorage.setItem('cg_data',JSON.stringify(D)); }catch(e){} };
+const human=()=>opp==='two'||G.side===me;
+const flip=()=>opp!=='two'&&me===-1;
+const botName=()=>X().opp[opp][1];
+function persist(){ D.save=over?null:{G,H:H.slice(-60),K:K.slice(-200),opp,me,last}; save(); }
+
+function sizeBoard(){ const w=$('wrap'), bd=$('board'); const s=Math.max(160,Math.floor(Math.min(w.clientWidth,w.clientHeight)));
+  bd.style.width=bd.style.height=s+'px'; bd.style.setProperty('--pc',(s/8*.8)+'px'); }
+function danger(){ const out=new Set(); if(!hints||over||!human()) return out; const b=G.b, s=G.side;
+  for(let i=0;i<64;i++){ const p=b[i]; if(!p||(p>0?1:-1)!==s||Math.abs(p)===6) continue;
+    if(attacked(b,i,-s)){ const t=Math.abs(p); if(!attacked(b,i,s)||t>=4) out.add(i); } }
+  return out; }
+function render(){
+  const bd=$('board'); bd.innerHTML=''; const dz=danger(), chk=inCheck(G)?kpos(G.b,G.side):-1, F=flip();
+  const show=sel>=0&&hints, tg=lm.filter(m=>m.f===sel).map(m=>m.t);
+  for(let v=0;v<64;v++){ const s=F?63-v:v, r=s>>3, c=s&7, vr=v>>3, vc=v&7, d=document.createElement('div');
+    d.className='ch-sq '+((r+c)%2?'d':'l'); d.id='cg-sq'+s;
+    if(last&&(s===last[0]||s===last[1])) d.classList.add('last');
+    if(s===sel) d.classList.add('sel');
+    if(dz.has(s)) d.classList.add('cg-danger');
+    if(s===chk) d.classList.add('cg-check');
+    if(tip&&(s===tip.f||s===tip.t)) d.classList.add('cg-tip');
+    const p=G.b[s];
+    if(p){ const e=document.createElement('span'); e.className='ch-pc '+(p>0?'w':'b')+(last&&s===last[1]?' pop':''); e.textContent=GL[Math.abs(p)]; d.appendChild(e); }
+    if(show&&tg.includes(s)){ const m=document.createElement('span'); m.className=p||(lm.find(x=>x.f===sel&&x.t===s).fl&2)?'ch-ring':'ch-dot'; d.appendChild(m); }
+    if(vc===0){ const m=document.createElement('span'); m.className='ch-co r'; m.textContent=8-r; d.appendChild(m); }
+    if(vr===7){ const m=document.createElement('span'); m.className='ch-co f'; m.textContent='abcdefgh'[c]; d.appendChild(m); }
+    d.onclick=()=>tap(s); bd.appendChild(d); }
+  renderCaps();
+}
+function renderCaps(){
+  const cnt={}; [1,-1].forEach(s=>{ cnt[s]={1:8,2:2,3:2,4:2,5:1}; }); let mat=0;
+  G.b.forEach(p=>{ if(!p) return; const s=p>0?1:-1, t=Math.abs(p); if(t<6){ cnt[s][t]--; mat+=PV[t]*s; } });
+  const strip=(col)=>{ /* piesele culorii col luate de adversar */ let h=''; [5,4,3,2,1].forEach(t=>{ for(let i=0;i<Math.max(0,cnt[col][t]);i++) h+=`<span class="${col>0?'w':'b'}">${GL[t]}</span>`; }); return h; };
+  const bottom=opp==='two'?1:me, top=-bottom, adv=Math.round(mat/100)*bottom;
+  $('capT').innerHTML=(opp!=='two'?`<span class="who">${X().opp[opp][0]}</span>`:'')+strip(bottom)+(adv<0?`<span class="adv">+${-adv}</span>`:'');
+  $('capB').innerHTML=strip(top)+(adv>0?`<span class="adv">+${adv}</span>`:'');
+}
+function status(t,speak){ $('status').textContent=t; $('status').dataset.say=t; if(speak) sp(t); }
+function turnText(){ return opp==='two'?(G.side===1?X().turnW:X().turnB):(G.side===me?X().yourTurn:X().thinks(botName())); }
+function shake(){ const b=$('board'); b.classList.remove('ch-shake'); void b.offsetWidth; b.classList.add('ch-shake'); }
+
+function tap(s){
+  if(over||busy||!human()) return; const p=G.b[s], mine=p&&(p>0?1:-1)===G.side;
+  const mv=lm.filter(m=>m.f===sel&&m.t===s);
+  if(sel>=0&&mv.length){ if(mv.length>1) return askPromo(mv); return play(mv[0],true); }
+  if(mine){ sel=sel===s?-1:s; try{tick()}catch(e){} render(); return; }
+  if(sel>=0){ const t=Math.abs(G.b[sel]); const pseudo=gen(G,false).some(m=>m.f===sel&&m.t===s);
+    const txt=pseudo?X().kingBad:X().cant(cap1(X().N[t])); try{beep(false)}catch(e){} shake(); status(txt,true); sel=-1; render(); return; }
+  if(p&&opp==='two'){ status(X().notYours,true); }
+}
+function askPromo(mv){
+  const w=$('wrap'), o=document.createElement('div'); o.className='cg-promo';
+  o.innerHTML=`<div><b>${X().promoQ}</b><div class="row">${[5,4,3,2].map(t=>`<button data-t="${t}" class="${G.side>0?'':'b'}">${GL[t]}</button>`).join('')}</div></div>`;
+  o.querySelectorAll('button').forEach(b=>b.onclick=()=>{ o.remove(); play(mv.find(m=>m.pr===+b.dataset.t),true); });
+  w.appendChild(o); sp(X().promoQ);
+}
+function play(m,byHuman){
+  const prev=G, mover=prev.side, pt=Math.abs(prev.b[m.f]);
+  H.push(prev); K.push(key(prev)); G=make(prev,m); last=[m.f,m.t]; sel=-1; tip=null;
+  const capT=G.cap?Math.abs(G.cap):0;
+  try{ tick(); }catch(e){}
+  lm=legal(G); render(); persist();
+  if(checkEnd()) return;
+  const chk=inCheck(G); let say_='';
+  if(opp==='two'){ say_=(chk?X().check+' ':'')+(m.pr?X().promo+' ':'')+(G.side===1?X().turnW:X().turnB).replace(/ [⚪⚫]/,''); status(G.side===1?X().turnW:X().turnB); if(chk||m.pr) sp(say_); else if(capT) try{beep(true)}catch(e){} }
+  else if(byHuman){
+    if(capT){ try{beep(true); confetti(6);}catch(e){} if(capT>=2) say_=X().youTook(X().NA[capT])+' '; }
+    if(m.fl&4) say_+=X().castle+' '; if(m.pr) say_+=X().promo+' '; if(chk) say_+=X().check;
+    status(X().thinks(botName())); if(say_) sp(say_);
+    busy=true; const g=gen_; setTimeout(()=>botTurn(g),say_?1100:550);
+  } else {
+    if(capT) say_=X().botTook(botName(),X().NY[capT]); else if(m.fl&4) say_=X().castle; else say_=X().botMoved(botName(),X().NA[pt]);
+    if(chk) say_+=' '+X().checkYou;
+    const dz=danger(); if(dz.size&&!chk&&hints) say_+=' '+X().danger;
+    status(chk?X().checkYou:X().yourTurn); sp(say_); busy=false;
+  }
+}
+function botTurn(g){ if(g!==gen_||over||view!=='play') return; const t0=Date.now(); const m=pick(G,opp);
+  const wait=Math.max(0,500-(Date.now()-t0)); setTimeout(()=>{ if(g!==gen_||!m) return; play(m,false); },wait); }
+function checkEnd(){
+  let txt=null, res=null;
+  if(!lm.length){ if(inCheck(G)){ const winner=-G.side; res=opp==='two'?'w':(winner===me?'win':'lose');
+      txt=opp==='two'?(winner===1?X().mateW:X().mateB):(winner===me?X().mateWin:X().mateLose(botName())); }
+    else { txt=X().stale; res='draw'; } }
+  else if(insufficient(G.b)){ txt=X().insuf; res='draw'; }
+  else if(G.hm>=100){ txt=X().fifty; res='draw'; }
+  else { const k=key(G); if(K.filter(x=>x===k).length>=2){ txt=X().rep; res='draw'; } }
+  if(!txt) return false;
+  over=true; busy=false; status(txt,true); render();
+  if(res==='win'){ const n={easy:1,mid:2,hard:3}[opp]; D.wins[opp]=(D.wins[opp]||0)+1; stars+=n; try{ renderBar(); confetti(40); beep(true); }catch(e){} }
+  else if(res==='w'||res==='draw'){ stars+=1; try{ renderBar(); confetti(14); }catch(e){} }
+  else { try{ beep(false); }catch(e){} }
+  $('stars').textContent='⭐ '+stars; D.save=null; save(); return true;
+}
+function newGame(){
+  gen_++; G=startPos(); H=[]; K=[]; sel=-1; last=null; over=false; busy=false; tip=null;
+  me=opp==='two'?1:(colPick===0?(Math.random()<.5?1:-1):colPick);
+  lm=legal(G); openPlay(); render();
+  status(turnText()); sp(opp==='two'?X().intro2:X().intro(me));
+  if(opp!=='two'&&me===-1){ busy=true; const g=gen_; setTimeout(()=>botTurn(g),1600); }
+  persist();
+}
+function resume(){ const s=D.save; gen_++; G=s.G; H=s.H||[]; K=s.K||[]; opp=s.opp; me=s.me; last=s.last; sel=-1; over=false; busy=false; tip=null;
+  lm=legal(G); openPlay(); render(); status(turnText(),true);
+  if(!human()){ busy=true; const g=gen_; setTimeout(()=>botTurn(g),800); } }
+function undo(){
+  if(!H.length||(busy&&!over)) return; gen_++; over=false; busy=false; tip=null; sel=-1;
+  do { G=H.pop(); K.pop(); } while(H.length&&opp!=='two'&&G.side!==me);
+  if(opp!=='two'&&G.side!==me){ /* robotul a început partida: refacem prima lui mutare */ }
+  last=null; lm=legal(G); render(); persist(); status(turnText());
+  if(!human()){ busy=true; const g=gen_; setTimeout(()=>botTurn(g),600); }
+}
+function giveTip(){
+  if(over||busy||!human()) return; nodes=0;
+  const sc=rootScores(G,2).sort((a,b)=>b.v-a.v); if(!sc.length) return; tip=sc[0].m; sel=-1; render();
+  sp(X().tipSay(X().ND[Math.abs(G.b[tip.f])]));
+}
+
+/* ================= ecrane ================= */
+function top(){ $('hint').textContent=hints?X().hintsOn:X().hintsOff; $('hint').setAttribute('aria-pressed',hints);
+  $('back').textContent=view==='setup'?X().back:X().menu; $('stars').textContent='⭐ '+stars;
+  $('undo').textContent=X().undo; $('tipB').textContent=X().tip; $('say').textContent=X().listen; $('new').textContent=X().newg; }
+function showSetup(){
+  view='setup'; gen_++; busy=false; $('play').hidden=true; const S=$('setup'); S.hidden=false; $('title').textContent='♟️ '+X().title; top();
+  let h='';
+  if(D.save){ const o=X().opp[D.save.opp]; h+=`<button class="cg-opp cont" id="cg-cont"><span class="ic">${o[0]}</span><span class="nm">${X().cont}</span></button>`; }
+  h+=`<h3>${X().who}</h3><div class="cg-opps">`+['easy','mid','hard','two'].map(k=>{ const o=X().opp[k];
+    return `<button class="cg-opp" data-k="${k}"><span class="ic">${o[0]}</span><span class="nm">${o[1]}</span><span class="lv">${o[2]}${k!=='two'?' · '+X().wins(D.wins[k]||0):''}</span></button>`; }).join('')+`</div>`;
+  h+=`<h3>${X().color}</h3><div class="cg-cols">`+[[1,X().white],[-1,X().black],[0,X().rand]].map(([v,t])=>`<button data-c="${v}" aria-pressed="${colPick===v}">${t}</button>`).join('')+`</div>`;
+  S.innerHTML=h;
+  S.querySelectorAll('.cg-opp[data-k]').forEach(b=>b.onclick=()=>{ opp=b.dataset.k; newGame(); });
+  S.querySelectorAll('.cg-cols button').forEach(b=>b.onclick=()=>{ colPick=+b.dataset.c; try{localStorage.setItem('cg_col',colPick)}catch(e){} showSetup(); });
+  const c=$('cont'); if(c) c.onclick=resume;
+}
+function openPlay(){ view='play'; $('setup').hidden=true; $('play').hidden=false; top();
+  $('title').textContent='♟️ '+(opp==='two'?X().opp.two[1]:X().opp[opp][0]+' '+X().opp[opp][1]);
+  requestAnimationFrame(()=>{ sizeBoard(); }); sizeBoard(); }
+$('back').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){}
+  if(view==='play'){ showSetup(); return; } root.hidden=true; if(window.openChess) window.openChess(); };
+$('hint').onclick=()=>{ hints=!hints; try{localStorage.setItem('cg_hints',hints?'1':'0')}catch(e){} top(); if(view==='play') render(); };
+$('undo').onclick=undo; $('tipB').onclick=giveTip; $('new').onclick=()=>{ D.save=null; save(); newGame(); };
+$('say').onclick=()=>sp($('status').dataset.say||''); $('status').onclick=()=>sp($('status').dataset.say||'');
+addEventListener('resize',()=>{ if(!root.hidden&&view==='play') sizeBoard(); });
+window.openChessGame=()=>{ root.hidden=false; showSetup(); };
+window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){return G},get nodes(){return nodes}};
 })();
 </script>
 
