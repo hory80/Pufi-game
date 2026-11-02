@@ -19,7 +19,7 @@ xcodegen                       # generează PufiStars.xcodeproj
 open PufiStars.xcodeproj
 ```
 
-În Xcode: **Signing & Capabilities → Team** (contul tău), schimbă Bundle ID dacă vrei (`ch.hory.pufistars`), adaugă o imagine 1024×1024 în `Assets.xcassets/AppIcon`, apoi Run pe iPad.
+În Xcode: **Signing & Capabilities → Team** (contul tău), păstrează Bundle ID `ch.hory.pufistars`, adaugă o imagine 1024×1024 în `Assets.xcassets/AppIcon`, apoi Run pe iPad.
 
 La fiecare build, scriptul „Sync web game” recopiază automat `index.html` din rădăcina repo-ului — deci după `git pull` doar dai Run.
 
@@ -40,3 +40,23 @@ Fără cheie, în Debug totul e deblocat.
 - Sub iconiță (pe ecranul principal): **Pufi** (`CFBundleDisplayName`). Un nume lung ar fi tăiat de iOS.
 - Numele din App Store (max. 30 de caractere), per limbă:
   ro „Pufi – Școala jocurilor” · de „Pufi – Die Spieleschule” · en „Pufi – The Game School” · fr „Pufi – L’école des jeux” · it „Pufi – La scuola dei giochi” · es „Pufi – La escuela de juegos” · pt „Pufi – A escola dos jogos” · nl „Pufi – De spelletjesschool” · pl „Pufi – Szkoła zabaw” · hu „Pufi – A játékiskola” · uk „Пуфі – Школа ігор” · ru „Пуфи – Школа игр”
+
+## Verificare automată
+
+```sh
+xcodebuild -project PufiStars.xcodeproj -scheme PufiStars \
+  -destination 'platform=iOS Simulator,name=iPad (A16),OS=26.5' \
+  -derivedDataPath /tmp/pufi-derived -parallel-testing-enabled NO \
+  -collect-test-diagnostics never test
+```
+
+Alege un simulator instalat. Folosește o destinație iPhone pentru a repeta verificarea.
+Într-un folder sincronizat cu iCloud, păstrează DerivedData în `/tmp`: metadatele
+Finder adăugate automat pot invalida semnarea simulatorului. Nu este nevoie de
+un Developer Team pentru simulatoare. Pentru un aparat fizic, Hory trebuie să
+aleagă propriul Team în Signing & Capabilities.
+
+Testele verifică jocul împachetat, bridge-ul real WKWebView, vocea nativă,
+Debug IAP fără cheie, copia progresului, blocarea navigării externe, poarta și
+orientările. Calitatea microfonului, recunoașterea românei pe aparat și
+cumpărările reale trebuie verificate pe dispozitiv.
