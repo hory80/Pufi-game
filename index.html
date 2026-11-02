@@ -4179,6 +4179,391 @@ S('aq',{title:'🐠 I miei acquari',main:'🌿 Acquario',pred:'🦈 Vasca dei pr
 </script>
 
 <script>
+/* ===== Nederlands — hoofdspel, wereld, monumenten, voetballers ===== */
+(()=>{ const lg='nl', IDX=10;
+L10N.main=L10N.main||{};
+L10N.main[lg]={ code:'nl', speech:'nl-NL', title:'Tel de sterren ⭐', start:'▶ Start!', i:IDX,
+  gNum:'🔢 Getallen', gFlag:'🚩 Vlaggen', gAb:'🧮 Telraam',
+  sbShow:'👆 Laat zien', sbAdd:'➕ Erbij', sbTen:'🍒 Maak 10', tens:'Tientallen', ones:'Eenheden', check:'✔ Klaar',
+  sbHint:'Het rode kraaltje bovenaan is 5 waard. Elk geel kraaltje onderaan is 1 waard.',
+  showSay:n=>`Laat het getal ${n} zien op het telraam.`, showTxt:n=>`Laat zien: <b>${n}</b>`, showRight:n=>`Ja! Dat is ${n}.`,
+  showWrong:(v,n)=>`Het telraam laat ${v} zien. We zoeken ${n}.`,
+  addSay:(a,b)=>`Het telraam laat ${a} zien. Doe er ${b} bij. Hoeveel is dat?`, addWrong:v=>`Het telraam laat ${v} zien. Probeer het nog eens!`,
+  tenQ1:a=>`Hoeveel moet er bij ${a} om 10 te maken?`,
+  tenR1:(a,n,b,r)=>`Ja! ${a} plus ${n} is 10. We splitsen ${b} in ${n} en ${r}.`,
+  tenQ2:r=>`En nu: 10 plus ${r}. Hoeveel is dat?`, tenWin:(a,b,v)=>`${a} plus ${b} is ${v}.`, easy:'Makkelijk', all:'Alle landen',
+  add:'➕ Plussen', sub:'➖ Minnen', mix:'🔀 Gemengd', upto:n=>`tot ${n}`,
+  plus:'plus', minus:'min', q:(a,s,b)=>`Hoeveel is ${a} ${s} ${b}?`, res:(a,s,b,v)=>`${a} ${s} ${b} is ${v}.`,
+  msgAdd:'Hoeveel zijn het er samen?', msgSub:n=>`Er ${n===1?'gaat':'gaan'} ${n} weg. Hoeveel blijven er over?`,
+  findSay:n=>`Zoek de vlag van ${n}!`, findShow:n=>`Zoek: <b>${n}</b>`,
+  flagRight:n=>`Ja! Dat is ${n}.`, flagWrong:(x,n)=>`Dat is ${x}. Zoek ${n}!`, flagTry:'Blijf zoeken! 🔍',
+  cont:{eu:'Europa',as:'Azië',af:'Afrika',na:'Noord-Amerika',sa:'Zuid-Amerika',oc:'Oceanië'},
+  where:(n,c)=>`${n.charAt(0).toUpperCase()+n.slice(1)} ligt in ${c}.`, capSay:k=>`De hoofdstad is ${k}.`, capLbl:'Hoofdstad', sightSay:x=>`Daar vind je ${x}.`, nextBtn:'▶ Volgende',
+  praise:['Heel goed!','Super!','Knap gedaan!','Geweldig!','Perfect!','Fantastisch!'],
+  bigMsg:'🏅 Je hebt 10 sterren verdiend!', bigSay:'Je hebt tien sterren verdiend! Je bent een kampioen!',
+  tryMsg:'Probeer het nog eens! Tel opnieuw 🙂', wrongSay:v=>`Het is geen ${v}. Probeer het nog eens!`,
+  listen:'🔊 Luisteren', on:'🗣️ Stem: aan', off:'🔇 Stem: uit', defVoice:'Standaardstem',
+  sample:'Hallo! Zo klinkt mijn stem.', hello:'Kom, we gaan spelen! ', names:/xander|claire|ellen|fleur|lotte/ };
+L10N.misc=L10N.misc||{}; L10N.misc[lg]={playGame:'Een partij spelen',vsRobot:'tegen de robot of een vriend',newB:'NIEUW'};
+L10N.mon=L10N.mon||{}; L10N.mon[lg]={tap:'Tik op een plaatje om meer te weten!',close:'✖ Sluiten',listen:'🔊 Luisteren',play:'🎵 Volkslied luisteren',stop:'⏹ Volkslied stoppen',photo:'Foto'};
+L10N.fb=L10N.fb||{}; L10N.fb[lg]={btn:'⚽ Voetballers',title:n=>`⚽ Beroemde voetballers: ${n}`,say:n=>`Dit zijn de beroemdste voetballers van ${n}! Tik op een speler om meer te weten.`};
+const NAMES={CH:'Zwitserland',RO:'Roemenië',DE:'Duitsland',FR:'Frankrijk',IT:'Italië',AT:'Oostenrijk',ES:'Spanje',GB:'het Verenigd Koninkrijk',US:'de Verenigde Staten',JP:'Japan',BR:'Brazilië',CA:'Canada',GR:'Griekenland',PT:'Portugal',NL:'Nederland',SE:'Zweden',NO:'Noorwegen',TR:'Turkije',IN:'India',AU:'Australië',MX:'Mexico',AR:'Argentinië',PL:'Polen',UA:'Oekraïne',BE:'België',DK:'Denemarken',KR:'Zuid-Korea',EG:'Egypte',IE:'Ierland',HR:'Kroatië',FI:'Finland',HU:'Hongarije',MD:'Moldavië',CN:'China',ZA:'Zuid-Afrika',IS:'IJsland'};
+COUNTRIES.forEach(c=>{ c[IDX]=NAMES[c[3]]||c[5]; });
+const CAPS_L={CH:'Bern',RO:'Boekarest',DE:'Berlijn',FR:'Parijs',IT:'Rome',AT:'Wenen',ES:'Madrid',GB:'Londen',US:'Washington',JP:'Tokio',BR:'Brasilia',CA:'Ottawa',GR:'Athene',PT:'Lissabon',NL:'Amsterdam',SE:'Stockholm',NO:'Oslo',TR:'Ankara',IN:'New Delhi',AU:'Canberra',MX:'Mexico-Stad',AR:'Buenos Aires',PL:'Warschau',UA:'Kyiv',BE:'Brussel',DK:'Kopenhagen',KR:'Seoul',EG:'Caïro',IE:'Dublin',HR:'Zagreb',FI:'Helsinki',HU:'Boedapest',MD:'Chisinau',CN:'Peking',ZA:'Pretoria',IS:'Reykjavik'};
+for(const k in CAPS) CAPS[k][IDX-1]=CAPS_L[k]||CAPS[k][4];
+const SIGHT={CH:'de Alpen, kaas en chocolade',RO:'kasteel Bran, de Karpaten en beren',DE:'kastelen, pretzels en auto’s',FR:'de Eiffeltoren, croissants en kaas',IT:'pizza, het Colosseum en pasta',AT:'muziek, bergen en taart',ES:'flamenco, zon en paella',GB:'de koninklijke wacht, de London Eye en thee',US:'het Vrijheidsbeeld, American football en hotdogs',JP:'de berg Fuji, sushi en kersenbloesem',BR:'voetbal, papegaaien en het Amazoneregenwoud',CA:'esdoornbladeren, ijsberen en ijshockey',GR:'oude tempels, olijven en de zee',PT:'de oceaan, vis en gele trammetjes',NL:'tulpen, fietsen en windmolens',SE:'elanden, sneeuw en rode huisjes',NO:'walvissen, fjorden en het noorderlicht',TR:'moskeeën, thee en luchtballonnen',IN:'olifanten, de Taj Mahal en pittig eten',AU:'kangoeroes, koala’s en surfen',MX:'taco’s, cactussen en feesten',AR:'tango, barbecue en voetbal',PL:'kastelen, pierogi en de winter',UA:'zonnebloemen, graan en pierogi',BE:'chocolade, wafels en frietjes',DK:'Lego, de Kleine Zeemeermin en fietsen',KR:'paleizen, noedels en muziek',EG:'kamelen, piramides en de woestijn',IE:'klavertjes, schapen en regen',HR:'de zee, boten en kastelen',FI:'de Kerstman, sneeuw en sauna’s',HU:'kastelen, paprika en warmwaterbaden',MD:'druiven, boomgaarden en zonnebloemen',CN:'panda’s, de Chinese Muur en eetstokjes',ZA:'leeuwen, giraffen en olifanten',IS:'vulkanen, ijs en kleine paardjes'};
+for(const k in SIGHTS) SIGHTS[k][IDX]=SIGHT[k]||SIGHTS[k][5];
+const MONT={
+CH:[['De Matterhorn','De Matterhorn is een heel hoge berg met een spitse top, net een driehoek. Hij is bijna 4500 meter hoog!'],['De Glacier Express','Een rode trein die over heel hoge bruggen tussen de bergen rijdt. Het is de langzaamste sneltrein van de wereld!'],['De fontein van Genève','Een reuzenfontein in het meer van Genève die het water 140 meter hoog spuit, zo hoog als een wolkenkrabber!']],
+RO:[['Kasteel Bran','Een kasteel op een heuvel. Men zegt dat het het kasteel van Dracula is, de vampier uit de verhalen.'],['De beschilderde kloosters van Boekovina','Oude kerken die ook vanbuiten beschilderd zijn, met heiligen en verhalen. Het klooster van Voroneț heeft een blauw dat over de hele wereld bekend is.'],['De Donaudelta','Hier stroomt de Donau in de Zwarte Zee. Er leven duizenden vogels, zelfs pelikanen!']],
+DE:[['Slot Neuschwanstein','Een sprookjeskasteel, gebouwd door een koning die van ridders droomde. Het bracht de kastelen uit prinsessenfilms op een idee.'],['De Brandenburger Tor','Een grote poort in Berlijn met een wagen en vier paarden erop. Het is het teken van een verenigd Duitsland.'],['De Dom van Keulen','Een enorme kerk met twee heel hoge torens. Het bouwen duurde meer dan 600 jaar!']],
+FR:[['De Eiffeltoren','Een ijzeren toren in Parijs van meer dan 300 meter hoog. ’s Nachts schittert hij met duizenden lichtjes!'],['Het Louvre','Het meest bezochte museum ter wereld, met een glazen piramide bij de ingang. Hier hangt de Mona Lisa.'],['De Mont-Saint-Michel','Een abdij op een klein eiland. Bij vloed ligt er zee omheen. Bij eb kun je ernaartoe lopen.']],
+IT:[['Het Colosseum','Een reusachtig stadion in Rome van bijna 2000 jaar oud. Duizenden mensen kwamen hier naar voorstellingen kijken.'],['De toren van Pisa','Een toren die scheef staat omdat de grond eronder zacht is. Op foto’s doen toeristen alsof ze hem tegenhouden!'],['Venetië','Een stad die op het water gebouwd is, met grachten in plaats van straten. Mensen varen in boten die gondels heten.']],
+AT:[['Paleis Schönbrunn','Een enorm paleis in Wenen met meer dan 1000 kamers en de oudste dierentuin van de wereld.'],['Het geboortehuis van Mozart','Het gele huis in Salzburg waar Mozart geboren is. Toen hij 5 was, schreef hij al muziek!'],['De Grossglockner','De hoogste berg van Oostenrijk, met een grote gletsjer eronder.']],
+ES:[['De Sagrada Família','Een reusachtige kerk in Barcelona met torens als zandkastelen. Er wordt al meer dan 140 jaar aan gebouwd!'],['Het Alhambra','Een oud paleis in Granada met tuinen, fonteinen en muren die versierd zijn als kant.'],['Park Güell','Een kleurrijk park in Barcelona met een hagedis van mozaïekstukjes en golvende bankjes.']],
+GB:[['De Big Ben','Een grote klokkentoren in Londen. De reuzenklok binnenin heet Big Ben.'],['Stonehenge','Een cirkel van reuzenstenen, bijna 5000 jaar geleden neergezet. Niemand weet precies waarom!'],['Buckingham Palace','Het huis van de Britse koning in Londen. Ervoor staan wachters met hoge zwarte mutsen.']],
+US:[['Het Vrijheidsbeeld','Een reusachtig groen beeld in New York met een fakkel in de hand. Het was een cadeau van Frankrijk.'],['De Grand Canyon','Een enorme, diepe kloof die een rivier in miljoenen jaren heeft uitgesleten. De rotsen zijn rood en oranje.'],['De Golden Gate Bridge','Een lange rode brug in San Francisco. De mist verstopt vaak de helft ervan.']],
+JP:[['De berg Fuji','Een vulkaan met sneeuw op de top, de hoogste berg van Japan.'],['Het Fushimi Inari-heiligdom','Een heilige plek in Kyoto met duizenden oranje poorten achter elkaar, net een tunnel die de berg op gaat.'],['Kasteel Himeji','Een wit kasteel dat Witte Reiger heet, omdat het lijkt op een vogel die wegvliegt.']],
+BR:[['Christus de Verlosser','Een reusachtig beeld met gespreide armen op een berg boven Rio de Janeiro.'],['Het Amazoneregenwoud','Het grootste regenwoud van de wereld. Er leven jaguars, papegaaien en apen.'],['De Iguaçu-watervallen','Honderden watervallen naast elkaar op de grens met Argentinië. Het water dondert!']],
+CA:[['De Niagarawatervallen','Reuzenwatervallen tussen Canada en de Verenigde Staten. Met een boot kun je er dichtbij komen en word je kletsnat!'],['De Rocky Mountains','Hoge bergen met turquoise meren, waar beren en elanden wonen.'],['De CN Tower','Een heel hoge toren in Toronto met een glazen vloer: je ziet de stad onder je voeten.']],
+GR:[['De Akropolis','Een heuvel in Athene met marmeren tempels van 2500 jaar oud. De beroemdste is het Parthenon.'],['Santorini','Een eiland met witte huizen en blauwe daken, gebouwd op de rand van een vulkaan.'],['Olympia','De plek waar de Olympische Spelen begonnen, bijna 3000 jaar geleden.']],
+PT:[['De Toren van Belém','Een toren als een klein kasteel aan de rivier in Lissabon. Hiervandaan vertrokken zeevaarders om de wereld te ontdekken.'],['Tram 28 in Lissabon','Een oud geel trammetje dat door heel smalle straatjes op en neer rijdt.'],['Het Pena-paleis','Een rood met geel, kleurrijk paleis boven op een heuvel in Sintra. Het lijkt een tekenfilmkasteel.']],
+NL:[['De molens van Kinderdijk','19 oude windmolens op een rij. Ze pompten het water van het land, zodat het niet onderliep.'],['De Keukenhof','Een enorme tuin met miljoenen tulpen in alle kleuren, die in de lente bloeien.'],['De grachten van Amsterdam','Een stad met veel grachten en bruggen, waar meer fietsen zijn dan mensen!']],
+SE:[['De oude stad van Stockholm','Oude straatjes en kleurige huizen op een eiland. Stockholm is gebouwd op 14 eilanden!'],['Het ijshotel','Een hotel helemaal van ijs en sneeuw, zelfs de bedden! In de lente smelt het en elke winter wordt het opnieuw gebouwd.'],['Het Vasamuseum','Een oud houten schip dat bijna 400 jaar geleden zonk en bijna heel uit de zee is gehaald.']],
+NO:[['De fjorden','Lange, smalle zeearmen tussen heel hoge bergen, met watervallen die recht in het water vallen.'],['Het noorderlicht','Groene en paarse lichten die ’s winters in het noorden van Noorwegen aan de hemel dansen.'],['De staafkerk van Borgund','Een houten kerk van bijna 850 jaar oud, met drakenkoppen op de daken.']],
+TR:[['De Hagia Sophia','Een enorm gebouw in Istanbul met een reusachtige koepel, bijna 1500 jaar oud.'],['Cappadocië','Een land met rotsen als schoorstenen. ’s Ochtends zweven er honderden luchtballonnen boven.'],['Pamukkale','Sneeuwwitte terrassen vol warm turquoise water. Maar het is geen sneeuw, het is steen!']],
+IN:[['De Taj Mahal','Een gebouw van wit marmer dat een keizer bouwde uit liefde voor zijn vrouw.'],['De bengaalse tijgers','In de bossen van India leven tijgers met oranje en zwarte strepen. Elke tijger heeft andere strepen!'],['Het Rode Fort','Een groot fort van rode steen in Delhi, waar de keizers woonden.']],
+AU:[['Het Sydney Opera House','Een wit gebouw met daken als zeilen, vlak aan de zee.'],['Uluru','Een reusachtige rode rots midden in de woestijn. Bij zonsondergang verandert hij van kleur!'],['Het Groot Barrièrerif','Het grootste koraalrif van de wereld, zo groot dat je het vanuit de ruimte kunt zien. Er zwemmen bonte vissen en schildpadden.']],
+MX:[['Chichén Itzá','Een trappiramide, gebouwd door de Maya’s. Als je ervoor in je handen klapt, klinkt de echo als een vogel!'],['De Piramide van de Zon','Een reuzenpiramide in een heel oude stad die Teotihuacán heet. Je kunt honderden treden naar boven klimmen.'],['De cenotes','Verborgen meertjes in grotten, met helder blauw water waarin je kunt zwemmen.']],
+AR:[['De Perito Moreno-gletsjer','Een reuzengletsjer die nog steeds groeit. Af en toe vallen er enorme brokken ijs met veel lawaai in het meer!'],['De tango in Buenos Aires','Tango is een dans die hier is uitgevonden. Er wordt zelfs op straat gedanst in de kleurrijke wijk La Boca.'],['De pinguïns van Patagonië','Duizenden pinguïns wonen op de stranden in het zuiden en waggelen naar de zee.']],
+PL:[['Kasteel Wawel','Een kasteel in Krakau. Volgens de legende woonde er een draak onder, en nu staat er een drakenbeeld dat echt vuur spuwt!'],['De zoutmijn van Wieliczka','Een zoutmijn onder de grond met een hele kerk uit zout gehakt, zelfs de kroonluchters!'],['De oude stad van Warschau','Kleurige huizen rond een plein, met een beeld van een zeemeermin die de stad beschermt.']],
+UA:[['Het Holenklooster van Kyiv','Een klooster met gouden koepels en grotten onder de grond, waar monniken woonden.'],['De tunnel van de liefde','Een spoorlijn in het bos waar de bomen een groene tunnel vormen.'],['De zonnebloemvelden','In de zomer worden hele velden geel. De zonnebloem is de nationale bloem van Oekraïne.']],
+BE:[['Het Atomium','Een gek gebouw in Brussel van negen grote metalen bollen, net een reuzenatoom.'],['De Grote Markt','Een plein in Brussel met gouden gebouwen. Om de twee jaar ligt er een tapijt van bloemen.'],['Belgische chocolade','België is beroemd om zijn chocolade. Pralines, chocolaatjes met een vulling, zijn hier uitgevonden!']],
+DK:[['De Kleine Zeemeermin','Een klein beeld op een rots in Kopenhagen, naar het sprookje van Hans Christian Andersen.'],['Legoland','Lego is in Denemarken uitgevonden! In Legoland zie je hele steden van legosteentjes.'],['Nyhavn','Een haven met huizen zo kleurig als snoepjes en oude houten schepen.']],
+KR:[['Het Gyeongbokgung-paleis','Een koninklijk paleis in Seoul waar de wachters kleurige kleren dragen zoals vroeger.'],['Het eiland Jeju','Een eiland dat door een vulkaan is ontstaan, met stranden, watervallen en lachende stenen beelden.'],['De N Seoul Tower','Een toren op een berg midden in de stad. Daar hangen mensen kleurige vriendschapsslotjes op.']],
+EG:[['De piramides van Gizeh','Reuzengraven voor de farao’s, 4500 jaar geleden gebouwd met miljoenen stenen blokken.'],['De Grote Sfinx','Een reuzenbeeld met het lijf van een leeuw en het hoofd van een mens, dat de piramides bewaakt.'],['Het Dal der Koningen','Een dal waar farao’s in verborgen graven in de berg werden begraven. Hier vond men de schat van Toetanchamon.']],
+IE:[['De Cliffs of Moher','Reuzenkliffen die recht in de oceaan vallen. Daar broeden papegaaiduikers met kleurige snavels.'],['Kasteel Blarney','Een kasteel met een toversteen: wie hem kust, kan volgens de legende heel goed praten.'],['Saint Patrick’s Day','Een feest met optochten waarbij iedereen groen draagt en klavertjes heeft.']],
+HR:[['Dubrovnik','Een oude stad met dikke muren eromheen waarover je kunt wandelen, aan de zee.'],['De meren van Plitvice','16 turquoise meren, verbonden door watervallen, met houten paadjes over het water.'],['De dalmatiërs','Gevlekte dalmatiërs zijn genoemd naar Dalmatië, een streek in Kroatië.']],
+FI:[['Het Kerstmandorp','In Rovaniemi, op de poolcirkel, is een dorp waar je het hele jaar de Kerstman kunt bezoeken.'],['De rendieren van Lapland','In het noorden van Finland leven veel rendieren. Ze trekken sleeën door de sneeuw.'],['Het land van duizend meren','Finland heeft meer dan 180.000 meren! Daarom heet het het land van de duizend meren.']],
+HU:[['Het Hongaarse parlement','Een enorm, prachtig gebouw aan de Donau dat ’s nachts als goud schittert.'],['De Széchenyi-baden','Zwembaden met warm water dat uit de grond komt. In de winter wordt er zelfs geschaakt in het water!'],['Het Vissersbastion','Een muur met zeven witte torens als tentjes, vanwaar je de hele stad ziet.']],
+MD:[['Orheiul Vechi','Een klooster dat in een rots is uitgehakt, boven een rivier die een grote bocht maakt.'],['Het fort van Soroca','Een rond stenen fort aan de rivier de Dnjestr, begonnen door Stefan de Grote.'],['Boomgaarden en wijngaarden','Moldavië heeft heel vruchtbare grond waar druiven, appels en walnoten groeien.']],
+CN:[['De Chinese Muur','Een heel lange muur die gebouwd is om China te beschermen. Hij is duizenden kilometers lang!'],['De reuzenpanda’s','Reuzenpanda’s wonen in de bergen van China en eten bijna de hele dag bamboe.'],['De Verboden Stad','Een enorm paleis in Peking met gele daken. Vroeger mochten alleen de keizer en zijn mensen naar binnen.']],
+ZA:[['De Tafelberg','Een berg met een platte top als een tafel boven Kaapstad. Soms ligt er een wolk op als een tafelkleed!'],['Het Krugerpark','Een enorm park waar je leeuwen, olifanten, giraffen en zebra’s in het wild ziet.'],['Boulders Beach','Een strand waar Afrikaanse pinguïns tussen de mensen door wandelen.']],
+IS:[['De vulkanen van IJsland','IJsland heeft meer dan 30 actieve vulkanen. Soms zie je rode lava stromen!'],['De geiser Strokkur','Een hete bron die om de paar minuten water de lucht in spuit, als een fontein van de natuur.'],['De Skógafoss','Een grote witte waterval. Op zonnige dagen zie je bijna altijd een regenboog in de druppeltjes!']]};
+for(const k in MONT) (MON[k]||[]).forEach((m,i)=>{ if(MONT[k][i]) (m._t=m._t||{})[lg]=MONT[k][i]; });
+const FBT={
+CH:['Klein maar razendsnel, beroemd om zijn spectaculaire doelpunten voor Zwitserland.','Middenvelder en aanvoerder van Zwitserland, met meer dan 100 interlands.','Een keeper die veel belangrijke strafschoppen stopte, ook op het EK.'],
+RO:['Hij werd «de Koning» genoemd en was de beste Roemeense voetballer, met een magische linkervoet.','Een spits die veel doelpunten maakte voor Roemenië en in Italië en Engeland speelde.','Een sterke verdediger, aanvoerder van Barcelona, die op drie WK’s speelde.'],
+DE:['Hij heette «de Keizer» en won het WK als speler én als trainer.','Een van de grootste doelpuntenmakers ooit, wereldkampioen in 1974.','Een keeper die vaak uit zijn doel komt als een verdediger. Wereldkampioen in 2014.'],
+FR:['Een heel elegante speler die Frankrijk in 1998 wereldkampioen maakte.','Een van de snelste voetballers van de wereld. Wereldkampioen in 2018.','Een elegante spits die veel scoorde voor Frankrijk en Arsenal.'],
+IT:['Beroemd om zijn paardenstaart en mooie doelpunten; hij heette «de Goddelijke Paardenstaart».','Een legendarische verdediger die meer dan 900 wedstrijden voor AC Milan speelde.','Een legendarische keeper, wereldkampioen in 2006, die tot zijn 45e bleef spelen.'],
+AT:['Hij kan op veel plekken spelen en won een paar keer de Champions League.','Hij maakte de doelpunten waarmee Oostenrijk Duitsland versloeg op het WK van 1978.','Een sterke spits en een van de topscorers van Oostenrijk ooit.'],
+ES:['Hij maakte het doelpunt waarmee Spanje in 2010 wereldkampioen werd.','Een verdediger en aanvoerder, wereldkampioen in 2010, die veel kopdoelpunten maakte.','Een heel jong talent: hij won het EK van 2024 toen hij pas 17 was.'],
+GB:['Hij werd in 1966 wereldkampioen met Engeland en was beroemd om zijn harde schoten.','Beroemd om zijn vrije trappen die als een banaan afbogen.','De topscorer aller tijden van het Engelse elftal.'],
+US:['Hij heet «Captain America» en is de ster van het Amerikaanse team.','Een van de topscorers aller tijden van het Amerikaanse team.','Een spits die twee keer het WK voor vrouwen won met de Verenigde Staten.'],
+JP:['Een van de eerste grote Japanse sterren die in Europa schitterde, in Italië.','De aanvoerster die Japan in 2011 wereldkampioen bij de vrouwen maakte.','Een razendsnelle vleugelspeler, beroemd om zijn dribbels.'],
+BR:['Hij heette «de Koning van het voetbal» en won drie keer het WK.','De topscorer aller tijden van Brazilië, beroemd om zijn dribbels.','Een van de beste speelsters ooit, zes keer gekozen tot beste speelster van de wereld.'],
+CA:['Een razendsnelle verdediger en een van de sterren van Canada.','Zij scoorde meer interlanddoelpunten dan wie ook ter wereld, mannen of vrouwen!','Een spits die veel doelpunten maakt voor Canada.'],
+GR:['Aanvoerder van Griekenland toen het verrassend het EK van 2004 won.','Hij maakte het doelpunt in de finale van het EK 2004.','Een middenvelder die meer interlands voor Griekenland speelde dan wie ook.'],
+PT:['De topscorer aller tijden in het interlandvoetbal.','Hij heette «de Zwarte Panter» en was topscorer op het WK van 1966.','Een heel talentvolle vleugelspeler, in 2001 gekozen tot beste speler van de wereld.'],
+NL:['Een voetbalgenie. Een schijnbeweging is naar hem vernoemd: de Cruijff-draai.','Een spits die een fantastische volley maakte in de finale van het EK 1988.','Een lange, rustige verdediger, aanvoerder van Nederland.'],
+SE:['Een heel lange spits, beroemd om acrobatische doelpunten als karatetrappen.','Een geliefde spits die veel scoorde voor Zweden en Celtic.','Een jonge, elegante spits, een van de huidige sterren van Zweden.'],
+NO:['Een reusachtige, razendsnelle spits die maar blijft scoren.','Een creatieve middenvelder en aanvoerder van Noorwegen, die op zijn 15e prof werd.','Hij maakte in de laatste minuut het winnende doelpunt in de Champions League-finale van 1999.'],
+TR:['Hij maakte het snelste doelpunt ooit op een WK, na 11 seconden!','Een jong talent met een magische linkervoet, «de Turkse Messi» genoemd.','De aanvoerder van Turkije, beroemd om zijn vrije trappen.'],
+IN:['De topscorer van India en een van de grootste interlandscoorders ter wereld.','Een van de eerste grote sterren van het Indiase voetbal en jarenlang aanvoerder.','Een heel lange keeper, de eerste Indiër in een grote Europese competitie, in Noorwegen.'],
+AU:['Beroemd om zijn kopdoelpunten en omdat hij na een goal tegen de hoekvlag bokste.','Een spits die na een doelpunt een achterwaartse salto maakt!','Een sterke spits, aanvoerder van Australië op het WK van 2006.'],
+MX:['Beroemd om zijn acrobatische doelpunten en zijn salto als juichgebaar.','Een verdediger en aanvoerder die op vijf WK’s speelde.','Een keeper met krullen, beroemd om zijn ongelooflijke reddingen op WK’s.'],
+AR:['Een van de beste voetballers aller tijden, wereldkampioen in 2022.','Een dribbelgenie dat in 1986 wereldkampioen werd.','Hij scoorde in de WK-finale van 2022 en in een finale van de Copa América.'],
+PL:['Een spits die ooit 5 doelpunten maakte in maar 9 minuten!','Een snelle middenvelder, de ster van Polen op het WK van 1982.','Een keeper die op het WK strafschoppen stopte.'],
+UA:['Een beroemde spits die in 2004 de Gouden Bal won.','Een razendsnelle spits die in 1975 de Gouden Bal won.','Hij kan op het middenveld en in de verdediging spelen en is een van de sterren van Oekraïne.'],
+BE:['Een fantastische dribbelaar, aanvoerder van België, derde op het WK van 2018.','Een middenvelder met ongelooflijke passes, een van de besten ter wereld.','Een heel lange keeper, bijna twee meter.'],
+DK:['Hij geldt als de beste Deense voetballer, beroemd om zijn magische passes.','Een reuzenkeeper die in 1992 met Denemarken het EK won.','Een creatieve middenvelder, beroemd om zijn passes en vrije trappen.'],
+KR:['De aanvoerder van Zuid-Korea, die topscorer werd in de Engelse Premier League.','Hij heette «Drie Longen» omdat hij kon rennen zonder moe te worden.','Een Koreaanse voetballegende die veel scoorde in Duitsland.'],
+EG:['Hij heet «de Egyptische Koning», een razendsnelle spits die heel veel scoort.','Een middenvelder die in heel Egypte geliefd is en twee keer de Afrika Cup won.','Een spits met veel doelpunten die meer dan 170 interlands voor Egypte speelde.'],
+IE:['Een harde middenvelder en aanvoerder, beroemd omdat hij nooit opgaf.','De topscorer van Ierland, beroemd om zijn radslag als juichgebaar.','Een rustige, elegante verdediger, heel geliefd bij de Ierse fans.'],
+HR:['Een briljante middenvelder, gekozen tot beste speler van het WK 2018.','Topscorer van het WK 1998, toen Kroatië derde werd.','Een middenvelder die met Kroatië de WK-finale van 2018 speelde.'],
+FI:['In Finland heet hij «de Koning»; hij won de Champions League met Ajax.','De topscorer van Finland, die het land naar zijn eerste EK bracht.','Een lange, sterke verdediger, aanvoerder van Liverpool.'],
+HU:['Een van de grootste doelpuntenmakers ooit. Het mooiste doelpunt van elk jaar krijgt de Puskás-prijs.','De aanvoerder van Hongarije, beroemd om zijn harde schoten van ver.','Hij won in 1967 de Gouden Bal, als enige Hongaar ooit.'],
+MD:['De topscorer aller tijden van Moldavië.','Een verdediger en aanvoerder, de speler met de meeste interlands voor Moldavië.','Een van de spelers met de meeste interlands voor Moldavië.'],
+CN:['Een Chinese spits die in Spanje speelde, een van de topscorers van China.','De eerste Chinese speler die scoorde in de Engelse Premier League.','Een van de beste speelsters van de eeuw, die China in 1999 naar de WK-finale bracht.'],
+ZA:['De topscorer aller tijden van Zuid-Afrika.','Verdediger en aanvoerder van Zuid-Afrika, heel geliefd bij Leeds United.','Een talentvolle middenvelder die in Engeland speelde en op het WK van 2010 in eigen land.'],
+IS:['Een middenvelder, beroemd om zijn vrije trappen, een van de topscorers van IJsland.','In zijn eerste interland voor IJsland viel hij in voor… zijn eigen vader!','Een keeper die op het WK van 2018 een strafschop van Messi stopte. Hij is ook filmregisseur!']};
+for(const k in FBT) (FB[k]||[]).forEach((p,i)=>{ if(FBT[k][i]) (p._t=p._t||{})[lg]=FBT[k][i]; });
+})();
+</script>
+
+<script>
+/* ===== Nederlands — lezen ===== */
+(()=>{ const lg='nl', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Lezen',title:'Lezen en schrijven',back:'⬅ Terug',menu:'⬅ Menu',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','Het alfabet'],fish:['🎣','Vang de letter'],train:['🚂','De klankentrein'],build:['🧩','Het toverwoord'],read:['👀','Lees en kies'],story:['📚','Verhaaltjes'],write:['✍️','Schrijf met je vinger']},
+  alphaTask:'Tik op een letter om hem te horen!',album:(n,t)=>`🏅 Stickers: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, van ${w}.`,
+  fishSay:(l,w)=>`Vang de letter ${l}, van ${w}!`,fishWrong:l=>`Dit is de letter ${l}. Probeer het nog eens!`,fishRight:l=>`Goed zo! Je hebt de ${l} gevangen.`,
+  trainSay:w=>`Maak het woord ${w}! Zet de wagons op volgorde.`,trainDone:w=>`Goed zo! ${w}!`,
+  buildSay:w=>`Schrijf het woord ${w}!`,buildDone:w=>`Super! Je hebt ${w} geschreven.`,
+  readTask:'Lees het woord en kies het plaatje!',readWrong:'Probeer het nog eens!',readRight:w=>`Ja! ${w}!`,
+  storyTask:'Kies een verhaaltje!',readMe:'▶ Lees voor',readSelf:'Tik op een woord om het te horen.',storyDone:'Goed zo! Je hebt het verhaaltje uit.',
+  writeTask:l=>`Schrijf ${l}. Begin bij de groene stip.`,writeDone:l=>`Goed zo! Je hebt ${l} geschreven!`,offTrack:'Volg de grijze lijn 🙂',
+  letters:'🔤 Letters',digits:'🔢 Cijfers',next:'▶ Volgende',again:'↺ Nog een keer',listen:'🔊 Luisteren',
+  sylQ:w=>`Hoeveel klankgroepen heeft het woord ${w}?`,sylN:n=>n===1?'één klankgroep':n+' klankgroepen',sylSay:(w,n,x)=>`Ja! ${w} heeft ${n}: ${x}.`,sylWrong:'Probeer het nog eens! Klap bij elke klankgroep. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'klankgroep':'klankgroepen'} 👏`,
+  mPick:'🔤 Kies letters',mFree:'✏️ Schrijf over de lijn',mGuide:'✍️ Schrijf met hulp',clear:'🧽 Wissen',freeHint:'Schrijf de letter over de grijze lijn.',freeBad:'Probeer over de lijn te schrijven 🙂',writeLetter:l=>`Schrijf de letter ${l}.`};
+D.AQTX[lg]={btn:'🐠 Mijn aquarium',title:'🐠 Mijn aquarium',empty:'Vang vissen om je aquarium te vullen!',slow:'🐢 Langzaam',fast:'🐇 Snel',close:'✖ Sluiten'};
+D.STX[lg]={syl:'🎨 Gekleurde klankgroepen',listen:'🔊 Lees voor',self:'👆 Ik lees zelf',next:'Volgend woord ▶',selfHint:'Lees het gele woord hardop en druk dan op ▶. Ken je een woord niet? Tik erop.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, van ${w}!`,(l,w)=>`Waar is de ${l}? ${l}, van ${w}.`,(l,w)=>`Zoek de ${l}, van ${w}!`,(l,w)=>`De vis met de ${l}, van ${w}!`,(l,w)=>`Kom op, de ${l}, van ${w}!`],
+  pic:w=>`Met welke letter begint ${w}?`, ok:['Gevangen!','Super!','Goede vangst!','Wauw!','Ja!','Wat een vis!'], no:['Die niet!','Oei, een andere vis!','Zoek verder!',x=>`Dit is de ${x}.`],
+  gold:'De gouden vis! Drie sterren!', lvl:n=>`Niveau ${n}! Er komen nieuwe zeedieren!`, bucket:'Emmer'};
+D.ALPHA[lg]=[['A','🐒','AAP'],['B','🐻','BEER'],['C','🍋','CITROEN'],['D','🐬','DOLFIJN'],['E','🦆','EEND'],['F','🚲','FIETS'],['G','🦒','GIRAF'],['H','🐶','HOND'],['I','🐛','INSECT'],['J','🧥','JAS'],['K','🐱','KAT'],['L','🦁','LEEUW'],['M','🐭','MUIS'],
+  ['N','👃','NEUS'],['O','🐘','OLIFANT'],['P','🐧','PINGUÏN'],['Q','🦜','QUETZAL'],['R','🚀','RAKET'],['S','⭐','STER'],['T','🍅','TOMAAT'],['U','🦉','UIL'],['V','🐟','VIS'],['W','☁️','WOLK'],['X','🎹','XYLOFOON'],['Y','🧘','YOGA'],['Z','☀️','ZON']];
+D.WORDS[lg]=[['👩','MA-MA'],['👨','PA-PA'],['🐱','POES'],['🐶','HOND'],['🏠','HUIS'],['🍎','AP-PEL'],['🚗','AU-TO'],['☀️','ZON'],['🌙','MAAN'],['🐟','VIS'],['🦆','EEND'],['🎈','BAL-LON'],['🌸','BLOEM'],['🦁','LEEUW'],
+  ['🍌','BA-NAAN'],['🐸','KIK-KER'],['🦋','VLIN-DER'],['🍓','AARD-BEI'],['🥕','WOR-TEL'],['🐭','MUIS'],['🐄','KOE'],['🌳','BOOM'],['🍉','WA-TER-ME-LOEN'],['🐢','SCHIL-PAD'],['🚂','TREIN'],['🐻','BEER'],['☁️','WOLK'],['🎂','TAART'],['🐰','KO-NIJN'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi en de bal','Pu·fi heeft een ro·de bal. De bal stuit om·hoog, om·hoog, om·hoog. Pu·fi rent er·ach·ter·aan. Wat een pret!'],
+ ['🐱','Poes Mimi','Mi·mi is een klei·ne poes. Ze drinkt melk. Dan slaapt ze in de zon. Mi·auw, zegt Mi·mi.'],
+ ['🏖️','Een dag aan zee','Van·daag gaan we naar zee. Het wa·ter is blauw. Ik bouw een zand·kas·teel. Wat een mooie dag!'],
+ ['🚂','De trein','De trein rijdt snel. Tsjoe tsjoe, zegt de trein. Ma·ma en pa·pa kij·ken uit het raam. We gaan naar o·ma.'],
+ ['⛄','De sneeuwpop','Bui·ten sneeuwt het. Pu·fi maakt een sneeuw·pop. Hij krijgt een wor·tel als neus. De sneeuw·pop lacht.'],
+ ['🍯','De beer en de honing','Een gro·te beer zoekt ho·ning. De bij·en vlie·gen: bzz, bzz! De beer vindt een pot ho·ning. Mmm, lek·ker!'],
+ ['🎂','Pufi is jarig','Van·daag is Pu·fi ja·rig. Op de taart staan zes kaar·sjes. De vrien·den zin·gen een liedje. Pu·fi blaast en lacht.'],
+ ['🚀','De raket','Pu·fi vliegt met een ra·ket. Om·hoog, steeds ho·ger! Hij ziet de maan en de ster·ren. Dan gaat hij naar huis om te e·ten.'],
+ ['🌈','De regen','Het re·gent en Pu·fi heeft een ge·le pa·ra·plu. Hij springt in de plas·sen: plons, plons! Dan komt de zon. Aan de lucht staat een re·gen·boog.'],
+ ['🥕','De moestuin','O·ma heeft een moes·tuin. Daar groei·en to·ma·ten en wor·tels. Pu·fi geeft de bloe·men wa·ter. Een slak·je kruipt heel lang·zaam.']];
+D.X2[lg]={ groups:['🔤 Letters en klanken','✍️ Schrijven','📚 Lezen'],
+  games:{hunt:['👂','Klankenjacht'],pos:['📍','Waar hoor je de klank?'],bubble:['🫧','Letterbellen'],twins:['🔍','Woordtweelingen']},
+  huntSay:(u,ex)=>`Tik op alle plaatjes die beginnen met ${u}, zoals ${ex}!`, huntTask:u=>`Wat begint met ${u}?`,
+  huntNo:w=>`${w}? Nee, die past niet.`, huntDone:'Goed zo! Je hebt ze allemaal gevonden! De andere passen niet.',
+  posSay:(l,w)=>`Waar hoor je de ${l} in ${w}? Aan het begin, in het midden of aan het eind?`, posTask:l=>`Waar hoor je de ${l}?`,
+  posLbl:['Aan het begin','In het midden','Aan het eind'], posRight:(l,w,p)=>`Ja! In ${w} hoor je de ${l} ${p.toLowerCase()}.`, posWrong:'Luister nog een keer!',
+  bubbleSay:w=>`Prik de bellen op volgorde en schrijf ${w}!`, bubbleTask:f=>`Woorden met ${f}`, bubbleDone:w=>`Super! Je hebt ${w} geschreven.`,
+  twinsSay:'Welk woord hoort bij het plaatje?', twinsWrong:w=>`Hier staat ${w}. Probeer het nog eens!`, twinsRight:w=>`Ja! ${w}!`, listen:'🔊 Luisteren' };
+const RAW='ZON☀️ MAAN🌙 HUIS🏠 POES🐱 HOND🐶 VIS🐟 KIKKER🐸 BEER🐻 LEEUW🦁 KOE🐄 SCHAAP🐑 SLAK🐌 SCHILDPAD🐢 SCHIP🚢 PARAPLU☂️ BOOM🌳 BOEK📖 BAL⚽ BROOD🍞 MELK🥛 BOTER🧈 APPEL🍎 BANAAN🍌 BLOEM🌸 EEND🦆 EGEL🦔 NEUS👃 ROOS🌹 TIJGER🐯 TREIN🚂 BOOT⛵ RAKET🚀 PADDENSTOEL🍄 HART❤️ KAAS🧀 WALVIS🐳 MUIS🐭 KIP🐔 PAARD🐴 ZWAAN🦢 LEPEL🥄 TOMAAT🍅 KERS🍒 WORTEL🥕 PEER🍐 CITROEN🍋 MOND👄 KROON👑 BEL🔔 KAARS🕯️ PENSEEL🖌️ BEZEM🧹 KOPJE☕ BRIL👓 KAMEEL🐪 MIER🐜 SPIN🕷️ OLIFANT🐘 KROKODIL🐊 AUTO🚗 OOG👁️ BIJ🐝 SLANG🐍 SCHAAR✂️ SCHOEN👟 SLEUTEL🔑 VLINDER🦋 STER⭐ STOEL🪑 POTLOOD✏️ SOK🧦 STEEN🪨 IJSJE🍦 EMMER🪣 UIL🦉 GEIT🐐 AAP🐒 VARKEN🐷 GITAAR🎸 KLOK⏰ HAMER🔨 KUIKEN🐤 MAMA👩 WOLK☁️ AARDBEI🍓 DOLFIJN🐬 GIRAF🦒 ZEBRA🦓 WOLF🐺 VOS🦊 PINGUÏN🐧 KONIJN🐰 VLIEGTUIG✈️ FIETS🚲 VUUR🔥 KERSTBOOM🎄 CADEAU🎁 TAART🎂 DOBBELSTEEN🎲 HAND✋ VOET🦶 TAND🦷 OOR👂 MES🔪 HAAN🐓 CHOCOLA🍫 VIOOL🎻 TROMMEL🥁 SLOT🔒 BRIEF✉️ VLAG🚩 ZOUT🧂 HONING🍯 TELEFOON📱 UI🧅 HERT🦌 TAS👜 RAAM🪟 SPIEGEL🪞 JAS🧥 ROBOT🤖 OCTOPUS🐙 KONINGIN👸 VRACHTWAGEN🚚 HOED🎩 PIZZA🍕 SINAASAPPEL🍊 DRUIF🍇 VOGEL🐦 KOALA🐨 BED🛏️ EIKEL🌰 SJAAL🧣 BLAD🍃 KNOFLOOK🧄 VUIST👊 EZEL🫏 MUTS🧢 TOREN🗼 SPEEN🍼 NACHT🌃 EI🥚 WORM🪱 ANANAS🍍 POP🪆 REGEN🌧️ CLOWN🤡 NEST🪺 MOLEN🌬️ TUIN🏡 TENT⛺ BUIK🫃 DUIF🕊️ KOEKJE🍪 SCHOOL🏫 SCHOMMEL🛝 BLAUW🔵';
+const seen={}; D.VOC[lg]=RAW.trim().split(/\s+/).map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; }).filter(x=>!seen[x[1]]&&!seen[x[0]]&&(seen[x[1]]=seen[x[0]]=1));
+D.GRA[lg]=['SCH','IJ','EI','UI','OU','AU','OE','EU','IE','AA','EE','OO','UU','CH','NG'];
+D.HUNTLONG[lg]=['SCH','CH','EI','UI','OU','AU','OE','EU','IJ','IE','AA','EE','OO','UU'];
+D.HUNTL[lg]='BDFGHKLMNPRSTVWZ';
+D.FAM[lg]=[['EI','IJ'],['UI'],['OU','AU'],['OE'],['EU'],['IE'],['SCH'],['NG']];
+D.POSL[lg]='MLNPKRT';
+})();
+</script>
+
+<script>
+/* ===== Nederlands — telraam, schaken, rekenen, start, tijd, Pufi, app ===== */
+(()=>{ const lg='nl'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+const one=s=>s===1?'één ster':`${s} sterren`;
+S('sa',{title:'🧮 Telraamacademie',back:'⬅ Terug',map:'⬅ Kaart',hint:'💡 Hulp',check:'✔ Klaar',clear:'🧹 Wissen',eyeOn:'👀 Getal: aan',eyeOff:'👀 Getal: uit',
+  unlockOn:'🔓 Alles: aan',unlockOff:'🔓 Alles: uit',worlds:['🌱 De wereld van de eenheden','🌳 De wereld van de tientallen','🚀 Telraammeesters'],extra:'🎁 Extra',
+  free:['🎨','Vrij spelen'],ten:['🍒','Maak 10'],lvl:n=>`Niveau ${n}`,place:['Eenheden','Tientallen','Honderdtallen'],
+  names:['De kraaltjes van 1','Het kraaltje van 5','Lees de kraaltjes','Makkelijke sommen','De vriendjes van 5','Tientallen en eenheden','Grote getallen','De vriendjes van 10','Eraf halen','Grote sommen','Flits','Anzan'],
+  intro:['Elk geel kraaltje onderaan is 1 waard. Schuif ze omhoog naar de balk in het midden.','Het rode kraaltje bovenaan is 5 waard. Schuif het omlaag naar de balk.','Kijk naar het telraam en zeg welk getal het laat zien.','Er staat al een getal op het telraam. Doe er kraaltjes bij en kijk hoeveel het wordt.','Zijn de kraaltjes van 1 op? Roep dan je vriendje: het kraaltje van 5!','De linkerstang laat de tientallen zien. De rechterstang laat de eenheden zien.','Lees eerst de tientallen en dan de eenheden.','Zijn er niet genoeg eenheden? Doe er een tiental bij en haal het vriendje eraf.','Als we eraf halen, schuiven we kraaltjes weg van de balk.','Tel eerst de tientallen erbij en dan de eenheden.','Een getal verschijnt heel even. Onthoud het en laat het zien op het telraam!','Luister naar de getallen en tel ze een voor een op het telraam erbij.'],
+  show:n=>`Laat ${n} zien.`,add:(a,b)=>`Het telraam laat ${a} zien. Doe er ${b} bij.`,sub:(a,b)=>`Het telraam laat ${a} zien. Haal er ${b} af.`,
+  read:'Welk getal laat het telraam zien?',flash1:'Onthoud het getal!',flash2:'Laat het nu zien op het telraam.',again:'👁 Nog eens laten zien',
+  anz1:'Luister en tel erbij!',anz2:'Hoeveel staat er nu op het telraam?',plus:'plus',
+  hintBlink:'Schuif de kraaltjes die knipperen.',f5a:b=>`Doe het kraaltje van 5 erbij en haal er ${5-b} af.`,f10a:b=>`Doe er een tiental bij en haal er ${10-b} eenheden af.`,f5s:b=>`Haal het kraaltje van 5 eraf en doe er ${5-b} bij.`,
+  right:n=>`Ja! ${n}!`,have:v=>`Het telraam laat ${v} zien. Probeer het nog eens!`,readWrong:'Kijk nog eens naar de kraaltjes.',
+  done:s=>`Niveau gehaald! Je hebt ${one(s)} verdiend!`,next:'▶ Volgend niveau',again2:'↺ Nog een keer',locked:'Maak eerst het vorige niveau af.',
+  freeTask:'Schuif de kraaltjes zoals je wilt. Ik zeg welk getal het is!',acad:'🧮 Academie',one});
+S('ch',{ tab:'♟️ Schaken', title:'De schaakschool', back:'⬅ Terug', menu:'⬅ Menu', hintsOn:'💡 Hulp: aan', hintsOff:'💡 Hulp: uit',
+  lvl:n=>`Niveau ${n}`, next:'🔄 Nieuwe opdracht', again:'↺ Nog een keer', listen:'🔊 Luisteren', moves:n=>`Zetten: ${n}`,
+  names:{K:'De koning',Q:'De dame',R:'De toren',B:'De loper',N:'Het paard',P:'De pion'},
+  short:{K:'Koning',Q:'Dame',R:'Toren',B:'Loper',N:'Paard',P:'Pion'},
+  nom:{K:'de koning',Q:'de dame',R:'de toren',B:'de loper',N:'het paard',P:'de pion'},
+  dat:{K:'de koning',Q:'de dame',R:'de toren',B:'de loper',N:'het paard',P:'de pion'},
+  blackAcc:{Q:'de zwarte dame',R:'de zwarte toren',B:'de zwarte loper',N:'het zwarte paard',P:'de zwarte pion'},
+  games:{learn:['🎓','De stukken'],stars:['⭐','Sterren verzamelen'],capture:['🍽️','Sla het stuk'],escape:['🛡️','Red de koning'],mate:['👑','Schaakmat!'],pawns:['⚔️','Het pionnengevecht']},
+  desc:{K:'De koning is het belangrijkste stuk. Hij zet maar één stap, in alle richtingen.',
+        Q:'De dame is het sterkste stuk. Ze gaat recht en schuin, zo ver als ze wil.',
+        R:'De toren gaat recht: vooruit, achteruit, naar links en naar rechts, zo ver als hij wil.',
+        B:'De loper gaat alleen schuin en blijft altijd op dezelfde kleur.',
+        N:'Het paard springt in een L: twee vakjes rechtdoor en één opzij. Het kan over andere stukken springen!',
+        P:'De pion gaat één vakje vooruit. De eerste keer mag hij er twee. Komt hij aan de overkant, dan wordt hij een dame!'},
+  learnTask:'Tik op het stuk en verzet het 3 keer.', learnDone:n=>`Super! Nu weet je hoe ${n} loopt.`,
+  promo:'Wauw! De pion is aan de overkant en is een dame geworden!',
+  starsTask:(n,k)=>`Verzamel alle ${k} sterren met ${n}.`, starsDone:m=>`Je hebt alle sterren verzameld in ${m} zetten!`,
+  captureTask:x=>`Sla ${x}!`, gotIt:x=>`Je hebt ${x} geslagen!`, notTarget:x=>`Oei! Je moet ${x} slaan.`,
+  escapeTask:'Je koning staat schaak! Zet hem op een veilig vakje.', safe:'De koning is veilig!',
+  mateTask:'Zet schaakmat in één zet!', mate:'Schaakmat! Je hebt gewonnen!', notMate:'Dat is geen schaakmat. Probeer het nog eens!', mateHint:'Tip: probeer het met het stuk dat knippert.',
+  pawnsTask:'Breng een witte pion naar de overkant! De robot speelt met zwart.', pawnsWin:'Je pion is aan de overkant! Je hebt gewonnen!',
+  pawnsLose:'Deze keer heeft de robot gewonnen. Nog een keer?', botStuck:'De robot kan niet meer zetten. Je hebt gewonnen!',
+  youStuck:'Je kunt niet meer zetten. Deze keer wint de robot.', botThinks:'De robot denkt na…', yourTurn:'Jij bent!',
+  cant:n=>`${n} mag daar niet heen.`, kingBad:'Daar zou de koning aangevallen worden!' });
+S('cg',{ title:'Een partij schaak', back:'⬅ Terug', menu:'⬅ Menu', hintsOn:'💡 Hulp: aan', hintsOff:'💡 Hulp: uit',
+  who:'Tegen wie speel je?', color:'Jij speelt met:', white:'⚪ Wit', black:'⚫ Zwart', rand:'🎲 Willekeurig',
+  opp:{easy:['🐣','Robo-Kuiken','makkelijk'],mid:['🦊','Robo-Vos','gemiddeld'],hard:['🦉','Robo-Uil','moeilijk'],two:['👫','Twee spelers','op dezelfde tablet']},
+  cont:'▶ Verder spelen', wins:n=>`Gewonnen: ${n}`,
+  intro:(me)=>`Kom, we spelen! ${me===1?'Jij hebt wit en mag beginnen':'Jij hebt zwart. De robot begint'}.`, intro2:'Kom, we spelen! Wit begint.',
+  yourTurn:'Jij bent!', thinks:n=>`${n} denkt na…`, turnW:'Wit is aan zet ⚪', turnB:'Zwart is aan zet ⚫',
+  N:{1:'de pion',2:'het paard',3:'de loper',4:'de toren',5:'de dame',6:'de koning'},
+  NA:{1:'de pion',2:'het paard',3:'de loper',4:'de toren',5:'de dame',6:'de koning'},
+  NY:{1:'je pion',2:'je paard',3:'je loper',4:'je toren',5:'je dame',6:'je koning'},
+  ND:{1:'de pion',2:'het paard',3:'de loper',4:'de toren',5:'de dame',6:'de koning'},
+  botMoved:(n,p)=>`${n} heeft ${p} verzet.`, botTook:(n,p)=>`${n} heeft ${p} geslagen.`, youTook:p=>`Goed zo! Je hebt ${p} geslagen.`,
+  castle:'Rokade! De koning verstopt zich achter de toren.', check:'Schaak!', checkYou:'Schaak! Je koning wordt aangevallen. Red hem!',
+  mateWin:'Schaakmat! Je hebt gewonnen! Goed zo, kampioen!', mateLose:n=>`Schaakmat. Deze keer heeft ${n} gewonnen. Nog een partij?`,
+  mateW:'Schaakmat! Wit wint!', mateB:'Schaakmat! Zwart wint!',
+  stale:'Pat! De koning kan niet bewegen, maar staat niet schaak. Remise.', rep:'Drie keer dezelfde stelling. Remise!',
+  fifty:'Vijftig zetten zonder slaan. Remise!', insuf:'Er zijn te weinig stukken over om mat te zetten. Remise!',
+  undo:'↶ Terug', tip:'💡 Tip', newg:'🔄 Nieuwe partij', listen:'🔊',
+  tipSay:p=>`Probeer ${p} te verzetten!`, promoQ:'Waarin verandert de pion?', promo:'De pion is aan de overkant en is veranderd!',
+  cant:n=>`${n} mag daar niet heen.`, kingBad:'Dan zou je koning schaak staan!', notYours:'Dat is een stuk van de andere speler.',
+  danger:'Pas op! Het stuk met de rode cirkel kan geslagen worden.' });
+S('mw',{title:'🔢 De getallenwereld',back:'⬅ Terug',allOn:'🔓 Alles: aan',allOff:'🔓 Alles: uit',hint:'💡 Hulp',lvl:n=>`Niveau ${n}`,
+ hello:'Welkom in de getallenwereld! Kies een spel.',done:s=>`Klaar! Je hebt ${['','één ster','twee sterren','drie sterren'][s]} verdiend!`,next:'▶ Volgend niveau',again:'↺ Nog een keer',toMenu:'⬅ Niveaus',locked:'Maak eerst het vorige niveau af.',
+ games:{add:['➕','Plussen en minnen'],cmp:['🐊','De hongerige krokodil'],nb:['🏠','De burenstraat'],ord:['🐧','Pinguïns op een rij'],box:['🎁','De geheime doos'],sb:['🧮','Telraam'],ten:['🍒','Maak 10']},
+ lvAdd:['Plussommen tot 5','Plussommen tot 10','Minsommen tot 10','Plussommen tot 20','Minsommen tot 20','Gemengd tot 20','Hele tientallen','Tot 100'],
+ lvCmp:['Vergelijk de stapels','De tekens < > =','Getallen tot 20','Getallen tot 100','Vergelijk de sommen'],
+ lvNb:['De rechterbuur','De linkerbuur','Beide buren tot 20','Beide buren tot 100','Het getal in het midden'],
+ lvOrd:['Drie getallen, van klein naar groot','Vier getallen, van groot naar klein','Tot 20, gemengd','Tot 100, van klein naar groot','Tot 100, gemengd'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Gemengd tot 20','Gemengd tot 100'],
+ plus:'plus',minus:'min',make:'is',addQ:(a,o,b)=>`Hoeveel is ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} is ${c}!`,
+ addStory:(a,b,e)=>`Je hebt ${a} ${e}. Er komen er ${b} bij. Hoeveel zijn het er nu?`,subStory:(a,b)=>`Er zijn er ${a}. Er gaan er ${b} weg. Hoeveel blijven er over?`,
+ frog:'De kikker springt over de getallenlijn. Tel de sprongen!',
+ cmpPile:'De hongerige krokodil wil de grootste stapel! Tik erop!',cmpSym:'Welk teken hoort hier? De krokodil doet zijn bek open naar het grootste getal!',cmpBad:'De krokodil wil altijd meer!',
+ gt:(a,b)=>`${a} is groter dan ${b}.`,lt:(a,b)=>`${a} is kleiner dan ${b}.`,eq:(a,b)=>`${a} is gelijk aan ${b}.`,chomp:'Hap!',
+ nbR:n=>`Wie woont er rechts van ${n}? De rechterbuur is één meer.`,nbL:n=>`Wie woont er links van ${n}? De linkerbuur is één minder.`,nbLR:n=>`Zoek beide buren van ${n}!`,nbB:(a,b)=>`Welk getal woont er tussen ${a} en ${b}?`,
+ nbOk:s=>`${s}. Goed zo, de buren staan op hun plek!`,nbNo:'Die woont hier niet. Probeer het nog eens!',
+ ordUp:'Zet de pinguïns van klein naar groot. Maak een trap omhoog!',ordDown:'Zet de pinguïns van groot naar klein. Maak een glijbaan!',
+ ordOk:'Perfect! De volgorde klopt!',ordNo:'Oei, hier klopt de volgorde niet. Probeer het nog eens!',up:'🪜 Van klein naar groot',down:'🛝 Van groot naar klein',
+ boxQ:'Hoeveel appels zitten er in de geheime doos? Leg appels in de doos tot de weegschaal recht hangt!',boxQ100:'Welk getal zit er in de geheime doos? Leg appels erbij tot de weegschaal recht hangt!',boxOk:(e)=>`De weegschaal hangt recht! ${e}`,heavyL:'De linkerkant is zwaarder.',heavyR:'De rechterkant is zwaarder.'});
+S('hm',{title:'Tel de sterren ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',bday:'🎂 Verjaardag van het kind',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
+const NL_H=['twaalf','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf'];
+const H=h=>NL_H[h%12];
+const hr=h=>`${H(h)} uur`;
+const itIs=t=>`Het is ${t}.`;
+const al=t=>'om '+t;
+S('tm',{title:'⏳ De tijd van Pufi',back:'⬅ Terug',allOn:'🔓 Alles: aan',allOff:'🔓 Alles: uit',lvl:n=>`Niveau ${n}`,ok:'✔ Klaar',listen:'🔊 Luisteren',help:'💡 Hulp',first:a=>`Eerst: ${a}.`,nextIs:(a,b)=>`Na ${a} komt: ${b}.`,
+ done:s=>`Klaar! Je hebt ${['','één ster','twee sterren','drie sterren'][s]} verdiend!`,next:'▶ Volgend niveau',again:'↺ Nog een keer',toMenu:'⬅ Terug',locked:'Maak eerst het vorige niveau af.',
+ ladder:['🕰️ de uren','🌅 een dag','🚃 7 dagen = een week','🎡 12 maanden = een jaar'],
+ worlds:{clock:['🕰️','De klok'],day:['🌅','De dag'],cal:['📅','De week en de kalender'],seas:['🌳','De seizoenen']},
+ games:{explore:['🕰️','De toverklok'],cuckoo:['🐦','De koekoeksklok'],pizza:['🍕','De pizzaklok'],station:['🚂','Het station'],memo:['🧩','Memory'],oven:['⏳','Hoe lang duurt het?'],
+  order:['🧸','Zet de dag op volgorde'],dayclk:['🌞','Een dag met Pufi'],moments:['🌗','De dagdelen'],ytm:['📆','Gisteren, vandaag, morgen'],
+  week:['🚃','De weektrein'],calm:['📅','Mijn kalender'],months:['🎡','Het maandenrad'],
+  tree:['🌳','De seizoensboom'],dress:['🦊','Kleed Pufi aan'],sort:['🧺','Sorteer per seizoen']},
+ lv:{cuckoo:['Tel de koekoeks','Lees de klok','Zet de klok goed'],pizza:['Half','Laat half zien','Kwart over','Kwart voor','Laat de kwartieren zien'],
+  station:['Hele uren','Half','De kwartieren','Per 5 minuten','Elke minuut','De 24-uursklok'],memo:['Hele en halve uren','De kwartieren','Per 5 minuten'],
+  oven:['Een uur','Twee uur','Een half uur','Een kwartier','Gemengd'],order:['De ochtend','De hele dag'],dayclk:['Hele uren','Half'],ytm:['Het verhaal van Pufi','De dagen van de week'],
+  week:['Zet de dagen op volgorde','Welke dag komt erna?','Welke dag komt ervoor?'],calm:['Vandaag, gisteren, morgen','De dagen van de week','Tel de dagen'],months:['De maanden op volgorde','Welke maand komt erna?','Maanden en seizoenen']},
+ days:['maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag','zondag'],
+ months:['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'],
+ seas:['lente','zomer','herfst','winter'], seasT:['Lente','Zomer','Herfst','Winter'],
+ parts:['’s ochtends','’s middags om twaalf uur','’s middags','’s avonds','’s nachts'],
+ today:(wd,d,mo,s)=>`Vandaag is het ${wd} ${d} ${mo}. Het is ${s}!`,
+ time:(h,m)=>{ if(m===0) return hr(h); if(m===15) return `kwart over ${H(h)}`; if(m===30) return `half ${H(h+1)}`; if(m===45) return `kwart voor ${H(h+1)}`;
+   if(m<15) return `${m} over ${H(h)}`; if(m<30) return `${30-m} voor half ${H(h+1)}`; if(m<45) return `${m-30} over half ${H(h+1)}`; return `${60-m} voor ${H(h+1)}`; },
+ short:null, itIs, hourOnly:h=>hr(h),
+ hands:'De grote wijzer laat de minuten zien. De kleine wijzer laat de uren zien.',
+ exHi:'Draai de wijzers met je vinger en kijk hoe de dag voorbijgaat!', now:'⏰ Nu', gears:'⚙️ Tandwielen', pz:'🍕 Pizza',
+ cuCount:'Luister naar de koekoek! Hoe vaak roept hij?', cuRead:'Hoe laat is het?', cuSet:h=>`Zet de klok op ${hr(h)}! Draai de kleine wijzer.`,
+ pzRead:'Hoe laat is het? Kijk hoeveel pizza er gekleurd is.', pzSet:t=>`Laat ${t} zien! Draai de grote wijzer.`, pzHalf:'Een halve pizza is een half uur: 30 minuten.', pzQuar:'Een stuk pizza is een kwartier: 15 minuten.',
+ dest:[['🏔️','de bergen'],['🏖️','de zee'],['👵','oma'],['🏰','het kasteel'],['🦁','de dierentuin'],['🌲','het bos']],
+ stTask:(t,d)=>`De trein naar ${d} vertrekt ${al(t)}. Zet de klok op de vertrektijd!`, go:'🚂 Vertrekken!', stWrong:'Oei! De klok laat een andere tijd zien. Probeer het nog eens!', st24:(d,t,p)=>`${d} betekent ${t}, ${p}.`,
+ memoTask:'Draai de kaarten om en zoek de paren: de klok en zijn tijd!',
+ ovItems:[['🎂','de taart'],['🍕','de pizza'],['🍪','de koekjes'],['🍞','het brood']], dur:m=>({60:'een uur',120:'twee uur',30:'een half uur',15:'een kwartier',45:'drie kwartier',90:'anderhalf uur'})[m],
+ ovTask:(it,t,d)=>`Pufi zet ${it} ${al(t)} in de oven. Het moet ${d} bakken. Draai de grote wijzer vooruit en druk op Klaar!`, ovEarly:'Het is nog niet klaar! Draai verder.', ovBurn:'Oei, te lang! Het is een beetje aangebrand. Probeer het nog eens!', ovDone:t=>`Ping! Het is klaar! ${itIs(t)}`,
+ acts:[['⏰','Pufi wordt wakker',420],['🪥','tandenpoetsen',430],['🥣','ontbijten',450],['🎒','naar school',480],['🍽️','lunchen',720],['😴','middagslaapje',780],['🛝','spelen in het park',960],['🍝','avondeten',1080],['🛁','in bad',1140],['📖','een verhaaltje voor het slapengaan',1170],['🌙','naar bed',1200]],
+ ordTask:'Zet de dag van Pufi op volgorde: van de ochtend tot de avond!',
+ dcTask:(a,t)=>`${a.charAt(0).toUpperCase()+a.slice(1)}! Zet de klok op ${t}.`,
+ mom:[[0,'🥣','ontbijten we'],[0,'🐓','kraait de haan en komt de zon op'],[1,'🍝','eten we ons middageten'],[1,'☀️','staat de zon het hoogst'],[2,'🍪','eten we een koekje na het slaapje'],[2,'🛝','spelen we in het park'],[3,'🌇','gaat de zon onder'],[3,'🛁','gaan we in bad voor het slapengaan'],[4,'😴','slapen we'],[4,'🦉','gaat de uil op jacht en schitteren de sterren']],
+ moTask:a=>`Wanneer ${a}?`,
+ ytmL:['GISTEREN','VANDAAG','MORGEN'], places:[['👵','bij oma'],['🛝','in het park'],['🏊','in het zwembad'],['🦁','in de dierentuin'],['🏫','op school'],['🎂','op een feestje'],['🏖️','aan zee'],['🚒','bij de brandweer']],
+ ytmStory:(a,b,c)=>`Gisteren was Pufi ${a}. Vandaag is hij ${b}. Morgen gaat hij ${c}.`, ytmQ:['Waar was Pufi gisteren?','Waar is Pufi vandaag?','Waar gaat Pufi morgen heen?'],
+ ytmD:(k,d)=>[`Vandaag is het ${d}. Welke dag was het gisteren?`,`Vandaag is het ${d}. Welke dag is het morgen?`][k],
+ weekTask:'Zet de wagons op volgorde: begin bij maandag!', weekAfter:d=>`Welke dag komt na ${d}?`, weekBefore:d=>`Welke dag komt voor ${d}?`, weekend:'Zaterdag en zondag is het weekend: geen school!',
+ calToday:'Tik op vandaag!', calTom:'Tik op morgen!', calYes:'Tik op gisteren!', calWd:n=>`Welke dag van de week is het op de ${n}e?`, calCount:n=>`Hoeveel dagen is het nog tot de ${n}e? Tik de dagen een voor een aan, begin bij morgen!`, calHow:'Hoeveel dagen heb je geteld?',
+ bday:n=>n===0?'🎂 Vandaag ben je jarig! Gefeliciteerd!':`🎂 Nog ${n===1?'één dag':n+' dagen'} tot je verjaardag`,
+ moOrder:'Tik de maanden op volgorde aan, begin bij januari!', moAfter:m=>`Welke maand komt na ${m}?`, moSeas:m=>`In welk seizoen valt ${m}?`,
+ treeHi:['In de lente gaat de boom bloeien. Tik op de knopjes!','In de zomer hangt de boom vol fruit. Pluk de kersen!','In de herfst worden de bladeren geel en vallen ze. Schud aan de boom!','In de winter slaapt de boom onder de sneeuw. Maak een sneeuwpop!'],
+ dressTask:s=>`Het is ${s}! Wat trekt Pufi aan? Kies drie dingen die passen.`, dressNo:['Hm, dat past nu niet.','Pff, in de zomer is het daar veel te warm voor!','Hm, dat past nu niet.','Brrr! In de winter is het daar veel te koud voor!'],
+ sortTask:'In welk seizoen gebruiken we dit? Leg het in de goede mand!'});
+S('pq',{title:'Het avontuur van Pufi',sub:'Kies een wereld! Verzamel de sterren en de 3 regenboogsterren 🌟 in elk niveau.',help:'◀ ▶ lopen · ⬆ springen (twee keer!) · ⬇ de buis in',exit:'⬅ Terug',lvl:n=>`Niveau ${n}`,
+ names:['De wei','Het herfstbos','De kristalgrot','In de wolken','Het strand','Het sneeuwland','De vuurvliegjesnacht','Het lavakasteel'],
+ start:(n,t)=>`Niveau ${n}: ${t}. Hup, Pufi!`, won:'Goed zo! Pufi is thuis!', winS:(s,m)=>`⭐ ${s} sterren · 🌟 ${m} van de 3 regenboogsterren`, next:'▶ Verder', again:'↺ Nog een keer', map:'🗺️ Kaart',
+ grow:'Wauw! Pufi is groot geworden!', shrink:'Au! Pufi is weer klein. Je krijgt nog een kans!', hurt:'Au! Je bent een hartje kwijt.', over:'Oei! We proberen het opnieuw vanaf de vlag.', rainbow:'De regenboogster! Niemand houdt je tegen!', medal:'Een regenboogster!', check:'De vlag is van jou! Hier begin je weer.', heart:'Een hartje erbij!',
+ secret:'Een geheime kamer!', allDone:'Je hebt alle werelden uitgespeeld! Je bent een kampioen!',
+ signs:{move:'Loop met de pijltjes en spring met de gele knop!',box:'Stoot met je hoofd tegen het blok met het vraagteken!',stomp:'Spring op de slak! Geef dan een schop tegen het huisje.',grow:'Van de ster word je groot! Als je groot bent, kun je stenen kapotmaken.',pipe:'Ga op de buis staan en druk op het pijltje omlaag! Er is een geheime kamer.',hog:'De egel heeft stekels! Spring er niet op, ga eromheen.',spring:'Spring op de trampoline om hoog te vliegen!',flag:'Raak de vlag aan! Als je je pijn doet, begin je hier weer.',goal:'Spring zo hoog als je kunt tegen de finishvlag!',bee:'De bijen vliegen op en neer. Spring erop!',lava:'Pas op voor de lava! Gebruik de plateaus.',fish:'De vissen springen uit het water! Wacht even en ga dan.'}});
+S('nt',{recT:'🎙️ De stem van de ouders',recH:'Neem complimentjes op met je eigen stem. Je kind hoort ze als het iets goed doet.',slot:i=>`Compliment ${i}`,rec:'⏺ Opnemen',stop:'⏹ Klaar',play:'▶',del:'🗑',
+   buyT:'💎 Volledige versie',buy:p=>`Alles ontgrendelen ${p||''}`,restore:'Aankopen herstellen',owned:'✅ Je hebt de volledige versie. Dank je wel!',voice:q=>`Stem: ${q}`,
+   mic:'🎤 Ik lees hardop',micHint:'Lees hardop! Elk woord dat je leest wordt groen. Ken je een woord niet? Tik erop.',micNo:'De microfoon is niet beschikbaar. Probeer «Ik lees zelf».',listenMe:'🔊 Luister naar jezelf',micRead:n=>`Je hebt ${n} woorden zelf gelezen!`,listening:'Ik luister…'});
+})();
+</script>
+
+<script>
+/* ===== Nederlands — vormen, RoboPufi, aquarium ===== */
+(()=>{ const lg='nl'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+S('gm',{title:'📐 De vormenwereld',back:'⬅ Terug',hello:'Welkom in de vormenwereld! Kies een spel.',hint:'💡 Hulp',undo:'↩ Terug',clear:'🗑️ Wissen',
+ games:{geo:['📌','Het spijkerbord'],tan:['🧩','De vormenpuzzel'],cube:['🧊','Blokken in 3D'],meas:['📏','Schatten en meten']},
+ done:s=>`Klaar! Je hebt ${['','één ster','twee sterren','drie sterren'][s]} verdiend!`,next:'▶ Verder',again:'↺ Nog een keer',toMenu:'⬅ Spellen',
+ shapes:{3:'een driehoek',4:'een vierhoek',5:'een vijfhoek',6:'een zeshoek',sq:'een vierkant',rect:'een rechthoek'},
+ geoIntro:'Tik de spijkertjes een voor een aan om het elastiekje te spannen. Tik weer op het eerste spijkertje om de vorm te sluiten!',
+ geoT:['Maak een driehoek!','Maak een vierkant!','Maak een rechthoek die geen vierkant is!','Maak een vierkant met zijden van drie hokjes!','Hoeveel hokjes zitten er in de vorm?','Maak een vorm met precies vier hokjes erin!','Hoeveel stukken hek zijn er nodig rond de tuin?','Maak een grote driehoek met zes hokjes erin!'],
+ made:s=>`Je hebt ${s} gemaakt!`,corners:n=>`Hij heeft ${n} hoeken.`,notTri:'Een driehoek heeft drie hoeken. Probeer het nog eens!',notSq:'Een vierkant heeft vier even lange zijden en rechte hoeken.',isSq:'Dat is een vierkant! Maak één kant langer.',notRect:'Een rechthoek heeft vier rechte hoeken.',
+ notSq3:'Elke zijde moet drie hokjes lang zijn.',areaIs:n=>`Je vorm heeft ${n} hokjes erin.`,cross:'Het elastiekje kruist! Probeer het nog eens.',
+ geoHint:['Een driehoek heeft drie hoeken. Tik de gele spijkertjes op volgorde aan: één, twee, drie en dan weer de eerste!','Een vierkant heeft vier even lange zijden. Tik de gele spijkertjes op volgorde aan!','Een rechthoek is langer dan hij hoog is. Tik de gele spijkertjes op volgorde aan!','Elke zijde is drie hokjes lang. Tik de gele spijkertjes op volgorde aan!','Tel de hokjes rij voor rij. In de eerste rij zijn het er vier. Hoeveel rijen zijn er?','Twee hokjes naast elkaar en nog twee eronder zijn vier! Tik de gele spijkertjes aan!','Tel elk stuk hek, van punt tot punt, de hele rand rond.','Een zijde van vier hokjes en een van drie maken een grote driehoek. Tik de gele spijkertjes aan!'],areaQ:'Hoeveel hokjes zitten erin? Tel maar!',perimQ:'Hoeveel stukken hek zijn er nodig rondom?',areaA:n=>`Er zitten ${n} hokjes in. Dat is de oppervlakte!`,perimA:n=>`Er zijn ${n} stukken hek nodig. Dat is de omtrek!`,
+ tanIntro:'Sleep de stukken op de schaduw. Tik op een stuk om het te draaien!',tanT:['Maak een vierkant van twee driehoeken!','Bouw een huis!','Maak een vis!','Maak een zeilboot!','Bouw een raket!','Maak een kat!'],
+ rotate:'Bijna! Tik op het stuk om het te draaien.',tanOk:['Twee driehoeken maken een vierkant!','Wat een mooi huis!','Een vis!','Een zeilboot klaar om te varen!','De raket stijgt op!','Miauw! Een kat!'],
+ cubeIntro:'Kijk goed naar de blokken! Sommige zijn verstopt achter of onder andere.',cubeCount:'Hoeveel blokken zijn het?',cubeTop:'Hoe ziet het er van boven uit? Kies!',cubeBuild:'Bouw het na! Tik op een plek om een blok neer te zetten.',
+ cubeA:n=>`Het zijn ${n} blokken!`,cubeTopA:'Precies! Dat is het bovenaanzicht.',cubeBuildA:'Precies hetzelfde! Jij bent een architect!',cubeNo:'Kijk nog eens. Vergeet de verstopte blokken niet!',model:'Voorbeeld',yours:'Van jou',
+ measIntro:'Laten we afstanden schatten en meten!',estQ:'Hoeveel stappen zet het vosje tot de wortel? Raad eens!',estRef:'Bovenaan zie je hoe lang één stap is. Je kunt hem met je vinger verslepen!',u1:'1 stap',penRef:'Bovenaan ligt een potlood. Je kunt het met je vinger verslepen om te meten!',u2:'1 potlood',steps:n=>`${n} stappen!`,exact:'Perfect! Precies goed geraden!',close:'Heel dichtbij!',far:(g,n)=>`Je zei ${g}, maar het zijn ${n} stappen.`,
+ cmpQ:'Welk pad is langer?',blue:'🟦 Blauw',orange:'🟧 Oranje',same:'🟰 Even lang',cmpA:(a,b)=>`Het blauwe pad is ${a} stappen, het oranje ${b}.`,
+ penQ:'Hoeveel potloden lang is de boomstam?',penA:n=>`Hij is ${n} potloden lang!`,rugQ:'Welk kleed is groter?',rugA:(a,b)=>`Het blauwe kleed heeft ${a} hokjes, het oranje ${b}.`});
+S('rb',{back:'⬅ Terug',allOn:'🔓 Alles: aan',allOff:'🔓 Alles: uit',
+ hello:'Hallo! Ik ben RoboPufi, de robotvos. Laten we samen bouwen en programmeren!',
+ zones:{prog:['🧭','Programmeer RoboPufi'],mech:['⚙️','Eenvoudige machines'],circ:['⚡','Stroomkringen'],sens:['👀','Sensoren'],gar:['🔧','De werkplaats']},
+ zoneSay:{prog:'Vertel RoboPufi met de pijltjes waar hij heen moet!',mech:'Laten we ontdekken hoe machines werken!',circ:'Laten we de stroom laten lopen!',sens:'Robots voelen de wereld met sensoren. Laten we ze uitproberen!',gar:'Hier kun je mijn kleur en onderdelen veranderen!'},
+ lvl:n=>`Niveau ${n}`,
+ progIntro:'Zet de pijltjes op volgorde en druk op Start. Breng RoboPufi naar de batterij!',
+ loopIntro:'Je hebt maar een paar kaartjes! Tik op een pijltje in het programma om het te herhalen.',
+ starIntro:'Verzamel onderweg ook de sterren!',
+ run:'▶ Start',clear:'🗑️ Wissen',hint:'💡 Hulp',
+ edge:'Oei! Dat is de rand.',bump:'Boem! RoboPufi botste tegen een steen. Probeer het nog eens!',water:'Plons! RoboPufi kan niet zwemmen!',short:'RoboPufi is niet bij de batterij. Voeg meer pijltjes toe!',full:'Er is geen plek meer! Tik op een pijltje om het te herhalen.',empty:'Leg eerst pijltjes neer!',
+ progWin:'Ik ben bij de batterij! Dank je wel!',
+ done:s=>`Klaar! Je hebt ${s===1?'één ster':s+' sterren'} verdiend!`,next:'▶ Verder',again:'↺ Nog een keer',toZone:'⬅ Terug',locked:'Maak eerst het vorige niveau af.',
+ mech:{lever:['⚖️','De wip'],gears:['⚙️','De tandwielen'],ramp:['🛝','De helling']},
+ leverIntro:'De wip is een hefboom. Sleep dieren naar de rechterkant zodat hij recht komt!',
+ leverTip:'Zag je dat? Een licht dier ver van het midden kan een zwaar dier optillen!',
+ leverOk:'Perfect in evenwicht!',leverHint:(a,d)=>`Probeer ${a} op plek ${d}.`,
+ ani:{1:'de muis',2:'het konijn',3:'de hond',4:'de olifant'},
+ gearsIntro:'Het rode wiel heeft een motor. Kijk hoe het de andere laat draaien! Je kunt het ook met je vinger draaien.',
+ qFast:'Welk wiel draait het snelst? Tik erop!',qDir:c=>`Het rode wiel draait zo ↻. Welke kant draait het ${c} wiel op?`,cname:{blue:'blauwe',green:'groene'},
+ whyFast:'Ja! Het kleine wiel draait meer rondjes, dus het gaat sneller.',whyDir:'Ja! Twee wielen die elkaar raken draaien de andere kant op.',whyChain:'Ja! Het middelste wiel verandert de richting en het derde verandert hem weer.',gearWrong:'Kijk nog eens goed naar de wielen.',motor:'⚡ Motor',
+ rampIntro:'Sleep het bovenste punt om de helling hoger of lager te maken. De bal moet bij het vlaggetje stoppen!',
+ drop:'🔴 Loslaten!',far:'Te ver! Maak de helling lager.',near:'Te kort! Maak de helling hoger.',rampOk:'Precies bij het vlaggetje!',rampTip:'Hoe hoger de helling, hoe verder de bal rolt!',
+ circIntro:'Sleep een draad van een wit puntje naar een ander. Stroom heeft een hele kring nodig, van plus naar min.',
+ cgoal:['Laat het lampje branden!','Laat het lampje branden met de schakelaar!','Zet de ventilator aan!','Laat beide lampjes branden!','Laat de bel rinkelen!','Laat het lampje branden en zet de ventilator aan!'],
+ shortC:'Kortsluiting! Een draad verbindt plus direct met min. De batterij wordt heet!',swNow:'De kring is klaar. Druk nu op de schakelaar!',circOk:'De kring is gesloten. De stroom loopt!',tapWire:'Tik op een draad om hem weg te halen.',
+ sens:{light:['🔦','De lichtsensor'],line:['✏️','Volg de lijn'],touch:['🖐️','De aanraaksensor']},
+ lightIntro:'RoboPufi heeft een lichtsensor. Beweeg de zaklamp en hij volgt hem naar de oplader!',lightOk:'De batterij laadt op! Dank je wel!',
+ lineIntro:'RoboPufi heeft een sensor die de zwarte lijn ziet. Teken een pad van hem naar de batterij en druk op Start!',
+ lineStart:'Begin precies bij RoboPufi met tekenen.',lineRock:'Boem! Het pad gaat over een steen.',lineEnd:'Het pad komt niet bij de batterij.',erase:'🧽 Wissen',
+ touchIntro:'RoboPufi heeft aanraaksensoren. Tik op het deel dat ik zeg!',
+ parts:{head:'het hoofd',ant:'de antenne',belly:'de buik',arm:'de hand',wheels:'het wiel',tracks:'de rupsband',legs:'het been'},
+ touchAsk:p=>`Tik op ${p}!`,touchWrong:p=>`Dit is ${p}. Zoek verder!`,touchOk:p=>`Ja, ${p}!`,
+ gar:{color:'🎨 Kleur',wheels:'🛞 Wielen',ant:'📡 Antenne',arms:'🦾 Armen',eyes:'👀 Ogen'},
+ dance:'💃 Dansen!',need:n=>`${n} ⭐`,needSay:n=>`Je hebt ${n} sterren nodig. Speel en verzamel sterren!`,cool:'Wat zie ik er mooi uit!',
+ garIntro:'Kies mijn kleur en mijn onderdelen! Nieuwe onderdelen komen vrij als je in alle spellen sterren verzamelt.'});
+S('rbg',{intro:'De tandwielwerkplaats! De rode motor draait. Zet er wielen bij zodat de beweging bij de machine komt.',
+  t:['Het schip heeft kracht nodig! Zet er een wiel bij dat de motor met de schroef verbindt.','De klok staat stil! Vul het gat met twee wielen.','De auto moet snel gaan! Welk wiel zet je aan het eind?','De kraan moet de zware olifant optillen! Welk wiel zet je aan het eind?','O nee, het schip vaart achteruit! Zet er wielen bij of haal ze weg zodat het vooruit gaat.'],
+  why:['Goed zo! De motor draait de wielen en de wielen draaien de schroef van het schip.','In een klok duwen kleine en grote wielen elkaar en bewegen ze de wijzers.','Een klein wiel aan het eind draait razendsnel. Zo gaat de auto snel! Een fiets werkt net zo.','Het grote wiel aan het eind draait langzaam, maar is heel sterk. Zo tilt een kraan zware dingen op!','Elk nieuw wiel verandert de richting. Nu duwt de schroef het schip vooruit!'],
+  noFit:'Past niet! Probeer een andere maat.',gap:'De wielen raken elkaar nog niet.',noRoom:'Er is geen plek meer!',slow:'De auto is te langzaam. Probeer een kleiner wiel aan het eind.',weak:'Te zwaar! Probeer een groter wiel aan het eind.',back:'Het schip vaart nog steeds achteruit.',
+  undo:'↩ Weghalen',sz:{S:'Klein',M:'Middel',L:'Groot'}});
+S('rbc',{zone:['🎨','Het kleurenlab'],zoneSay:'Laten we kleuren mengen, net als echte wetenschappers!',
+ col:{tubes:['🧪','De reageerbuisjes'],shirts:['👕','De T-shirtververij'],guess:['🔮','Raad de kleur']},
+ n:{R:'rood',Y:'geel',B:'blauw',W:'wit',K:'zwart',orange:'oranje',green:'groen',purple:'paars',pink:'roze',lblue:'lichtblauw',brown:'bruin',lgreen:'lichtgroen',grey:'grijs'},
+ and:' en ',make:(a,c)=>`${a} wordt ${c}!`,
+ tubesIntro:'Meng de kleuren uit de buisjes in de beker tot je de goede kleur hebt. Tik op een buisje om te gieten!',
+ tubeTask:c=>`Maak ${c}!`,more:c=>`Doe er nog een beetje ${c} bij.`,extra:c=>`Je hebt ${c} erbij gedaan, maar dat past niet. Maak de beker leeg en probeer het opnieuw!`,full:'De beker is vol! Maak hem leeg en probeer het opnieuw.',empty:'🫗 Leegmaken',
+ shirtsIntro:'Welkom in de ververij! De klanten willen gekleurde T-shirts. Meng de verf in de bak en tik dan op het shirt om het te verven.',
+ want:(c,o)=>`Ik wil een ${c} shirt, zoals ${o}!`,noPaint:'Doe eerst verf in de bak!',notMine:'Dat is niet mijn kleur! We wassen het en proberen het opnieuw.',thanks:'Dank je wel! Het is prachtig!',
+ guessIntro:'Welke kleur krijg je als je mengt? Raad eens!',guessQ:a=>`${a} wordt…?`,guessNo:'Niet helemaal. Kijk wat eruit komt!',
+ obj:{orange:'een sinaasappel',green:'een kikker',purple:'druiven',pink:'een bloem',lblue:'de lucht',brown:'een beer',lgreen:'een kiwi',grey:'een olifant'}});
+{ const r=L10N.rb[lg], c=L10N.rbc[lg]; r.zones.col=c.zone; r.zoneSay.col=c.zoneSay; r.col=c.col; }
+S('aq',{title:'🐠 Mijn aquariums',main:'🌿 Aquarium',pred:'🦈 Rovervissenbak',close:'✖ Sluiten',eatOn:'🐟➜🦈 Rovers eten: aan',eatOff:'🐟➜🦈 Rovers eten: uit',
+  pantry:'Voorraadkast',empty:'Vang letters om vissen en voer te halen!',hungry:n=>`${n} vissen hebben honger! Vang letters om eten te halen.`,hungry1:'Een vis heeft honger! Vang letters om eten te halen.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)}: die eet ${who}.`,nobody:f=>`Niemand heeft hier zin in ${f}.`,full:'Vol!',hungryS:'Honger',happy:'Vol en blij',
+  diet:'Eet:',size:['klein','jong','groot'],move2pred:'➜ 🦈 Rovervissenbak',move2main:'➜ 🌿 Aquarium',ok:'👍',
+  warn:n=>`Pas op! ${n} jaagt op visjes. Zet hem in de rovervissenbak!`,ate:(p,v)=>`${p} heeft ${v} opgegeten!`,got:(e,f)=>`Je hebt ${f} gevangen voor de vissen! ${e}`,newFish:n=>`Een nieuwe vis in het aquarium: ${n}!`,more:n=>`+${n} in de rivier`,sated:'De vissen zitten vol! Kom morgen terug.',night:'🌙 Nacht',day:'☀️ Dag',nightSay:'Welterusten, visjes! ’s Nachts gaat de meerval op jacht.',daySay:'Goedemorgen, visjes!',album:'📖 Album',albumT:'Het vissenalbum',albumSay:(n,t)=>`Je hebt ${n} van de ${t} soorten gevonden. Vang letters om ze allemaal te vinden!`,dirty:'Het glas is vies! Maak het schoon met je vinger.',clean:'Het aquarium glimt! De vissen zijn blij!',come:'Kijk, ze komen eten!'});
+})();
+</script>
+
+<script>
 /* ===== Português — jogo principal, mundo, monumentos, jogadores ===== */
 (()=>{ const lg='pt', IDX=9;
 L10N.main=L10N.main||{};
@@ -8152,6 +8537,14 @@ const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
   const NM={caras:['il carassio','Carassio','Il carassio è un pesce dorato e tranquillo. Gli piacciono le piante e i vermi.'],crap:['la carpa','Carpa','La carpa ha piccoli baffi per cercare il cibo nel fango.'],pastrav:['la trota','Trota','La trota vive nei ruscelli freddi di montagna. Ha macchie nere e una striscia rosa.'],biban:['il pesce persico','Persico','Il pesce persico ha strisce sul dorso e pinne rosse. Caccia i pesciolini.'],somn:['il pesce gatto','Pesce gatto','Il pesce gatto ha lunghi baffi e mangia quasi tutto. Caccia di notte.'],stiuca:['il luccio','Luccio','Il luccio è il grande cacciatore dei fiumi. Si nasconde e attacca velocissimo!'],rac:['il gambero di fiume','Gambero','Il gambero di fiume ha le chele e cammina all’indietro. Pulisce il fondo.'],testoasa:['la tartaruga','Tartaruga','La tartaruga d’acqua porta la sua casa sulla schiena.'],plev:['il pesciolino','Pesciolino','']};
   for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
   const FD={alg:'le alghe',worm:'i vermi',ins:'gli insetti',plev:'i pesciolini'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>
+<script>
+/* Nederlands — vissennamen */
+(()=>{ const lg='nl', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['de giebel','Giebel','De giebel is een goudkleurige, rustige vis. Hij houdt van planten en wormpjes.'],crap:['de karper','Karper','De karper heeft snorharen om eten te zoeken in de modder.'],pastrav:['de forel','Forel','De forel woont in koude bergbeekjes. Hij heeft zwarte stippen en een roze streep.'],biban:['de baars','Baars','De baars heeft strepen op zijn rug en rode vinnen. Hij jaagt op visjes.'],somn:['de meerval','Meerval','De meerval heeft lange snorharen en eet bijna alles. Hij jaagt ’s nachts.'],stiuca:['de snoek','Snoek','De snoek is de grote jager van de rivier. Hij verstopt zich en valt bliksemsnel aan!'],rac:['de rivierkreeft','Rivierkreeft','De rivierkreeft heeft scharen en loopt achteruit. Hij maakt de bodem schoon.'],testoasa:['de schildpad','Schildpad','De waterschildpad draagt haar huisje op haar rug.'],plev:['het visje','Visje','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'de algen',worm:'de wormen',ins:'de insecten',plev:'de visjes'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
 })();
 </script>
 <script>
