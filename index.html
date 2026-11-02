@@ -431,7 +431,7 @@ button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 
 <div class="start" id="start">
   <div class="parade">🍎🚗🇨🇭🇷🇴🇩🇪</div>
-  <h1 id="startTitle">Adunări cu Stele ⭐</h1>
+  <h1 id="startTitle">Pufi – Școala jocurilor ⭐</h1>
   <div class="chips langs" role="group" aria-label="Limba / Sprache">
     <button id="sRo" data-lang="ro">🇷🇴 Română</button>
     <button id="sDe" data-lang="de">🇩🇪 Deutsch</button>
@@ -996,7 +996,7 @@ function openFb(c){
 function closeFb(){ $('fbPop').hidden=true; try{ if(synth) synth.cancel(); }catch(e){} }
 
 const L={
-  ro:{ code:'ro', speech:'ro-RO', title:'Adunări cu Stele ⭐', start:'▶ Începe', i:1,
+  ro:{ code:'ro', speech:'ro-RO', title:'Pufi – Școala jocurilor ⭐', start:'▶ Începe', i:1,
     gNum:'🔢 Numere', gFlag:'🚩 Steaguri', gAb:'🧮 Soroban',
     sbShow:'👆 Arată', sbAdd:'➕ Adună', sbTen:'🍒 Face 10', tens:'Zeci', ones:'Unități', check:'✔ Gata',
     sbHint:'Bila roșie de sus valorează 5. Fiecare bilă galbenă de jos valorează 1.',
@@ -1018,7 +1018,7 @@ const L={
     tryMsg:'Mai încearcă! Numără din nou 🙂', wrongSay:v=>`Nu e ${v}. Mai încearcă!`,
     listen:'🔊 Ascultă', on:'🗣️ Vocea: pornită', off:'🔇 Vocea: oprită', defVoice:'Voce implicită',
     sample:'Bună! Așa sună vocea mea.', hello:'Hai să ne jucăm! ', names:/ioana|alina/ },
-  de:{ code:'de', speech:'de-DE', title:'Rechnen mit Sternen ⭐', start:'▶ Los geht’s', i:2,
+  de:{ code:'de', speech:'de-DE', title:'Pufi – Die Spieleschule ⭐', start:'▶ Los geht’s', i:2,
     gNum:'🔢 Zahlen', gFlag:'🚩 Flaggen', gAb:'🧮 Abakus',
     sbShow:'👆 Zeigen', sbAdd:'➕ Rechnen', sbTen:'🍒 Mach 10', tens:'Zehner', ones:'Einer', check:'✔ Fertig',
     sbHint:'Die rote Perle oben zählt 5. Jede gelbe Perle unten zählt 1.',
@@ -1040,7 +1040,7 @@ const L={
     tryMsg:'Versuch es nochmal! Zähl noch einmal 🙂', wrongSay:v=>`Nicht ${v}. Versuch es nochmal!`,
     listen:'🔊 Anhören', on:'🗣️ Stimme: an', off:'🔇 Stimme: aus', defVoice:'Standardstimme',
     sample:'Hallo! So klingt meine Stimme.', hello:'Komm, wir spielen! ', names:/anna|petra|helena|katja|marlene|vicki/ },
-  en:{ code:'en', speech:'en-GB', title:'Counting Stars ⭐', start:'▶ Start', i:5,
+  en:{ code:'en', speech:'en-GB', title:'Pufi – The Game School ⭐', start:'▶ Start', i:5,
     gNum:'🔢 Numbers', gFlag:'🚩 Flags', gAb:'🧮 Abacus',
     sbShow:'👆 Show', sbAdd:'➕ Add', sbTen:'🍒 Make 10', tens:'Tens', ones:'Ones', check:'✔ Done',
     sbHint:'The red bead on top is worth 5. Each yellow bead below is worth 1.',
@@ -3090,7 +3090,7 @@ add('Ї','I','D 38 0','D 62 0'); add('ї','ı','D 40 28','D 60 28');
 /* ===== Español — juego principal, mundo, monumentos, futbolistas ===== */
 (()=>{ const lg='es', IDX=8;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'es', speech:'es-ES', title:'Cuenta estrellas ⭐', start:'▶ ¡Vamos!', i:IDX,
+L10N.main[lg]={ code:'es', speech:'es-ES', title:'Pufi – La escuela de juegos ⭐', start:'▶ ¡Vamos!', i:IDX,
   gNum:'🔢 Números', gFlag:'🚩 Banderas', gAb:'🧮 Ábaco',
   sbShow:'👆 Muestra', sbAdd:'➕ Suma', sbTen:'🍒 Haz 10', tens:'Decenas', ones:'Unidades', check:'✔ Listo',
   sbHint:'La bolita roja de arriba vale 5. Cada bolita amarilla de abajo vale 1.',
@@ -3331,7 +3331,7 @@ S('mw',{title:'🔢 El mundo de los números',back:'⬅ Atrás',allOn:'🔓 Todo
  ordUp:'Pon los pingüinos de menor a mayor: del más pequeño al más grande. ¡Haz una escalera que sube!',ordDown:'Pon los pingüinos de mayor a menor: del más grande al más pequeño. ¡Haz un tobogán!',
  ordOk:'¡Perfecto! ¡El orden es correcto!',ordNo:'¡Uy! Aquí el orden no está bien. ¡Inténtalo otra vez!',up:'🪜 De menor a mayor',down:'🛝 De mayor a menor',
  boxQ:'¿Cuántas manzanas hay en la caja secreta? ¡Pon manzanas en la caja hasta que la balanza esté recta!',boxQ100:'¿Qué número hay en la caja secreta? ¡Añade manzanas hasta que la balanza esté recta!',boxOk:(e)=>`¡La balanza está recta! ${e}`,heavyL:'El lado izquierdo pesa más.',heavyR:'El lado derecho pesa más.'});
-S('hm',{title:'Cuenta estrellas ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',bday:'🎂 Cumpleaños del niño',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
+S('hm',{title:'Pufi – La escuela de juegos ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',bday:'🎂 Cumpleaños del niño',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
 const ES_H=['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once'];
 const hr=h=>{ const k=h%12; return k===1?'la una':`las ${ES_H[k]}`; };
 const itIs=t=>(t.startsWith('la una')?`Es ${t}.`:`Son ${t}.`);
@@ -3473,7 +3473,7 @@ S('aq',{title:'🐠 Mis acuarios',main:'🌿 Acuario',pred:'🦈 Pecera de depre
 /* ===== Français — jeu principal, monde, monuments, footballeurs ===== */
 (()=>{ const lg='fr', IDX=6;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'fr', speech:'fr-FR', title:'Compter les étoiles ⭐', start:'▶ C’est parti', i:IDX,
+L10N.main[lg]={ code:'fr', speech:'fr-FR', title:'Pufi – L’école des jeux ⭐', start:'▶ C’est parti', i:IDX,
   gNum:'🔢 Nombres', gFlag:'🚩 Drapeaux', gAb:'🧮 Boulier',
   sbShow:'👆 Montre', sbAdd:'➕ Ajoute', sbTen:'🍒 Fais 10', tens:'Dizaines', ones:'Unités', check:'✔ Fini',
   sbHint:'La perle rouge en haut vaut 5. Chaque perle jaune en bas vaut 1.',
@@ -3718,7 +3718,7 @@ S('mw',{title:'🔢 Le monde des nombres',back:'⬅ Retour',allOn:'🔓 Tout : o
  ordUp:'Range les pingouins dans l’ordre croissant : du plus petit au plus grand. Fais un escalier qui monte !',ordDown:'Range les pingouins dans l’ordre décroissant : du plus grand au plus petit. Fais un toboggan !',
  ordOk:'Parfait ! L’ordre est juste !',ordNo:'Oups, l’ordre n’est pas juste ici. Essaie encore !',up:'🪜 Croissant',down:'🛝 Décroissant',
  boxQ:'Combien de pommes y a-t-il dans la boîte secrète ? Mets des pommes dans la boîte jusqu’à ce que la balance soit droite !',boxQ100:'Quel nombre est dans la boîte secrète ? Ajoute des pommes jusqu’à ce que la balance soit droite !',boxOk:(e)=>`La balance est droite ! ${e}`,heavyL:'Le côté gauche est plus lourd.',heavyR:'Le côté droit est plus lourd.'});
-S('hm',{title:'Compter les étoiles ⭐',q:'À quoi on joue aujourd’hui ?',math:'Maths',world:'Le monde',read:'Lire',time:'Le temps',bday:'🎂 Anniversaire de l’enfant',shapes:'Formes',robo:'RoboPufi',chess:'Échecs',pufi:'Pufi',par:'Parents',home:'🏠 Accueil',voice:'Voix',on:'🔊 Voix : oui',off:'🔇 Voix : non',close:'✖ Fermer',hello:'À quoi on joue aujourd’hui ? Choisis une carte !'});
+S('hm',{title:'Pufi – L’école des jeux ⭐',q:'À quoi on joue aujourd’hui ?',math:'Maths',world:'Le monde',read:'Lire',time:'Le temps',bday:'🎂 Anniversaire de l’enfant',shapes:'Formes',robo:'RoboPufi',chess:'Échecs',pufi:'Pufi',par:'Parents',home:'🏠 Accueil',voice:'Voix',on:'🔊 Voix : oui',off:'🔇 Voix : non',close:'✖ Fermer',hello:'À quoi on joue aujourd’hui ? Choisis une carte !'});
 const FR_H=['douze','une','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze'];
 const hr=h=>{ const k=h%12; if(k===0) return h%24===12?'midi':'minuit'; return `${FR_H[k]} heure${k===1?'':'s'}`; };
 const hr12=h=>{ const k=h%12; return k===0?'midi':`${FR_H[k]} heure${k===1?'':'s'}`; };
@@ -3860,7 +3860,7 @@ S('aq',{title:'🐠 Mes aquariums',main:'🌿 Aquarium',pred:'🦈 Bassin des pr
 /* ===== Magyar — fő játék, világ, látnivalók, focisták ===== */
 (()=>{ const lg='hu', IDX=12;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'hu', speech:'hu-HU', title:'Számold a csillagokat ⭐', start:'▶ Indulás!', i:IDX,
+L10N.main[lg]={ code:'hu', speech:'hu-HU', title:'Pufi – A játékiskola ⭐', start:'▶ Indulás!', i:IDX,
   gNum:'🔢 Számok', gFlag:'🚩 Zászlók', gAb:'🧮 Golyós számológép',
   sbShow:'👆 Mutasd', sbAdd:'➕ Adj hozzá', sbTen:'🍒 Legyen 10', tens:'Tízesek', ones:'Egyesek', check:'✔ Kész',
   sbHint:'A felső piros golyó 5-öt ér. Minden alsó sárga golyó 1-et ér.',
@@ -4102,7 +4102,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  ordUp:'Állítsd sorba a pingvineket a legkisebbtől a legnagyobbig. Építs felfelé menő lépcsőt!',ordDown:'Állítsd sorba a pingvineket a legnagyobbtól a legkisebbig. Építs csúszdát!',
  ordOk:'Tökéletes! Jó a sorrend!',ordNo:'Hoppá, itt nem jó a sorrend. Próbáld újra!',up:'🪜 Növekvő',down:'🛝 Csökkenő',
  boxQ:'Hány alma van a titkos dobozban? Tegyél almát a dobozba, amíg a mérleg egyenes nem lesz!',boxQ100:'Milyen szám van a titkos dobozban? Tegyél hozzá almát, amíg a mérleg egyenes nem lesz!',boxOk:(e)=>`A mérleg egyenes! ${e}`,heavyL:'A bal oldal nehezebb.',heavyR:'A jobb oldal nehezebb.'});
-S('hm',{title:'Számold a csillagokat ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',bday:'🎂 A gyerek születésnapja',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
+S('hm',{title:'Pufi – A játékiskola ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',bday:'🎂 A gyerek születésnapja',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
 const HU=['tizenkettő','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
 const HA=['tizenkét','egy','két','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
 const hr=h=>`${HA[h%12]} óra`;
@@ -4247,7 +4247,7 @@ S('aq',{title:'🐠 Az akváriumaim',main:'🌿 Akvárium',pred:'🦈 Ragadozók
 /* ===== Italiano — gioco principale, mondo, monumenti, calciatori ===== */
 (()=>{ const lg='it', IDX=7;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'it', speech:'it-IT', title:'Conta le stelle ⭐', start:'▶ Si parte', i:IDX,
+L10N.main[lg]={ code:'it', speech:'it-IT', title:'Pufi – La scuola dei giochi ⭐', start:'▶ Si parte', i:IDX,
   gNum:'🔢 Numeri', gFlag:'🚩 Bandiere', gAb:'🧮 Abaco',
   sbShow:'👆 Mostra', sbAdd:'➕ Aggiungi', sbTen:'🍒 Fai 10', tens:'Decine', ones:'Unità', check:'✔ Fatto',
   sbHint:'La perlina rossa in alto vale 5. Ogni perlina gialla in basso vale 1.',
@@ -4488,7 +4488,7 @@ S('mw',{title:'🔢 Il mondo dei numeri',back:'⬅ Indietro',allOn:'🔓 Tutti: 
  ordUp:'Metti i pinguini in ordine crescente: dal più piccolo al più grande. Fai una scala che sale!',ordDown:'Metti i pinguini in ordine decrescente: dal più grande al più piccolo. Fai uno scivolo!',
  ordOk:'Perfetto! L’ordine è giusto!',ordNo:'Ops, qui l’ordine non è giusto. Riprova!',up:'🪜 Crescente',down:'🛝 Decrescente',
  boxQ:'Quante mele ci sono nella scatola segreta? Metti mele nella scatola finché la bilancia è dritta!',boxQ100:'Che numero c’è nella scatola segreta? Aggiungi mele finché la bilancia è dritta!',boxOk:(e)=>`La bilancia è dritta! ${e}`,heavyL:'Il lato sinistro è più pesante.',heavyR:'Il lato destro è più pesante.'});
-S('hm',{title:'Conta le stelle ⭐',q:'A che cosa giochiamo oggi?',math:'Matematica',world:'Il mondo',read:'Leggere',time:'Il tempo',bday:'🎂 Compleanno del bambino',shapes:'Forme',robo:'RoboPufi',chess:'Scacchi',pufi:'Pufi',par:'Genitori',home:'🏠 Home',voice:'Voce',on:'🔊 Voce: sì',off:'🔇 Voce: no',close:'✖ Chiudi',hello:'A che cosa giochiamo oggi? Scegli una carta!'});
+S('hm',{title:'Pufi – La scuola dei giochi ⭐',q:'A che cosa giochiamo oggi?',math:'Matematica',world:'Il mondo',read:'Leggere',time:'Il tempo',bday:'🎂 Compleanno del bambino',shapes:'Forme',robo:'RoboPufi',chess:'Scacchi',pufi:'Pufi',par:'Genitori',home:'🏠 Home',voice:'Voce',on:'🔊 Voce: sì',off:'🔇 Voce: no',close:'✖ Chiudi',hello:'A che cosa giochiamo oggi? Scegli una carta!'});
 const IT_H=['dodici','una','due','tre','quattro','cinque','sei','sette','otto','nove','dieci','undici'];
 const hr=h=>{ const k=h%12; return k===0?'mezzogiorno':k===1?'l’una':`le ${IT_H[k]}`; };
 const itIs=t=>(t.startsWith('le ')?`Sono ${t}.`:`È ${t}.`);
@@ -4631,7 +4631,7 @@ S('aq',{title:'🐠 I miei acquari',main:'🌿 Acquario',pred:'🦈 Vasca dei pr
 /* ===== Nederlands — hoofdspel, wereld, monumenten, voetballers ===== */
 (()=>{ const lg='nl', IDX=10;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'nl', speech:'nl-NL', title:'Tel de sterren ⭐', start:'▶ Start!', i:IDX,
+L10N.main[lg]={ code:'nl', speech:'nl-NL', title:'Pufi – De spelletjesschool ⭐', start:'▶ Start!', i:IDX,
   gNum:'🔢 Getallen', gFlag:'🚩 Vlaggen', gAb:'🧮 Telraam',
   sbShow:'👆 Laat zien', sbAdd:'➕ Erbij', sbTen:'🍒 Maak 10', tens:'Tientallen', ones:'Eenheden', check:'✔ Klaar',
   sbHint:'Het rode kraaltje bovenaan is 5 waard. Elk geel kraaltje onderaan is 1 waard.',
@@ -4872,7 +4872,7 @@ S('mw',{title:'🔢 De getallenwereld',back:'⬅ Terug',allOn:'🔓 Alles: aan',
  ordUp:'Zet de pinguïns van klein naar groot. Maak een trap omhoog!',ordDown:'Zet de pinguïns van groot naar klein. Maak een glijbaan!',
  ordOk:'Perfect! De volgorde klopt!',ordNo:'Oei, hier klopt de volgorde niet. Probeer het nog eens!',up:'🪜 Van klein naar groot',down:'🛝 Van groot naar klein',
  boxQ:'Hoeveel appels zitten er in de geheime doos? Leg appels in de doos tot de weegschaal recht hangt!',boxQ100:'Welk getal zit er in de geheime doos? Leg appels erbij tot de weegschaal recht hangt!',boxOk:(e)=>`De weegschaal hangt recht! ${e}`,heavyL:'De linkerkant is zwaarder.',heavyR:'De rechterkant is zwaarder.'});
-S('hm',{title:'Tel de sterren ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',bday:'🎂 Verjaardag van het kind',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
+S('hm',{title:'Pufi – De spelletjesschool ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',bday:'🎂 Verjaardag van het kind',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
 const NL_H=['twaalf','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf'];
 const H=h=>NL_H[h%12];
 const hr=h=>`${H(h)} uur`;
@@ -5017,7 +5017,7 @@ S('aq',{title:'🐠 Mijn aquariums',main:'🌿 Aquarium',pred:'🦈 Rovervissenb
 (()=>{ const lg='pl', IDX=11;
 window.__plf=(n,a,b,c)=>n===1?a:(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?b:c;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'pl', speech:'pl-PL', title:'Policz gwiazdki ⭐', start:'▶ Start!', i:IDX,
+L10N.main[lg]={ code:'pl', speech:'pl-PL', title:'Pufi – Szkoła zabaw ⭐', start:'▶ Start!', i:IDX,
   gNum:'🔢 Liczby', gFlag:'🚩 Flagi', gAb:'🧮 Liczydło',
   sbShow:'👆 Pokaż', sbAdd:'➕ Dodaj', sbTen:'🍒 Zrób 10', tens:'Dziesiątki', ones:'Jedności', check:'✔ Gotowe',
   sbHint:'Czerwony koralik na górze jest wart 5. Każdy żółty koralik na dole jest wart 1.',
@@ -5259,7 +5259,7 @@ S('mw',{title:'🔢 Świat liczb',back:'⬅ Wstecz',allOn:'🔓 Wszystkie: wł.'
  ordUp:'Ustaw pingwiny od najmniejszego do największego. Zrób schody w górę!',ordDown:'Ustaw pingwiny od największego do najmniejszego. Zrób zjeżdżalnię!',
  ordOk:'Doskonale! Kolejność jest dobra!',ordNo:'Ups, tu kolejność się nie zgadza. Spróbuj jeszcze raz!',up:'🪜 Rosnąco',down:'🛝 Malejąco',
  boxQ:'Ile jabłek jest w tajemniczym pudełku? Wkładaj jabłka do pudełka, aż waga będzie prosta!',boxQ100:'Jaka liczba jest w tajemniczym pudełku? Dokładaj jabłka, aż waga będzie prosta!',boxOk:(e)=>`Waga jest prosta! ${e}`,heavyL:'Lewa strona jest cięższa.',heavyR:'Prawa strona jest cięższa.'});
-S('hm',{title:'Policz gwiazdki ⭐',q:'W co się dziś bawimy?',math:'Matematyka',world:'Świat',read:'Czytanie',time:'Czas',bday:'🎂 Urodziny dziecka',shapes:'Kształty',robo:'RoboPufi',chess:'Szachy',pufi:'Pufi',par:'Rodzice',home:'🏠 Start',voice:'Głos',on:'🔊 Głos: wł.',off:'🔇 Głos: wył.',close:'✖ Zamknij',hello:'W co się dziś bawimy? Wybierz kartę!'});
+S('hm',{title:'Pufi – Szkoła zabaw ⭐',q:'W co się dziś bawimy?',math:'Matematyka',world:'Świat',read:'Czytanie',time:'Czas',bday:'🎂 Urodziny dziecka',shapes:'Kształty',robo:'RoboPufi',chess:'Szachy',pufi:'Pufi',par:'Rodzice',home:'🏠 Start',voice:'Głos',on:'🔊 Głos: wł.',off:'🔇 Głos: wył.',close:'✖ Zamknij',hello:'W co się dziś bawimy? Wybierz kartę!'});
 const NOM=['dwunasta','pierwsza','druga','trzecia','czwarta','piąta','szósta','siódma','ósma','dziewiąta','dziesiąta','jedenasta'];
 const LOC=['dwunastej','pierwszej','drugiej','trzeciej','czwartej','piątej','szóstej','siódmej','ósmej','dziewiątej','dziesiątej','jedenastej'];
 const ACC=['dwunastą','pierwszą','drugą','trzecią','czwartą','piątą','szóstą','siódmą','ósmą','dziewiątą','dziesiątą','jedenastą'];
@@ -5405,7 +5405,7 @@ S('aq',{title:'🐠 Moje akwaria',main:'🌿 Akwarium',pred:'🦈 Akwarium drapi
 /* ===== Português — jogo principal, mundo, monumentos, jogadores ===== */
 (()=>{ const lg='pt', IDX=9;
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'pt', speech:'pt-BR', title:'Conta estrelas ⭐', start:'▶ Vamos!', i:IDX,
+L10N.main[lg]={ code:'pt', speech:'pt-BR', title:'Pufi – A escola dos jogos ⭐', start:'▶ Vamos!', i:IDX,
   gNum:'🔢 Números', gFlag:'🚩 Bandeiras', gAb:'🧮 Ábaco',
   sbShow:'👆 Mostre', sbAdd:'➕ Some', sbTen:'🍒 Faça 10', tens:'Dezenas', ones:'Unidades', check:'✔ Pronto',
   sbHint:'A bolinha vermelha de cima vale 5. Cada bolinha amarela de baixo vale 1.',
@@ -5647,7 +5647,7 @@ S('mw',{title:'🔢 O mundo dos números',back:'⬅ Voltar',allOn:'🔓 Todos: s
  ordUp:'Coloque os pinguins do menor para o maior. Faça uma escada que sobe!',ordDown:'Coloque os pinguins do maior para o menor. Faça um escorregador!',
  ordOk:'Perfeito! A ordem está certa!',ordNo:'Opa, aqui a ordem não está certa. Tente de novo!',up:'🪜 Do menor ao maior',down:'🛝 Do maior ao menor',
  boxQ:'Quantas maçãs tem na caixa secreta? Coloque maçãs na caixa até a balança ficar reta!',boxQ100:'Que número está na caixa secreta? Coloque maçãs até a balança ficar reta!',boxOk:(e)=>`A balança está reta! ${e}`,heavyL:'O lado esquerdo está mais pesado.',heavyR:'O lado direito está mais pesado.'});
-S('hm',{title:'Conta estrelas ⭐',q:'Do que vamos brincar hoje?',math:'Matemática',world:'O mundo',read:'Ler',time:'O tempo',bday:'🎂 Aniversário da criança',shapes:'Formas',robo:'RoboPufi',chess:'Xadrez',pufi:'Pufi',par:'Pais',home:'🏠 Início',voice:'Voz',on:'🔊 Voz: sim',off:'🔇 Voz: não',close:'✖ Fechar',hello:'Do que vamos brincar hoje? Escolha uma carta!'});
+S('hm',{title:'Pufi – A escola dos jogos ⭐',q:'Do que vamos brincar hoje?',math:'Matemática',world:'O mundo',read:'Ler',time:'O tempo',bday:'🎂 Aniversário da criança',shapes:'Formas',robo:'RoboPufi',chess:'Xadrez',pufi:'Pufi',par:'Pais',home:'🏠 Início',voice:'Voz',on:'🔊 Voz: sim',off:'🔇 Voz: não',close:'✖ Fechar',hello:'Do que vamos brincar hoje? Escolha uma carta!'});
 const PT_H=['doze','uma','duas','três','quatro','cinco','seis','sete','oito','nove','dez','onze'];
 const hr=h=>{ const k=h%12; return k===1?'uma hora':`${PT_H[k]} horas`; };
 const hb=h=>PT_H[h%12];
@@ -5792,7 +5792,7 @@ S('aq',{title:'🐠 Meus aquários',main:'🌿 Aquário',pred:'🦈 Aquário dos
 (()=>{ const lg='ru', IDX=14;
 window.__slf=window.__slf||((n,a,b,c)=>{ const d=n%10, h=n%100; return d===1&&h!==11?a:(d>=2&&d<=4&&(h<10||h>=20))?b:c; });
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'ru', speech:'ru-RU', title:'Посчитай звёздочки ⭐', start:'▶ Начнём!', i:IDX,
+L10N.main[lg]={ code:'ru', speech:'ru-RU', title:'Пуфи – Школа игр ⭐', start:'▶ Начнём!', i:IDX,
   gNum:'🔢 Числа', gFlag:'🚩 Флаги', gAb:'🧮 Счёты',
   sbShow:'👆 Покажи', sbAdd:'➕ Прибавь', sbTen:'🍒 Собери 10', tens:'Десятки', ones:'Единицы', check:'✔ Готово',
   sbHint:'Красная бусина сверху — это 5. Каждая жёлтая бусина снизу — это 1.',
@@ -6034,7 +6034,7 @@ S('mw',{title:'🔢 Мир чисел',back:'⬅ Назад',allOn:'🔓 Все:
  ordUp:'Поставь пингвинов от самого маленького до самого большого. Сделай лесенку вверх!',ordDown:'Поставь пингвинов от самого большого до самого маленького. Сделай горку!',
  ordOk:'Отлично! Порядок правильный!',ordNo:'Ой, здесь порядок неправильный. Попробуй ещё раз!',up:'🪜 По возрастанию',down:'🛝 По убыванию',
  boxQ:'Сколько яблок в тайной коробке? Клади яблоки в коробку, пока весы не встанут ровно!',boxQ100:'Какое число в тайной коробке? Добавляй яблоки, пока весы не встанут ровно!',boxOk:(e)=>`Весы стоят ровно! ${e}`,heavyL:'Левая сторона тяжелее.',heavyR:'Правая сторона тяжелее.'});
-S('hm',{title:'Посчитай звёздочки ⭐',q:'Во что играем сегодня?',math:'Математика',world:'Мир',read:'Чтение',time:'Время',bday:'🎂 День рождения ребёнка',shapes:'Фигуры',robo:'РобоПуфи',chess:'Шахматы',pufi:'Пуфи',par:'Родители',home:'🏠 Главная',voice:'Голос',on:'🔊 Голос: вкл.',off:'🔇 Голос: выкл.',close:'✖ Закрыть',hello:'Во что играем сегодня? Выбери карточку!'});
+S('hm',{title:'Пуфи – Школа игр ⭐',q:'Во что играем сегодня?',math:'Математика',world:'Мир',read:'Чтение',time:'Время',bday:'🎂 День рождения ребёнка',shapes:'Фигуры',robo:'РобоПуфи',chess:'Шахматы',pufi:'Пуфи',par:'Родители',home:'🏠 Главная',voice:'Голос',on:'🔊 Голос: вкл.',off:'🔇 Голос: выкл.',close:'✖ Закрыть',hello:'Во что играем сегодня? Выбери карточку!'});
 const CNT=['двенадцать','час','два','три','четыре','пять','шесть','семь','восемь','девять','десять','одиннадцать'];
 const GEN=['первого','второго','третьего','четвёртого','пятого','шестого','седьмого','восьмого','девятого','десятого','одиннадцатого','двенадцатого'];
 const MG={5:'пяти',10:'десяти',15:'пятнадцати',20:'двадцати',25:'двадцати пяти'};
@@ -6182,7 +6182,7 @@ S('aq',{title:'🐠 Мои аквариумы',main:'🌿 Аквариум',pred
 (()=>{ const lg='uk', IDX=13;
 window.__slf=(n,a,b,c)=>{ const d=n%10, h=n%100; return d===1&&h!==11?a:(d>=2&&d<=4&&(h<10||h>=20))?b:c; };
 L10N.main=L10N.main||{};
-L10N.main[lg]={ code:'uk', speech:'uk-UA', title:'Порахуй зірочки ⭐', start:'▶ Почнімо!', i:IDX,
+L10N.main[lg]={ code:'uk', speech:'uk-UA', title:'Пуфі – Школа ігор ⭐', start:'▶ Почнімо!', i:IDX,
   gNum:'🔢 Числа', gFlag:'🚩 Прапори', gAb:'🧮 Рахівниця',
   sbShow:'👆 Покажи', sbAdd:'➕ Додай', sbTen:'🍒 Склади 10', tens:'Десятки', ones:'Одиниці', check:'✔ Готово',
   sbHint:'Червона кулька вгорі — це 5. Кожна жовта кулька внизу — це 1.',
@@ -6424,7 +6424,7 @@ S('mw',{title:'🔢 Світ чисел',back:'⬅ Назад',allOn:'🔓 Ус�
  ordUp:'Постав пінгвінів від найменшого до найбільшого. Зроби сходинки вгору!',ordDown:'Постав пінгвінів від найбільшого до найменшого. Зроби гірку!',
  ordOk:'Чудово! Порядок правильний!',ordNo:'Ой, тут порядок неправильний. Спробуй ще раз!',up:'🪜 За зростанням',down:'🛝 За спаданням',
  boxQ:'Скільки яблук у таємній скриньці? Клади яблука в скриньку, доки терези не стануть рівно!',boxQ100:'Яке число в таємній скриньці? Додавай яблука, доки терези не стануть рівно!',boxOk:(e)=>`Терези стоять рівно! ${e}`,heavyL:'Ліва сторона важча.',heavyR:'Права сторона важча.'});
-S('hm',{title:'Порахуй зірочки ⭐',q:'У що граємо сьогодні?',math:'Математика',world:'Світ',read:'Читання',time:'Час',bday:'🎂 День народження дитини',shapes:'Фігури',robo:'РобоПуфі',chess:'Шахи',pufi:'Пуфі',par:'Батьки',home:'🏠 Головна',voice:'Голос',on:'🔊 Голос: увімк.',off:'🔇 Голос: вимк.',close:'✖ Закрити',hello:'У що граємо сьогодні? Вибери картку!'});
+S('hm',{title:'Пуфі – Школа ігор ⭐',q:'У що граємо сьогодні?',math:'Математика',world:'Світ',read:'Читання',time:'Час',bday:'🎂 День народження дитини',shapes:'Фігури',robo:'РобоПуфі',chess:'Шахи',pufi:'Пуфі',par:'Батьки',home:'🏠 Головна',voice:'Голос',on:'🔊 Голос: увімк.',off:'🔇 Голос: вимк.',close:'✖ Закрити',hello:'У що граємо сьогодні? Вибери картку!'});
 const NOM=['дванадцята','перша','друга','третя','четверта','п’ята','шоста','сьома','восьма','дев’ята','десята','одинадцята'];
 const ACC=['дванадцяту','першу','другу','третю','четверту','п’яту','шосту','сьому','восьму','дев’яту','десяту','одинадцяту'];
 const LOC=['дванадцятій','першій','другій','третій','четвертій','п’ятій','шостій','сьомій','восьмій','дев’ятій','десятій','одинадцятій'];
@@ -8269,6 +8269,7 @@ window.RDAQ={open,close,add,pool,iconSVG,hungryCount,T:()=>T(),SP,fishSVG};
 #hm-root[hidden]{display:none}
 .hm-head{display:flex;align-items:center;gap:10px;width:100%;max-width:1000px;flex-wrap:wrap;justify-content:center}
 .hm-head h1{flex:1 1 300px;margin:0;font-size:clamp(1.9rem,5.5vw,3.2rem);text-align:center;line-height:1.05}
+.hm-head h1 small{display:block;font-size:.5em;margin-top:4px;opacity:.85;letter-spacing:.02em}
 .hm-langs{display:flex;gap:6px}
 .hm-langs button{font:inherit;font-weight:800;font-size:1.05rem;border:3px solid var(--ink);background:#fff;border-radius:999px;padding:4px 12px;cursor:pointer}
 .hm-langs button[aria-pressed="true"]{background:var(--ink);color:#fff}
@@ -8582,9 +8583,9 @@ window.__mw={genAdd,ADDL,BOXL};
 (()=>{
 /* ===== ecranul de start cu carduri ===== */
 const $=id=>document.getElementById('hm-'+id), root=$('root');
-const HT={ro:{title:'Adunări cu Stele ⭐',q:'Ce jucăm azi?',math:'Matematică',world:'Lumea',read:'Citește',time:'Timpul',bday:'🎂 Ziua de naștere a copilului',pname:'🗣️ Cum să spună vocea „Pufi”? Atinge și ascultă:',psample:'Bună! Eu sunt Pufi.',shapes:'Forme',robo:'RoboPufi',chess:'Șah',pufi:'Pufi',par:'Părinți',home:'🏠 Acasă',voice:'Vocea',on:'🔊 Vocea: DA',off:'🔇 Vocea: NU',close:'✖ Închide',hello:'Ce jucăm azi? Alege un card!'},
- de:{title:'Rechnen mit Sternen ⭐',q:'Was spielen wir heute?',math:'Mathe',world:'Die Welt',read:'Lesen',time:'Die Zeit',bday:'🎂 Geburtstag des Kindes',pname:'🗣️ Wie soll die Stimme „Pufi“ sagen? Tippen und anhören:',psample:'Hallo! Ich bin Pufi.',shapes:'Formen',robo:'RoboPufi',chess:'Schach',pufi:'Pufi',par:'Eltern',home:'🏠 Start',voice:'Stimme',on:'🔊 Stimme: AN',off:'🔇 Stimme: AUS',close:'✖ Schließen',hello:'Was spielen wir heute? Such dir eine Karte aus!'},
- en:{title:'Counting with Stars ⭐',q:'What shall we play today?',math:'Maths',world:'The world',read:'Reading',time:'Time',bday:'🎂 Child’s birthday',pname:'🗣️ How should the voice say “Pufi”? Tap to listen:',psample:'Hello! I am Pufi.',shapes:'Shapes',robo:'RoboPufi',chess:'Chess',pufi:'Pufi',par:'Parents',home:'🏠 Home',voice:'Voice',on:'🔊 Voice: ON',off:'🔇 Voice: OFF',close:'✖ Close',hello:'What shall we play today? Pick a card!'}};
+const HT={ro:{title:'Pufi – Școala jocurilor ⭐',q:'Ce jucăm azi?',math:'Matematică',world:'Lumea',read:'Citește',time:'Timpul',bday:'🎂 Ziua de naștere a copilului',pname:'🗣️ Cum să spună vocea „Pufi”? Atinge și ascultă:',psample:'Bună! Eu sunt Pufi.',shapes:'Forme',robo:'RoboPufi',chess:'Șah',pufi:'Pufi',par:'Părinți',home:'🏠 Acasă',voice:'Vocea',on:'🔊 Vocea: DA',off:'🔇 Vocea: NU',close:'✖ Închide',hello:'Ce jucăm azi? Alege un card!'},
+ de:{title:'Pufi – Die Spieleschule ⭐',q:'Was spielen wir heute?',math:'Mathe',world:'Die Welt',read:'Lesen',time:'Die Zeit',bday:'🎂 Geburtstag des Kindes',pname:'🗣️ Wie soll die Stimme „Pufi“ sagen? Tippen und anhören:',psample:'Hallo! Ich bin Pufi.',shapes:'Formen',robo:'RoboPufi',chess:'Schach',pufi:'Pufi',par:'Eltern',home:'🏠 Start',voice:'Stimme',on:'🔊 Stimme: AN',off:'🔇 Stimme: AUS',close:'✖ Schließen',hello:'Was spielen wir heute? Such dir eine Karte aus!'},
+ en:{title:'Pufi – The Game School ⭐',q:'What shall we play today?',math:'Maths',world:'The world',read:'Reading',time:'Time',bday:'🎂 Child’s birthday',pname:'🗣️ How should the voice say “Pufi”? Tap to listen:',psample:'Hello! I am Pufi.',shapes:'Shapes',robo:'RoboPufi',chess:'Chess',pufi:'Pufi',par:'Parents',home:'🏠 Home',voice:'Voice',on:'🔊 Voice: ON',off:'🔇 Voice: OFF',close:'✖ Close',hello:'What shall we play today? Pick a card!'}};
 const H=()=>TR('hm',HT);
 /* pronunția numelui „Pufi”: părintele alege varianta care sună bine pe dispozitivul lui */
 function pufiVar(){ return {ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',it:'Pufi',es:'Pufi',pt:'Pufi',nl:'Poefie',pl:'Pufi',hu:'Pufi',uk:'Пуфі',ru:'Пуфи'}[lang]||'Pufi'; }
@@ -8592,7 +8593,7 @@ try{ if(window.speechSynthesis&&!speechSynthesis.__pufi){ const _sp=speechSynthe
 const CARDS=[['math','🔢','#FFE9A8'],['world','🌍','#CDEBFF'],['read','📖','#FFD9E2'],['time','⏳','#D8F3E3'],['shapes','📐','#FFE6C2'],['robo','🤖','#D9E4FF'],['chess','♟️','#E6E9F2'],['pufi','🦊','#FFE0C7'],['par','⚙️','#EEEEEE']];
 let mainReturn='home';
 function ensureStart(){ if(typeof started!=='undefined'&&!started){ started=true; const s=document.getElementById('start'); if(s) s.hidden=true; try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
-function render(){ $('title').textContent=H().title; $('q').textContent=H().q; $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0);
+function render(){ { const t=H().title.replace(/\s*⭐\s*$/,''), pr=t.split(' – '), e=$('title'); if(pr.length===2){ e.innerHTML=''; e.append(pr[0]+' ⭐'); const sm=document.createElement('small'); sm.textContent=pr[1]; e.appendChild(sm); } else e.textContent=H().title; try{ document.title=t; }catch(_){} } $('q').textContent=H().q; $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0);
   paintLangs();
   const g=$('grid'); g.innerHTML=''; CARDS.forEach(([k,ic,bg])=>{ const c=document.createElement('button'); c.className='hm-card'; c.style.background=bg; c.innerHTML=`<span class="ic">${ic}</span><span class="t">${H()[k]}</span>`; c.onclick=()=>openCard(k); g.appendChild(c); });
   const hb=document.getElementById('gHome'); if(hb) hb.textContent=H().home; }

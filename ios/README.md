@@ -35,3 +35,8 @@ Fără cheie, în Debug totul e deblocat.
 ## De verificat pe aparat
 - Recunoașterea în **română**: `native.call('asr.available',{lang:'ro'})` → `onDevice`. Dacă e `false`, audio trece prin serverele Apple — de menționat în politica de confidențialitate.
 - Categoria **Kids**: fără analytics/ads terțe; linkurile externe sunt blocate în `GameWebView`.
+
+## Numele aplicației
+- Sub iconiță (pe ecranul principal): **Pufi** (`CFBundleDisplayName`). Un nume lung ar fi tăiat de iOS.
+- Numele din App Store (max. 30 de caractere), per limbă:
+  ro „Pufi – Școala jocurilor” · de „Pufi – Die Spieleschule” · en „Pufi – The Game School” · fr „Pufi – L’école des jeux” · it „Pufi – La scuola dei giochi” · es „Pufi – La escuela de juegos” · pt „Pufi – A escola dos jogos” · nl „Pufi – De spelletjesschool” · pl „Pufi – Szkoła zabaw” · hu „Pufi – A játékiskola” · uk „Пуфі – Школа ігор” · ru „Пуфи – Школа игр”
