@@ -8652,7 +8652,7 @@ function openCard(k){ ensureStart(); try{ if(synth) synth.cancel(); }catch(e){}
   if(k==='pufi') return window.openPufi&&window.openPufi(lang);
   if(k==='par'){ if(window.__parentsGate) return window.__parentsGate().then(ok=>{ if(ok) parents(); }); return parents(); } }
 function openMainGame(g){ ensureStart(); mainReturn=g==='ten'?'math':'home'; try{ game=g==='ten'?'abacus':'flags'; if(g==='ten') sbMode='ten'; store('joc',game); syncChips(); next(); }catch(e){} root.hidden=true; }
-window.__openMainGame=openMainGame;
+window.__openMainGame=openMainGame; window.__hmT=()=>H(); window.__hmOpen=openCard;
 function parents(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); ov.appendChild(box);
   const v=document.getElementById('voice'), m=document.getElementById('mute'); const h=document.createElement('h3'); h.textContent='⚙️ '+H().par; h.style.margin='0'; box.appendChild(h);
   const lab=document.createElement('div'); lab.textContent=H().voice+':'; lab.style.fontWeight='800'; box.appendChild(lab); const ph=document.createElement('span'); if(v){ v.parentNode.insertBefore(ph,v); box.appendChild(v); }
@@ -10309,6 +10309,288 @@ const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
   const FD={alg:'az alga',worm:'a kukac',ins:'a rovar',plev:'a kishal'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
 })();
 </script>
+<style>
+/* ===== Insula lui Pufi ===== */
+.isl-ban{position:relative;width:100%;max-width:1000px;height:clamp(150px,30vh,270px);border-radius:28px;overflow:hidden;cursor:pointer;box-shadow:0 8px 0 rgba(36,50,95,.18);flex:none;border:none;padding:0;font:inherit;background:#6EC6FF}
+.isl-ban:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(36,50,95,.18)}
+.isl-ban svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.isl-ban .cap{position:absolute;left:12px;bottom:10px;background:rgba(255,255,255,.92);border-radius:18px;padding:6px 14px;font-weight:800;color:#24325f;text-align:left;line-height:1.15;max-width:75%}
+.isl-ban .cap b{display:block;font-size:clamp(1.2rem,3.2vw,1.7rem)}
+.isl-ban .cap span{font-size:clamp(.85rem,2vw,1.05rem);opacity:.85}
+.isl-ban .bdg{position:absolute;right:12px;top:10px;background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;font-size:clamp(1rem,2.6vw,1.35rem);color:#24325f}
+.isl-ban .bdg.hot{background:#FFD43B;animation:islPulse 1s ease-in-out infinite}
+@keyframes islPulse{50%{transform:scale(1.12)}}
+#isl-root{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;gap:6px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);font-family:var(--display);color:var(--ink);background:#3BA7E5}
+#isl-root[hidden]{display:none}
+#isl-root .rb-top h2{margin:0;flex:1;text-align:center;font-size:clamp(1.3rem,3.6vw,2rem);color:#fff;text-shadow:0 2px 0 #24325f,0 -2px 0 #24325f,2px 0 0 #24325f,-2px 0 0 #24325f}
+#isl-stage{flex:1;min-height:0;position:relative;overflow:hidden}
+#isl-stage.por{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+#isl-stage.por svg{max-width:none}
+#isl-stage svg{width:100%;height:100%;display:block;-webkit-user-select:none;user-select:none}
+.isl-b{cursor:pointer}
+#isl-pop{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:#fff;border-radius:24px;padding:12px 16px;width:min(560px,94%);box-sizing:border-box;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;font-weight:800;box-shadow:0 8px 0 rgba(36,50,95,.18);z-index:2}
+#isl-pop[hidden]{display:none}
+#isl-pop h3{margin:0;font-size:clamp(1.2rem,3vw,1.6rem)}
+#isl-pop p{margin:0;font-size:clamp(1rem,2.4vw,1.2rem);line-height:1.3}
+#isl-pop .bar{width:100%;height:16px;border-radius:999px;background:#E6ECF7;overflow:hidden}
+#isl-pop .bar i{display:block;height:100%;background:linear-gradient(90deg,#FFD43B,#FFB020);border-radius:999px}
+#isl-pop .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.isl-toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:100000;background:#fff;border:3px solid #FFB020;border-radius:999px;padding:8px 18px;font-family:var(--display);font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);color:#24325f;pointer-events:none;animation:islToast 3s ease forwards;white-space:nowrap;box-shadow:0 6px 0 rgba(36,50,95,.15)}
+@keyframes islToast{0%{opacity:0;transform:translate(-50%,-20px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+/* animații în scenă */
+.isl-svg .cl{animation:islCloud 60s linear infinite}
+.isl-svg .cl2{animation:islCloud 85s linear infinite;animation-delay:-40s}
+@keyframes islCloud{from{transform:translateX(-260px)}to{transform:translateX(1260px)}}
+.isl-svg .boat{animation:islBoat 70s linear infinite}
+@keyframes islBoat{from{transform:translateX(-120px)}to{transform:translateX(1120px)}}
+.isl-svg .bob{animation:islBob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islBob{50%{transform:translateY(-4px) rotate(-3deg)}}
+.isl-svg .wave{animation:islWave 6s linear infinite}
+.isl-svg .wave2{animation:islWave 9s linear infinite reverse}
+@keyframes islWave{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+.isl-svg .palm{animation:islSway 4s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islSway{50%{transform:rotate(4deg)}}
+.isl-svg .tw{animation:islTw 2s ease-in-out infinite}
+@keyframes islTw{50%{opacity:.2}}
+.isl-svg .spin{animation:islSpin 6s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islSpin{to{transform:rotate(360deg)}}
+.isl-svg .smoke{animation:islSmoke 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islSmoke{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translate(14px,-46px) scale(1.5)}}
+.isl-svg .flag{animation:islFlag 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:left center}
+@keyframes islFlag{50%{transform:scaleX(.8) skewY(4deg)}}
+.isl-svg .hop{animation:islHop 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islHop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.isl-svg .beam{animation:islBeam 4s ease-in-out infinite;transform-box:fill-box;transform-origin:left center}
+@keyframes islBeam{0%,100%{transform:scaleX(1);opacity:.75}50%{transform:scaleX(-1);opacity:.75}25%,75%{opacity:.15}}
+.isl-svg .an{transition:transform 2.6s linear}
+.isl-svg .egg{animation:islEgg 2s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+.isl-svg .egg.rdy{animation:islEggR .6s ease-in-out infinite}
+@keyframes islEgg{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-8deg)}92%{transform:rotate(8deg)}}
+@keyframes islEggR{25%{transform:rotate(-10deg) translateY(-3px)}75%{transform:rotate(10deg) translateY(-3px)}}
+.isl-svg .grow{animation:islGrow 1.3s cubic-bezier(.3,1.5,.5,1) both;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islGrow{0%{transform:scale(.15,.05);opacity:0}60%{transform:scale(1.08,1.12);opacity:1}100%{transform:scale(1)}}
+.isl-svg .pf{animation:islPf 1.4s ease-out forwards;transform-box:fill-box;transform-origin:center}
+@keyframes islPf{0%{opacity:1;transform:translate(0,0) scale(.4)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}}
+.isl-svg .tap{animation:islTapH 1.2s ease-in-out infinite}
+@keyframes islTapH{50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.isl-svg *{animation-duration:0s!important;transition:none!important}}
+</style>
+<script>
+(()=>{
+/* Insula lui Pufi: stelele câștigate în fiecare card construiesc o clădire; în fiecare zi un ou surpriză aduce un prieten nou. */
+const TX={
+ ro:{title:'Insula lui Pufi',sub:'Câștigă stele și insula ta crește!',b:{time:'Turnul cu ceas',read:'Biblioteca',math:'Turnul cifrelor',world:'Farul',shapes:'Piramida formelor',robo:'Atelierul roboților',chess:'Castelul de șah',pufi:'Casa lui Pufi'},
+   grow:c=>`Ca să crească, joacă: ${c}!`,max:'Clădirea e gata! ✨',up:(n,k)=>`${n}: nivelul ${k}!`,lv:k=>`Nivelul ${k}`,
+   eggNeed:k=>`Câștigă 3 stele azi și oul se deschide! (${k}/3)`,eggReady:'Oul e gata! Atinge-l de trei ori!',hatched:'Un prieten nou a venit pe insulă!',eggDone:'Mâine vine un ou nou!',friends:'Prieteni'},
+ de:{title:'Pufis Insel',sub:'Sammle Sterne und deine Insel wächst!',b:{time:'Der Uhrturm',read:'Die Bibliothek',math:'Der Zahlenturm',world:'Der Leuchtturm',shapes:'Die Formenpyramide',robo:'Die Roboterwerkstatt',chess:'Die Schachburg',pufi:'Pufis Haus'},
+   grow:c=>`Damit es wächst, spiel: ${c}!`,max:'Fertig gebaut! ✨',up:(n,k)=>`${n}: Stufe ${k}!`,lv:k=>`Stufe ${k}`,
+   eggNeed:k=>`Sammle heute 3 Sterne, dann schlüpft das Ei! (${k}/3)`,eggReady:'Das Ei ist bereit! Tippe dreimal darauf!',hatched:'Ein neuer Freund ist auf die Insel gekommen!',eggDone:'Morgen kommt ein neues Ei!',friends:'Freunde'},
+ en:{title:'Pufi’s Island',sub:'Win stars and your island grows!',b:{time:'Clock Tower',read:'Library',math:'Number Tower',world:'Lighthouse',shapes:'Shape Pyramid',robo:'Robot Workshop',chess:'Chess Castle',pufi:'Pufi’s House'},
+   grow:c=>`To make it grow, play: ${c}!`,max:'Fully built! ✨',up:(n,k)=>`${n}: level ${k}!`,lv:k=>`Level ${k}`,
+   eggNeed:k=>`Win 3 stars today and the egg will hatch! (${k}/3)`,eggReady:'The egg is ready! Tap it three times!',hatched:'A new friend has come to the island!',eggDone:'A new egg comes tomorrow!',friends:'Friends'},
+ fr:{title:'L’île de Pufi',sub:'Gagne des étoiles et ton île grandit !',b:{time:'La tour de l’horloge',read:'La bibliothèque',math:'La tour des nombres',world:'Le phare',shapes:'La pyramide des formes',robo:'L’atelier des robots',chess:'Le château d’échecs',pufi:'La maison de Pufi'},
+   grow:c=>`Pour le faire grandir, joue : ${c} !`,max:'Construction terminée ! ✨',up:(n,k)=>`${n} : niveau ${k} !`,lv:k=>`Niveau ${k}`,
+   eggNeed:k=>`Gagne 3 étoiles aujourd’hui et l’œuf va éclore ! (${k}/3)`,eggReady:'L’œuf est prêt ! Touche-le trois fois !',hatched:'Un nouvel ami est arrivé sur l’île !',eggDone:'Demain, un nouvel œuf arrive !',friends:'Amis'},
+ it:{title:'L’isola di Pufi',sub:'Vinci stelle e la tua isola cresce!',b:{time:'La torre dell’orologio',read:'La biblioteca',math:'La torre dei numeri',world:'Il faro',shapes:'La piramide delle forme',robo:'L’officina dei robot',chess:'Il castello degli scacchi',pufi:'La casa di Pufi'},
+   grow:c=>`Per farlo crescere, gioca: ${c}!`,max:'Costruzione finita! ✨',up:(n,k)=>`${n}: livello ${k}!`,lv:k=>`Livello ${k}`,
+   eggNeed:k=>`Vinci 3 stelle oggi e l’uovo si schiude! (${k}/3)`,eggReady:'L’uovo è pronto! Toccalo tre volte!',hatched:'Un nuovo amico è arrivato sull’isola!',eggDone:'Domani arriva un nuovo uovo!',friends:'Amici'},
+ es:{title:'La isla de Pufi',sub:'¡Gana estrellas y tu isla crece!',b:{time:'La torre del reloj',read:'La biblioteca',math:'La torre de los números',world:'El faro',shapes:'La pirámide de formas',robo:'El taller de robots',chess:'El castillo de ajedrez',pufi:'La casa de Pufi'},
+   grow:c=>`Para que crezca, juega: ${c}!`,max:'¡Construcción terminada! ✨',up:(n,k)=>`${n}: ¡nivel ${k}!`,lv:k=>`Nivel ${k}`,
+   eggNeed:k=>`¡Gana 3 estrellas hoy y el huevo se abrirá! (${k}/3)`,eggReady:'¡El huevo está listo! ¡Tócalo tres veces!',hatched:'¡Un nuevo amigo ha llegado a la isla!',eggDone:'¡Mañana llega un huevo nuevo!',friends:'Amigos'},
+ pt:{title:'A ilha do Pufi',sub:'Ganhe estrelas e sua ilha cresce!',b:{time:'A torre do relógio',read:'A biblioteca',math:'A torre dos números',world:'O farol',shapes:'A pirâmide das formas',robo:'A oficina dos robôs',chess:'O castelo de xadrez',pufi:'A casa do Pufi'},
+   grow:c=>`Para crescer, jogue: ${c}!`,max:'Construção concluída! ✨',up:(n,k)=>`${n}: nível ${k}!`,lv:k=>`Nível ${k}`,
+   eggNeed:k=>`Ganhe 3 estrelas hoje e o ovo vai chocar! (${k}/3)`,eggReady:'O ovo está pronto! Toque nele três vezes!',hatched:'Um novo amigo chegou à ilha!',eggDone:'Amanhã chega um ovo novo!',friends:'Amigos'},
+ nl:{title:'Het eiland van Pufi',sub:'Verdien sterren en je eiland groeit!',b:{time:'De klokkentoren',read:'De bibliotheek',math:'De cijfertoren',world:'De vuurtoren',shapes:'De vormenpiramide',robo:'De robotwerkplaats',chess:'Het schaakkasteel',pufi:'Het huis van Pufi'},
+   grow:c=>`Speel ${c} om het te laten groeien!`,max:'Helemaal klaar! ✨',up:(n,k)=>`${n}: niveau ${k}!`,lv:k=>`Niveau ${k}`,
+   eggNeed:k=>`Verdien vandaag 3 sterren, dan komt het ei uit! (${k}/3)`,eggReady:'Het ei is klaar! Tik er drie keer op!',hatched:'Er is een nieuwe vriend op het eiland!',eggDone:'Morgen komt er een nieuw ei!',friends:'Vrienden'},
+ pl:{title:'Wyspa Pufiego',sub:'Zdobywaj gwiazdki, a twoja wyspa urośnie!',b:{time:'Wieża zegarowa',read:'Biblioteka',math:'Wieża liczb',world:'Latarnia morska',shapes:'Piramida kształtów',robo:'Warsztat robotów',chess:'Szachowy zamek',pufi:'Domek Pufiego'},
+   grow:c=>`Żeby urosło, zagraj: ${c}!`,max:'Gotowe! ✨',up:(n,k)=>`${n}: poziom ${k}!`,lv:k=>`Poziom ${k}`,
+   eggNeed:k=>`Zdobądź dziś 3 gwiazdki, a jajko się wykluje! (${k}/3)`,eggReady:'Jajko jest gotowe! Stuknij je trzy razy!',hatched:'Na wyspę przybył nowy przyjaciel!',eggDone:'Jutro przyjdzie nowe jajko!',friends:'Przyjaciele'},
+ hu:{title:'Pufi szigete',sub:'Gyűjts csillagokat, és nő a szigeted!',b:{time:'Az óratorony',read:'A könyvtár',math:'A számtorony',world:'A világítótorony',shapes:'A formapiramis',robo:'A robotműhely',chess:'A sakkvár',pufi:'Pufi háza'},
+   grow:c=>`Hogy nőjön, játssz: ${c}!`,max:'Kész! ✨',up:(n,k)=>`${n}: ${k}. szint!`,lv:k=>`${k}. szint`,
+   eggNeed:k=>`Szerezz ma 3 csillagot, és kikel a tojás! (${k}/3)`,eggReady:'A tojás készen áll! Koppints rá háromszor!',hatched:'Új barát érkezett a szigetre!',eggDone:'Holnap új tojás jön!',friends:'Barátok'},
+ uk:{title:'Острів Пуфі',sub:'Збирай зірочки, і твій острів росте!',b:{time:'Годинникова вежа',read:'Бібліотека',math:'Вежа чисел',world:'Маяк',shapes:'Піраміда фігур',robo:'Майстерня роботів',chess:'Шаховий замок',pufi:'Будиночок Пуфі'},
+   grow:c=>`Щоб росло, грай: ${c}!`,max:'Готово! ✨',up:(n,k)=>`${n}: рівень ${k}!`,lv:k=>`Рівень ${k}`,
+   eggNeed:k=>`Здобудь сьогодні 3 зірочки, і яйце трісне! (${k}/3)`,eggReady:'Яйце готове! Торкнися його тричі!',hatched:'На острів прийшов новий друг!',eggDone:'Завтра буде нове яйце!',friends:'Друзі'},
+ ru:{title:'Остров Пуфи',sub:'Собирай звёзды, и твой остров растёт!',b:{time:'Башня с часами',read:'Библиотека',math:'Башня чисел',world:'Маяк',shapes:'Пирамида фигур',robo:'Мастерская роботов',chess:'Шахматный замок',pufi:'Домик Пуфи'},
+   grow:c=>`Чтобы росло, играй: ${c}!`,max:'Готово! ✨',up:(n,k)=>`${n}: уровень ${k}!`,lv:k=>`Уровень ${k}`,
+   eggNeed:k=>`Получи сегодня 3 звезды, и яйцо треснет! (${k}/3)`,eggReady:'Яйцо готово! Нажми на него три раза!',hatched:'На остров пришёл новый друг!',eggDone:'Завтра будет новое яйцо!',friends:'Друзья'}};
+const T=()=>TX[lang]||TX.en;
+const HM=()=>{ try{ return window.__hmT?window.__hmT():{}; }catch(e){ return {}; } };
+const sayT=t=>{ try{ return typeof say==='function'?say(t):null; }catch(e){} };
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const KEYS=['pufi','time','read','math','shapes','robo','chess','world'];
+const TH=[3,12,30,60];
+const ANIMALS=['🐰','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐤','🦆','🦉','🐴','🦄','🐞','🦋','🐢','🦀','🐬','🐳','🐙','🦒','🐘','🦔','🐿️','🦩','🦜','🐑','🐐','🦌','🦦','🐶','🐱'];
+const SEA=['🐬','🐳','🐙'];
+const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+const curStars=()=>{ try{ return typeof stars!=='undefined'?(+stars||0):0; }catch(e){ return 0; } };
+/* ---- starea ---- */
+let pts=LS.get('isl_pts',null);
+if(!pts){ const t=curStars(), s=Math.min(12,Math.floor(t/8)); pts={}; KEYS.forEach(k=>pts[k]=s); LS.set('isl_pts',pts); }
+const reload=()=>{ pts=LS.get('isl_pts',pts)||pts; };
+const lvOf=k=>{ const p=(pts[k]||0)+(k==='pufi'?3:0); return TH.filter(t=>p>=t).length; };
+const ptsOf=k=>(pts[k]||0)+(k==='pufi'?3:0);
+const seen=()=>LS.get('isl_seen',{});
+const day=()=>{ let d=LS.get('isl_day',null); if(!d||d.d!==today()){ d={d:today(),n:0}; LS.set('isl_day',d); } return d; };
+const animals=()=>LS.get('isl_ani',[]);
+const eggState=()=>{ const ani=animals(), h=LS.get('isl_hatch',''); if(h===today()) return 'done'; if(!ani.length&&!h) return 'ready'; return day().n>=3?'ready':'wait'; };
+/* ---- cine a câștigat steaua? (cardul deschis) ---- */
+const ROOTS=[['sa','math'],['cg','chess'],['ch','chess'],['pq','pufi'],['pf','pufi'],['tm','time'],['rd','read'],['gm','shapes'],['rb','robo'],['mw','math']];
+function curCard(){ const hm=document.getElementById('hm-root'), ir=document.getElementById('isl-root');
+  for(const [id,k] of ROOTS){ const e=document.getElementById(id+'-root'); if(e&&!e.hidden&&getComputedStyle(e).display!=='none') return k; }
+  if(ir&&!ir.hidden) return null; if(hm&&!hm.hidden) return null;
+  try{ return (typeof game!=='undefined'&&game==='abacus')?'math':'world'; }catch(e){ return 'world'; } }
+let last=curStars();
+setInterval(()=>{ const s=curStars(); if(s>last){ const d=s-last, k=curCard(); const dd=day(); dd.n+=d; LS.set('isl_day',dd);
+    if(k){ const before=lvOf(k); pts[k]=(pts[k]||0)+d; LS.set('isl_pts',pts); const after=lvOf(k); if(after>before) toast('🏝️ '+T().up(T().b[k],after)); }
+    if(dd.n>=3&&dd.n-d<3&&eggState()==='ready') toast('🥚 '+T().eggReady); }
+  last=s; },1000);
+function toast(t){ const e=document.createElement('div'); e.className='isl-toast'; e.textContent=t; document.body.appendChild(e); setTimeout(()=>e.remove(),3200); }
+/* ---- ora reală: zi / noapte ---- */
+const hour=()=>{ if(window.__islHour!=null) return window.__islHour; const d=new Date(); return d.getHours()+d.getMinutes()/60; };
+function phase(h){ return (h<6.5||h>=20.5)?'night':h<8?'dawn':h>=18.5?'dusk':'day'; }
+const SKY={day:['#6EC6FF','#CDEBFF','#3BA7E5'],dawn:['#FFB38A','#FFE6B8','#5DB4E0'],dusk:['#FF8A65','#9575CD','#4F63B5'],night:['#0B1640','#2C3E80','#1C3D7A']};
+/* ---- clădiri (originea = mijlocul bazei) ---- */
+const INK='#24325f', FH=40;
+const win=(x,y,w,h,n)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${n?'#FFE07A':'#BFE6FF'}" stroke="${INK}" stroke-width="2.5"/>`;
+function floors(w,f,col,n){ let s=''; for(let i=0;i<f;i++){ const y=-(i+1)*FH; s+=`<rect x="${-w/2}" y="${y}" width="${w}" height="${FH}" fill="${col}" stroke="${INK}" stroke-width="3"/>`;
+  const nw=w>=100?3:w>=66?2:1, ww=16, gap=(w-nw*ww)/(nw+1); for(let j=0;j<nw;j++){ if(i===0&&nw%2===1&&j===(nw-1)/2) continue; s+=win(-w/2+gap+j*(ww+gap),y+10,ww,20,n); } }
+  return s+`<rect x="-10" y="-30" width="20" height="30" rx="8" fill="#A0663A" stroke="${INK}" stroke-width="2.5"/>`; }
+const tri=(w,top,col)=>`<polygon points="${-w/2-12},${top} ${w/2+12},${top} 0,${top-Math.max(34,w*.42)}" fill="${col}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+const flagAt=(x,y,col)=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-34}" stroke="${INK}" stroke-width="3"/><path class="flag" d="M${x} ${y-34} l24 7 l-24 7z" fill="${col}" stroke="${INK}" stroke-width="2"/>`;
+const sparkle=(y)=>`<text class="tw" x="-34" y="${y}" font-size="22">✨</text><text class="tw" x="16" y="${y-14}" font-size="18" style="animation-delay:-1s">✨</text>`;
+function site(){ return `<rect x="-36" y="-44" width="72" height="44" rx="6" fill="rgba(255,255,255,.35)" stroke="${INK}" stroke-width="2.5" stroke-dasharray="7 6"/><line x1="0" y1="0" x2="0" y2="-58" stroke="#A0663A" stroke-width="5"/><rect x="-22" y="-80" width="44" height="28" rx="6" fill="#FFD43B" stroke="${INK}" stroke-width="2.5"/><text x="0" y="-59" text-anchor="middle" font-size="20">🚧</text>`; }
+const BUILD={
+ time:(l,n)=>{ const f=Math.min(l,3), w=72, top=-f*FH-64; let s=floors(w,f,'#FFE3A3',n);
+   s+=`<rect x="${-w/2}" y="${top}" width="${w}" height="64" fill="#FFD27A" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="${top+32}" r="25" fill="#fff" stroke="${INK}" stroke-width="3"/>`;
+   for(let i=0;i<12;i++){ const a=i*Math.PI/6; s+=`<circle cx="${(Math.sin(a)*19).toFixed(1)}" cy="${(top+32-Math.cos(a)*19).toFixed(1)}" r="${i%3?1.6:2.6}" fill="${INK}"/>`; }
+   s+=`<g transform="translate(0 ${top+32})"><line class="isl-hh" x1="0" y1="0" x2="0" y2="-12" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><line class="isl-mh" x1="0" y1="0" x2="0" y2="-19" stroke="#E8505B" stroke-width="3" stroke-linecap="round"/></g>`;
+   s+=tri(w,top,'#E8505B'); if(l>=4) s+=flagAt(0,top-30,'#FFD43B')+sparkle(top-50); return s; },
+ read:(l,n)=>{ const f=Math.min(l,2), w=124, top=-f*FH; let s=floors(w,f,'#FFD9E2',n);
+   if(l>=3){ for(const x of [-50,-26,26,50]) s+=`<rect x="${x-4}" y="-38" width="8" height="38" fill="#fff" stroke="${INK}" stroke-width="2"/>`; }
+   s+=tri(w,top,'#5B7FDE')+`<text x="0" y="${top-10}" text-anchor="middle" font-size="24">📖</text>`; if(l>=3) s+=`<text class="hop" x="${w/2-6}" y="-2" font-size="24">📚</text>`; if(l>=4) s+=flagAt(0,top-52,'#E8505B')+sparkle(top-70); return s; },
+ math:(l,n)=>{ const c=[0,2,4,6,7][l], C=['#FF6B6B','#FFD43B','#3ECF8E','#4AA8FF','#B07CFF','#FF9F43','#FF6BB5']; let s='';
+   for(let i=0;i<c;i++){ const x=(i%2?6:-6)-20, y=-(i+1)*40; s+=`<g ${i===c-1?'class="hop"':''}><rect x="${x}" y="${y}" width="40" height="40" rx="6" fill="${C[i]}" stroke="${INK}" stroke-width="3"/><text x="${x+20}" y="${y+29}" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" stroke="${INK}" stroke-width="1">${i+1}</text></g>`; }
+   if(l>=4) s+=sparkle(-c*40-14); return s; },
+ world:(l,n)=>{ const h=[0,80,125,170,170][l], top=-h; let s=`<polygon points="-30,0 30,0 18,${top} -18,${top}" fill="#fff" stroke="${INK}" stroke-width="3"/>`;
+   for(let y=-20;y>top+10;y-=40){ const t=-y/h, t2=(-y+20)/h, w1=30-12*t, w2=30-12*t2; s+=`<polygon points="${-w1},${y} ${w1},${y} ${w2},${y-20} ${-w2},${y-20}" fill="#E8505B"/>`; }
+   s+=`<polygon points="-30,0 30,0 18,${top} -18,${top}" fill="none" stroke="${INK}" stroke-width="3"/>`;
+   s+=`<rect x="-20" y="${top-30}" width="40" height="30" rx="4" fill="${n?'#FFE07A':'#FFF3B0'}" stroke="${INK}" stroke-width="3"/><path d="M-24 ${top-30} Q0 ${top-56} 24 ${top-30}z" fill="#E8505B" stroke="${INK}" stroke-width="3"/>`;
+   s+=`<g transform="translate(0 ${top-15})"><polygon class="beam" points="0,0 160,-26 160,26" fill="#FFF3B0" opacity="${n?.75:.35}"/></g>`;
+   if(l>=4) s+=sparkle(top-60); return s; },
+ shapes:(l,n)=>{ let s=`<rect x="-44" y="-70" width="88" height="70" rx="6" fill="#FFB347" stroke="${INK}" stroke-width="3"/>`+win(-10,-56,20,22,n);
+   if(l>=2) s+=`<g class="spin"><circle cx="0" cy="-104" r="34" fill="#3ECF8E" stroke="${INK}" stroke-width="3"/><path d="M0 -138 V-70 M-34 -104 H34" stroke="${INK}" stroke-width="2.5"/></g>`;
+   if(l>=3) s+=`<polygon points="-32,${l>=2?-138:-70} 32,${l>=2?-138:-70} 0,${l>=2?-190:-122}" fill="#4AA8FF" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+   if(l>=4) s+=`<text class="spin" x="0" y="-198" text-anchor="middle" font-size="30">⭐</text>`+sparkle(-210); return s; },
+ robo:(l,n)=>{ const f=Math.min(l,2), w=116, top=-f*FH; let s=floors(w,f,'#D9E4FF',n);
+   s+=`<rect x="${-w/2}" y="${top-12}" width="${w}" height="12" fill="#8FA3D9" stroke="${INK}" stroke-width="3"/>`;
+   const g=(cx,cy,r,col,rev)=>{ let p=''; for(let i=0;i<8;i++){ const a=i*Math.PI/4; p+=`<rect x="${(cx+Math.cos(a)*r-5).toFixed(1)}" y="${(cy+Math.sin(a)*r-5).toFixed(1)}" width="10" height="10" fill="${col}" stroke="${INK}" stroke-width="2" transform="rotate(${i*45} ${(cx+Math.cos(a)*r).toFixed(1)} ${(cy+Math.sin(a)*r).toFixed(1)})"/>`; }
+     return `<g class="spin" ${rev?'style="animation-direction:reverse"':''}>${p}<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" stroke="${INK}" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="${r/3}" fill="#fff" stroke="${INK}" stroke-width="2"/></g>`; };
+   s+=g(w/2,top-6,20,'#FFD43B'); if(l>=2) s+=g(w/2-30,top-22,13,'#FF9F43',1);
+   if(l>=2) s+=`<rect x="-40" y="${top-46}" width="16" height="34" fill="#8FA3D9" stroke="${INK}" stroke-width="3"/><circle class="smoke" cx="-32" cy="${top-54}" r="9" fill="#fff" opacity=".8"/><circle class="smoke" cx="-32" cy="${top-54}" r="8" fill="#fff" style="animation-delay:-1.5s"/>`;
+   if(l>=3) s+=`<text class="hop" x="-54" y="-2" font-size="30">🤖</text>`; if(l>=4) s+=sparkle(top-70); return s; },
+ chess:(l,n)=>{ const f=Math.min(l,3), w=78, top=-f*FH; const cren=(x,y,w)=>{ let p=''; for(let i=0;i<4;i++) if(i%2===0) p+=`<rect x="${x+i*w/4}" y="${y-12}" width="${w/4}" height="12" fill="#E6E9F2" stroke="${INK}" stroke-width="2.5"/>`; return p+`<rect x="${x+3*w/4}" y="${y-12}" width="${w/4}" height="12" fill="#E6E9F2" stroke="${INK}" stroke-width="2.5"/>`; };
+   let s=''; if(l>=2){ for(const sx of [-1,1]){ const tx=sx*(w/2+16), th=f*FH-14; s+=`<rect x="${tx-16}" y="${-th}" width="32" height="${th}" fill="#D3D8E6" stroke="${INK}" stroke-width="3"/>`+cren(tx-16,-th,32)+win(tx-6,-th+14,12,18,n); } }
+   s+=floors(w,f,'#E6E9F2',n)+cren(-w/2,top,w)+flagAt(0,top-12,'#B07CFF'); if(l>=3) s+=`<text x="0" y="${top+30}" text-anchor="middle" font-size="22">♞</text>`; if(l>=4) s+=sparkle(top-60); return s; },
+ pufi:(l,n)=>{ const f=l>=3?2:1, w=112, top=-f*FH; let s=`<rect x="20" y="${top-56}" width="18" height="40" fill="#C0603A" stroke="${INK}" stroke-width="3"/><circle class="smoke" cx="29" cy="${top-62}" r="9" fill="#fff"/><circle class="smoke" cx="29" cy="${top-62}" r="8" fill="#fff" style="animation-delay:-1.5s"/>`;
+   s+=floors(w,f,'#FFE0C7',n)+tri(w,top,'#C0603A');
+   if(l>=2){ for(let x=-w/2-30;x<=-w/2-6;x+=8) s+=`<rect x="${x}" y="-18" width="5" height="18" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`; s+=`<text x="${w/2+2}" y="-2" font-size="20">🌷</text><text x="${w/2+20}" y="-2" font-size="18">🌻</text>`; }
+   if(l>=4) s+=flagAt(-w/2+10,top,'#FFD43B')+sparkle(top-60); return s; }};
+const POS={time:[300,386],chess:[455,382],math:[610,386],shapes:[760,394],read:[215,470],pufi:[372,478],robo:[528,476],world:[935,540]};
+const ORDER=['time','chess','math','shapes','read','pufi','robo','world'];
+/* ---- scena ---- */
+function scene(o){ o=o||{}; const h=hour(), ph=phase(h), n=ph==='night', [s1,s2,sea]=SKY[ph]; const sw=seen();
+  let s=`<svg class="isl-svg" viewBox="${o.vb||'0 0 1000 640'}" preserveAspectRatio="${o.slice?'xMidYMid slice':'xMidYMid meet'}" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="islSky${o.id||''}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient></defs>
+  <rect x="-500" y="-200" width="2000" height="560" fill="url(#islSky${o.id||''})"/>`;
+  if(n){ for(let i=0;i<26;i++){ const x=(i*137)%1000, y=20+(i*71)%230; s+=`<circle class="tw" cx="${x}" cy="${y}" r="${i%3?1.6:2.6}" fill="#fff" style="animation-delay:${-(i%7)*.4}s"/>`; }
+    s+=`<g transform="translate(840 90)"><circle r="34" fill="#FFF6C8"/><circle cx="14" cy="-8" r="30" fill="${s1}"/></g>`; }
+  else { const t=Math.max(0,Math.min(1,(h-6)/14)), x=80+t*840, y=210-Math.sin(t*Math.PI)*160;
+    s+=`<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)})"><g class="spin" style="animation-duration:20s">${[0,45,90,135,180,225,270,315].map(a=>`<rect x="-4" y="-62" width="8" height="18" rx="4" fill="#FFC83D" transform="rotate(${a})"/>`).join('')}</g><circle r="38" fill="#FFD43B" stroke="#FFB020" stroke-width="4"/></g>`; }
+  const cloud=(y,sc,cls)=>`<g class="${cls}"><g transform="translate(0 ${y}) scale(${sc})" opacity="${n?.35:.95}"><ellipse cx="0" cy="0" rx="48" ry="22" fill="#fff"/><ellipse cx="34" cy="-12" rx="34" ry="24" fill="#fff"/><ellipse cx="-30" cy="-6" rx="26" ry="18" fill="#fff"/></g></g>`;
+  s+=cloud(90,1,'cl')+cloud(160,.7,'cl2');
+  s+=`<rect x="-500" y="320" width="2000" height="400" fill="${sea}"/>`;
+  s+=`<g class="boat"><g transform="translate(0 338)"><g class="bob"><path d="M-30 0 H30 L20 14 H-20z" fill="#C0603A" stroke="${INK}" stroke-width="2.5"/><line x1="0" y1="0" x2="0" y2="-40" stroke="${INK}" stroke-width="2.5"/><path d="M2 -38 L26 -6 H2z" fill="#fff" stroke="${INK}" stroke-width="2"/></g></g></g>`;
+  const waves=(y,cls,op)=>{ let d=`M-200 ${y}`; for(let x=-200;x<1300;x+=40) d+=` q20 -10 40 0`; return `<path class="${cls}" d="${d}" fill="none" stroke="#fff" stroke-width="3" opacity="${op}" stroke-linecap="round"/>`; };
+  s+=waves(372,'wave',.5)+waves(600,'wave2',.55)+waves(626,'wave',.4);
+  s+=`<ellipse cx="500" cy="452" rx="440" ry="122" fill="#F4D58D" stroke="#E2B865" stroke-width="4"/><ellipse cx="500" cy="424" rx="392" ry="88" fill="${n?'#4E9A62':'#7BD389'}"/>`;
+  s+=`<path d="M890 560 Q900 500 950 505 Q1000 510 1000 560z" fill="#9AA5B8" stroke="${INK}" stroke-width="3"/>`;
+  const palm=(x,y,sc)=>`<g transform="translate(${x} ${y}) scale(${sc})"><g class="palm"><path d="M0 0 Q-6 -50 6 -100" stroke="#A0663A" stroke-width="12" fill="none" stroke-linecap="round"/>${[-150,-110,-60,-20,20].map(a=>`<path d="M6 -100 q30 -20 60 6" stroke="#3ECF8E" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(${a+90} 6 -100)"/>`).join('')}</g></g>`;
+  s+=palm(110,470,.9)+palm(860,440,.8);
+  ORDER.forEach(k=>{ const l=lvOf(k), [x,y]=POS[k], anim=o.grow&&o.grow.includes(k);
+    s+=`<g class="isl-b" data-b="${k}" transform="translate(${x} ${y})"><rect x="-70" y="-230" width="140" height="240" fill="transparent"/><g class="${anim?'grow':''}">${l?BUILD[k](l,n):site()}</g></g>`; });
+  const es=eggState();
+  if(es!=='done'&&!o.noEgg) s+=`<g class="isl-egg" transform="translate(700 552)"><g class="egg ${es==='ready'?'rdy':''}"><ellipse cx="0" cy="-24" rx="20" ry="25" fill="#FFF7E6" stroke="${INK}" stroke-width="3"/><circle cx="-7" cy="-30" r="4" fill="#FF6BB5"/><circle cx="8" cy="-18" r="5" fill="#4AA8FF"/><circle cx="6" cy="-36" r="3" fill="#3ECF8E"/></g>${es==='wait'?[0,1,2].map(i=>`<circle cx="${-14+i*14}" cy="12" r="5" fill="${i<day().n?'#FFD43B':'#fff'}" stroke="${INK}" stroke-width="2"/>`).join(''):''}</g>`;
+  s+=`<g id="isl-ani${o.id||''}"></g></svg>`; return s; }
+/* animalele și Pufi se plimbă pe plajă */
+let walkers=[], walkT=0;
+function placeAnimals(svg,id,still){ const g=svg.querySelector('#isl-ani'+(id||'')); if(!g) return; const n=phase(hour())==='night'; g.innerHTML='';
+  const list=['🦊'].concat(animals().slice(-14)); const out=[];
+  list.forEach((e,i)=>{ const sea=SEA.includes(e); const x=sea?60+Math.random()*120+(i%2)*760:200+Math.random()*560, y=sea?612:520+((i*17)%34);
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g'); el.setAttribute('class','an'); el.style.transform=`translate(${x}px,${y}px)`;
+    el.innerHTML=`<g><text x="0" y="0" text-anchor="middle" font-size="${e==='🦊'?40:32}">${e}</text>${n&&!sea?'<text class="tw" x="18" y="-26" font-size="16">💤</text>':''}</g>`; g.appendChild(el); out.push({el,x,y,sea}); });
+  if(!still&&!n) walkers=out; }
+function walk(){ walkers.forEach(w=>{ if(Math.random()<.35) return; const nx=w.sea?Math.max(30,Math.min(970,w.x+(Math.random()-.5)*220)):Math.max(180,Math.min(800,w.x+(Math.random()-.5)*200)); const f=nx<w.x?-1:1; w.x=nx;
+  w.el.style.transform=`translate(${nx}px,${w.y}px)`; const inner=w.el.firstChild; if(inner) inner.style.transform=`scaleX(${-f})`; }); }
+function clockHands(root){ const d=new Date(), hh=(d.getHours()%12+d.getMinutes()/60)*30, mm=d.getMinutes()*6;
+  root.querySelectorAll('.isl-hh').forEach(e=>e.setAttribute('transform',`rotate(${hh})`)); root.querySelectorAll('.isl-mh').forEach(e=>e.setAttribute('transform',`rotate(${mm})`)); }
+/* ---- banner pe ecranul de start ---- */
+function pending(){ const sw=seen(); return KEYS.some(k=>lvOf(k)>(sw[k]||0)); }
+function banner(){ reload(); const hm=document.getElementById('hm-root'); if(!hm) return; let b=document.getElementById('isl-ban');
+  if(!b){ b=document.createElement('button'); b.id='isl-ban'; b.className='isl-ban'; b.onclick=openIsland; hm.insertBefore(b,document.getElementById('hm-grid')); }
+  const es=eggState(), pd=pending();
+  b.innerHTML=scene({slice:1,id:'b',vb:'0 170 1000 450'})+`<div class="cap"><b>🏝️ ${T().title}</b><span>${T().sub}</span></div>`+
+    `<div class="bdg ${es==='ready'||pd?'hot':''}">${pd?'🏗️ !':es==='ready'?'🥚 !':es==='wait'?'🥚 '+day().n+'/3':'🐾 '+animals().length}</div>`;
+  b.style.background=SKY[phase(hour())][2]; const sv=b.querySelector('svg'); placeAnimals(sv,'b',true); clockHands(sv); }
+new MutationObserver(()=>{ const hm=document.getElementById('hm-root'); if(hm&&!hm.hidden) banner(); }).observe(document.getElementById('hm-root')||document.body,{attributes:true,attributeFilter:['hidden']});
+/* ---- ecranul insulei ---- */
+const root=document.createElement('div'); root.id='isl-root'; root.hidden=true;
+root.innerHTML=`<div class="rb-top"><button class="ch-btn" id="isl-back"></button><h2 id="isl-title"></h2><div class="ch-pill" id="isl-fr"></div><div class="ch-pill" id="isl-stars">⭐ 0</div></div><div id="isl-stage"></div>
+<div id="isl-pop" hidden></div>`;
+document.body.appendChild(root);
+const $=id=>document.getElementById('isl-'+id);
+let tick=null;
+function texts(){ $('back').textContent=HM().home||'🏠'; $('title').textContent='🏝️ '+T().title; $('fr').textContent='🐾 '+animals().length; $('stars').textContent='⭐ '+curStars(); }
+function draw(grow){ const st=$('stage'); const por=st.clientWidth/Math.max(1,st.clientHeight)<1.3; st.innerHTML=scene({grow,vb:por?'40 150 960 490':st.clientHeight<520?'70 140 880 470':null}); st.classList.toggle('por',por); root.style.background=SKY[phase(hour())][2]; const sv=st.querySelector('svg');
+  placeAnimals(sv,'',false); clockHands(sv);
+  if(por){ sv.style.width=Math.round(st.clientHeight*960/490)+'px'; sv.style.height=st.clientHeight+'px'; st.scrollLeft=(sv.clientWidth-st.clientWidth)/2; }
+  sv.querySelectorAll('.isl-b').forEach(e=>e.onclick=ev=>{ ev.stopPropagation(); building(e.dataset.b); });
+  const eg=sv.querySelector('.isl-egg'); if(eg) eg.onclick=ev=>{ ev.stopPropagation(); eggTap(eg); };
+  sv.onclick=()=>{ $('pop').hidden=true; }; }
+function pop(html){ const p=$('pop'); p.innerHTML=html; p.hidden=false; return p; }
+function building(k){ const l=lvOf(k), p=ptsOf(k), nx=TH[l], pv=l?TH[l-1]:0, name=T().b[k], card=HM()[k]||k;
+  const msg=l>=4?T().max:T().grow(card);
+  const el=pop(`<h3>${name}</h3><p>${l?T().lv(l)+' · ':''}⭐ ${p}${nx?' / '+nx:''}</p>${nx?`<div class="bar"><i style="width:${Math.round(Math.min(1,(p-pv)/(nx-pv))*100)}%"></i></div>`:''}<p>${msg}</p><div class="row"><button class="rb-b" data-a="s">🔊</button><button class="rb-b go" data-a="p">▶ ${card}</button></div>`);
+  el.querySelector('[data-a=s]').onclick=()=>sayT(name+'. '+msg); el.querySelector('[data-a=p]').onclick=()=>{ close(); setTimeout(()=>{ try{ window.__hmOpen&&window.__hmOpen(k); }catch(e){} },30); };
+  sayT(name+'. '+msg); }
+let taps=0;
+function eggTap(eg){ const es=eggState(); if(es==='wait'){ const m=T().eggNeed(day().n); const el=pop(`<h3>🥚</h3><p>${m}</p><div class="row"><button class="rb-b" data-a="s">🔊</button></div>`); el.querySelector('[data-a=s]').onclick=()=>sayT(m); sayT(m); return; }
+  if(es!=='ready') return; taps++; $('pop').hidden=true; const g=eg.querySelector('.egg');
+  if(taps<3){ g.classList.remove('rdy'); void g.getBoundingClientRect(); g.classList.add('rdy');
+    const crack=document.createElementNS('http://www.w3.org/2000/svg','path'); crack.setAttribute('d',taps===1?'M-12 -26 l6 5 l5 -6 l6 6':'M-16 -16 l8 4 l6 -7 l7 6 l8 -4'); crack.setAttribute('stroke',INK); crack.setAttribute('stroke-width','2.5'); crack.setAttribute('fill','none'); g.appendChild(crack);
+    try{ beep&&beep(true); }catch(e){} return; }
+  taps=0; const have=animals(); let pool=ANIMALS.filter(a=>!have.includes(a)); if(!pool.length) pool=ANIMALS; const a=pool[Math.floor(Math.random()*pool.length)];
+  have.push(a); LS.set('isl_ani',have); LS.set('isl_hatch',today());
+  const svg=eg.ownerSVGElement; eg.innerHTML=`<text x="0" y="0" text-anchor="middle" font-size="64" class="grow">${a}</text>`+burst(0,-30); try{ confetti&&confetti(24); }catch(e){} try{ beep&&beep(true); }catch(e){}
+  const el=pop(`<h3 style="font-size:3rem;line-height:1">${a}</h3><p>${T().hatched}</p><p style="opacity:.75">${T().eggDone}</p><div class="row"><button class="rb-b" data-a="s">🔊</button></div>`); el.querySelector('[data-a=s]').onclick=()=>sayT(T().hatched+' '+T().eggDone);
+  sayT(T().hatched); texts(); setTimeout(()=>{ if(!root.hidden){ eg.remove(); placeAnimals(svg,'',false); } },2600); }
+function burst(x,y){ let s=''; const E=['⭐','✨','🌟','💛']; for(let i=0;i<10;i++){ const a=i/10*Math.PI*2; s+=`<text class="pf" x="${x}" y="${y}" text-anchor="middle" font-size="22" style="--dx:${(Math.cos(a)*90).toFixed(0)}px;--dy:${(Math.sin(a)*80-30).toFixed(0)}px">${E[i%4]}</text>`; } return s; }
+function openIsland(){ try{ if(typeof ensureStart==='function') ensureStart(); }catch(e){} try{ const s=document.getElementById('start'); if(s&&typeof started!=='undefined'&&!started){ started=true; s.hidden=true; } }catch(e){}
+  reload(); root.hidden=false; texts(); $('pop').hidden=true; taps=0;
+  const sw=seen(), grow=KEYS.filter(k=>lvOf(k)>(sw[k]||0)); draw(grow);
+  const ns={}; KEYS.forEach(k=>ns[k]=lvOf(k)); LS.set('isl_seen',ns);
+  if(grow.length){ const sv=$('stage').querySelector('svg'); grow.forEach(k=>{ const g=sv.querySelector(`[data-b="${k}"]`); if(g) g.insertAdjacentHTML('beforeend',burst(0,-60)); }); try{ confetti&&confetti(20); }catch(e){}
+    sayT(grow.length===1?T().up(T().b[grow[0]],lvOf(grow[0])):T().title+'! '+T().sub); }
+  else if(eggState()==='ready') sayT(T().eggReady); else sayT(T().title+'. '+T().sub);
+  clearInterval(tick); tick=setInterval(()=>{ if(root.hidden) return; walk(); if(++walkT%8===0) clockHands(root); $('stars').textContent='⭐ '+curStars(); },2700); setTimeout(walk,400); }
+function close(){ root.hidden=true; clearInterval(tick); walkers=[]; try{ speechSynthesis.cancel(); }catch(e){} banner(); }
+$('back').onclick=close;
+window.openIsland=openIsland; window.__islBanner=banner;
+(window.__LR=window.__LR||[]).push(()=>{ banner(); if(!root.hidden){ texts(); } });
+setTimeout(banner,0);
+})();
+</script>
 <script>
 /* Italiano — nomi dei pesci */
 (()=>{ const lg='it', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
@@ -10347,7 +10629,7 @@ function picker(){
   ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; document.body.appendChild(ov);
 }
 window.__switchLang=switchLang; window.__langPicker=picker;
-const IDS=['stars','ch-stars','rd-stars','sa-stars','cg-stars','gm-stars','mw-stars','rb-stars','tm-stars'];
+const IDS=['stars','ch-stars','rd-stars','sa-stars','cg-stars','gm-stars','mw-stars','rb-stars','tm-stars','isl-stars'];
 function add(){ IDS.forEach(id=>document.querySelectorAll('[id="'+id+'"]').forEach(p=>{ const host=id==='stars'?p.parentElement:p; if(host.parentElement&&host.parentElement.classList.contains('lp-grp')) return;
   const g=document.createElement('span'); g.className='lp-grp'; host.parentElement.insertBefore(g,host);
   const b=document.createElement('span'); b.className='lp-mini'; b.setAttribute('role','button'); b.tabIndex=0; b.onclick=e=>{ e.stopPropagation(); picker(); };
