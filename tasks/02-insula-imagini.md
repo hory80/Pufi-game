@@ -49,7 +49,7 @@ Dacă nu ai deloc acces la generare de imagini, oprește-te și spune-i lui Hory
 
 ## Lista imaginilor
 
-Etapa 1 = imaginile 1–21 (obligatorii). Etapa 2 = animalele 22–33 (fă-le după etapa 1, în același PR dacă ai timp).
+Etapa 1 = imaginile 1–18 (obligatorii). Etapa 2 = animalele 19–30 (fă-le după etapa 1, în același PR dacă ai timp).
 
 ## Etapa 1 — fundalul (generează-le primele)
 
