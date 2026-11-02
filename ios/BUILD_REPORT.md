@@ -2,13 +2,10 @@
 
 Date: 2026-11-02. Branch: `ios-build`; base: `main`.
 
-**Status: draft PR; upstream web regression blocks acceptance after rebase.**
-The native app builds. Before rebase, all 14 simulator tests passed. The required
-pull from `main` brought in `4b298eb` (base now `a288e58`), which removed the
-HTML document scaffold, UTF-8 charset and mobile viewport metadata. The bundled
-game now displays corrupted Unicode and does not initialize `__parentsGate`;
-bridge integration tests time out. Restore the web document metadata before
-merging and repeat both simulator suites. Per the task, `index.html` was not edited.
+**Status: simulator verification passed; ready for review.**
+Rebased `ios-build` onto `main` at `5d7fd89`, including the restored HTML
+scaffold/UTF-8 metadata (`1d1597d`) and the web fixes from findings 1–6
+(`5d7fd89`). No web files were edited on this branch.
 
 ## Changes, by file
 
@@ -17,7 +14,7 @@ merging and repeat both simulator suites. Per the task, `index.html` was not edi
 - `PufiStars/Services/RecognitionService.swift`: use the current Bluetooth option; clean up the engine/tap after startup failure or recognition completion; ignore callbacks from cancelled recognition sessions.
 - `PufiStars/Services/RecorderService.swift`: check recording/playback startup results, restore playback audio on recording failure, and resolve interrupted/failed playback callbacks so JS Promises do not remain pending.
 - `PufiStars/Web/Bridge.swift`: isolate bridge state on the main actor and stop competing recording/recognition before switching audio operations. Command names, arguments, Promise results and event names are unchanged.
-- `PufiStars/Web/GameWebView.swift`: install a WebKit rule blocking HTTP(S) resources before loading the bundled game, including its external Google Fonts stylesheet. External navigation remains blocked. This does not block native StoreKit/RevenueCat or Apple speech services.
+- `PufiStars/Web/GameWebView.swift`: install a WebKit rule blocking HTTP(S) resources before loading the bundled game, including any external stylesheets. External navigation remains blocked. This does not block native StoreKit/RevenueCat or Apple speech services.
 - `PufiStars/UI/ParentalGateView.swift`: always provide four positive answer choices.
 - `project.yml`: add hosted bridge integration and UI test targets to the reproducible XcodeGen scheme.
 - `PufiStarsTests/BridgeTests.swift`: report document encoding and helper availability on initialization timeout; exercise the real bundled game and WKWebView bridge: language/voice selection, native speech word events, Debug IAP, backup storage, gate resolution, blocked external navigation and absent recording playback.
@@ -48,32 +45,29 @@ xcodebuild -project PufiStars.xcodeproj -scheme PufiStars \
   -parallel-testing-enabled NO -collect-test-diagnostics never test
 ```
 
-## Results before and after the required rebase
+## Verification on repaired main `5d7fd89`
 
-On the original web baseline `55683ef`, both complete simulator suites passed:
-**7/7 tests on iPad (A16)** and **7/7 tests on iPhone 17 Pro**, with zero failures.
-The app built for both. Result bundles (local, not committed):
+Both complete simulator suites passed against web baseline `5d7fd89`, copied
+into the app by `sync_web.sh`:
 
-- `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_12-59-38-+0100.xcresult`
-- `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_13-01-01-+0100.xcresult`
+| Simulator | Result |
+| --- | --- |
+| iPad (A16), iOS 26.5 | PASS — 7 tests, zero failures. |
+| iPhone 17 Pro, iOS 26.5 | PASS — 7 tests, zero failures. |
 
-Earlier baseline test failures were corrected accessibility queries (switches
-versus buttons, scrolling to offscreen controls, and Apple's permission text
-prefix), plus the Documents-folder signing metadata issue. Full-screen captures
-avoid an XCTest app-screenshot rotation artifact.
+Both runs completed with `TEST SUCCEEDED` and built/ran the app. Existing tests
+and assertions are unchanged. The UTF-8/initialization blocker is resolved;
+there are no remaining simulator-suite failures blocking review. Layout
+screenshots confirm readable text and emoji with the embedded local font.
 
-After `git pull --rebase origin main`, web baseline `a288e58` fails game/bridge
-initialization checks. The iPad screenshot confirms corrupted emoji/diacritics;
-this is a real upstream failure, not an assertion to suppress. Final rebase
-verification: the iPad test build succeeds, but **0/7 tests pass** (all four
-hosted tests fail the game-integration setup; all three UI tests fail on the
-corrupted/missing controls). An iPhone diagnostic test also fails the same
-initialization check. Its captured diagnostic is `charset: windows-1252`,
-`native: object`, `gate: undefined`: the native shim exists, but the web
-integration helpers do not. Both final simulator app builds succeed. The draft is
-blocked on the upstream fix, rather than weakening tests or changing web files.
+Result bundles (local, not committed):
 
-## Checklist on original web baseline `55683ef`
+- `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_13-20-00-+0100.xcresult`
+- `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_13-21-29-+0100.xcresult`
+
+Physical-device and purchase checks below remain outside simulator coverage.
+
+## Simulator checklist
 
 | Check | Result and scope |
 | --- | --- |
@@ -82,8 +76,8 @@ blocked on the upstream fix, rather than weakening tests or changing web files.
 | Offline bundled game | PASS: file-based page loads with remote HTTP(S) web resources blocked; host networking was not switched off. |
 | iPad portrait/landscape and iPhone | PASS: the game fills the screen in both orientations; iPhone menus scroll to lower cards. Full-screen screenshots reviewed; app-only XCTest screenshots during rotation were misleading. |
 | Language switch and native voice | PASS: UI switch to English, German `voiceInfo` returns a named German voice, real native speech emits word events. Enhanced/Premium installed-voice quality needs a device. |
-| Stories → microphone and permission text | PASS: story read-aloud opens on both simulators. Fresh microphone prompt text verified; the fresh iPhone speech prompt contains the exact project explanation after Apple’s standard disclosure. |
-| Words turn green from live reading | NOT TESTABLE in this run: iPad recognition reported unavailable; iPhone entered Listening, but no child speech or fabricated recognition events were supplied. |
+| Stories → microphone and permission text | PASS in the original run: story read-aloud opens; fresh microphone and speech permission explanations were verified. Permissions remain granted for these reruns, so fresh prompts are not re-tested. |
+| Words turn green from live reading | NOT TESTED for live accuracy: no child speech or fabricated recognition events were supplied. Verify green-word tracking on a physical device. |
 | Parental gate | PASS: cancel does not open Parents; correct multiplication opens it. |
 | Praise record/play/delete | PASS on both simulators through the actual Parents UI. Audio fidelity requires a physical device. |
 | Recorded praise after a correct answer | NOT TESTED end-to-end: playback works, but the web success hook is randomized (45%, with a 15-second cooldown). Verify an audible success on device. |
@@ -94,31 +88,31 @@ blocked on the upstream fix, rather than weakening tests or changing web files.
 | External links/resources | PASS for blocked HTTPS navigation; all HTTP(S) WebKit subresources are blocked by the installed content rule. |
 | Physical-device signing | NOT TESTED: Hory must choose his Apple Developer Team in Signing & Capabilities before a device build. |
 
-## Web-game changes to hand to the web maintainer
+## Upstream web fixes reviewed
 
-`index.html` was left unchanged.
+The previous blocking HTML/UTF-8 regression is fixed by `1d1597d`. Commit
+`5d7fd89` also addresses the first six report findings:
 
-**Blocking after rebase — document start (`index.html:1`):** restore
-`<!doctype html>`, `<html lang="ro">`, `<head>`, `<meta charset="utf-8">`, and
-`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`,
-with the corresponding head/body document structure. Commit `4b298eb` removed
-the original scaffold. Without the charset, Unicode is visibly corrupted and
-the native integration script does not initialize; without the viewport, mobile
-layout is also at risk. This must be corrected by the web maintainer, then synced
-and retested. The findings below are additional source-inspection follow-ups.
+1. Browser speech cancellation now calls native `stopSpeak` too.
+2. Karaoke offsets use the transformed spoken text.
+3. Cancelled karaoke no longer marks remaining words as read.
+4. Parent recording controls stop/refresh after the native duration limit or panel removal, and confirm the slot exists.
+5. Backup restoration merges missing keys; saving avoids empty snapshots and runs after localStorage writes, on hiding and on page exit.
+6. Baloo 2 is embedded as a local data font; the remote Google Fonts request is removed.
 
-1. `openCard`, `openStory`, reading Back handlers and other navigation paths call browser `speechSynthesis.cancel()`. Native `AVSpeechSynthesizer` speech is separate and can continue after navigation. Route cancellation through `native.call('stopSpeak')` as well when the bridge exists.
-2. `window.__nativeKaraoke` calculates word offsets against the original text, then sends text transformed by `fixSpeech` and the language-specific Pufi replacement. A length-changing replacement shifts later native UTF-16 word offsets. Derive offsets from exactly the spoken text, or preserve a mapping back to displayed words.
-3. `window.__nativeKaraoke` marks every word as read when `speak` resolves, even when native returns `false` for cancellation. Check the completion value and cancellation token before marking the remainder read.
-4. `window.__parentsExtra`: native recordings stop after 12 seconds, but the web button remains in the recording state until tapped. Add a matching UI timeout, refresh the actual recording list, and show success only if the slot exists. Closing Parents should call `rec.stop`.
-5. `snap()` / `store.get` restore block: `localStorage.length < 2` is a heuristic, not a check for missing game progress. A partially populated store can prevent recovery; one-key snapshots are never restored. Validate known progress keys, merge only missing values, and avoid overwriting a valid backup with an empty snapshot. A force-kill before the 20-second timer can also leave the native backup behind localStorage; save on meaningful progress changes.
-6. The document `<head>` loads Google Fonts over HTTPS. The iOS wrapper now blocks it and uses fallback fonts. Bundle a licensed local font if the exact web typography is required offline.
-7. `window.__premium` is only referenced by the purchase-panel display; no game-content access checks use it. Define which content the non-consumable should unlock before implementing a paywall.
+These fixes were reviewed in source. The simulator suites exercise the overall
+native/web flows; they do not separately prove every corrected edge case,
+including karaoke offset accuracy, automatic 12-second recording stop and
+storage-eviction recovery.
+
+Remaining product decision: `window.__premium` still controls only purchase-panel
+messaging. Define which game content `unlock_all` should unlock before adding a
+paywall. This is independent of the resolved encoding blocker and Debug IAP tests.
 
 ## Open questions for Hory
 
 - Select your Apple Developer Team before a real-device build; provide the intended 1024px app icon (the current catalog has no image).
 - Configure the RevenueCat public iOS key and the current offering containing `unlock_all`; verify App Store sandbox buy/restore before release.
 - Should Romanian recognition fall back to Apple's servers when on-device recognition is unavailable, as currently implemented? Confirm the intended privacy disclosure and behavior.
-- Confirm the content that should be premium, and assign the web-side corrections above to the web maintainer.
+- Confirm the content that should be premium.
 - Complete a device acceptance pass for live green-word recognition, audio quality, audible praise after success, all progress types, and real purchases. Simulator passes do not replace those checks.
