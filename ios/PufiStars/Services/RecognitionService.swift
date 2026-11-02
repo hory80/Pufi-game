@@ -3,10 +3,13 @@ import Speech
 
 /// Ascultă copilul cât citește și trimite textul recunoscut către joc (karaoke „Citesc cu voce”).
 /// Înregistrează în paralel citirea, ca s-o poată asculta la final.
+@MainActor
 final class RecognitionService {
     private let engine = AVAudioEngine()
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
+    private var hasTap = false
+    private var sessionID = UUID()
 
     var lastURL: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("lastReading.caf")
@@ -39,7 +42,7 @@ final class RecognitionService {
             throw NSError(domain: "asr", code: 1)
         }
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
         try session.setActive(true, options: .notifyOthersOnDeactivation)
 
         let req = SFSpeechAudioBufferRecognitionRequest()
@@ -54,26 +57,39 @@ final class RecognitionService {
         let format = input.outputFormat(forBus: 0)
         try? FileManager.default.removeItem(at: lastURL)
         let file = try? AVAudioFile(forWriting: lastURL, settings: format.settings)
-        input.removeTap(onBus: 0)
         input.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in
             req.append(buffer)
             try? file?.write(from: buffer)
         }
+        hasTap = true
         engine.prepare()
-        try engine.start()
+        do {
+            try engine.start()
+        } catch {
+            stop()
+            throw error
+        }
 
-        task = rec.recognitionTask(with: req) { result, error in
-            DispatchQueue.main.async {
+        let currentSession = sessionID
+
+        task = rec.recognitionTask(with: req) { [weak self] result, error in
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.sessionID == currentSession else { return }
                 if let result { onText(result.bestTranscription.formattedString, result.isFinal) }
-                if error != nil || (result?.isFinal ?? false) { onEnd() }
+                if error != nil || (result?.isFinal ?? false) {
+                    self.stop()
+                    onEnd()
+                }
             }
         }
     }
 
     func stop() {
-        if engine.isRunning {
-            engine.stop()
+        sessionID = UUID()
+        engine.stop()
+        if hasTap {
             engine.inputNode.removeTap(onBus: 0)
+            hasTap = false
         }
         request?.endAudio()
         task?.cancel()

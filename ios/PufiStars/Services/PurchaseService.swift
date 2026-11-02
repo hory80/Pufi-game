@@ -3,6 +3,7 @@ import RevenueCat
 
 /// O singură cumpărare: „Deblochează tot” (non-consumable), prin RevenueCat.
 /// În RevenueCat: entitlement `premium`, offering curent cu un pachet care conține produsul `unlock_all`.
+@MainActor
 final class PurchaseService {
     static let shared = PurchaseService()
 
@@ -29,15 +30,17 @@ final class PurchaseService {
         guard configured else { done(isPremium); return }
         Purchases.shared.getCustomerInfo { [weak self] info, _ in
             guard let self else { return }
-            self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
-            DispatchQueue.main.async { done(self.isPremium) }
+            DispatchQueue.main.async {
+                self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
+                done(self.isPremium)
+            }
         }
     }
 
     func price(_ done: @escaping (String?) -> Void) {
         guard configured else { done(nil); return }
         Purchases.shared.getOfferings { offerings, _ in
-            let p = offerings?.current?.availablePackages.first?.storeProduct.localizedPriceString
+            let p = offerings?.current?.availablePackages.first(where: { $0.storeProduct.productIdentifier == "unlock_all" })?.storeProduct.localizedPriceString
             DispatchQueue.main.async { done(p) }
         }
     }
@@ -45,12 +48,14 @@ final class PurchaseService {
     func buy(_ done: @escaping (Bool) -> Void) {
         guard configured else { done(isPremium); return }
         Purchases.shared.getOfferings { [weak self] offerings, _ in
-            guard let self, let pkg = offerings?.current?.availablePackages.first else {
+            guard let self, let pkg = offerings?.current?.availablePackages.first(where: { $0.storeProduct.productIdentifier == "unlock_all" }) else {
                 DispatchQueue.main.async { done(false) }; return
             }
             Purchases.shared.purchase(package: pkg) { _, info, _, _ in
-                self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
-                DispatchQueue.main.async { done(self.isPremium) }
+                DispatchQueue.main.async {
+                    self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
+                    done(self.isPremium)
+                }
             }
         }
     }
@@ -59,8 +64,10 @@ final class PurchaseService {
         guard configured else { done(isPremium); return }
         Purchases.shared.restorePurchases { [weak self] info, _ in
             guard let self else { return }
-            self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
-            DispatchQueue.main.async { done(self.isPremium) }
+            DispatchQueue.main.async {
+                self.isPremium = info?.entitlements[self.entitlement]?.isActive == true
+                done(self.isPremium)
+            }
         }
     }
 }

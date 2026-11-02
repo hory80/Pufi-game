@@ -1,7 +1,8 @@
 import AVFoundation
 
 /// Vocea nativă: folosește vocile Premium/Enhanced instalate pe iPad (Setări > Accesibilitate > Conținut vorbit > Voci).
-final class SpeechService: NSObject, AVSpeechSynthesizerDelegate {
+@MainActor
+final class SpeechService: NSObject, @preconcurrency AVSpeechSynthesizerDelegate {
     private let synth = AVSpeechSynthesizer()
     private var completions: [ObjectIdentifier: (Bool) -> Void] = [:]
     private var wordHandlers: [ObjectIdentifier: (NSRange) -> Void] = [:]
@@ -67,7 +68,7 @@ final class SpeechService: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     func stop() {
-        if synth.isSpeaking { synth.stopSpeaking(at: .immediate) }
+        if synth.isSpeaking || synth.isPaused { synth.stopSpeaking(at: .immediate) }
     }
 
     private func finish(_ u: AVSpeechUtterance, _ ok: Bool) {

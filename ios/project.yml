@@ -44,3 +44,33 @@ targets:
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Speech recognition follows your child's reading and colours each word that was read correctly."
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  PufiStarsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PufiStarsTests
+    dependencies:
+      - target: PufiStars
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+  PufiStarsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PufiStarsUITests
+    dependencies:
+      - target: PufiStars
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  PufiStars:
+    build:
+      targets:
+        PufiStars: all
+    test:
+      targets:
+        - PufiStarsTests
+        - PufiStarsUITests

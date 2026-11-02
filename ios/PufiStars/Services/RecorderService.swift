@@ -1,6 +1,7 @@
 import AVFoundation
 
 /// Înregistrările părintelui („Bravo!”, „Super, campionule!”…). Rămân doar pe acest aparat.
+@MainActor
 final class RecorderService: NSObject, AVAudioPlayerDelegate {
     private var recorder: AVAudioRecorder?
     private var player: AVAudioPlayer?
@@ -36,10 +37,14 @@ final class RecorderService: NSObject, AVAudioPlayerDelegate {
                 AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
             ]
             let r = try AVAudioRecorder(url: url(key), settings: settings)
-            r.record(forDuration: 12)
+            guard r.record(forDuration: 12) else {
+                SpeechService.usePlaybackSession()
+                return false
+            }
             recorder = r
             return true
         } catch {
+            SpeechService.usePlaybackSession()
             return false
         }
     }
@@ -54,15 +59,26 @@ final class RecorderService: NSObject, AVAudioPlayerDelegate {
 
     func play(url: URL, done: @escaping () -> Void) {
         player?.stop()
+        let previous = playDone
+        playDone = nil
+        previous?()
         guard FileManager.default.fileExists(atPath: url.path), let p = try? AVAudioPlayer(contentsOf: url) else { done(); return }
         SpeechService.usePlaybackSession()
         p.delegate = self
         player = p
         playDone = done
-        p.play()
+        if !p.play() { finishPlayback() }
     }
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        finishPlayback()
+    }
+
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        finishPlayback()
+    }
+
+    private func finishPlayback() {
         let d = playDone
         playDone = nil
         d?()
