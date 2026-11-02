@@ -3795,6 +3795,393 @@ S('aq',{title:'🐠 Mes aquariums',main:'🌿 Aquarium',pred:'🦈 Bassin des pr
 </script>
 
 <script>
+/* ===== Magyar — fő játék, világ, látnivalók, focisták ===== */
+(()=>{ const lg='hu', IDX=12;
+L10N.main=L10N.main||{};
+L10N.main[lg]={ code:'hu', speech:'hu-HU', title:'Számold a csillagokat ⭐', start:'▶ Indulás!', i:IDX,
+  gNum:'🔢 Számok', gFlag:'🚩 Zászlók', gAb:'🧮 Golyós számológép',
+  sbShow:'👆 Mutasd', sbAdd:'➕ Adj hozzá', sbTen:'🍒 Legyen 10', tens:'Tízesek', ones:'Egyesek', check:'✔ Kész',
+  sbHint:'A felső piros golyó 5-öt ér. Minden alsó sárga golyó 1-et ér.',
+  showSay:n=>`Mutasd meg ezt a számot a golyós számológépen: ${n}.`, showTxt:n=>`Mutasd: <b>${n}</b>`, showRight:n=>`Igen! Ez ${n}.`,
+  showWrong:(v,n)=>`A számológép ezt mutatja: ${v}. Ezt keressük: ${n}.`,
+  addSay:(a,b)=>`A számológép ezt mutatja: ${a}. Adj hozzá ennyit: ${b}. Mennyi lesz?`, addWrong:v=>`A számológép ezt mutatja: ${v}. Próbáld újra!`,
+  tenQ1:a=>`Mennyi hiányzik ebből: ${a}, hogy 10 legyen?`,
+  tenR1:(a,n,b,r)=>`Igen! ${a} meg ${n} az 10. A(z) ${b} számot szétszedjük: ${n} és ${r}.`,
+  tenQ2:r=>`És most: 10 meg ${r}. Mennyi?`, tenWin:(a,b,v)=>`${a} meg ${b} az ${v}.`, easy:'Könnyű', all:'Minden ország',
+  add:'➕ Összeadás', sub:'➖ Kivonás', mix:'🔀 Vegyes', upto:n=>`${n}-ig`,
+  plus:'meg', minus:'mínusz', q:(a,s,b)=>`Mennyi ${a} ${s} ${b}?`, res:(a,s,b,v)=>`${a} ${s} ${b} az ${v}.`,
+  msgAdd:'Hány van összesen?', msgSub:n=>`Elmegy ${n}. Hány marad?`,
+  findSay:n=>`Keresd meg a zászlót: ${n}!`, findShow:n=>`Keresd: <b>${n}</b>`,
+  flagRight:n=>`Igen! Ez ${n}.`, flagWrong:(x,n)=>`Ez ${x}. Keresd ezt: ${n}!`, flagTry:'Keresd tovább! 🔍',
+  cont:{eu:'Európában',as:'Ázsiában',af:'Afrikában',na:'Észak-Amerikában',sa:'Dél-Amerikában',oc:'Óceániában'},
+  where:(n,c)=>`${n.charAt(0).toUpperCase()+n.slice(1)} ${c} van.`, capSay:k=>`A fővárosa: ${k}.`, capLbl:'Főváros', sightSay:x=>`Híres dolgai: ${x}.`, nextBtn:'▶ Tovább',
+  praise:['Nagyon ügyes!','Szuper!','Kiváló!','Ügyes vagy!','Tökéletes!','Fantasztikus!'],
+  bigMsg:'🏅 Szereztél 10 csillagot!', bigSay:'Szereztél tíz csillagot! Igazi bajnok vagy!',
+  tryMsg:'Próbáld újra! Számold meg még egyszer 🙂', wrongSay:v=>`Ez nem ${v}. Próbáld újra!`,
+  listen:'🔊 Meghallgatom', on:'🗣️ Hang: be', off:'🔇 Hang: ki', defVoice:'Alapértelmezett hang',
+  sample:'Szia! Így szól a hangom.', hello:'Játsszunk! ', names:/mariska|tünde|eszter/ };
+L10N.misc=L10N.misc||{}; L10N.misc[lg]={playGame:'Játssz egy partit',vsRobot:'a robot vagy egy barát ellen',newB:'ÚJ'};
+L10N.mon=L10N.mon||{}; L10N.mon[lg]={tap:'Koppints egy képre, és megtudsz róla valamit!',close:'✖ Bezárás',listen:'🔊 Meghallgatom',play:'🎵 A himnusz meghallgatása',stop:'⏹ Himnusz leállítása',photo:'Fotó'};
+L10N.fb=L10N.fb||{}; L10N.fb[lg]={btn:'⚽ Focisták',title:n=>`⚽ Híres focisták: ${n}`,say:n=>`Ezek az ország leghíresebb focistái: ${n}! Koppints egy játékosra, és megtudsz róla valamit.`};
+const NAMES={CH:'Svájc',RO:'Románia',DE:'Németország',FR:'Franciaország',IT:'Olaszország',AT:'Ausztria',ES:'Spanyolország',GB:'az Egyesült Királyság',US:'az Egyesült Államok',JP:'Japán',BR:'Brazília',CA:'Kanada',GR:'Görögország',PT:'Portugália',NL:'Hollandia',SE:'Svédország',NO:'Norvégia',TR:'Törökország',IN:'India',AU:'Ausztrália',MX:'Mexikó',AR:'Argentína',PL:'Lengyelország',UA:'Ukrajna',BE:'Belgium',DK:'Dánia',KR:'Dél-Korea',EG:'Egyiptom',IE:'Írország',HR:'Horvátország',FI:'Finnország',HU:'Magyarország',MD:'Moldova',CN:'Kína',ZA:'a Dél-afrikai Köztársaság',IS:'Izland'};
+COUNTRIES.forEach(c=>{ c[IDX]=NAMES[c[3]]||c[5]; });
+const CAPS_L={CH:'Bern',RO:'Bukarest',DE:'Berlin',FR:'Párizs',IT:'Róma',AT:'Bécs',ES:'Madrid',GB:'London',US:'Washington',JP:'Tokió',BR:'Brazíliaváros',CA:'Ottawa',GR:'Athén',PT:'Lisszabon',NL:'Amszterdam',SE:'Stockholm',NO:'Oslo',TR:'Ankara',IN:'Újdelhi',AU:'Canberra',MX:'Mexikóváros',AR:'Buenos Aires',PL:'Varsó',UA:'Kijev',BE:'Brüsszel',DK:'Koppenhága',KR:'Szöul',EG:'Kairó',IE:'Dublin',HR:'Zágráb',FI:'Helsinki',HU:'Budapest',MD:'Chișinău',CN:'Peking',ZA:'Pretoria',IS:'Reykjavík'};
+for(const k in CAPS) CAPS[k][IDX-1]=CAPS_L[k]||CAPS[k][4];
+const SIGHT={CH:'az Alpok, a sajt és a csokoládé',RO:'Törcsvár, a Kárpátok és a medvék',DE:'a várak, a perec és az autók',FR:'az Eiffel-torony, a croissant és a sajt',IT:'a pizza, a Colosseum és a tészta',AT:'a zene, a hegyek és a sütemények',ES:'a flamenco, a napsütés és a paella',GB:'a királyi testőrök, a London Eye és a tea',US:'a Szabadság-szobor, az amerikai foci és a hotdog',JP:'a Fudzsi, a szusi és a cseresznyevirág',BR:'a foci, a papagájok és az Amazonas esőerdő',CA:'a juharlevél, a jegesmedvék és a jégkorong',GR:'az ősi templomok, az olajbogyó és a tenger',PT:'az óceán, a halak és a sárga villamosok',NL:'a tulipánok, a biciklik és a szélmalmok',SE:'a jávorszarvasok, a hó és a piros házak',NO:'a bálnák, a fjordok és a sarki fény',TR:'a mecsetek, a tea és a hőlégballonok',IN:'az elefántok, a Tádzs Mahal és a csípős ételek',AU:'a kenguruk, a koalák és a szörfözés',MX:'a taco, a kaktuszok és a fiesták',AR:'a tangó, a sült hús és a foci',PL:'a várak, a pirog és a tél',UA:'a napraforgók, a búza és a pirog',BE:'a csokoládé, a gofri és a sült krumpli',DK:'a Lego, a Kis hableány és a biciklik',KR:'a paloták, a tészta és a zene',EG:'a tevék, a piramisok és a sivatag',IE:'a lóhere, a bárányok és az eső',HR:'a tenger, a hajók és a várak',FI:'a Mikulás, a hó és a szauna',HU:'a várak, a paprika és a gyógyfürdők',MD:'a szőlő, a gyümölcsösök és a napraforgók',CN:'a pandák, a Nagy Fal és az evőpálcikák',ZA:'az oroszlánok, a zsiráfok és az elefántok',IS:'a vulkánok, a jég és a kis lovak'};
+for(const k in SIGHTS) SIGHTS[k][IDX]=SIGHT[k]||SIGHTS[k][5];
+const MONT={
+CH:[['A Matterhorn','A Matterhorn egy nagyon magas hegy, hegyes csúccsal, mint egy háromszög. Majdnem 4500 méter magas!'],['A Glacier Express','Egy piros vonat, amely nagyon magas hidakon megy a hegyek között. Ez a világ leglassabb gyorsvonata!'],['A genfi szökőkút','Óriási szökőkút a Genfi-tavon, amely 140 méter magasra lövi a vizet, olyan magasra, mint egy felhőkarcoló!']],
+RO:[['Törcsvár','Egy vár egy dombon. Azt mondják, ez Drakula, a mesebeli vámpír vára.'],['A bukovinai festett kolostorok','Régi templomok, amelyeket kívülről is kifestettek szentekkel és történetekkel. A voroneți kolostor kékje világhírű.'],['A Duna-delta','Itt ömlik a Duna a Fekete-tengerbe. Madarak ezrei élnek itt, még pelikánok is!']],
+DE:[['Neuschwanstein kastély','Mesebeli kastély, amelyet egy lovagokról álmodozó király építtetett. Erről mintázták a hercegnős filmek kastélyait.'],['A Brandenburgi kapu','Nagy kapu Berlinben, a tetején négy ló húzta kocsival. Az egyesült Németország jelképe.'],['A kölni dóm','Hatalmas templom két nagyon magas toronnyal. Több mint 600 évig építették!']],
+FR:[['Az Eiffel-torony','Vastorony Párizsban, több mint 300 méter magas. Esténként ezernyi fénnyel csillog!'],['A Louvre','A világ leglátogatottabb múzeuma, a bejáratánál üvegpiramissal. Itt van a Mona Lisa festmény.'],['Mont-Saint-Michel','Apátság egy kis szigeten. Dagálykor tenger veszi körül, apálykor gyalog is oda lehet menni.']],
+IT:[['A Colosseum','Óriási aréna Rómában, majdnem 2000 éves. Emberek ezrei jöttek ide előadásokat nézni.'],['A pisai ferde torony','Ez a torony megdől, mert puha alatta a talaj. A fotókon a turisták úgy tesznek, mintha megtartanák!'],['Velence','Vízre épült város, utcák helyett csatornákkal. Az emberek gondolának nevezett csónakokkal járnak.']],
+AT:[['A schönbrunni kastély','Hatalmas kastély Bécsben, több mint 1000 szobával és a világ legrégebbi állatkertjével.'],['Mozart szülőháza','Sárga ház Salzburgban, ahol Mozart született. Már ötévesen zenét szerzett!'],['A Grossglockner','Ausztria legmagasabb hegye, a lábánál nagy gleccserrel.']],
+ES:[['A Sagrada Família','Óriási templom Barcelonában, homokvárra emlékeztető tornyokkal. Már több mint 140 éve építik!'],['Az Alhambra','Régi palota Granadában kertekkel, szökőkutakkal és csipkeszerűen díszített falakkal.'],['A Güell park','Színes park Barcelonában, csempedarabkákból kirakott gyíkkal és hullámos padokkal.']],
+GB:[['A Big Ben','Nagy óratorony Londonban. A benne lévő óriási harangot hívják Big Bennek.'],['Stonehenge','Óriási kövekből álló kör, majdnem 5000 évvel ezelőtt állították fel. Senki sem tudja biztosan, miért!'],['A Buckingham-palota','A brit király otthona Londonban. Előtte magas fekete süveges őrök állnak.']],
+US:[['A Szabadság-szobor','Óriási zöld szobor New Yorkban, fáklyát tart a kezében. Franciaország ajándéka volt.'],['A Grand Canyon','Hatalmas, mély szurdok, amelyet egy folyó vájt ki évmilliók alatt. A sziklák pirosak és narancssárgák.'],['A Golden Gate híd','Hosszú piros híd San Franciscóban. A köd gyakran eltakarja a felét.']],
+JP:[['A Fudzsi','Hósapkás vulkán, Japán legmagasabb hegye.'],['A Fusimi Inari szentély','Szent hely Kiotóban, ahol narancssárga kapuk ezrei állnak egymás mögött, mint egy alagút a hegyre.'],['A himedzsi vár','Fehér vár, amelyet Fehér Kócsag várnak hívnak, mert olyan, mint egy felröppenő madár.']],
+BR:[['A Megváltó Krisztus-szobor','Óriási, kitárt karú szobor egy hegyen Rio de Janeiro fölött.'],['Az Amazonas esőerdő','A világ legnagyobb esőerdeje. Jaguárok, papagájok és majmok élnek itt.'],['Az Iguaçu-vízesések','Több száz vízesés egymás mellett, az argentin határon. A víz mennydörögve zúg!']],
+CA:[['A Niagara-vízesés','Óriási vízesések Kanada és az Egyesült Államok között. Hajóval közel lehet menni, és csuromvizes leszel!'],['A Sziklás-hegység','Magas hegyek türkizkék tavakkal, ahol medvék és jávorszarvasok élnek.'],['A CN Tower','Nagyon magas torony Torontóban üvegpadlóval: a lábad alatt látod a várost.']],
+GR:[['Az Akropolisz','Domb Athénban 2500 éves márványtemplomokkal. A leghíresebb a Parthenón.'],['Szantorini','Sziget fehér házakkal és kék tetőkkel, egy vulkán peremére építve.'],['Olümpia','Itt kezdődtek az olimpiai játékok, majdnem 3000 évvel ezelőtt.']],
+PT:[['A belémi torony','Kis várra emlékeztető torony a folyóparton Lisszabonban. Innen indultak a hajósok felfedezni a világot.'],['A lisszaboni 28-as villamos','Régi sárga villamos, amely nagyon keskeny utcákon jár fel és le.'],['A Pena-palota','Piros-sárga, színes palota egy domb tetején Sintrában. Olyan, mint egy rajzfilmkastély.']],
+NL:[['A kinderdijki szélmalmok','19 régi szélmalom egy sorban. Kiszivattyúzták a vizet a földekről, hogy ne legyen árvíz.'],['A Keukenhof','Hatalmas kert tulipánok millióival minden színben, tavasszal virágoznak.'],['Amszterdam csatornái','Sok csatornás, hidas város, ahol több bicikli van, mint ember!']],
+SE:[['Stockholm óvárosa','Régi utcácskák és színes házak egy szigeten. Stockholm 14 szigetre épült!'],['A jéghotel','Hotel, amely teljesen jégből és hóból van, még az ágyak is! Tavasszal elolvad, és minden télen újraépítik.'],['A Vasa Múzeum','Régi fahajó, amely majdnem 400 éve elsüllyedt, és szinte épen hozták ki a tengerből.']],
+NO:[['A fjordok','Hosszú, keskeny tengeröblök nagyon magas hegyek között, a vízesések egyenesen a vízbe zuhannak.'],['A sarki fény','Zöld és lila fények, amelyek télen az égen táncolnak Norvégia északi részén.'],['A borgundi fatemplom','Majdnem 850 éves fatemplom, a tetején sárkányfejekkel.']],
+TR:[['A Hagia Szophia','Hatalmas épület Isztambulban óriási kupolával, majdnem 1500 éves.'],['Kappadókia','Kéményformájú sziklák földje. Reggelente hőlégballonok százai lebegnek felettük.'],['Pamukkale','Hófehér teraszok tele meleg, türkizkék vízzel. De ez nem hó, hanem kő!']],
+IN:[['A Tádzs Mahal','Fehér márványépület, amelyet egy császár a felesége iránti szeretetből építtetett.'],['A bengáli tigrisek','India erdeiben narancs-fekete csíkos tigrisek élnek. Minden tigrisnek más a csíkja!'],['A Vörös Erőd','Nagy vörös kőerőd Delhiben, ahol a császárok laktak.']],
+AU:[['A Sydney-i Operaház','Fehér épület vitorlára emlékeztető tetőkkel, közvetlenül a tengerparton.'],['Az Uluru','Óriási vörös szikla a sivatag közepén. Napnyugtakor megváltozik a színe!'],['A Nagy-korallzátony','A világ legnagyobb korallzátonya, olyan nagy, hogy az űrből is látszik. Színes halak és teknősök úszkálnak benne.']],
+MX:[['Chichén Itzá','Lépcsős piramis, amelyet a maják építettek. Ha tapsolsz előtte, a visszhang olyan, mint egy madárhang!'],['A Nap-piramis','Óriási piramis egy nagyon régi városban, Teotihuacánban. Több száz lépcsőfokon lehet felmászni a tetejére.'],['A cenoték','Barlangokban rejtőző tavacskák kék, átlátszó vízzel, amelyben úszni is lehet.']],
+AR:[['A Perito Moreno-gleccser','Óriási gleccser, amely még mindig nő. Néha hatalmas jégtömbök zuhannak nagy robajjal a tóba!'],['A tangó Buenos Airesben','A tangó itt született tánc. Még az utcán is táncolják a színes La Boca negyedben.'],['Patagónia pingvinjei','Pingvinek ezrei élnek a déli partokon, és totyogva mennek a tengerhez.']],
+PL:[['A Wawel','Vár Krakkóban. A legenda szerint alatta egy sárkány élt, és ma ott áll egy sárkányszobor, amely tényleg tüzet okád!'],['A wieliczkai sóbánya','Föld alatti sóbánya egy egész, sóból faragott templommal, még a csillárok is sóból vannak!'],['A varsói óváros','Színes házak egy tér körül, és egy sellőszobor, amely védi a várost.']],
+UA:[['A kijevi barlangkolostor','Kolostor arany kupolákkal és föld alatti barlangokkal, ahol szerzetesek éltek.'],['A szerelem alagútja','Vasúti sín az erdőben, ahol a fák zöld alagutat formáltak.'],['A napraforgómezők','Nyáron egész mezők sárgulnak be. A napraforgó Ukrajna nemzeti virága.']],
+BE:[['Az Atomium','Különös épület Brüsszelben kilenc nagy fémgömbből, mint egy óriási atom.'],['A Grand-Place','Tér Brüsszelben aranyozott házakkal. Kétévente virágszőnyeg borítja.'],['A belga csokoládé','Belgium a csokoládéjáról híres. A töltött bonbont, a pralinét itt találták fel!']],
+DK:[['A Kis hableány','Kis szobor egy sziklán Koppenhágában, Hans Christian Andersen meséje alapján.'],['Legoland','A Legót Dániában találták fel! Legolandben egész városokat látsz legókockákból.'],['Nyhavn','Kikötő cukorkaszínű házakkal és régi fahajókkal.']],
+KR:[['A Kjongbokkung palota','Királyi palota Szöulban, ahol az őrök régi, színes ruhát viselnek.'],['Csedzsu-sziget','Vulkán alkotta sziget strandokkal, vízesésekkel és mosolygó kőszobrokkal.'],['Az N Seoul Tower','Torony egy hegyen a város közepén. Az emberek színes barátságlakatokat akasztanak ide.']],
+EG:[['A gízai piramisok','Óriási sírok a fáraóknak, 4500 éve épültek több millió kőtömbből.'],['A Nagy Szfinx','Óriási szobor oroszlántesttel és emberfejjel, amely a piramisokat őrzi.'],['A Királyok völgye','Völgy, ahol a fáraókat a hegybe rejtett sírokba temették. Itt találták meg Tutanhamon kincsét.']],
+IE:[['A Moheri-sziklák','Óriási sziklafalak, amelyek egyenesen az óceánba zuhannak. Színes csőrű lundák fészkelnek itt.'],['Blarney vára','Vár egy varázskővel: a legenda szerint aki megcsókolja, nagyon szépen fog beszélni.'],['Szent Patrik napja','Ünnep felvonulásokkal, amikor mindenki zöldbe öltözik és lóherét visel.']],
+HR:[['Dubrovnik','Régi város vastag falakkal, amelyeken sétálni lehet, közvetlenül a tenger mellett.'],['A Plitvicei-tavak','16 türkizkék tó, amelyeket vízesések kötnek össze, a víz fölött fapallókkal.'],['A dalmaták','A pöttyös dalmata kutyák Dalmáciáról, egy horvát tájegységről kapták a nevüket.']],
+FI:[['A Mikulásfalu','Rovaniemiben, a sarkkörön van egy falu, ahol egész évben meglátogathatod a Mikulást.'],['Lappföld rénszarvasai','Finnország északi részén sok rénszarvas él. Szánokat húznak a hóban.'],['Az ezer tó országa','Finnországban több mint 180 000 tó van! Ezért hívják az ezer tó országának.']],
+HU:[['Az Országház','Hatalmas, gyönyörű épület a Duna partján, amely éjjel aranyként ragyog.'],['A Széchenyi fürdő','Medencék meleg vízzel, amely a föld alól jön. Télen még sakkoznak is a vízben!'],['A Halászbástya','Fal hét fehér, sátorra emlékeztető toronnyal, ahonnan az egész város látszik.']],
+MD:[['Orheiul Vechi','Sziklába vájt kolostor egy nagy kanyarban folyó folyó fölött.'],['A szorokai erőd','Kerek kőerőd a Dnyeszter partján, Nagy István kezdte építeni.'],['Gyümölcsösök és szőlők','Moldovának nagyon termékeny földje van, ahol szőlő, alma és dió terem.']],
+CN:[['A kínai Nagy Fal','Nagyon hosszú fal, amelyet Kína védelmére építettek. Több ezer kilométer hosszú!'],['Az óriáspandák','Az óriáspandák Kína hegyeiben élnek, és szinte egész nap bambuszt esznek.'],['A Tiltott Város','Hatalmas palota Pekingben sárga tetőkkel. Régen csak a császár és az emberei léphettek be.']],
+ZA:[['Az Asztal-hegy','Asztalhoz hasonló lapos tetejű hegy Fokváros fölött. Néha egy felhő ül rajta, mint egy terítő!'],['A Kruger Nemzeti Park','Hatalmas park, ahol szabadon látsz oroszlánokat, elefántokat, zsiráfokat és zebrákat.'],['A Boulders strand','Strand, ahol pápaszemes pingvinek sétálnak az emberek között.']],
+IS:[['Izland vulkánjai','Izlandon több mint 30 működő vulkán van. Néha folyó vörös lávát is látni!'],['A Strokkur gejzír','Forró forrás, amely néhány percenként a magasba lövi a vizet, mint a természet szökőkútja.'],['A Skógafoss','Nagy, fehér vízesés. Napos napokon szinte mindig szivárvány látszik a vízcseppekben!']]};
+for(const k in MONT) (MON[k]||[]).forEach((m,i)=>{ if(MONT[k][i]) (m._t=m._t||{})[lg]=MONT[k][i]; });
+const FBT={
+CH:['Alacsony, de villámgyors, látványos góljairól híres Svájcban.','Középpályás és Svájc csapatkapitánya, több mint 100 válogatott mérkőzéssel.','Kapus, aki sok fontos tizenegyest védett, az Európa-bajnokságon is.'],
+RO:['«Királynak» hívták, ő volt a legjobb román focista, varázslatos bal lábbal.','Csatár, aki sok gólt lőtt Romániának, és Olaszországban meg Angliában is játszott.','Erős védő, a Barcelona kapitánya, aki három világbajnokságon játszott.'],
+DE:['«Császárnak» hívták, játékosként és edzőként is világbajnok lett.','A történelem egyik legnagyobb gólvágója, 1974-ben világbajnok.','Kapus, aki gyakran kijön a kapuból, mint egy védő. 2014-ben világbajnok.'],
+FR:['Nagyon elegáns játékos, aki 1998-ban világbajnokságra vezette Franciaországot.','A világ egyik leggyorsabb focistája. 2018-ban világbajnok.','Elegáns csatár, aki sok gólt lőtt Franciaországnak és az Arsenalnak.'],
+IT:['A lófarkáról és szép góljairól volt híres, «Isteni Lófaroknak» hívták.','Legendás védő, aki több mint 900 meccset játszott az AC Milanban.','Legendás kapus, 2006-ban világbajnok, 45 éves koráig játszott.'],
+AT:['Sok poszton tud játszani, és többször megnyerte a Bajnokok Ligáját.','Az 1978-as világbajnokságon ő lőtte a győztes gólokat Németország ellen.','Erős csatár, Ausztria egyik legeredményesebb gólszerzője.'],
+ES:['Ő lőtte a gólt, amellyel Spanyolország 2010-ben világbajnok lett.','Védő és csapatkapitány, 2010-ben világbajnok, sok fejes gólt lőtt.','Nagyon fiatal tehetség: 17 évesen megnyerte a 2024-es Európa-bajnokságot.'],
+GB:['1966-ban világbajnok lett Angliával, és erős lövéseiről volt híres.','Híresek voltak a szabadrúgásai, amelyek úgy kanyarodtak, mint egy banán.','Az angol válogatott minden idők legeredményesebb gólszerzője.'],
+US:['«Amerika Kapitánynak» hívják, az amerikai válogatott sztárja.','Az amerikai válogatott egyik legeredményesebb gólszerzője.','Csatár, aki kétszer nyerte meg a női világbajnokságot az Egyesült Államokkal.'],
+JP:['Az egyik első nagy japán sztár, aki Európában, Olaszországban ragyogott.','A csapatkapitány, aki 2011-ben világbajnokságra vezette Japán női válogatottját.','Villámgyors szélső, cseleiről híres.'],
+BR:['«A foci királyának» hívták, háromszor nyert világbajnokságot.','Brazília minden idők legeredményesebb gólszerzője, cseleiről híres.','Minden idők egyik legjobb focistanője, hatszor választották a világ legjobbjának.'],
+CA:['Villámgyors védő és Kanada egyik sztárja.','Több válogatott gólt lőtt, mint bárki más a világon, férfiakat is beleértve!','Csatár, aki sok gólt lő Kanadának.'],
+GR:['Görögország kapitánya, amikor a csapat meglepetésre megnyerte a 2004-es Eb-t.','Ő lőtte a gólt a 2004-es Eb döntőjében.','Középpályás, aki többször játszott Görögország válogatottjában, mint bárki más.'],
+PT:['A válogatott futball minden idők legeredményesebb gólszerzője.','«Fekete Párducnak» hívták, az 1966-os világbajnokság gólkirálya volt.','Nagyon tehetséges szélső, 2001-ben a világ legjobb játékosának választották.'],
+NL:['A foci zsenije. Egy csel is róla kapta a nevét: a Cruyff-fordulat.','Csatár, aki fantasztikus kapásgólt lőtt az 1988-as Eb döntőjében.','Magas, nyugodt védő, Hollandia csapatkapitánya.'],
+SE:['Nagyon magas csatár, karaterúgásra emlékeztető akrobatikus góljairól híres.','Népszerű csatár, aki sok gólt lőtt Svédországnak és a Celticnek.','Fiatal, elegáns csatár, Svédország egyik mostani sztárja.'],
+NO:['Óriási, villámgyors csatár, aki folyton gólokat lő.','Kreatív középpályás és Norvégia csapatkapitánya, 15 évesen lett profi.','Az 1999-es Bajnokok Ligája-döntő utolsó percében ő lőtte a győztes gólt.'],
+TR:['Ő lőtte a világbajnokságok leggyorsabb gólját, 11 másodperc után!','Fiatal tehetség varázslatos bal lábbal, «török Messinek» hívják.','Törökország csapatkapitánya, szabadrúgásairól híres.'],
+IN:['India legeredményesebb gólszerzője, és a világ egyik legtöbb válogatott gólt szerző játékosa.','Az indiai foci egyik első nagy sztárja és sokáig csapatkapitány.','Nagyon magas kapus, az első indiai egy nagy európai bajnokságban, Norvégiában.'],
+AU:['Fejes góljairól és arról volt híres, hogy gól után megbokszolta a szögletzászlót.','Csatár, aki gól után hátraszaltót csinál!','Erős csatár, Ausztrália kapitánya a 2006-os világbajnokságon.'],
+MX:['Akrobatikus góljairól és szaltós ünnepléséről híres.','Védő és csapatkapitány, aki öt világbajnokságon játszott.','Göndör hajú kapus, hihetetlen védéseiről híres a világbajnokságokon.'],
+AR:['Minden idők egyik legjobb focistája, 2022-ben világbajnok.','A cselezés zsenije, aki 1986-ban világbajnok lett.','Gólt lőtt a 2022-es vb-döntőben és egy Copa América-döntőben is.'],
+PL:['Csatár, aki egyszer 5 gólt lőtt mindössze 9 perc alatt!','Gyors középpályás, Lengyelország sztárja az 1982-es világbajnokságon.','Kapus, aki tizenegyest védett a világbajnokságon.'],
+UA:['Híres csatár, aki 2004-ben megnyerte az Aranylabdát.','Villámgyors csatár, aki 1975-ben megnyerte az Aranylabdát.','Középpályán és védőként is tud játszani, Ukrajna egyik sztárja.'],
+BE:['Fantasztikus cselező, Belgium kapitánya, a 2018-as vb harmadik helyezettje.','Középpályás hihetetlen passzokkal, a világ egyik legjobbja.','Nagyon magas kapus, majdnem két méter.'],
+DK:['Minden idők legjobb dán focistájának tartják, varázslatos passzairól híres.','Óriási kapus, aki 1992-ben Európa-bajnok lett Dániával.','Kreatív középpályás, passzairól és szabadrúgásairól híres.'],
+KR:['Dél-Korea csapatkapitánya, aki gólkirály lett az angol Premier League-ben.','«Három tüdőnek» hívták, mert fáradás nélkül tudott futni.','A koreai foci legendája, aki sok gólt lőtt Németországban.'],
+EG:['«Egyiptomi királynak» hívják, villámgyors csatár, aki rengeteg gólt lő.','Egész Egyiptomban szeretett középpályás, kétszer nyerte meg az Afrikai Nemzetek Kupáját.','Gólerős csatár, aki több mint 170 válogatott meccset játszott Egyiptomban.'],
+IE:['Kemény középpályás és csapatkapitány, arról híres, hogy sosem adta fel.','Írország legeredményesebb gólszerzője, gól után cigánykereket hányt.','Nyugodt, elegáns védő, nagyon szerették az ír szurkolók.'],
+HR:['Kiváló középpályás, a 2018-as világbajnokság legjobb játékosa.','Az 1998-as vb gólkirálya, amikor Horvátország harmadik lett.','Középpályás, aki Horvátországgal a 2018-as vb-döntőben játszott.'],
+FI:['Finnországban «Királynak» hívják, az Ajaxszal megnyerte a Bajnokok Ligáját.','Finnország legeredményesebb gólszerzője, aki első Eb-jére vezette az országot.','Magas, erős védő, a Liverpool csapatkapitánya.'],
+HU:['A történelem egyik legnagyobb gólvágója. Az év legszebb gólja Puskás-díjat kap.','Magyarország csapatkapitánya, nagy erejű távoli lövéseiről híres.','1967-ben ő nyerte meg az Aranylabdát, egyedüli magyarként.'],
+MD:['Moldova minden idők legeredményesebb gólszerzője.','Védő és csapatkapitány, a legtöbb válogatott meccsel rendelkező moldovai játékos.','Az egyik legtöbbet játszó moldovai válogatott labdarúgó.'],
+CN:['Kínai csatár, aki Spanyolországban játszott, Kína egyik legeredményesebb gólszerzője.','Az első kínai játékos, aki gólt lőtt az angol Premier League-ben.','Az évszázad egyik legjobb focistanője, aki 1999-ben vb-döntőbe vezette Kínát.'],
+ZA:['A Dél-afrikai Köztársaság minden idők legeredményesebb gólszerzője.','Dél-Afrika védője és csapatkapitánya, nagyon szerették a Leeds Unitednél.','Tehetséges középpályás, aki Angliában és a 2010-es hazai világbajnokságon játszott.'],
+IS:['Szabadrúgásairól híres középpályás, Izland egyik legeredményesebb gólszerzője.','Első válogatott meccsén a saját apukája helyére állt be!','Kapus, aki a 2018-as vb-n kivédte Messi tizenegyesét. Filmrendező is!']};
+for(const k in FBT) (FB[k]||[]).forEach((p,i)=>{ if(FBT[k][i]) (p._t=p._t||{})[lg]=FBT[k][i]; });
+})();
+</script>
+
+<script>
+/* ===== Magyar — olvasás ===== */
+(()=>{ const lg='hu', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Olvasás',title:'Olvasás és írás',back:'⬅ Vissza',menu:'⬅ Menü',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','Az ábécé'],fish:['🎣','Fogd ki a betűt'],train:['🚂','A szótagvonat'],build:['🧩','A varázsszó'],read:['👀','Olvasd el és válassz'],story:['📚','Mesék'],write:['✍️','Írj az ujjaddal']},
+  alphaTask:'Koppints egy betűre, és meghallod!',album:(n,t)=>`🏅 Matricák: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, mint ${w}.`,
+  fishSay:(l,w)=>`Fogd ki ezt a betűt: ${l}, mint ${w}!`,fishWrong:l=>`Ez a betű: ${l}. Próbáld újra!`,fishRight:l=>`Ügyes! Kifogtad: ${l}.`,
+  trainSay:w=>`Rakd ki a szót: ${w}! Tedd sorba a vagonokat.`,trainDone:w=>`Ügyes! ${w}!`,
+  buildSay:w=>`Írd le a szót: ${w}!`,buildDone:w=>`Szuper! Leírtad: ${w}.`,
+  readTask:'Olvasd el a szót, és válaszd ki a képet!',readWrong:'Próbáld újra!',readRight:w=>`Igen! ${w}!`,
+  storyTask:'Válassz egy mesét!',readMe:'▶ Olvasd fel',readSelf:'Koppints egy szóra, és meghallod.',storyDone:'Ügyes! Végigolvastad a mesét.',
+  writeTask:l=>`Írd le: ${l}. A zöld pöttynél kezdd.`,writeDone:l=>`Ügyes! Leírtad: ${l}!`,offTrack:'Kövesd a szürke vonalat 🙂',
+  letters:'🔤 Betűk',digits:'🔢 Számjegyek',next:'▶ Tovább',again:'↺ Még egyszer',listen:'🔊 Meghallgatom',
+  sylQ:w=>`Hány szótagból áll ez a szó: ${w}?`,sylN:n=>`${n===1?'egy':n} szótag`,sylSay:(w,n,x)=>`Igen! ${w}: ${n}. ${x}.`,sylWrong:'Próbáld újra! Tapsolj minden szótagnál. 👏',sylShow:(x,n)=>`${x} = ${n} szótag 👏`,
+  mPick:'🔤 Válassz betűket',mFree:'✏️ Írj a vonalra',mGuide:'✍️ Írj segítséggel',clear:'🧽 Törlés',freeHint:'Írd a betűt a szürke vonalra.',freeBad:'Próbálj a vonalra írni 🙂',writeLetter:l=>`Írd le ezt a betűt: ${l}.`};
+D.AQTX[lg]={btn:'🐠 Az akváriumom',title:'🐠 Az akváriumom',empty:'Fogj halakat, hogy megteljen az akváriumod!',slow:'🐢 Lassan',fast:'🐇 Gyorsan',close:'✖ Bezárás'};
+D.STX[lg]={syl:'🎨 Színes szótagok',listen:'🔊 Olvasd fel',self:'👆 Én olvasom',next:'Következő szó ▶',selfHint:'Olvasd fel hangosan a sárga szót, aztán nyomd meg a ▶ gombot. Ha nem ismersz egy szót, koppints rá.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, mint ${w}!`,(l,w)=>`Hol van ez a betű: ${l}? ${l}, mint ${w}.`,(l,w)=>`Keresd: ${l}, mint ${w}!`,(l,w)=>`A hal ezzel a betűvel: ${l}, mint ${w}!`,(l,w)=>`Gyerünk: ${l}, mint ${w}!`],
+  pic:w=>`Milyen betűvel kezdődik: ${w}?`, ok:['Megvan!','Szuper!','Szép fogás!','Hűha!','Igen!','Micsoda hal!'], no:['Nem az!','Hoppá, másik hal!','Keresd tovább!',x=>`Ez: ${x}.`],
+  gold:'Az aranyhal! Három csillag!', lvl:n=>`${n}. szint! Új tengeri állatok érkeznek!`, bucket:'Vödör'};
+D.ALPHA[lg]=[['A','🍎','ALMA'],['Á','🛏️','ÁGY'],['B','🐸','BÉKA'],['C','🐱','CICA'],['D','🐬','DELFIN'],['E','🐭','EGÉR'],['É','🏢','ÉPÜLET'],['F','🌳','FA'],['G','🍄','GOMBA'],['H','🐟','HAL'],['I','🏫','ISKOLA'],['Í','🏹','ÍJ'],['J','🍦','JÉGKRÉM'],['K','🐶','KUTYA'],['L','🐴','LÓ'],['M','🐝','MÉH'],
+  ['N','☀️','NAP'],['O','🦁','OROSZLÁN'],['Ó','⏰','ÓRA'],['Ö','🐂','ÖKÖR'],['Ő','🦌','ŐZ'],['P','🕷️','PÓK'],['R','🦊','RÓKA'],['S','🧢','SAPKA'],['T','🐢','TEKNŐS'],['U','🥒','UBORKA'],['Ú','🛣️','ÚT'],['Ü','🍾','ÜVEG'],['Ű','🪡','TŰ'],['V','🌸','VIRÁG'],['Z','🦓','ZEBRA']];
+D.WORDS[lg]=[['👩','A-NYA'],['👨','A-PA'],['🐱','CI-CA'],['🐶','KU-TYA'],['🏠','HÁZ'],['🍎','AL-MA'],['🚗','AU-TÓ'],['☀️','NAP'],['🌙','HOLD'],['🐟','HAL'],['🦆','KA-CSA'],['🎈','LU-FI'],['🌸','VI-RÁG'],['🦁','O-ROSZ-LÁN'],
+  ['🍌','BA-NÁN'],['🐸','BÉ-KA'],['🦋','PIL-LAN-GÓ'],['🍓','E-PER'],['🥕','RÉ-PA'],['🐭','E-GÉR'],['🐄','TE-HÉN'],['🌳','FA'],['🍉','GÖ-RÖG-DIN-NYE'],['🐢','TEK-NŐS'],['🚂','VO-NAT'],['🐻','MA-CI'],['☁️','FEL-HŐ'],['🎂','TOR-TA'],['🐰','NYÚL'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi és a labda','Pu·fi·nak van egy pi·ros lab·dá·ja. A lab·da pat·tog fel, fel, fel. Pu·fi fut·ni kezd utá·na. De jó mu·lat·ság!'],
+ ['🐱','Mimi cica','Mi·mi egy ki·csi ci·ca. Te·jet i·szik. Az·tán a na·pon al·szik. Mi·áu, mond·ja Mi·mi.'],
+ ['🏖️','Egy nap a tengerparton','Ma a ten·ger·hez me·gyünk. A víz kék. Ho·mok·vá·rat é·pí·tek. Mi·lyen szép nap!'],
+ ['🚂','A vonat','A vo·nat gyor·san megy. Pö·fö·gő, mond·ja a vo·nat. A·nya és a·pa ki·néz az ab·la·kon. Me·gyünk a ma·má·hoz.'],
+ ['⛄','A hóember','Kint e·sik a hó. Pu·fi hó·em·bert é·pít. Ré·pá·ból or·rot kap. A hó·em·ber mo·so·lyog.'],
+ ['🍯','A maci és a méz','Egy nagy ma·ci mé·zet ke·res. A mé·hek re·pül·nek: zzz, zzz! A ma·ci ta·lál egy üveg mé·zet. Hmm, de fi·nom!'],
+ ['🎂','Pufi születésnapja','Ma van Pu·fi szü·le·tés·nap·ja. A tor·tán hat gyer·tya van. A ba·rá·tok éne·kel·nek. Pu·fi el·fúj·ja a gyer·tyá·kat és ne·vet.'],
+ ['🚀','A rakéta','Pu·fi ra·ké·tán re·pül. Fel, egy·re ma·ga·sab·ra! Lát·ja a Hol·dat és a csil·la·go·kat. Az·tán ha·za·megy va·cso·ráz·ni.'],
+ ['🌈','Az eső','E·sik az e·ső, és Pu·fi·nak sár·ga e·ser·nyő·je van. Ug·rál a po·cso·lyák·ban: csobb, csobb! Az·tán ki·süt a nap. Az é·gen szi·vár·vány van.'],
+ ['🥕','A kert','A ma·má·nak van egy kert·je. Pa·ra·di·csom és ré·pa nő ben·ne. Pu·fi meg·lo·csol·ja a vi·rá·go·kat. Egy kis csi·ga las·san má·szik.']];
+D.X2[lg]={ groups:['🔤 Betűk és hangok','✍️ Írás','📚 Olvasás'],
+  games:{hunt:['👂','Hangvadászat'],pos:['📍','Hol hallod a hangot?'],bubble:['🫧','Betűbuborékok'],twins:['🔍','Ikerszavak']},
+  huntSay:(u,ex)=>`Koppints minden képre, amely ezzel kezdődik: ${u}, mint ${ex}!`, huntTask:u=>`Mi kezdődik ezzel: ${u}?`,
+  huntNo:w=>`${w}? Nem, ez nem jó.`, huntDone:'Ügyes! Mindet megtaláltad! A többi nem illik ide.',
+  posSay:(l,w)=>`Hol hallod ezt a hangot: ${l}? A szó: ${w}. Az elején, a közepén vagy a végén?`, posTask:l=>`Hol hallod: ${l}?`,
+  posLbl:['Az elején','A közepén','A végén'], posRight:(l,w,p)=>`Igen! ${w}: a ${l} ${p.toLowerCase()} van.`, posWrong:'Hallgasd meg még egyszer!',
+  bubbleSay:w=>`Pukkaszd ki sorban a buborékokat, és írd le: ${w}!`, bubbleTask:f=>`Szavak ezzel: ${f}`, bubbleDone:w=>`Szuper! Leírtad: ${w}.`,
+  twinsSay:'Melyik szó illik a képhez?', twinsWrong:w=>`Ez van ideírva: ${w}. Próbáld újra!`, twinsRight:w=>`Igen! ${w}!`, listen:'🔊 Meghallgatom' };
+const RAW='NAP☀️ HOLD🌙 HÁZ🏠 CICA🐱 KUTYA🐶 HAL🐟 BÉKA🐸 MACI🐻 OROSZLÁN🦁 TEHÉN🐄 BÁRÁNY🐑 CSIGA🐌 TEKNŐS🐢 HAJÓ🚢 ESERNYŐ☂️ FA🌳 KÖNYV📖 LABDA⚽ KENYÉR🍞 TEJ🥛 VAJ🧈 ALMA🍎 BANÁN🍌 VIRÁG🌸 KACSA🦆 SÜNI🦔 ORR👃 RÓZSA🌹 TIGRIS🐯 VONAT🚂 VITORLÁS⛵ RAKÉTA🚀 GOMBA🍄 SZÍV❤️ SAJT🧀 BÁLNA🐳 EGÉR🐭 TYÚK🐔 LÓ🐴 HATTYÚ🦢 KANÁL🥄 PARADICSOM🍅 CSERESZNYE🍒 RÉPA🥕 KÖRTE🍐 CITROM🍋 SZÁJ👄 KORONA👑 CSENGŐ🔔 GYERTYA🕯️ ECSET🖌️ SEPRŰ🧹 BÖGRE☕ SZEMÜVEG👓 TEVE🐪 HANGYA🐜 PÓK🕷️ ELEFÁNT🐘 KROKODIL🐊 AUTÓ🚗 SZEM👁️ MÉH🐝 KÍGYÓ🐍 OLLÓ✂️ CIPŐ👟 KULCS🔑 PILLANGÓ🦋 CSILLAG⭐ SZÉK🪑 CERUZA✏️ ZOKNI🧦 KŐ🪨 FAGYI🍦 VÖDÖR🪣 BAGOLY🦉 KECSKE🐐 MAJOM🐒 MALAC🐷 GITÁR🎸 ÓRA⏰ KALAPÁCS🔨 CSIBE🐤 ANYA👩 FELHŐ☁️ DINNYE🍉 EPER🍓 DELFIN🐬 ZSIRÁF🦒 ZEBRA🦓 FARKAS🐺 RÓKA🦊 PINGVIN🐧 NYÚL🐰 REPÜLŐ✈️ BICIKLI🚲 TŰZ🔥 FENYŐFA🎄 AJÁNDÉK🎁 TORTA🎂 KOCKA🎲 KÉZ✋ LÁB🦶 FOG🦷 FÜL👂 KÉS🔪 KAKAS🐓 CSOKI🍫 HEGEDŰ🎻 DOB🥁 LAKAT🔒 LEVÉL✉️ ZÁSZLÓ🚩 SÓ🧂 MÉZ🍯 TELEFON📱 HAGYMA🧅 SZARVAS🦌 TÁSKA👜 ABLAK🪟 TÜKÖR🪞 KABÁT🧥 ROBOT🤖 POLIP🐙 KIRÁLYNŐ👸 TEHERAUTÓ🚚 KALAP🎩 PIZZA🍕 NARANCS🍊 SZŐLŐ🍇 MADÁR🐦 KOALA🐨 ÁGY🛏️ MAKK🌰 SÁL🧣 FOKHAGYMA🧄 ÖKÖL👊 SZAMÁR🫏 SAPKA🧢 TORONY🗼 CUMI🍼 ÉJSZAKA🌃 TOJÁS🥚 GILISZTA🪱 ANANÁSZ🍍 BABA🪆 ESŐ🌧️ BOHÓC🤡 FÉSZEK🪺 SZÉL🌬️ GYÜMÖLCS🍑 GYEREK🧒 NYAKKENDŐ👔 PAPAGÁJ🦜 UBORKA🥒 LYUK🕳️ KANNA🫖 GYÜMÖLCSLÉ🧃 SZAKÁCS👨‍🍳 MOSOLY😊 KÁPOSZTA🥬 ÍJ🏹 ÜVEG🍾 ÚT🛣️';
+const seen={}; D.VOC[lg]=RAW.trim().split(/\s+/).map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; }).filter(x=>!seen[x[1]]&&!seen[x[0]]&&(seen[x[1]]=seen[x[0]]=1));
+D.GRA[lg]=['DZS','CS','DZ','GY','LY','NY','SZ','TY','ZS'];
+D.HUNTLONG[lg]=['DZS','CS','DZ','GY','LY','NY','SZ','TY','ZS'];
+D.HUNTL[lg]='BCDFGHJKLMNPRSTVZ';
+D.FAM[lg]=[['CS'],['SZ'],['ZS'],['GY'],['NY'],['TY'],['LY','J']];
+D.POSL[lg]='MLNPRTK';
+})();
+</script>
+
+<script>
+/* ===== Magyar — golyós számológép, sakk, matek, kezdőlap, idő, Pufi, app ===== */
+(()=>{ const lg='hu'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+const one=s=>s===1?'egy csillagot':`${s} csillagot`;
+const st3=['','egy csillagot','két csillagot','három csillagot'];
+S('sa',{title:'🧮 Számológép-akadémia',back:'⬅ Vissza',map:'⬅ Térkép',hint:'💡 Segítség',check:'✔ Kész',clear:'🧹 Törlés',eyeOn:'👀 Szám: be',eyeOff:'👀 Szám: ki',
+  unlockOn:'🔓 Mind: be',unlockOff:'🔓 Mind: ki',worlds:['🌱 Az egyesek világa','🌳 A tízesek világa','🚀 Számológép-mesterek'],extra:'🎁 Még több',
+  free:['🎨','Szabad játék'],ten:['🍒','Legyen 10'],lvl:n=>`${n}. szint`,place:['Egyesek','Tízesek','Százasok'],
+  names:['Az 1-es golyók','Az 5-ös golyó','Olvasd le a golyókat','Könnyű összeadás','Az 5 barátai','Tízesek és egyesek','Nagy számok','A 10 barátai','Elvétel','Nagy összeadás','Villám','Anzan'],
+  intro:['Minden alsó sárga golyó 1-et ér. Told fel őket a középső rúdhoz.','A felső piros golyó 5-öt ér. Told le a rúdhoz.','Nézd meg a számológépet, és mondd meg, milyen számot mutat.','A gépen már van egy szám. Tegyél hozzá golyókat, és nézd meg, mennyi lesz.','Ha elfogynak az 1-es golyók, hívd a barátodat: az 5-ös golyót!','A bal oldali rúd a tízeseket mutatja. A jobb oldali az egyeseket.','Először a tízeseket olvasd le, aztán az egyeseket.','Ha nem elég az egyes, tegyél hozzá egy tízest, és vedd el a barátot.','Elvételnél eltoljuk a golyókat a rúdtól.','Először a tízeseket add hozzá, aztán az egyeseket.','Egy szám csak egy pillanatra jelenik meg. Jegyezd meg, és mutasd meg a gépen!','Hallgasd a számokat, és add őket hozzá egymás után a gépen.'],
+  show:n=>`Mutasd: ${n}.`,add:(a,b)=>`A gép ezt mutatja: ${a}. Adj hozzá: ${b}.`,sub:(a,b)=>`A gép ezt mutatja: ${a}. Vegyél el: ${b}.`,
+  read:'Milyen számot mutat a gép?',flash1:'Jegyezd meg a számot!',flash2:'Most mutasd meg a gépen.',again:'👁 Mutasd újra',
+  anz1:'Figyelj, és add hozzá!',anz2:'Mennyi van most a gépen?',plus:'meg',
+  hintBlink:'Mozgasd a villogó golyókat.',f5a:b=>`Tedd hozzá az 5-ös golyót, és vegyél el ennyit: ${5-b}.`,f10a:b=>`Tegyél hozzá egy tízest, és vegyél el ennyi egyest: ${10-b}.`,f5s:b=>`Vedd el az 5-ös golyót, és tegyél hozzá ennyit: ${5-b}.`,
+  right:n=>`Igen! ${n}!`,have:v=>`A gép ezt mutatja: ${v}. Próbáld újra!`,readWrong:'Nézd meg újra a golyókat.',
+  done:s=>`Kész a szint! Szereztél ${one(s)}!`,next:'▶ Következő szint',again2:'↺ Még egyszer',locked:'Előbb fejezd be az előző szintet.',
+  freeTask:'Mozgasd a golyókat, ahogy szeretnéd. Én megmondom a számot!',acad:'🧮 Akadémia',one});
+S('ch',{ tab:'♟️ Sakk', title:'Sakkiskola', back:'⬅ Vissza', menu:'⬅ Menü', hintsOn:'💡 Segítség: be', hintsOff:'💡 Segítség: ki',
+  lvl:n=>`${n}. szint`, next:'🔄 Új feladat', again:'↺ Még egyszer', listen:'🔊 Meghallgatom', moves:n=>`Lépések: ${n}`,
+  names:{K:'A király',Q:'A vezér',R:'A bástya',B:'A futó',N:'A huszár',P:'A gyalog'},
+  short:{K:'Király',Q:'Vezér',R:'Bástya',B:'Futó',N:'Huszár',P:'Gyalog'},
+  nom:{K:'a király',Q:'a vezér',R:'a bástya',B:'a futó',N:'a huszár',P:'a gyalog'},
+  dat:{K:'király',Q:'vezér',R:'bástya',B:'futó',N:'huszár',P:'gyalog'},
+  blackAcc:{Q:'a fekete vezért',R:'a fekete bástyát',B:'a fekete futót',N:'a fekete huszárt',P:'a fekete gyalogot'},
+  games:{learn:['🎓','A bábuk'],stars:['⭐','Gyűjtsd a csillagokat'],capture:['🍽️','Üsd le a bábut'],escape:['🛡️','Mentsd meg a királyt'],mate:['👑','Sakk-matt!'],pawns:['⚔️','Gyalogcsata']},
+  desc:{K:'A király a legfontosabb bábu. Csak egy mezőt lép, bármelyik irányba.',
+        Q:'A vezér a legerősebb bábu. Egyenesen és átlósan lép, olyan messzire, amennyire akar.',
+        R:'A bástya egyenesen lép: előre, hátra, balra és jobbra, olyan messzire, amennyire akar.',
+        B:'A futó csak átlósan lép, és mindig ugyanazon a színen marad.',
+        N:'A huszár L alakban ugrik: két mezőt egyenesen és egyet oldalra. Át tud ugrani más bábukat!',
+        P:'A gyalog egy mezőt lép előre. Először kettőt is léphet. Ha a túloldalra ér, vezérré változik!'},
+  learnTask:'Koppints a bábura, és lépj vele háromszor.', learnDone:n=>`Szuper! Most már tudod, hogyan lép ${n}.`,
+  promo:'Hűha! A gyalog a túloldalra ért, és vezérré változott!',
+  starsTask:(n,k)=>`Gyűjts össze ${k} csillagot, ezzel a bábuval: ${n}.`, starsDone:m=>`Minden csillagot összegyűjtöttél! Lépések: ${m}.`,
+  captureTask:x=>`Üsd le ${x}!`, gotIt:x=>`Leütötted ${x}!`, notTarget:x=>`Hoppá! Le kell ütnöd ${x}.`,
+  escapeTask:'Sakkban van a királyod! Lépj vele biztonságos mezőre.', safe:'A király biztonságban van!',
+  mateTask:'Adj mattot egy lépésből!', mate:'Sakk-matt! Nyertél!', notMate:'Ez nem matt. Próbáld újra!', mateHint:'Tipp: próbáld a villogó bábuval.',
+  pawnsTask:'Juttass el egy fehér gyalogot a túloldalra! A robot sötéttel játszik.', pawnsWin:'A gyalogod átért! Nyertél!',
+  pawnsLose:'Most a robot nyert. Próbáljuk újra?', botStuck:'A robot nem tud lépni. Nyertél!',
+  youStuck:'Nem tudsz lépni. Most a robot nyer.', botThinks:'A robot gondolkodik…', yourTurn:'Te jössz!',
+  cant:n=>`${n} nem léphet oda.`, kingBad:'Ott a királyt megtámadnák!' });
+S('cg',{ title:'Sakkparti', back:'⬅ Vissza', menu:'⬅ Menü', hintsOn:'💡 Segítség: be', hintsOff:'💡 Segítség: ki',
+  who:'Ki ellen játszol?', color:'Ezzel játszol:', white:'⚪ Világos', black:'⚫ Sötét', rand:'🎲 Véletlen',
+  opp:{easy:['🐣','Robo-Csibe','könnyű'],mid:['🦊','Robo-Róka','közepes'],hard:['🦉','Robo-Bagoly','nehéz'],two:['👫','Két játékos','ugyanazon a tableten']},
+  cont:'▶ A parti folytatása', wins:n=>`Győzelmek: ${n}`,
+  intro:(me)=>`Játsszunk! ${me===1?'Világossal vagy, te kezdesz':'Sötéttel vagy. A robot kezd'}.`, intro2:'Játsszunk! A világos kezd.',
+  yourTurn:'Te jössz!', thinks:n=>`${n} gondolkodik…`, turnW:'Világos lép ⚪', turnB:'Sötét lép ⚫',
+  N:{1:'a gyalog',2:'a huszár',3:'a futó',4:'a bástya',5:'a vezér',6:'a király'},
+  NA:{1:'a gyalogot',2:'a huszárt',3:'a futót',4:'a bástyát',5:'a vezért',6:'a királyt'},
+  NY:{1:'a gyalogodat',2:'a huszárodat',3:'a futódat',4:'a bástyádat',5:'a vezéredet',6:'a királyodat'},
+  ND:{1:'a gyaloggal',2:'a huszárral',3:'a futóval',4:'a bástyával',5:'a vezérrel',6:'a királlyal'},
+  botMoved:(n,p)=>`${n} mozgatta ${p}.`, botTook:(n,p)=>`${n} leütötte ${p}.`, youTook:p=>`Ügyes! Leütötted ${p}.`,
+  castle:'Sáncolás! A király elbújik a bástya mögé.', check:'Sakk!', checkYou:'Sakk! Támadják a királyodat. Mentsd meg!',
+  mateWin:'Sakk-matt! Nyertél! Bravó, bajnok!', mateLose:n=>`Sakk-matt. Most ${n} nyert. Játsszunk még egyet?`,
+  mateW:'Sakk-matt! A világos nyert!', mateB:'Sakk-matt! A sötét nyert!',
+  stale:'Patt! A király nem tud lépni, de nincs sakkban. Döntetlen.', rep:'Háromszor ugyanaz az állás. Döntetlen!',
+  fifty:'Ötven lépés ütés nélkül. Döntetlen!', insuf:'Túl kevés bábu maradt a matthoz. Döntetlen!',
+  undo:'↶ Visszavonás', tip:'💡 Tipp', newg:'🔄 Új parti', listen:'🔊',
+  tipSay:p=>`Próbálj lépni ${p}!`, promoQ:'Mivé változzon a gyalog?', promo:'A gyalog a túloldalra ért, és átváltozott!',
+  cant:n=>`${n.charAt(0).toUpperCase()+n.slice(1)} nem léphet oda.`, kingBad:'Így a királyod sakkban lenne!', notYours:'Ez a másik játékos bábuja.',
+  danger:'Vigyázz! A piros karikás bábut leüthetik.' });
+S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',allOff:'🔓 Mind: ki',hint:'💡 Segítség',lvl:n=>`${n}. szint`,
+ hello:'Üdv a számok világában! Válassz egy játékot.',done:s=>`Kész! Szereztél ${st3[s]}!`,next:'▶ Következő szint',again:'↺ Még egyszer',toMenu:'⬅ Szintek',locked:'Előbb fejezd be az előző szintet.',
+ games:{add:['➕','Összeadás és kivonás'],cmp:['🐊','Az éhes krokodil'],nb:['🏠','A szomszédok utcája'],ord:['🐧','Pingvinek sorban'],box:['🎁','A titkos doboz'],sb:['🧮','Számológép'],ten:['🍒','Legyen 10']},
+ lvAdd:['Összeadás 5-ig','Összeadás 10-ig','Kivonás 10-ig','Összeadás 20-ig','Kivonás 20-ig','Vegyes 20-ig','Kerek tízesek','100-ig'],
+ lvCmp:['Hasonlítsd össze a kupacokat','A < > = jelek','Számok 20-ig','Számok 100-ig','Hasonlítsd össze a műveleteket'],
+ lvNb:['A jobb oldali szomszéd','A bal oldali szomszéd','Mindkét szomszéd 20-ig','Mindkét szomszéd 100-ig','A középső szám'],
+ lvOrd:['Három szám, növekvő sorrendben','Négy szám, csökkenő sorrendben','20-ig, vegyesen','100-ig, növekvő','100-ig, vegyesen'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Vegyes 20-ig','Vegyes 100-ig'],
+ plus:'meg',minus:'mínusz',make:'az',addQ:(a,o,b)=>`Mennyi ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} az ${c}!`,
+ addStory:(a,b,e)=>`Van ${a} (${e}). Jön még ${b}. Hány van most?`,subStory:(a,b)=>`Van ${a}. Elmegy ${b}. Hány marad?`,
+ frog:'A béka ugrál a számegyenesen. Számold az ugrásokat!',
+ cmpPile:'Az éhes krokodil a nagyobb kupacot akarja! Koppints rá!',cmpSym:'Melyik jel kell ide? A krokodil a nagyobb szám felé tátja a száját!',cmpBad:'A krokodil mindig többet akar!',
+ gt:(a,b)=>`${a} nagyobb, mint ${b}.`,lt:(a,b)=>`${a} kisebb, mint ${b}.`,eq:(a,b)=>`${a} egyenlő ezzel: ${b}.`,chomp:'Hamm!',
+ nbR:n=>`Ki lakik jobbra ettől: ${n}? A jobb oldali szomszéd eggyel több.`,nbL:n=>`Ki lakik balra ettől: ${n}? A bal oldali szomszéd eggyel kevesebb.`,nbLR:n=>`Keresd meg mindkét szomszédját ennek: ${n}!`,nbB:(a,b)=>`Melyik szám lakik ${a} és ${b} között?`,
+ nbOk:s=>`${s}. Ügyes, a szomszédok a helyükön vannak!`,nbNo:'Ez nem itt lakik. Próbáld újra!',
+ ordUp:'Állítsd sorba a pingvineket a legkisebbtől a legnagyobbig. Építs felfelé menő lépcsőt!',ordDown:'Állítsd sorba a pingvineket a legnagyobbtól a legkisebbig. Építs csúszdát!',
+ ordOk:'Tökéletes! Jó a sorrend!',ordNo:'Hoppá, itt nem jó a sorrend. Próbáld újra!',up:'🪜 Növekvő',down:'🛝 Csökkenő',
+ boxQ:'Hány alma van a titkos dobozban? Tegyél almát a dobozba, amíg a mérleg egyenes nem lesz!',boxQ100:'Milyen szám van a titkos dobozban? Tegyél hozzá almát, amíg a mérleg egyenes nem lesz!',boxOk:(e)=>`A mérleg egyenes! ${e}`,heavyL:'A bal oldal nehezebb.',heavyR:'A jobb oldal nehezebb.'});
+S('hm',{title:'Számold a csillagokat ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',bday:'🎂 A gyerek születésnapja',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
+const HU=['tizenkettő','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
+const HA=['tizenkét','egy','két','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
+const hr=h=>`${HA[h%12]} óra`;
+const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
+const itIs=t=>`${cap(t)} van.`;
+const al=t=>t+'kor';
+S('tm',{title:'⏳ Pufi ideje',back:'⬅ Vissza',allOn:'🔓 Mind: be',allOff:'🔓 Mind: ki',lvl:n=>`${n}. szint`,ok:'✔ Kész',listen:'🔊 Meghallgatom',help:'💡 Segítség',first:a=>`Először: ${a}.`,nextIs:(a,b)=>`Ez után: ${a}, jön: ${b}.`,
+ done:s=>`Kész! Szereztél ${st3[s]}!`,next:'▶ Következő szint',again:'↺ Még egyszer',toMenu:'⬅ Vissza',locked:'Előbb fejezd be az előző szintet.',
+ ladder:['🕰️ az órák','🌅 egy nap','🚃 7 nap = egy hét','🎡 12 hónap = egy év'],
+ worlds:{clock:['🕰️','Az óra'],day:['🌅','A nap'],cal:['📅','A hét és a naptár'],seas:['🌳','Az évszakok']},
+ games:{explore:['🕰️','A varázsóra'],cuckoo:['🐦','A kakukkos óra'],pizza:['🍕','A pizzaóra'],station:['🚂','A pályaudvar'],memo:['🧩','Párkereső'],oven:['⏳','Meddig tart?'],
+  order:['🧸','Tedd sorba a napot'],dayclk:['🌞','Egy nap Pufival'],moments:['🌗','A napszakok'],ytm:['📆','Tegnap, ma, holnap'],
+  week:['🚃','A hét vonata'],calm:['📅','A naptáram'],months:['🎡','A hónapok kereke'],
+  tree:['🌳','Az évszakok fája'],dress:['🦊','Öltöztesd fel Pufit'],sort:['🧺','Válogasd évszak szerint']},
+ lv:{cuckoo:['Számold a kakukkolást','Olvasd le az órát','Állítsd be az órát'],pizza:['Fél','Mutasd a felet','Negyed','Háromnegyed','Mutasd a negyedeket'],
+  station:['Egész órák','Fél','Negyedek','5 percenként','Bármelyik perc','A 24 órás óra'],memo:['Egész és fél órák','Negyedek','5 percenként'],
+  oven:['Egy óra','Két óra','Fél óra','Negyed óra','Vegyes'],order:['A reggel','Az egész nap'],dayclk:['Egész órák','Fél'],ytm:['Pufi története','A hét napjai'],
+  week:['Tedd sorba a napokat','Melyik nap jön utána?','Melyik nap van előtte?'],calm:['Ma, tegnap, holnap','A hét napjai','Számold a napokat'],months:['A hónapok sorban','Melyik hónap jön utána?','Hónapok és évszakok']},
+ days:['hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap'],
+ months:['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'],
+ seas:['tavasz','nyár','ősz','tél'], seasT:['Tavasz','Nyár','Ősz','Tél'],
+ parts:['reggel','délben','délután','este','éjjel'],
+ today:(wd,d,mo,s)=>`Ma ${wd} van, ${mo} ${d}. Most ${s} van!`,
+ time:(h,m)=>{ if(m===0) return hr(h); if(m===15) return `negyed ${HU[(h+1)%12]}`; if(m===30) return `fél ${HU[(h+1)%12]}`; if(m===45) return `háromnegyed ${HU[(h+1)%12]}`; return `${HA[h%12]} óra ${m} perc`; },
+ short:null, itIs, hourOnly:h=>hr(h),
+ hands:'A nagymutató a perceket mutatja. A kismutató az órákat mutatja.',
+ exHi:'Forgasd a mutatókat az ujjaddal, és nézd, hogyan telik a nap!', now:'⏰ Most', gears:'⚙️ Fogaskerekek', pz:'🍕 Pizza',
+ cuCount:'Hallgasd a kakukkot! Hányszor szól?', cuRead:'Hány óra van?', cuSet:h=>`Állítsd az órát erre: ${hr(h)}! Mozgasd a kismutatót.`,
+ pzRead:'Hány óra van? Nézd meg, mennyi pizza van kiszínezve.', pzSet:t=>`Mutasd: ${t}! Mozgasd a nagymutatót.`, pzHalf:'Fél pizza fél óra: 30 perc.', pzQuar:'Egy szelet pizza negyed óra: 15 perc.',
+ dest:[['🏔️','a hegyek'],['🏖️','a tenger'],['👵','a nagymama'],['🏰','a kastély'],['🦁','az állatkert'],['🌲','az erdő']],
+ stTask:(t,d)=>`A vonat úti célja: ${d}. Indulás: ${t}. Állítsd az órát az indulás idejére!`, go:'🚂 Indulás!', stWrong:'Hoppá! Az óra más időt mutat. Próbáld újra!', st24:(d,t,p)=>`${d} azt jelenti: ${t}, ${p}.`,
+ memoTask:'Fordítsd meg a kártyákat, és keresd meg a párokat: az órát és az idejét!',
+ ovItems:[['🎂','a tortát'],['🍕','a pizzát'],['🍪','a kekszet'],['🍞','a kenyeret']], dur:m=>({60:'egy óráig',120:'két óráig',30:'fél óráig',15:'negyed óráig',45:'háromnegyed óráig',90:'másfél óráig'})[m],
+ ovTask:(it,t,d)=>`Pufi ${al(t)} beteszi ${it} a sütőbe. ${d.charAt(0).toUpperCase()+d.slice(1)} kell sülnie. Forgasd előre a nagymutatót, és nyomd meg a Kész gombot!`, ovEarly:'Még nincs kész! Forgasd tovább.', ovBurn:'Hoppá, túl sokáig! Kicsit megégett. Próbáld újra!', ovDone:t=>`Csing! Kész van! ${itIs(t)}`,
+ acts:[['⏰','Pufi felébred',420],['🪥','fogmosás',430],['🥣','reggeli',450],['🎒','indulás az oviba',480],['🍽️','ebéd',720],['😴','délutáni alvás',780],['🛝','játék a parkban',960],['🍝','vacsora',1080],['🛁','fürdés',1140],['📖','esti mese',1170],['🌙','lefekvés',1200]],
+ ordTask:'Tedd sorba Pufi napját: reggeltől estig!',
+ dcTask:(a,t)=>`${cap(a)}! Állítsd az órát erre: ${t}.`,
+ mom:[[0,'🥣','reggelizünk'],[0,'🐓','kukorékol a kakas és felkel a nap'],[1,'🍝','ebédelünk'],[1,'☀️','a nap a legmagasabban van'],[2,'🍪','uzsonnázunk alvás után'],[2,'🛝','a parkban játszunk'],[3,'🌇','lemegy a nap'],[3,'🛁','fürdünk lefekvés előtt'],[4,'😴','alszunk'],[4,'🦉','vadászik a bagoly és ragyognak a csillagok']],
+ moTask:a=>`Mikor ${a}?`,
+ ytmL:['TEGNAP','MA','HOLNAP'], places:[['👵','a nagymamánál'],['🛝','a parkban'],['🏊','az uszodában'],['🦁','az állatkertben'],['🏫','az oviban'],['🎂','egy zsúron'],['🏖️','a tengerparton'],['🚒','a tűzoltóknál']],
+ ytmStory:(a,b,c)=>`Tegnap Pufi ${a} volt. Ma ${b} van. Holnap ${c} lesz.`, ytmQ:['Hol volt Pufi tegnap?','Hol van Pufi ma?','Hol lesz Pufi holnap?'],
+ ytmD:(k,d)=>[`Ma ${d} van. Milyen nap volt tegnap?`,`Ma ${d} van. Milyen nap lesz holnap?`][k],
+ weekTask:'Tedd sorba a vagonokat: hétfővel kezdd!', weekAfter:d=>`Melyik nap jön ez után: ${d}?`, weekBefore:d=>`Melyik nap van ez előtt: ${d}?`, weekend:'A szombat és a vasárnap a hétvége: nincs ovi!',
+ calToday:'Koppints a mai napra!', calTom:'Koppints a holnapra!', calYes:'Koppints a tegnapra!', calWd:n=>`A hét melyik napjára esik a hónap ${n}. napja?`, calCount:n=>`Hány nap van még a hónap ${n}. napjáig? Koppints a napokra egyenként, holnaptól kezdve!`, calHow:'Hány napot számoltál?',
+ bday:n=>n===0?'🎂 Ma van a születésnapod! Boldog születésnapot!':`🎂 A születésnapodig még ${n===1?'egy':n} nap van`,
+ moOrder:'Koppints a hónapokra sorban, januárral kezdve!', moAfter:m=>`Melyik hónap jön ez után: ${m}?`, moSeas:m=>`Melyik évszakban van: ${m}?`,
+ treeHi:['Tavasszal virágzik a fa. Koppints a rügyekre!','Nyáron tele van gyümölccsel a fa. Szedd le a cseresznyét!','Ősszel a levelek megsárgulnak és lehullanak. Rázd meg a fát!','Télen a fa alszik a hó alatt. Építs hóembert!'],
+ dressTask:s=>`Most ${s} van! Mit vegyen fel Pufi? Válassz három illő dolgot.`, dressNo:['Hmm, ez most nem illik.','Uff, nyáron ehhez túl meleg van!','Hmm, ez most nem illik.','Brrr! Télen ehhez túl hideg van!'],
+ sortTask:'Melyik évszakban használjuk ezt? Tedd a jó kosárba!'});
+S('pq',{title:'Pufi kalandja',sub:'Válassz egy világot! Gyűjtsd össze a csillagokat és minden szinten a 3 szivárványcsillagot 🌟.',help:'◀ ▶ menj · ⬆ ugorj (kétszer is!) · ⬇ be a csőbe',exit:'⬅ Vissza',lvl:n=>`${n}. szint`,
+ names:['A rét','Az őszi erdő','A kristálybarlang','A felhők között','A tengerpart','A hóország','A szentjánosbogarak éjszakája','A lávakastély'],
+ start:(n,t)=>`${n}. szint: ${t}. Hajrá, Pufi!`, won:'Ügyes! Pufi hazaért!', winS:(s,m)=>`⭐ ${s} csillag · 🌟 ${m} / 3 szivárványcsillag`, next:'▶ Tovább', again:'↺ Még egyszer', map:'🗺️ Térkép',
+ grow:'Hűha! Pufi megnőtt!', shrink:'Jaj! Pufi újra kicsi lett. Van még egy esélyed!', hurt:'Jaj! Elvesztettél egy szívet.', over:'Hoppá! Próbáljuk újra a zászlótól.', rainbow:'A szivárványcsillag! Senki sem állíthat meg!', medal:'Egy szivárványcsillag!', check:'Tiéd a zászló! Innen folytatod.', heart:'Egy plusz szív!',
+ secret:'Egy titkos szoba!', allDone:'Minden világot végigjátszottál! Igazi bajnok vagy!',
+ signs:{move:'Menj a nyilakkal, és ugorj a sárga gombbal!',box:'Fejeld meg a kérdőjeles dobozt!',stomp:'Ugorj rá a csigára! Aztán rúgd el a házát.',grow:'A csillagtól megnősz! Ha nagy vagy, téglákat is törhetsz.',pipe:'Állj a csőre, és nyomd meg a lefelé nyilat! Titkos szoba van ott.',hog:'A süninek tüskéi vannak! Ne ugorj rá, kerüld ki.',spring:'Ugorj a trambulinra, és magasra repülsz!',flag:'Érintsd meg a zászlót! Ha megsérülsz, innen folytatod.',goal:'Ugorj minél magasabbra a célzászlóra!',bee:'A méhek fel-le repülnek. Ugorj rájuk!',lava:'Vigyázz a lávára! Használd a platformokat.',fish:'A halak kiugranak a vízből! Várj, aztán menj át.'}});
+S('nt',{recT:'🎙️ A szülők hangja',recH:'Vegyél fel dicséreteket a saját hangodon. A gyerek akkor hallja őket, amikor ügyes.',slot:i=>`${i}. dicséret`,rec:'⏺ Felvétel',stop:'⏹ Kész',play:'▶',del:'🗑',
+   buyT:'💎 Teljes verzió',buy:p=>`Minden feloldása ${p||''}`,restore:'Vásárlások visszaállítása',owned:'✅ Megvan a teljes verzió. Köszönjük!',voice:q=>`Hang: ${q}`,
+   mic:'🎤 Hangosan olvasok',micHint:'Olvass hangosan! Minden elolvasott szó zöld lesz. Ha nem ismersz egy szót, koppints rá.',micNo:'A mikrofon nem érhető el. Próbáld az «Én olvasom» gombot.',listenMe:'🔊 Hallgasd meg magad',micRead:n=>`Egyedül elolvastál ${n} szót!`,listening:'Figyelek…'});
+})();
+</script>
+
+<script>
+/* ===== Magyar — formák, RoboPufi, akvárium ===== */
+(()=>{ const lg='hu'; const S=(k,v)=>{ (L10N[k]=L10N[k]||{})[lg]=v; };
+const st3=['','egy csillagot','két csillagot','három csillagot'];
+S('gm',{title:'📐 A formák világa',back:'⬅ Vissza',hello:'Üdv a formák világában! Válassz egy játékot.',hint:'💡 Segítség',undo:'↩ Vissza',clear:'🗑️ Törlés',
+ games:{geo:['📌','A szögestábla'],tan:['🧩','Formakirakó'],cube:['🧊','Kockák 3D-ben'],meas:['📏','Becsüld meg és mérd meg']},
+ done:s=>`Kész! Szereztél ${st3[s]}!`,next:'▶ Tovább',again:'↺ Még egyszer',toMenu:'⬅ Játékok',
+ shapes:{3:'háromszög',4:'négyszög',5:'ötszög',6:'hatszög',sq:'négyzet',rect:'téglalap'},
+ geoIntro:'Koppints a szögekre egymás után, hogy kifeszítsd a gumit. A forma bezárásához koppints újra az első szögre!',
+ geoT:['Készíts háromszöget!','Készíts négyzetet!','Készíts olyan téglalapot, amely nem négyzet!','Készíts négyzetet, amelynek oldalai három kockányiak!','Hány kocka van a forma belsejében?','Készíts olyan formát, amelyben pontosan négy kocka van!','Hány kerítésdarab kell a kert köré?','Készíts nagy háromszöget hat kockával a belsejében!'],
+ made:s=>`Ezt készítetted: ${s}!`,corners:n=>`${n} sarka van.`,notTri:'A háromszögnek három sarka van. Próbáld újra!',notSq:'A négyzetnek négy egyforma oldala és derékszögű sarkai vannak.',isSq:'Ez négyzet! Tedd az egyik oldalát hosszabbra.',notRect:'A téglalapnak négy derékszögű sarka van.',
+ notSq3:'Minden oldal legyen három kocka hosszú.',areaIs:n=>`A formádban ${n} kocka van.`,cross:'A gumi keresztezi magát! Próbáld újra.',
+ geoHint:['A háromszögnek három sarka van. Koppints a sárga szögekre sorban: egy, kettő, három, aztán újra az elsőre!','A négyzetnek négy egyforma hosszú oldala van. Koppints a sárga szögekre sorban!','A téglalap hosszabb, mint amilyen magas. Koppints a sárga szögekre sorban!','Minden oldal három kocka hosszú. Koppints a sárga szögekre sorban!','Számold a kockákat soronként. Az első sorban négy van. Hány sor van?','Két kocka egymás mellett és még kettő alatta, az négy! Koppints a sárga szögekre!','Számolj meg minden kerítésdarabot pontról pontra, körbe-körbe.','Egy négykockás és egy háromkockás oldal nagy háromszöget ad. Koppints a sárga szögekre!'],areaQ:'Hány kocka van benne? Számold meg!',perimQ:'Hány kerítésdarab kell körbe?',areaA:n=>`${n} kocka van benne. Ez a terület!`,perimA:n=>`${n} kerítésdarab kell. Ez a kerület!`,
+ tanIntro:'Húzd a darabokat az árnyékra. Koppints egy darabra, hogy elforgasd!',tanT:['Rakj ki négyzetet két háromszögből!','Építs házat!','Rakj ki egy halat!','Rakj ki egy vitorlást!','Építs rakétát!','Rakj ki egy cicát!'],
+ rotate:'Majdnem! Koppints a darabra, hogy elforgasd.',tanOk:['Két háromszögből négyzet lesz!','Milyen szép ház!','Egy hal!','A vitorlás indulásra kész!','Felszáll a rakéta!','Miáú! Egy cica!'],
+ cubeIntro:'Nézd meg jól a kockákat! Néhány el van bújva mögöttük vagy alattuk.',cubeCount:'Hány kocka van?',cubeTop:'Hogyan néz ki felülről? Válassz!',cubeBuild:'Építsd meg ugyanígy! Koppints egy helyre, és oda kerül egy kocka.',
+ cubeA:n=>`${n} kocka van!`,cubeTopA:'Pontosan! Így néz ki felülről.',cubeBuildA:'Pont ugyanolyan! Igazi építész vagy!',cubeNo:'Nézd meg újra. Ne felejtsd el az elbújt kockákat!',model:'Minta',yours:'A tiéd',
+ measIntro:'Becsüljük meg és mérjük meg a távolságokat!',estQ:'Hány lépést tesz a kis róka a répáig? Tippelj!',estRef:'Fent látod, milyen hosszú egy lépés. Az ujjaddal húzogathatod!',u1:'1 lépés',penRef:'Fent van egy ceruza. Az ujjaddal húzogathatod, hogy mérj vele!',u2:'1 ceruza',steps:n=>`${n} lépés!`,exact:'Tökéletes! Pontosan eltaláltad!',close:'Nagyon közel!',far:(g,n)=>`Azt mondtad: ${g}, de ${n} lépés.`,
+ cmpQ:'Melyik ösvény hosszabb?',blue:'🟦 Kék',orange:'🟧 Narancs',same:'🟰 Egyforma',cmpA:(a,b)=>`A kék ösvény ${a} lépés, a narancs ${b}.`,
+ penQ:'Hány ceruza hosszú a fatörzs?',penA:n=>`${n} ceruza hosszú!`,rugQ:'Melyik szőnyeg nagyobb?',rugA:(a,b)=>`A kék szőnyegen ${a} kocka van, a narancson ${b}.`});
+S('rb',{back:'⬅ Vissza',allOn:'🔓 Mind: be',allOff:'🔓 Mind: ki',
+ hello:'Szia! RoboPufi vagyok, a robotróka. Építsünk és programozzunk együtt!',
+ zones:{prog:['🧭','Programozd RoboPufit'],mech:['⚙️','Egyszerű gépek'],circ:['⚡','Áramkörök'],sens:['👀','Érzékelők'],gar:['🔧','A műhely']},
+ zoneSay:{prog:'Mondd meg RoboPufinak a nyilakkal, merre menjen!',mech:'Fedezzük fel, hogyan működnek a gépek!',circ:'Indítsuk el az áramot!',sens:'A robotok érzékelőkkel érzékelik a világot. Próbáljuk ki őket!',gar:'Itt megváltoztathatod a színemet és az alkatrészeimet!'},
+ lvl:n=>`${n}. szint`,
+ progIntro:'Tedd sorba a nyilakat, és nyomd meg az Indulás gombot. Vezesd RoboPufit az elemhez!',
+ loopIntro:'Csak kevés kártyád van! Koppints egy nyílra a programban, hogy megismételd.',
+ starIntro:'Gyűjtsd össze útközben a csillagokat is!',
+ run:'▶ Indulás',clear:'🗑️ Törlés',hint:'💡 Segítség',
+ edge:'Hoppá! Ott a szél.',bump:'Bumm! RoboPufi nekiment egy kőnek. Próbáld újra!',water:'Csobb! RoboPufi nem tud úszni!',short:'RoboPufi nem ért el az elemhez. Tegyél hozzá több nyilat!',full:'Nincs több hely! Koppints egy nyílra, hogy megismételd.',empty:'Előbb tegyél le nyilakat!',
+ progWin:'Odaértem az elemhez! Köszönöm!',
+ done:s=>`Kész! Szereztél ${s===1?'egy':s} csillagot!`,next:'▶ Tovább',again:'↺ Még egyszer',toZone:'⬅ Vissza',locked:'Előbb fejezd be az előző szintet.',
+ mech:{lever:['⚖️','A mérleghinta'],gears:['⚙️','A fogaskerekek'],ramp:['🛝','A lejtő']},
+ leverIntro:'A mérleghinta egy emelő. Húzz állatokat a jobb oldalra, hogy egyenes legyen!',
+ leverTip:'Láttad? Egy könnyű állat messze a középtől fel tud emelni egy nehezet!',
+ leverOk:'Tökéletes egyensúly!',leverHint:(a,d)=>`Próbáld így: ${a}, a(z) ${d}. helyre.`,
+ ani:{1:'egér',2:'nyúl',3:'kutya',4:'elefánt'},
+ gearsIntro:'A piros keréknek motorja van. Nézd, hogyan forgatja a többit! Az ujjaddal is foroghatod.',
+ qFast:'Melyik kerék forog a leggyorsabban? Koppints rá!',qDir:c=>`A piros kerék így forog ↻. Merre forog a ${c} kerék?`,cname:{blue:'kék',green:'zöld'},
+ whyFast:'Igen! A kis kerék többször fordul körbe, ezért gyorsabb.',whyDir:'Igen! Két egymáshoz érő kerék ellenkező irányba forog.',whyChain:'Igen! A középső kerék megfordítja az irányt, a harmadik pedig újra megfordítja.',gearWrong:'Nézd meg újra figyelmesen a kerekeket.',motor:'⚡ Motor',
+ rampIntro:'Húzd a felső pontot, hogy magasabb vagy alacsonyabb legyen a lejtő. A labdának a zászlónál kell megállnia!',
+ drop:'🔴 Engedd el!',far:'Túl messze! Engedd lejjebb a lejtőt.',near:'Túl közel! Emeld feljebb a lejtőt.',rampOk:'Pont a zászlónál!',rampTip:'Minél magasabb a lejtő, annál messzebbre gurul a labda!',
+ circIntro:'Húzz egy vezetéket az egyik fehér pöttytől a másikig. Az áramnak teljes út kell, a pluszból a mínuszba.',
+ cgoal:['Kapcsold fel a villanykörtét!','Kapcsold fel a villanykörtét a kapcsolóval!','Indítsd el a ventilátort!','Kapcsold fel mindkét villanykörtét!','Csengesd meg a csengőt!','Kapcsold fel a villanykörtét, és indítsd el a ventilátort!'],
+ shortC:'Rövidzárlat! Egy vezeték egyenesen összeköti a pluszt a mínusszal. Felmelegszik az elem!',swNow:'Kész az áramkör. Most nyomd meg a kapcsolót!',circOk:'Zárt az áramkör. Folyik az áram!',tapWire:'Koppints egy vezetékre, hogy eltávolítsd.',
+ sens:{light:['🔦','A fényérzékelő'],line:['✏️','Kövesd a vonalat'],touch:['🖐️','Az érintésérzékelő']},
+ lightIntro:'RoboPufinak fényérzékelője van. Mozgasd a zseblámpát, és ő követi a töltőig!',lightOk:'Töltődik az elem! Köszönöm!',
+ lineIntro:'RoboPufinak van egy érzékelője, amely látja a fekete vonalat. Rajzolj utat tőle az elemig, és nyomd meg az Indulás gombot!',
+ lineStart:'Pont RoboPufinál kezdd a rajzolást.',lineRock:'Bumm! Az út egy kövön megy át.',lineEnd:'Az út nem ér el az elemig.',erase:'🧽 Törlés',
+ touchIntro:'RoboPufinak érintésérzékelői vannak. Koppints arra a részre, amit mondok!',
+ parts:{head:'a fej',ant:'az antenna',belly:'a has',arm:'a kéz',wheels:'a kerék',tracks:'a lánctalp',legs:'a láb'},
+ touchAsk:p=>`Koppints erre: ${p}!`,touchWrong:p=>`Ez ${p}. Keresd tovább!`,touchOk:p=>`Igen, ${p}!`,
+ gar:{color:'🎨 Szín',wheels:'🛞 Kerekek',ant:'📡 Antenna',arms:'🦾 Karok',eyes:'👀 Szemek'},
+ dance:'💃 Táncolj!',need:n=>`${n} ⭐`,needSay:n=>`${n} csillagra van szükséged. Játssz, és gyűjts csillagokat!`,cool:'De jól nézek ki!',
+ garIntro:'Válaszd ki a színemet és az alkatrészeimet! Az új alkatrészek akkor nyílnak meg, ha minden játékban gyűjtesz csillagokat.'});
+S('rbg',{intro:'A fogaskerékműhely! Forog a piros motor. Tegyél be kerekeket, hogy a mozgás eljusson a gépig.',
+  t:['A hajónak erő kell! Tegyél be egy kereket, amely összeköti a motort a hajócsavarral.','Megállt az óra! Töltsd ki a lyukat két kerékkel.','Az autónak gyorsan kell mennie! Milyen kereket teszel a végére?','A darunak fel kell emelnie a nehéz elefántot! Milyen kereket teszel a végére?','Jaj ne, a hajó hátrafelé megy! Tegyél be vagy vegyél ki kerekeket, hogy előre menjen.'],
+  why:['Ügyes! A motor forgatja a kerekeket, a kerekek pedig a hajócsavart.','Az órában kis és nagy kerekek tolják egymást, és mozgatják a mutatókat.','A végén lévő kis kerék villámgyorsan forog. Így megy gyorsan az autó! A bicikli is így működik.','A végén lévő nagy kerék lassan forog, de nagyon erős. Így emel fel a daru nehéz dolgokat!','Minden új kerék megfordítja az irányt. Most a hajócsavar előre tolja a hajót!'],
+  noFit:'Nem fér be! Próbálj másik méretet.',gap:'A kerekek még nem érnek össze.',noRoom:'Nincs több hely!',slow:'Az autó túl lassú. Próbálj kisebb kereket a végére.',weak:'Túl nehéz! Próbálj nagyobb kereket a végére.',back:'A hajó még mindig hátrafelé megy.',
+  undo:'↩ Kivétel',sz:{S:'Kicsi',M:'Közepes',L:'Nagy'}});
+S('rbc',{zone:['🎨','A színlabor'],zoneSay:'Keverjünk színeket, mint az igazi tudósok!',
+ col:{tubes:['🧪','A kémcsövek'],shirts:['👕','A pólófestő'],guess:['🔮','Találd ki a színt']},
+ n:{R:'piros',Y:'sárga',B:'kék',W:'fehér',K:'fekete',orange:'narancssárga',green:'zöld',purple:'lila',pink:'rózsaszín',lblue:'világoskék',brown:'barna',lgreen:'világoszöld',grey:'szürke'},
+ and:' és ',make:(a,c)=>`${a}: ebből ${c} lesz!`,
+ tubesIntro:'Keverd össze a kémcsövek színeit a pohárban, hogy meglegyen a kért szín. Koppints egy kémcsőre, hogy önts belőle!',
+ tubeTask:c=>`Keverj ki ilyen színt: ${c}!`,more:c=>`Tegyél még hozzá egy kicsit ebből: ${c}.`,extra:c=>`Ezt tetted hozzá: ${c}, de ez nem jó. Öntsd ki a poharat, és próbáld újra!`,full:'Tele van a pohár! Öntsd ki, és próbáld újra.',empty:'🫗 Kiöntés',
+ shirtsIntro:'Üdv a pólófestőben! A vevők színes pólókat szeretnének. Keverd ki a festéket a kádban, aztán koppints a pólóra, hogy befesd.',
+ want:(c,o)=>`Ilyen színű pólót kérek: ${c}, mint ${o}!`,noPaint:'Előbb tegyél festéket a kádba!',notMine:'Ez nem az én színem! Kimossuk, és újra próbáljuk.',thanks:'Köszönöm! Gyönyörű!',
+ guessIntro:'Milyen szín lesz a keverésből? Találd ki!',guessQ:a=>`${a}: ebből mi lesz…?`,guessNo:'Nem egészen. Nézd meg, mi lett belőle!',
+ obj:{orange:'egy narancs',green:'egy béka',purple:'a szőlő',pink:'egy virág',lblue:'az ég',brown:'egy mackó',lgreen:'egy kivi',grey:'egy elefánt'}});
+{ const r=L10N.rb[lg], c=L10N.rbc[lg]; r.zones.col=c.zone; r.zoneSay.col=c.zoneSay; r.col=c.col; }
+S('aq',{title:'🐠 Az akváriumaim',main:'🌿 Akvárium',pred:'🦈 Ragadozók medencéje',close:'✖ Bezárás',eatOn:'🐟➜🦈 A ragadozók esznek: be',eatOff:'🐟➜🦈 A ragadozók esznek: ki',
+  pantry:'Kamra',empty:'Fogj betűket, hogy halakat és eleséget szerezz!',hungry:n=>`${n} hal éhes! Fogj betűket, hogy enni hozz nekik.`,hungry1:'Egy hal éhes! Fogj betűket, hogy enni hozz neki.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)}: ezt eszi ${who}.`,nobody:f=>`Itt senki sem kér ebből: ${f}.`,full:'Jóllakott!',hungryS:'Éhes',happy:'Jóllakott és vidám',
+  diet:'Ezt eszi:',size:['kicsi','fiatal','nagy'],move2pred:'➜ 🦈 Ragadozók medencéje',move2main:'➜ 🌿 Akvárium',ok:'👍',
+  warn:n=>`Vigyázz! ${n} kis halakra vadászik. Tedd át a ragadozók medencéjébe!`,ate:(p,v)=>`${p} megette: ${v}!`,got:(e,f)=>`Ezt fogtad a halaknak: ${f}! ${e}`,newFish:n=>`Új hal az akváriumban: ${n}!`,more:n=>`+${n} a folyóban`,sated:'A halak jóllaktak! Gyere vissza holnap.',night:'🌙 Éjszaka',day:'☀️ Nappal',nightSay:'Jó éjszakát, halacskák! Éjjel a harcsa vadászni indul.',daySay:'Jó reggelt, halacskák!',album:'📖 Album',albumT:'A halalbum',albumSay:(n,t)=>`${t} fajból ${n} fajt találtál meg. Fogj betűket, hogy mindet megtaláld!`,dirty:'Piszkos az üveg! Tisztítsd meg az ujjaddal.',clean:'Ragyog az akvárium! A halak boldogok!',come:'Nézd, jönnek enni!'});
+})();
+</script>
+
+<script>
 /* ===== Italiano — gioco principale, mondo, monumenti, calciatori ===== */
 (()=>{ const lg='it', IDX=7;
 L10N.main=L10N.main||{};
@@ -8918,6 +9305,14 @@ const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
   const NM={caras:['le carassin','Carassin','Le carassin est un poisson doré et calme. Il aime les plantes et les vers.'],crap:['la carpe','Carpe','La carpe a de petites moustaches pour chercher à manger dans la vase.'],pastrav:['la truite','Truite','La truite vit dans les ruisseaux froids des montagnes. Elle a des points noirs et une bande rose.'],biban:['la perche','Perche','La perche a des rayures sur le dos et des nageoires rouges. Elle chasse les petits poissons.'],somn:['le silure','Silure','Le silure a de longues moustaches et mange presque tout. Il chasse la nuit.'],stiuca:['le brochet','Brochet','Le brochet est le grand chasseur des rivières. Il se cache et attaque très vite !'],rac:['l’écrevisse','Écrevisse','L’écrevisse a des pinces et marche à reculons. Elle nettoie le fond.'],testoasa:['la tortue','Tortue','La tortue d’eau porte sa maison sur son dos.'],plev:['le vairon','Vairon','']};
   for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
   const FD={alg:'des algues',worm:'des vers',ins:'des insectes',plev:'des petits poissons'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k]; }
+})();
+</script>
+<script>
+/* Magyar — halnevek */
+(()=>{ const lg='hu', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['a kárász','Kárász','A kárász aranyszínű, nyugodt hal. Szereti a növényeket és a kukacokat.'],crap:['a ponty','Ponty','A pontynak bajusza van, azzal keres ennivalót az iszapban.'],pastrav:['a pisztráng','Pisztráng','A pisztráng hideg hegyi patakokban él. Fekete pöttyei és rózsaszín csíkja van.'],biban:['a sügér','Sügér','A sügér hátán csíkok vannak, az uszonyai pirosak. Kis halakra vadászik.'],somn:['a harcsa','Harcsa','A harcsának hosszú bajusza van, és szinte mindent megeszik. Éjjel vadászik.'],stiuca:['a csuka','Csuka','A csuka a folyók nagy vadásza. Elbújik, és villámgyorsan támad!'],rac:['a folyami rák','Rák','A folyami ráknak ollói vannak, és hátrafelé megy. Kitakarítja a meder alját.'],testoasa:['a teknős','Teknős','A vízi teknős a hátán hordja a házát.'],plev:['a kishal','Kishal','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'az alga',worm:'a kukac',ins:'a rovar',plev:'a kishal'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
 })();
 </script>
 <script>
