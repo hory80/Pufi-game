@@ -10187,6 +10187,7 @@ window.__pq={start:startLevel,get P(){return P},get W(){return W},get state(){re
 @keyframes ntHelp{to{transform:scale(1.12)}}
 .nt-mic{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:1.2rem}
 .nt-mic i{width:16px;height:16px;border-radius:50%;background:#FF5D7A;animation:rdPulse 1s infinite}
+.nt-heard{opacity:.65;font-weight:700;font-size:.95em;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 <script>
 /* ===== integrarea cu aplicația iOS (window.native există doar în aplicație) ===== */
@@ -10235,11 +10236,15 @@ window.__nativeKaraoke=(text,words,cancelled)=>new Promise(res=>{ const t=spoken
 /* --- citire cu voce: recunoașterea vorbirii mută evidențierea --- */
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\p{L}\p{N}]+/gu,'');
 function lev(a,b){ const d=[...Array(b.length+1).keys()]; for(let i=1;i<=a.length;i++){ let p=d[0]; d[0]=i; for(let j=1;j<=b.length;j++){ const t=d[j]; d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1)); p=t; } } return d[b.length]; }
-const near=(a,b)=>a===b||(b.length>=4&&lev(a,b)<=Math.floor(b.length/4))||(b.length>=5&&a.length>=4&&b.startsWith(a.slice(0,4)));
+/* numele lui Pufi e inventat: recunoașterea îl scrie oricum („Puffy”, „Bufi”, „Poofy”), așa că orice cuvânt auzit în locul lui e bun */
+const NAMES=new Set(['pufi','pufis','pufiego','pufiemu','pufim','pufinak','пуфі','пуфи','пуфика','poofy','poefie','poufi']);
+const near=(a,b)=>{ if(a===b) return true; if(NAMES.has(b)) return a.length>=2; if(a.length<2||b.length<2) return false;
+  if(b.length<=3) return a[0]===b[0]&&lev(a,b)<=1&&Math.abs(a.length-b.length)<=1;
+  return lev(a,b)<=Math.max(1,Math.floor(b.length/3))||(b.length>=5&&a.length>=4&&b.startsWith(a.slice(0,4))); };
 window.__micRead=({spans,row,task,alive,onDone})=>{ const W=spans.map(o=>norm(o.sp.textContent)); let i=0, base=0, last=Date.now(), active=true, done=false;
-  const ind=document.createElement('div'); ind.className='nt-mic'; ind.innerHTML=`<i></i>${Y().listening}`; row.insertBefore(ind,row.firstChild); task.textContent=Y().micHint;
+  const ind=document.createElement('div'); ind.className='nt-mic'; ind.innerHTML=`<i></i>${Y().listening} <span class="nt-heard"></span>`; row.insertBefore(ind,row.firstChild); task.textContent=Y().micHint;
   const mark=()=>spans.forEach((o,j)=>{ o.sp.classList.toggle('hl',j===i); o.sp.classList.toggle('ok',j<i); o.sp.classList.remove('help'); });
-  const onPart=p=>{ if(!active) return; const toks=(p.text||'').split(/\s+/).map(norm).filter(Boolean); let j=base;
+  const onPart=p=>{ if(!active) return; const hw=(p.text||'').trim().split(/\s+/).slice(-3).join(' '); const he=ind.querySelector('.nt-heard'); if(he&&hw) he.textContent='«'+hw+'»'; const toks=(p.text||'').split(/\s+/).map(norm).filter(Boolean); let j=base;
     for(const tk of toks){ for(let k=j;k<Math.min(W.length,j+3);k++){ if(near(tk,W[k])){ j=k+1; break; } } }
     if(j>i){ i=j; last=Date.now(); mark(); try{ tick(); }catch(e){} if(i>=W.length) finish(); } };
   const onEnd=()=>{ if(active&&!done&&alive()){ base=i; setTimeout(start,250); } };
