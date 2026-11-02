@@ -3,6 +3,11 @@
 Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `59a4e71` (including Pufi’s Island).
 Task: `ios/tasks/01-free-until-dec-15.md`.
 
+The final required publication rebase also included `1689413` (the separate
+Soroban Arena Anzan web module). That diff was reviewed and the 12 unit/bridge
+tests rerun on both devices, including bundled-page loading. The complete
+19-test suites below were run against `59a4e71`; Arena gameplay was not tested.
+
 The app now grants full access before **15 December 2026, 00:00 Europe/Zurich**
 (`2026-12-14T23:00:00Z`), permanently to verified early users, or while RevenueCat
 entitlement `premium` is active. The strict comparison excludes an original
