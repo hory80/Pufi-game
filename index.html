@@ -1988,7 +1988,7 @@ function showMenu(){
   if(window.openChessGame){ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-game'; b.style.background='#FFE9A8'; b.style.boxShadow='0 8px 0 #E8C66A';
     b.innerHTML=`<span class="ic">🤖♟️</span><span class="nm">${(({ro:'Joacă o partidă',de:'Partie spielen',en:'Play a game'})[lang]||((L10N.misc||{})[lang]||{}).playGame||'Play a game')}</span><span class="lv">${(({ro:'cu robotul sau cu un prieten',de:'gegen Roboter oder Freund',en:'vs robot or a friend'})[lang]||((L10N.misc||{})[lang]||{}).vsRobot||'vs robot or a friend')}</span>`;
     b.onclick=()=>{ root.hidden=true; try{ speechSynthesis.cancel(); }catch(e){} window.openChessGame(); }; m.appendChild(b); }
-  GAMES.forEach(g=>{ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-'+g;
+  GAMES.forEach(g=>{ const b=document.createElement('button'); b.className='ch-card'; b.id='ch-g-'+g; b.dataset.lk='ch:'+g;
     b.innerHTML=`<span class="ic">${C().games[g][0]}</span><span class="nm">${C().games[g][1]}</span><span class="lv">${C().lvl(L(g))}</span>`;
     b.onclick=()=>openGame(g); m.appendChild(b); });
 }
@@ -1999,6 +1999,7 @@ $('sayBtn').onclick=()=>{ if(task.text) speak(task.text); };
 $('task').onclick=()=>{ if(task.text) speak(task.text); };
 $('newBtn').onclick=()=>{ if(view==='play'){ busy=false; newTask(); } };
 addEventListener('resize',()=>{ if(!root.hidden&&view==='play') sizeBoard(); });
+openGame=(f=>g=>{ if(window.__gate&&window.__gate('ch',g)) return showMenu(); return f(g); })(openGame);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play') openGame(mode); else showMenu(); });
 window.openChess=()=>{ root.hidden=false; showMenu(); };
 window.__chess={pseudo,legal,allLegal,isMate,inCheck,parse,MATES,doMove,genStars,genCapture,genEscape};
@@ -2303,7 +2304,7 @@ function openStory(s){
   storyTok++; try{ speechSynthesis.cancel(); }catch(e){} const stg=$('stage'); stg.innerHTML=''; msg('');
   const bar=el('div','rd-row');
   const sb=el('button','rd-btn',ST().syl); sb.setAttribute('aria-pressed',sylColor); sb.onclick=()=>{ sylColor=!sylColor; store('rd_syl',sylColor?'1':'0'); openStory(s); }; bar.appendChild(sb);
-  [['listen',ST().listen],['self',ST().self]].concat(window.__micRead?[['mic',window.__micLabel()]]:[]).forEach(([m,t])=>{ const b=el('button','rd-btn',t); b.id='rd-sm-'+m; b.setAttribute('aria-pressed',storyMode===m); b.onclick=()=>{ storyMode=m; openStory(s); }; bar.appendChild(b); });
+  [['listen',ST().listen],['self',ST().self]].concat(window.__micRead?[['mic',window.__micLabel()]]:[]).forEach(([m,t])=>{ const b=el('button','rd-btn',t); b.id='rd-sm-'+m; if(m==='mic') b.dataset.lk='nt:mic'; b.setAttribute('aria-pressed',storyMode===m); b.onclick=()=>{ if(m==='mic'&&window.__gate&&window.__gate('nt','mic')) return; storyMode=m; openStory(s); }; bar.appendChild(b); });
   stg.appendChild(bar);
   const box=el('div','rd-story'); box.appendChild(el('h3','',s[0]+' '+(upper?s[1].toUpperCase():s[1])));
   const tx=el('div','rd-text'+(sylColor?' syl':'')); box.appendChild(tx); stg.appendChild(box);
@@ -2595,11 +2596,12 @@ function updTop(){ $('stars').textContent='⭐ '+stars; $('caseBtn').textContent
 function showMenu(){ view='menu'; busy=false; storyTok++; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='📖 '+R().title; updTop();
   const m=$('menu'); m.innerHTML='';
   MENU.forEach((grp,gi)=>{ m.appendChild(el('div','rd-mhead',R2().groups[gi]));
-    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
+    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; b.dataset.lk='rd:'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
 function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=GN(g)[0]+' '+GN(g)[1]; updTop(); RUN[g](); }
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
 $('task').onclick=()=>{ if(task.say) speak(task.say); };
+openGame=(f=>g=>{ if(window.__gate&&window.__gate('rd',g)) return showMenu(); return f(g); })(openGame);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'&&game) openGame(game); else showMenu(); });
 window.openReading=()=>{ root.hidden=false; showMenu(); };
 window.__rd={glyph,parseStroke,ALPHA,WORDS};
@@ -2953,7 +2955,7 @@ function showMenu(){
   [0,1,2].forEach(w=>{ const h=document.createElement('h3'); h.className='sa-world'; h.textContent=X().worlds[w]; m.appendChild(h);
     const row=document.createElement('div'); row.className='sa-row';
     LV.forEach((L,i)=>{ if(L.w!==w) return; const open=isOpen(i);
-      row.appendChild(card(L.ic,X().lvl(i+1),X().names[i],best[i]||0,(open?'':'lock')+(i===cur?' cur':''),()=>{ if(!open){ sp(X().locked); return; } startLevel(i); })); });
+      const cb=card(L.ic,X().lvl(i+1),X().names[i],best[i]||0,(open?'':'lock')+(i===cur?' cur':''),()=>{ if(!open){ sp(X().locked); return; } startLevel(i); }); cb.dataset.lk='sa:w'+w; row.appendChild(cb); });
     m.appendChild(row); });
   const h=document.createElement('h3'); h.className='sa-world'; h.textContent=X().extra; m.appendChild(h);
   const row=document.createElement('div'); row.className='sa-row';
@@ -2989,6 +2991,7 @@ $('owl').onclick=rep; $('task').onclick=rep;
 $('ovNext').onclick=()=>startLevel(Math.min(li+1,LV.length-1));
 $('ovAgain').onclick=()=>startLevel(li);
 $('ovMap').onclick=showMenu;
+startLevel=(f=>i=>{ if(window.__gate&&window.__gate('sa','w'+LV[i].w)) return showMenu(); return f(i); })(startLevel);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'){ if(freeMode) startFree(); else startLevel(li); } else showMenu(); });
 window.openSoroban=()=>{ root.hidden=false; showMenu(); };
 window.saLabel=()=>{ const b=document.getElementById('sbAcad'); if(b) b.textContent=X().acad; if(!root.hidden){ if(view==='menu') showMenu(); else labels(); } };
@@ -6907,7 +6910,7 @@ function home(){
   bub.onclick=()=>sp(X().hello); hero.appendChild(bub);
   const cards=el('div','rb-cards');
   ['prog','mech','circ','sens','col','gar'].forEach(z=>{ const c=el('button','rb-card',`<span class="ic">${X().zones[z][0]}</span><span class="t">${X().zones[z][1]}</span><span class="p">${zoneScore(z)}</span>`);
-    c.onclick=()=>{ blip(); ({prog:zoneProg,mech:zoneMech,circ:zoneCirc,sens:zoneSens,col:zoneCol,gar:garage})[z](); sp(X().zoneSay[z]); }; cards.appendChild(c); });
+    c.dataset.lk='rb:'+z; c.onclick=()=>{ blip(); ({prog:zoneProg,mech:zoneMech,circ:zoneCirc,sens:zoneSens,col:zoneCol,gar:garage})[z](); sp(X().zoneSay[z]); }; cards.appendChild(c); });
   wrap.append(hero,cards); main.appendChild(wrap);
   if(!data.hello){ data.hello=true; save(); sp(X().hello); }
 }
@@ -7726,6 +7729,7 @@ function garage(){
 }
 
 /* ================= intrare ================= */
+{ const zw=(k,f)=>(...a)=>{ if(window.__gate&&window.__gate('rb',k)) return home(); return f(...a); }; zoneProg=zw('prog',zoneProg); zoneMech=zw('mech',zoneMech); zoneCirc=zw('circ',zoneCirc); zoneSens=zw('sens',zoneSens); zoneCol=zw('col',zoneCol); garage=zw('gar',garage); }
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; const Z={home,prog:zoneProg,mech:zoneMech,sens:zoneSens,circ:zoneCirc,col:zoneCol}; if(Z[view]) Z[view](); else if(view==='gar'&&typeof garage==='function') garage(); else if(curRestart) curRestart(); else home(); });
 window.openRobo=()=>{ root.hidden=false; home(); };
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gRobo')){ const b=document.createElement('button'); b.id='gRobo'; b.className='pufiTab'; b.textContent='🤖 RoboPufi'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} window.openRobo(); };
@@ -7849,7 +7853,7 @@ $('back').onclick=()=>{ stopAll(); if(back) back(); else { root.hidden=true; } }
 function menu(){ stopAll(); back=null; $('title').textContent=X().title; $('back').textContent=X().back; pill(); main.innerHTML='';
   const head=el('div','rb-head'); head.append(el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦊</div>')); const b=el('div','rb-bubble'); b.textContent=X().hello; head.append(b); main.append(head);
   const g=el('div','gm-cards'); Object.entries({geo:geoGame,tan:tanGame,cube:cubeGame,meas:measGame}).forEach(([k,fn])=>{ const s=data.prog[k]||0;
-    const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.onclick=()=>{ blip(); back=menu; fn(); }; g.appendChild(c); });
+    const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.dataset.lk='gm:'+k; c.onclick=()=>{ blip(); back=menu; fn(); }; g.appendChild(c); });
   main.appendChild(g); sp(X().hello); }
 
 /* ================= 1. TABLA CU ELASTICE ================= */
@@ -8044,7 +8048,7 @@ function measGame(){
 }
 
 /* ================= intrare ================= */
-const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; menu=__rm(menu); geoGame=__rm(geoGame); tanGame=__rm(tanGame); cubeGame=__rm(cubeGame); measGame=__rm(measGame);
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; { const gw=(k,f)=>(...a)=>{ if(window.__gate&&window.__gate('gm',k)) return menu(); return f(...a); }; geoGame=gw('geo',geoGame); tanGame=gw('tan',tanGame); cubeGame=gw('cube',cubeGame); measGame=gw('meas',measGame); } menu=__rm(menu); geoGame=__rm(geoGame); tanGame=__rm(tanGame); cubeGame=__rm(cubeGame); measGame=__rm(measGame);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openShapes=()=>{ root.hidden=false; menu(); };
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gShapes')){ const b=document.createElement('button'); b.id='gShapes'; b.className='pufiTab'; b.textContent='📐 Forme';
@@ -8436,7 +8440,7 @@ function home(){ stopAll(); back=null; curLevels=null; $('title').textContent=X(
   const head=el('div','rb-head'); head.append(el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦉</div>')); const b=el('div','rb-bubble'); b.textContent=X().hello; head.append(b); main.append(head);
   const g=el('div','mw-grid'); GAMES.forEach(k=>{ const L=LEVELS[k]?X()[LEVELS[k]].length:0, got=L?[...Array(L)].reduce((s,_,i)=>s+(data.prog[k+i]||0),0):null;
     const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span>${got!=null?`<span class="p">⭐ ${got}/${L*3}</span>`:''}`);
-    c.onclick=()=>{ blip(); if(k==='sb'){ window.openSoroban&&window.openSoroban(); return; } if(k==='ten'){ root.hidden=true; window.__openMainGame&&window.__openMainGame('ten'); return; } levels(k); }; g.appendChild(c); });
+    c.dataset.lk='mw:'+k; c.onclick=()=>{ blip(); if(k==='sb'){ window.openSoroban&&window.openSoroban(); return; } if(k==='ten'){ root.hidden=true; window.__openMainGame&&window.__openMainGame('ten'); return; } levels(k); }; g.appendChild(c); });
   main.appendChild(g); sp(X().hello); }
 const isOpen=(k,i)=>data.all||i===0||(data.prog[k+(i-1)]||0)>0;
 function levels(k){ stopAll(); back=home; curLevels=()=>levels(k); $('all').hidden=false; $('all').textContent=data.all?X().allOn:X().allOff; main.innerHTML='';
@@ -8587,7 +8591,7 @@ function gBox(li){ const L=BOXL[li]; let ti=0, errs=0, busy=false, t=null, x=0; 
   show(); }
 
 /* ================= intrare ================= */
-const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; home=__rm(home); levels=__rm(levels); play=__rm(play);
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; levels=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('mw',k)) return; return f(k,...a); })(levels); play=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('mw',k)) return home(); return f(k,...a); })(play); home=__rm(home); levels=__rm(levels); play=__rm(play);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openMath=()=>{ root.hidden=false; home(); };
 window.__mw={genAdd,ADDL,BOXL};
@@ -9001,7 +9005,7 @@ function showSetup(){
   let h='';
   if(D.save){ const o=X().opp[D.save.opp]; h+=`<button class="cg-opp cont" id="cg-cont"><span class="ic">${o[0]}</span><span class="nm">${X().cont}</span></button>`; }
   h+=`<h3>${X().who}</h3><div class="cg-opps">`+['easy','mid','hard','two'].map(k=>{ const o=X().opp[k];
-    return `<button class="cg-opp" data-k="${k}"><span class="ic">${o[0]}</span><span class="nm">${o[1]}</span><span class="lv">${o[2]}${k!=='two'?' · '+X().wins(D.wins[k]||0):''}</span></button>`; }).join('')+`</div>`;
+    return `<button class="cg-opp" data-k="${k}" data-lk="cg:${k}"><span class="ic">${o[0]}</span><span class="nm">${o[1]}</span><span class="lv">${o[2]}${k!=='two'?' · '+X().wins(D.wins[k]||0):''}</span></button>`; }).join('')+`</div>`;
   h+=`<h3>${X().color}</h3><div class="cg-cols">`+[[1,X().white],[-1,X().black],[0,X().rand]].map(([v,t])=>`<button data-c="${v}" aria-pressed="${colPick===v}">${t}</button>`).join('')+`</div>`;
   S.innerHTML=h;
   S.querySelectorAll('.cg-opp[data-k]').forEach(b=>b.onclick=()=>{ opp=b.dataset.k; newGame(); });
@@ -9018,6 +9022,7 @@ $('undo').onclick=undo; $('tipB').onclick=giveTip; $('new').onclick=()=>{ D.save
 $('say').onclick=()=>sp($('status').dataset.say||''); $('status').onclick=()=>sp($('status').dataset.say||'');
 addEventListener('resize',()=>{ if(!root.hidden&&view==='play') sizeBoard(); });
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'){ top(); render(); try{ status(turnText()); }catch(e){} } else showSetup(); });
+newGame=(f=>(...a)=>{ if(window.__gate&&window.__gate('cg',opp)) return showSetup(); return f(...a); })(newGame); resume=(f=>(...a)=>{ if(D.save&&window.__gate&&window.__gate('cg',D.save.opp)) return showSetup(); return f(...a); })(resume);
 window.openChessGame=()=>{ root.hidden=false; showSetup(); };
 window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){return G},get nodes(){return nodes}};
 })();
@@ -9669,7 +9674,7 @@ function home(){ stopAll(); back=null; curLevels=null; $('title').textContent=X(
 function world(w){ stopAll(); back=home; curLevels=null; $('all').hidden=true; $('title').textContent=X().worlds[w][0]+' '+X().worlds[w][1]; main.innerHTML='';
   main.append(head(X().worlds[w][0],X().worlds[w][1])); const g=el('div','tm-grid');
   WORLDS[w].forEach(k=>{ const L=nLv(k); const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span>${L?`<span class="p">⭐ ${gotStars(k)}/${L*3}</span>`:''}`);
-    c.onclick=()=>{ blip(); if(L>1) levels(k,w); else play(k,0,w); }; g.appendChild(c); });
+    c.dataset.lk='tm:'+k; c.onclick=()=>{ blip(); if(L>1) levels(k,w); else play(k,0,w); }; g.appendChild(c); });
   main.appendChild(g); sp(X().worlds[w][1]); }
 const isOpen=(k,i)=>data.all||i===0||(data.prog[k+(i-1)]||0)>0;
 const worldOf=k=>Object.keys(WORLDS).find(w=>WORLDS[w].includes(k));
@@ -9680,7 +9685,7 @@ function levels(k){ stopAll(); const w=worldOf(k); back=()=>world(w); curLevels=
   main.appendChild(g); sp(X().games[k][1]); }
 function play(k,i){ stopAll(); const w=worldOf(k); back=nLv(k)>1?()=>levels(k):()=>world(w); curRestart=()=>play(k,i); $('all').hidden=true; $('title').textContent=X().games[k][0]+' '+X().games[k][1]; RUN[k](i); }
 function levelDone(k,i,errs){ award(); finish(k+i,rate(errs),i<nLv(k)-1?()=>play(k,i+1):null); }
-const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; home=__rm(home); world=__rm(world); levels=__rm(levels); play=__rm(play);
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; levels=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('tm',k)) return; return f(k,...a); })(levels); play=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('tm',k)) return home(); return f(k,...a); })(play); home=__rm(home); world=__rm(world); levels=__rm(levels); play=__rm(play);
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openTime=()=>{ root.hidden=false; home(); };
 window.__tm={tSay,digi,skyCols,data,play};
@@ -10039,7 +10044,7 @@ root.addEventListener('touchmove',e=>e.preventDefault(),{passive:false}); root.a
 
 /* ---------- ecrane ---------- */
 function showMap(){ state='map'; clearKeys(); $('winOv').hidden=true; $('mapOv').hidden=false; $('title').textContent=X().title; $('sub').textContent=X().sub; $('help').textContent=X().help; $('exit').textContent=X().exit;
-  const m=$('map'); m.innerHTML=''; for(let i=0;i<NLV;i++){ const open=i<prog.un, b=document.createElement('button'); b.className='pq-lv'+(open?'':' lock'); b.style.background=LBG[i]; const md=prog.best[i]||0;
+  const m=$('map'); m.innerHTML=''; for(let i=0;i<NLV;i++){ const open=i<prog.un, b=document.createElement('button'); b.className='pq-lv'+(open?'':' lock'); b.dataset.lk='pq:'+i; b.style.background=LBG[i]; const md=prog.best[i]||0;
     b.innerHTML=`<span class="ic">${LIC[i]}</span><span class="t">${i+1}. ${X().names[i]}</span><span class="m">${'🌟'.repeat(md)}${'☆'.repeat(3-md)}</span>`; b.onclick=()=>{ if(!open) return; try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); ac.resume&&ac.resume(); }catch(e){} startLevel(i); }; m.appendChild(b); } }
 function showWin(){ if(state!=='won'||root.hidden) return; const last=LI===NLV-1; prog.best[LI]=Math.max(prog.best[LI]||0,medals.size); prog.un=Math.max(prog.un,Math.min(NLV,LI+2)); saveP(); cpX=null;
   try{ if(typeof stars!=='undefined'){ stars+=1+medals.size; renderBar&&renderBar(); } }catch(e){}
@@ -10058,6 +10063,7 @@ function loop(now){ try{ const dt=Math.min(.05,(now-lastT)/1000); lastT=now;
   requestAnimationFrame(loop); }
 resize(); MAIN=W=LV(0).main; P=newP(2*TS,GY*TS); requestAnimationFrame(loop);
 (window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden&&state==='map') showMap(); });
+startLevel=(f=>(i,...a)=>{ if(window.__gate&&window.__gate('pq',i)){ showMap(); return; } return f(i,...a); })(startLevel);
 window.openPufi=lg=>{ root.hidden=false; resize(); $('mute').textContent=muted?'🔇':'🔊'; showMap(); };
 window.__pq={start:startLevel,get P(){return P},get W(){return W},get state(){return state},keys,press:k=>{ if(k==='j') jumpPress=true; if(k==='d') downPress=true; },grow,LV,set hearts(v){hearts=v}};
 })();
@@ -10092,7 +10098,7 @@ const NT={ro:{recT:'🎙️ Vocea părintelui',recH:'Înregistrează laude cu vo
    mic:'🎤 I read aloud',micHint:'Read out loud! Every word you read turns green. If you don’t know a word, tap it.',micNo:'The microphone is not available. Try “I read myself”.',listenMe:'🔊 Listen to yourself',micRead:n=>`You read ${n} words by yourself!`,listening:'Listening…'}};
 const Y=()=>TR('nt',NT);
 const PUFI={ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',nl:'Poefie',uk:'Пуфі',ru:'Пуфи'};
-window.__micLabel=()=>Y().mic; window.__premium=false; N.call('iap.status').then(v=>{ window.__premium=!!v; });
+window.__micLabel=()=>Y().mic; window.__premium=undefined; const iapCheck=()=>N.call('iap.status').then(v=>{ if(window.__setPremium) window.__setPremium(v); else window.__premium=!!v; }); iapCheck(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) iapCheck(); });
 let recs=[]; const refreshRecs=()=>N.call('rec.list').then(l=>{ recs=Array.isArray(l)?l:[]; }); refreshRecs();
 
 /* --- orice oprire a vocii din joc oprește și vocea nativă --- */
@@ -10149,7 +10155,7 @@ window.__parentsExtra=async box=>{ const s=document.createElement('div'); s.clas
     const rb=document.createElement('button'), pb=document.createElement('button'), db=document.createElement('button'); rb.textContent=Y().rec; pb.textContent=Y().play; db.textContent=Y().del; let on=false;
     let watch=null;
     const stopRec=async()=>{ clearInterval(watch); watch=null; if(!on) return; on=false; await N.call('rec.stop'); rb.textContent=Y().rec; rb.classList.remove('on'); await refreshRecs(); lab.textContent=Y().slot(k)+(recs.includes(key)?' ✅':''); };
-    rb.onclick=async()=>{ if(!on){ if(await N.call('rec.start',{key})){ on=true; rb.textContent=Y().stop; rb.classList.add('on'); const t0=Date.now();
+    rb.onclick=async()=>{ if(!on&&window.__gate&&window.__gate('nt','rec')) return; if(!on){ if(await N.call('rec.start',{key})){ on=true; rb.textContent=Y().stop; rb.classList.add('on'); const t0=Date.now();
         /* aplicația oprește singură înregistrarea după 12 s; la fel și când se închide panoul */
         watch=setInterval(()=>{ if(!box.isConnected||Date.now()-t0>12300) stopRec(); },300); } } else stopRec(); };
     pb.onclick=()=>N.call('rec.play',{key}); db.onclick=async()=>{ await N.call('rec.delete',{key}); await refreshRecs(); lab.textContent=Y().slot(k); };
@@ -10159,8 +10165,8 @@ window.__parentsExtra=async box=>{ const s=document.createElement('div'); s.clas
   const b=document.createElement('div'); b.className='nt-sec'; b.innerHTML=`<h4>${Y().buyT}</h4>`; box.insertBefore(b,box.lastChild);
   const paint=async()=>{ b.querySelectorAll('button,div.m').forEach(x=>x.remove());
     if(window.__premium){ const m=document.createElement('div'); m.className='m'; m.textContent=Y().owned; b.appendChild(m); return; }
-    const price=await N.call('iap.price'); const bb=document.createElement('button'); bb.className='rb-b go'; bb.textContent=Y().buy(price); bb.onclick=async()=>{ window.__premium=!!await N.call('iap.buy'); paint(); };
-    const rs=document.createElement('button'); rs.className='rb-b'; rs.textContent=Y().restore; rs.onclick=async()=>{ window.__premium=!!await N.call('iap.restore'); paint(); }; b.append(bb,rs); };
+    const price=await N.call('iap.price'); const bb=document.createElement('button'); bb.className='rb-b go'; bb.textContent=Y().buy(price); bb.onclick=async()=>{ const v=!!await N.call('iap.buy'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); };
+    const rs=document.createElement('button'); rs.className='rb-b'; rs.textContent=Y().restore; rs.onclick=async()=>{ const v=!!await N.call('iap.restore'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); }; b.append(bb,rs); };
   paint(); };
 
 /* --- copie de siguranță a progresului --- */
@@ -10247,6 +10253,67 @@ function add(){ IDS.forEach(id=>document.querySelectorAll('[id="'+id+'"]').forEa
 add();
 /* butonul mare de pe start folosește aceeași schimbare */
 const hl=document.getElementById('hm-langs'); if(hl) new MutationObserver(paint).observe(hl,{childList:true,subtree:true});
+})();
+</script>
+<style>
+[data-lk].pl-lock{position:relative;filter:saturate(.55);opacity:.8}
+[data-lk].pl-lock::after{content:'🔒';position:absolute;top:6px;right:8px;font-size:1.15rem;line-height:1;filter:none}
+.pl-ov{position:fixed;inset:0;z-index:99998;background:rgba(36,50,95,.55);display:flex;align-items:center;justify-content:center}
+.pl-box{background:#fff;border-radius:26px;padding:22px 24px;width:min(460px,90vw);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;font-weight:800;color:#24325f;box-sizing:border-box}
+.pl-box .big{font-size:3rem;line-height:1}
+.pl-box p{margin:0;font-size:1.1rem;line-height:1.35}
+.pl-box button{font:inherit;font-weight:800;font-size:1.05rem;border:3px solid #24325f;background:#fff;color:#24325f;border-radius:999px;padding:8px 18px;cursor:pointer}
+.pl-box button.go{background:#3ecf8e;border-color:#2bb57a;color:#fff}
+.pl-box .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+</style>
+<script>
+/* Versiunea gratuită vs „Deblochează tot”.
+   Pe web nu se blochează nimic. În aplicație decide aplicația nativă (iap.status):
+   true = totul deblocat (cumpărat, perioada gratuită de lansare sau instalat înainte de data-limită). */
+(()=>{
+const FREE={mw:['add','cmp','sb','ten'],tm:['explore','cuckoo','pizza','order'],rd:['alpha','fish','hunt','read','story'],ch:['learn','stars'],cg:['easy','two'],
+  gm:['geo','tan'],rb:['prog','gar'],sa:['w0'],pq:['0','1'],nt:[]};
+const TXT={ro:{msg:'Jocul acesta e în versiunea completă.',ask:'Roagă un părinte să te ajute.',par:'👨‍👩‍👧 Pentru părinți',close:'✖ Închide'},
+ de:{msg:'Dieses Spiel gehört zur Vollversion.',ask:'Frag einen Erwachsenen um Hilfe.',par:'👨‍👩‍👧 Für Eltern',close:'✖ Schließen'},
+ en:{msg:'This game is part of the full version.',ask:'Ask a grown-up to help you.',par:'👨‍👩‍👧 For parents',close:'✖ Close'},
+ fr:{msg:'Ce jeu fait partie de la version complète.',ask:'Demande à un adulte de t’aider.',par:'👨‍👩‍👧 Pour les parents',close:'✖ Fermer'},
+ it:{msg:'Questo gioco fa parte della versione completa.',ask:'Chiedi aiuto a un adulto.',par:'👨‍👩‍👧 Per i genitori',close:'✖ Chiudi'},
+ es:{msg:'Este juego es parte de la versión completa.',ask:'Pide ayuda a un adulto.',par:'👨‍👩‍👧 Para los padres',close:'✖ Cerrar'},
+ pt:{msg:'Este jogo faz parte da versão completa.',ask:'Peça ajuda a um adulto.',par:'👨‍👩‍👧 Para os pais',close:'✖ Fechar'},
+ nl:{msg:'Dit spel hoort bij de volledige versie.',ask:'Vraag een volwassene om hulp.',par:'👨‍👩‍👧 Voor ouders',close:'✖ Sluiten'},
+ pl:{msg:'Ta gra jest w pełnej wersji.',ask:'Poproś dorosłego o pomoc.',par:'👨‍👩‍👧 Dla rodziców',close:'✖ Zamknij'},
+ hu:{msg:'Ez a játék a teljes verzió része.',ask:'Kérj segítséget egy felnőttől.',par:'👨‍👩‍👧 Szülőknek',close:'✖ Bezárás'},
+ uk:{msg:'Ця гра є в повній версії.',ask:'Попроси дорослого допомогти.',par:'👨‍👩‍👧 Для батьків',close:'✖ Закрити'},
+ ru:{msg:'Эта игра есть в полной версии.',ask:'Попроси взрослого помочь.',par:'👨‍👩‍👧 Для родителей',close:'✖ Закрыть'}};
+const T=()=>TXT[lang]||TXT.en;
+const NT=()=>((window.L10N||{}).nt||{})[lang]||((window.L10N||{}).nt||{}).en||{};
+const isLocked=(mod,key)=>!!window.native&&window.__premium===false&&!(FREE[mod]||[]).includes(String(key));
+window.__isLocked=isLocked;
+function paint(){ document.querySelectorAll('[data-lk]').forEach(e=>{ const [m,k]=e.dataset.lk.split(':'); e.classList.toggle('pl-lock',isLocked(m,k)); }); }
+window.__lkPaint=paint;
+let pt=0; new MutationObserver(()=>{ if(pt) return; pt=requestAnimationFrame(()=>{ pt=0; paint(); }); }).observe(document.body,{childList:true,subtree:true});
+function paywall(){
+  if(document.querySelector('.pl-ov')) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const ov=document.createElement('div'); ov.className='pl-ov'; const b=document.createElement('div'); b.className='pl-box'; ov.appendChild(b);
+  const base=()=>{ b.innerHTML=`<div class="big">🔒</div><p>${T().msg}</p><p style="font-weight:600">${T().ask}</p><div class="row"><button class="go" data-a="par">${T().par}</button><button data-a="x">${T().close}</button></div>`;
+    b.querySelector('[data-a=x]').onclick=()=>ov.remove();
+    b.querySelector('[data-a=par]').onclick=async()=>{ const ok=window.native?await window.native.call('gate',{lang}):true; if(ok) buy(); }; };
+  const buy=async()=>{ b.innerHTML=`<div class="big">💎</div><p>${NT().buyT||''}</p><div class="row"></div><button data-a="x">${T().close}</button>`;
+    b.querySelector('[data-a=x]').onclick=()=>ov.remove(); const row=b.querySelector('.row');
+    const price=await window.native.call('iap.price'); const bb=document.createElement('button'); bb.className='go'; bb.textContent=NT().buy?NT().buy(price):'Unlock';
+    bb.onclick=async()=>{ window.__setPremium(!!await window.native.call('iap.buy')); if(window.__premium) ov.remove(); };
+    const rs=document.createElement('button'); rs.textContent=NT().restore||'Restore';
+    rs.onclick=async()=>{ window.__setPremium(!!await window.native.call('iap.restore')); if(window.__premium) ov.remove(); };
+    row.append(bb,rs); };
+  base(); ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; document.body.appendChild(ov);
+  try{ typeof say==='function'&&say(T().msg+' '+T().ask); }catch(e){}
+}
+window.__paywall=paywall;
+window.__gate=(mod,key)=>{ if(!isLocked(mod,key)) return false; paywall(); return true; };
+/* starea vine de la aplicația nativă; la schimbare reafișăm ecranele */
+window.__setPremium=v=>{ const was=window.__premium; window.__premium=!!v; paint(); if(was!==window.__premium) (window.__LR||[]).forEach(f=>{ try{ f(); }catch(e){} }); };
+paint();
 })();
 </script>
 <script>
