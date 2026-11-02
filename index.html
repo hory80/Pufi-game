@@ -1374,7 +1374,10 @@ document.getElementById('gRead').onclick=()=>{ if(synth) synth.cancel(); window.
 document.getElementById('gChess').onclick=()=>{ if(synth) synth.cancel(); window.openChess&&window.openChess(); };
 document.getElementById('gPufi').onclick=()=>{ if(synth) synth.cancel(); window.openPufi&&window.openPufi(lang); };
 document.querySelectorAll('.tabs button[data-game]').forEach(btn=>btn.onclick=()=>{ game=btn.dataset.game; store('joc',game); syncChips(); next(); });
-function setLang(l){ lang=l; store('limba',lang); applyLang(); if(game==='abacus'){ next(); return; }
+function setLang(l){ lang=l; store('limba',lang); applyLang();
+  /* pagina principală e ascunsă (ecran de start sau alt card): nu citim nicio întrebare */
+  const hid=[...document.querySelectorAll('[id$="-root"]')].some(e=>!e.hidden); if(hid) return;
+  if(game==='abacus'){ next(); return; }
   if(game==='flags') showFlagQ(); else setMsg(); if(started) speakLocked(question()); }
 window.__setLang=setLang;
 document.querySelectorAll('.langs button').forEach(btn=>btn.onclick=()=>setLang(btn.dataset.lang));
@@ -8665,7 +8668,7 @@ function langPicker(){ const ov=document.createElement('div'); ov.className='hm-
   LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='hm-lpb'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
   ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
 (window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden) render(); });
-function setAppLang(c){ if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
+function setAppLang(c){ if(window.__switchLang) window.__switchLang(c); else if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
 /* buton Acasă în pagina principală */
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gHome')){ const b=document.createElement('button'); b.id='gHome'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} if(mainReturn==='math'&&window.openMath){ window.openMath(); root.hidden=false; } else root.hidden=false; render(); }; tabs.insertBefore(b,tabs.firstChild); } }catch(e){}
 /* la pornire nu mai începe matematica: ecranul cu carduri e primul */
