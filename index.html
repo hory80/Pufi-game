@@ -6577,6 +6577,32 @@ S('aq',{title:'🐠 Мої акваріуми',main:'🌿 Акваріум',pred
   warn:n=>`Обережно! ${n} полює на рибок. Перенеси в акваріум хижаків!`,ate:(p,v)=>`${p} з’їдає: ${v}!`,got:(e,f)=>`Ти зловив для рибок: ${f}! ${e}`,newFish:n=>`Нова рибка в акваріумі: ${n}!`,more:n=>`+${n} у річці`,sated:'Рибки ситі! Повертайся завтра.',night:'🌙 Ніч',day:'☀️ День',nightSay:'На добраніч, рибки! Уночі сом вирушає на полювання.',daySay:'Доброго ранку, рибки!',album:'📖 Альбом',albumT:'Альбом рибок',albumSay:(n,t)=>`Ти знайшов ${n} з ${t} видів. Лови літери, щоб знайти всі!`,dirty:'Скло брудне! Протри його пальчиком.',clean:'Акваріум сяє! Рибки щасливі!',come:'Дивись, вони припливають їсти!'});
 })();
 </script>
+<script>
+/* Timpul: jocuri noi (Trezește-l pe Pufi, Baloanele cu ore) — texte în celelalte 9 limbi */
+(()=>{ const T=(window.L10N||{}).tm; if(!T) return;
+const ADD={
+ fr:{g:{wake:['⏰','Réveille Pufi'],balloon:['🎈','Les ballons-horloges']},lv:{wake:['Heures pile','Et demie','Les quarts','De 5 en 5 minutes'],balloon:['Heures pile','Et demie','Les quarts']},
+   wakeTask:t=>`Pufi dort. Il doit se réveiller à ${t}. Règle le réveil !`,ring:'⏰ Sonne !',wakeWrong:t=>`Le réveil indique ${t}. Pufi se réveillerait à une autre heure. Essaie encore !`,wakeDone:'Bonjour, Pufi !',balTask:t=>`Attrape le ballon qui indique ${t} !`},
+ it:{g:{wake:['⏰','Sveglia Pufi'],balloon:['🎈','I palloncini-orologio']},lv:{wake:['Ore precise','E mezza','I quarti','Di 5 in 5 minuti'],balloon:['Ore precise','E mezza','I quarti']},
+   wakeTask:t=>`Pufi dorme. Ora della sveglia: ${t}. Regola la sveglia!`,ring:'⏰ Suona!',wakeWrong:t=>`La sveglia segna: ${t}. Pufi si sveglierebbe a un’altra ora. Riprova!`,wakeDone:'Buongiorno, Pufi!',balTask:t=>`Prendi il palloncino che segna: ${t}!`},
+ es:{g:{wake:['⏰','Despierta a Pufi'],balloon:['🎈','Los globos-reloj']},lv:{wake:['Horas en punto','Y media','Los cuartos','De 5 en 5 minutos'],balloon:['Horas en punto','Y media','Los cuartos']},
+   wakeTask:t=>`Pufi está dormido. Tiene que despertarse a ${t}. ¡Pon el despertador!`,ring:'⏰ ¡Suena!',wakeWrong:t=>`El despertador marca ${t}. Pufi se despertaría a otra hora. ¡Inténtalo otra vez!`,wakeDone:'¡Buenos días, Pufi!',balTask:t=>`¡Atrapa el globo que marca ${t}!`},
+ pt:{g:{wake:['⏰','Acorde o Pufi'],balloon:['🎈','Os balões-relógio']},lv:{wake:['Horas certas','E meia','Os quartos de hora','De 5 em 5 minutos'],balloon:['Horas certas','E meia','Os quartos de hora']},
+   wakeTask:t=>`O Pufi está dormindo. Hora de acordar: ${t}. Acerte o despertador!`,ring:'⏰ Tocar!',wakeWrong:t=>`O despertador mostra: ${t}. O Pufi acordaria em outra hora. Tente de novo!`,wakeDone:'Bom dia, Pufi!',balTask:t=>`Pegue o balão que mostra: ${t}!`},
+ nl:{g:{wake:['⏰','Maak Pufi wakker'],balloon:['🎈','Klokballonnen']},lv:{wake:['Hele uren','Half','De kwartieren','Per 5 minuten'],balloon:['Hele uren','Half','De kwartieren']},
+   wakeTask:t=>`Pufi slaapt. Hij moet om ${t} wakker worden. Zet de wekker!`,ring:'⏰ Rinkelen!',wakeWrong:t=>`De wekker staat op ${t}. Dan wordt Pufi op een andere tijd wakker. Probeer het nog eens!`,wakeDone:'Goedemorgen, Pufi!',balTask:t=>`Vang de ballon die ${t} aanwijst!`},
+ pl:{g:{wake:['⏰','Obudź Pufiego'],balloon:['🎈','Baloniki z zegarami']},lv:{wake:['Pełne godziny','Wpół do','Kwadranse','Co 5 minut'],balloon:['Pełne godziny','Wpół do','Kwadranse']},
+   wakeTask:t=>`Pufi śpi. Godzina pobudki: ${t}. Nastaw budzik!`,ring:'⏰ Dzwoń!',wakeWrong:t=>`Budzik pokazuje: ${t}. Pufi obudziłby się o innej godzinie. Spróbuj jeszcze raz!`,wakeDone:'Dzień dobry, Pufi!',balTask:t=>`Złap balonik, który pokazuje: ${t}!`},
+ hu:{g:{wake:['⏰','Ébreszd fel Pufit'],balloon:['🎈','Órás lufik']},lv:{wake:['Egész órák','Fél','Negyedek','5 percenként'],balloon:['Egész órák','Fél','Negyedek']},
+   wakeTask:t=>`Pufi alszik. Ébresztés ideje: ${t}. Állítsd be az ébresztőórát!`,ring:'⏰ Csörögj!',wakeWrong:t=>`Az ébresztő ezt mutatja: ${t}. Akkor Pufi máskor ébredne. Próbáld újra!`,wakeDone:'Jó reggelt, Pufi!',balTask:t=>`Kapd el a lufit, amelyik ezt mutatja: ${t}!`},
+ uk:{g:{wake:['⏰','Розбуди Пуфі'],balloon:['🎈','Кульки з годинниками']},lv:{wake:['Рівні години','Пів на','Чверті','Кожні 5 хвилин'],balloon:['Рівні години','Пів на','Чверті']},
+   wakeTask:t=>`Пуфі спить. Час прокидатися: ${t}. Постав будильник!`,ring:'⏰ Дзвони!',wakeWrong:t=>`Будильник показує: ${t}. Тоді Пуфі прокинеться в інший час. Спробуй ще раз!`,wakeDone:'Доброго ранку, Пуфі!',balTask:t=>`Злови кульку, яка показує: ${t}!`},
+ ru:{g:{wake:['⏰','Разбуди Пуфи'],balloon:['🎈','Шарики с часами']},lv:{wake:['Ровные часы','Половина','Четверти','Каждые 5 минут'],balloon:['Ровные часы','Половина','Четверти']},
+   wakeTask:t=>`Пуфи спит. Время просыпаться: ${t}. Поставь будильник!`,ring:'⏰ Звени!',wakeWrong:t=>`Будильник показывает: ${t}. Тогда Пуфи проснётся в другое время. Попробуй ещё раз!`,wakeDone:'Доброе утро, Пуфи!',balTask:t=>`Поймай шарик, который показывает: ${t}!`}};
+for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.assign(o.games,a.g); Object.assign(o.lv,a.lv);
+  ['wakeTask','ring','wakeWrong','wakeDone','balTask'].forEach(k=>o[k]=a[k]); }
+})();
+</script>
 
 <style>
 #rb-root{position:fixed;inset:0;z-index:50;background:#E8F0FF;background-image:linear-gradient(rgba(74,120,220,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(74,120,220,.08) 1px,transparent 1px);background-size:32px 32px;color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 10px);overflow:hidden}
@@ -9107,6 +9133,20 @@ window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){re
 @keyframes tmCu{0%{transform:translateX(0)}40%,60%{transform:translateX(-58px)}100%{transform:translateX(0)}}
 @keyframes tmTrain{to{transform:translateX(-900px)}}
 @keyframes tmSteam{0%{opacity:.8;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-60px) scale(1.4)}}
+@keyframes tmCloud{from{transform:translateX(-220px)}to{transform:translateX(1150px)}}
+@keyframes tmBird{0%{transform:translate(-120px,0)}50%{transform:translate(500px,-30px)}100%{transform:translate(1120px,10px)}}
+@keyframes tmTwinkle{50%{opacity:.25}}
+@keyframes tmZ{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(26px,-60px) scale(1.3)}}
+@keyframes tmNote{0%{opacity:0;transform:translate(0,0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--nx,40px),-120px) rotate(20deg)}}
+@keyframes tmStarUp{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1;transform:translate(0,-20px) scale(1.2)}100%{opacity:0;transform:translate(var(--sx,0),-180px) scale(.8)}}
+@keyframes tmSway{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
+@keyframes tmShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-9deg)}80%{transform:rotate(9deg)}}
+@keyframes tmSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes tmFloatUp{0%{transform:translateY(0)}100%{transform:translateY(-640px)}}
+@keyframes tmPop{0%{transform:scale(1);opacity:1}60%{transform:scale(1.6);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+@keyframes tmJump{0%,100%{transform:translateY(0)}40%{transform:translateY(-60px)}}
+@keyframes tmRain{to{transform:translateY(480px)}}
+.tm-burst{position:absolute;pointer-events:none;font-size:clamp(28px,5vh,46px);animation:tmStarUp 1.3s ease-out forwards;z-index:5}
 @media (prefers-reduced-motion:reduce){#tm-root *{animation-duration:.01s!important}}
 </style>
 <div id="tm-root" hidden>
@@ -9146,11 +9186,11 @@ ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff
  done:s=>`Gata! Ai câștigat ${['','o stea','două stele','trei stele'][s]}!`,next:'▶ Nivelul următor',again:'↺ Din nou',toMenu:'⬅ Înapoi',locked:'Termină întâi nivelul de dinainte.',
  ladder:['🕰️ ore','🌅 o zi','🚃 7 zile = o săptămână','🎡 12 luni = un an'],
  worlds:{clock:['🕰️','Ceasul'],day:['🌅','Ziua'],cal:['📅','Săptămâna și calendarul'],seas:['🌳','Anotimpurile']},
- games:{explore:['🕰️','Ceasul magic'],cuckoo:['🐦','Ceasul cu cuc'],pizza:['🍕','Ceasul-pizza'],station:['🚂','Gara'],memo:['🧩','Perechi'],oven:['⏳','Cât durează?'],
+ games:{wake:['⏰','Trezește-l pe Pufi'],balloon:['🎈','Baloanele cu ore'],explore:['🕰️','Ceasul magic'],cuckoo:['🐦','Ceasul cu cuc'],pizza:['🍕','Ceasul-pizza'],station:['🚂','Gara'],memo:['🧩','Perechi'],oven:['⏳','Cât durează?'],
   order:['🧸','Ordonează ziua'],dayclk:['🌞','O zi cu Pufi'],moments:['🌗','Momentele zilei'],ytm:['📆','Ieri, azi, mâine'],
   week:['🚃','Trenul săptămânii'],calm:['📅','Calendarul meu'],months:['🎡','Roata lunilor'],
   tree:['🌳','Copacul anotimpurilor'],dress:['🦊','Îmbracă-l pe Pufi'],sort:['🧺','Sortează pe anotimpuri']},
- lv:{cuckoo:['Numără cucu','Citește ceasul','Potrivește ceasul'],pizza:['Și jumătate','Arată jumătatea','Și un sfert','Fără un sfert','Arată sferturile'],
+ lv:{wake:['Ore fixe','Și jumătate','Sferturi','Din 5 în 5 minute'],balloon:['Ore fixe','Și jumătate','Sferturi'],cuckoo:['Numără cucu','Citește ceasul','Potrivește ceasul'],pizza:['Și jumătate','Arată jumătatea','Și un sfert','Fără un sfert','Arată sferturile'],
   station:['Ore fixe','Și jumătate','Sferturi','Din 5 în 5 minute','Orice minut','Ceasul de 24 de ore'],memo:['Ore și jumătăți','Sferturi','Din 5 în 5 minute'],
   oven:['O oră','Două ore','O jumătate de oră','Un sfert de oră','Amestec'],order:['Dimineața','Toată ziua'],dayclk:['Ore fixe','Și jumătate'],ytm:['Povestea lui Pufi','Zilele săptămânii'],
   week:['Pune zilele în ordine','Ce zi vine după?','Ce zi a fost înainte?'],calm:['Azi, ieri, mâine','Zilele săptămânii','Numără zilele'],months:['Lunile în ordine','Ce lună vine după?','Lunile și anotimpurile']},
@@ -9168,7 +9208,7 @@ ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff
  pzRead:'Ce oră arată ceasul? Uită-te cât din pizza e colorat.', pzSet:t=>`Arată ${t}! Mută minutarul.`, pzHalf:'Jumătate de pizza înseamnă jumătate de oră: 30 de minute.', pzQuar:'O felie de pizza este un sfert de oră: 15 minute.',
  dest:[['🏔️','munte'],['🏖️','mare'],['👵','bunica'],['🏰','castel'],['🦁','grădina zoologică'],['🌲','pădure']],
  stTask:(t,d)=>`Trenul spre ${d} pleacă la ${t}. Pune ceasul la ora plecării!`, go:'🚂 Pleacă!', stWrong:'Hopa! Ceasul arată altă oră. Mai încearcă!', st24:(d,t,p)=>`${d} înseamnă ${t} ${p}.`,
- memoTask:'Întoarce cărțile și găsește perechile: ceasul și ora lui!',
+ memoTask:'Întoarce cărțile și găsește perechile: ceasul și ora lui!', wakeTask:t=>`Pufi doarme. Trebuie să se trezească la ${t}. Pune ceasul deșteptător!`, ring:'⏰ Sună!', wakeWrong:t=>`Ceasul arată ${t}. Pufi s-ar trezi la altă oră. Mai încearcă!`, wakeDone:'Bună dimineața, Pufi!', balTask:t=>`Prinde balonul care arată ${t}!`,
  ovItems:[['🎂','tortul'],['🍕','pizza'],['🍪','fursecurile'],['🍞','pâinea']], dur:m=>({60:'o oră',120:'două ore',30:'o jumătate de oră',15:'un sfert de oră',45:'trei sferturi de oră',90:'o oră și jumătate'})[m],
  ovTask:(it,t,d)=>`Pufi pune ${it} în cuptor la ${t}. Trebuie să stea ${d}. Învârte minutarul înainte și apasă Gata!`, ovEarly:'Încă nu e gata! Mai învârte.', ovBurn:'Ups, prea mult! S-a ars puțin. Mai încearcă!', ovDone:t=>`Ding! E gata! Acum este ${t}.`,
  acts:[['⏰','Pufi se trezește',420],['🪥','se spală pe dinți',430],['🥣','micul dejun',450],['🎒','merge la grădiniță',480],['🍽️','prânzul',720],['😴','somnul de prânz',780],['🛝','joacă în parc',960],['🍝','cina',1080],['🛁','baia',1140],['📖','povestea de seară',1170],['🌙','culcarea',1200]],
@@ -9190,11 +9230,11 @@ de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓
  done:s=>`Geschafft! Du hast ${['','einen Stern','zwei Sterne','drei Sterne'][s]} gewonnen!`,next:'▶ Nächstes Level',again:'↺ Nochmal',toMenu:'⬅ Zurück',locked:'Schaffe zuerst das Level davor.',
  ladder:['🕰️ Stunden','🌅 ein Tag','🚃 7 Tage = eine Woche','🎡 12 Monate = ein Jahr'],
  worlds:{clock:['🕰️','Die Uhr'],day:['🌅','Der Tag'],cal:['📅','Woche und Kalender'],seas:['🌳','Die Jahreszeiten']},
- games:{explore:['🕰️','Die Zauberuhr'],cuckoo:['🐦','Die Kuckucksuhr'],pizza:['🍕','Die Pizza-Uhr'],station:['🚂','Der Bahnhof'],memo:['🧩','Paare finden'],oven:['⏳','Wie lange dauert es?'],
+ games:{wake:['⏰','Weck Pufi auf'],balloon:['🎈','Uhren-Ballons'],explore:['🕰️','Die Zauberuhr'],cuckoo:['🐦','Die Kuckucksuhr'],pizza:['🍕','Die Pizza-Uhr'],station:['🚂','Der Bahnhof'],memo:['🧩','Paare finden'],oven:['⏳','Wie lange dauert es?'],
   order:['🧸','Der Tag in Ordnung'],dayclk:['🌞','Ein Tag mit Pufi'],moments:['🌗','Tageszeiten'],ytm:['📆','Gestern, heute, morgen'],
   week:['🚃','Der Wochenzug'],calm:['📅','Mein Kalender'],months:['🎡','Das Monatsrad'],
   tree:['🌳','Der Jahreszeiten-Baum'],dress:['🦊','Zieh Pufi an'],sort:['🧺','Jahreszeiten sortieren']},
- lv:{cuckoo:['Kuckuck zählen','Uhr lesen','Uhr stellen'],pizza:['Halb','Halb einstellen','Viertel nach','Viertel vor','Viertel einstellen'],
+ lv:{wake:['Volle Stunden','Halbe Stunden','Viertelstunden','5-Minuten-Schritte'],balloon:['Volle Stunden','Halbe Stunden','Viertelstunden'],cuckoo:['Kuckuck zählen','Uhr lesen','Uhr stellen'],pizza:['Halb','Halb einstellen','Viertel nach','Viertel vor','Viertel einstellen'],
   station:['Volle Stunden','Halbe Stunden','Viertelstunden','5-Minuten-Schritte','Jede Minute','24-Stunden-Uhr'],memo:['Volle und halbe','Viertel','5 Minuten'],
   oven:['Eine Stunde','Zwei Stunden','Eine halbe Stunde','Eine Viertelstunde','Gemischt'],order:['Der Morgen','Der ganze Tag'],dayclk:['Volle Stunden','Halbe Stunden'],ytm:['Pufis Geschichte','Wochentage'],
   week:['Tage ordnen','Welcher Tag kommt danach?','Welcher Tag war davor?'],calm:['Heute, gestern, morgen','Wochentage','Tage zählen'],months:['Monate in Reihenfolge','Welcher Monat kommt danach?','Monate und Jahreszeiten']},
@@ -9212,7 +9252,7 @@ de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓
  pzRead:'Wie spät ist es? Schau, wie viel von der Pizza bunt ist.', pzSet:t=>`Zeig ${t}! Bewege den Minutenzeiger.`, pzHalf:'Halb vier heißt: die halbe Stunde bis vier ist schon um. Eine halbe Pizza ist eine halbe Stunde, 30 Minuten.', pzQuar:'Ein Stück Pizza ist eine Viertelstunde: 15 Minuten.',
  dest:[['🏔️','die Berge'],['🏖️','das Meer'],['👵','Oma'],['🏰','das Schloss'],['🦁','den Zoo'],['🌲','den Wald']],
  stTask:(t,d)=>`Der Zug fährt um ${t} los. Stell die Uhr auf die Abfahrtszeit!`, go:'🚂 Abfahrt!', stWrong:'Hoppla! Die Uhr zeigt eine andere Zeit. Versuch es nochmal!', st24:(d,t,p)=>`${d} heißt ${t} ${p}.`,
- memoTask:'Dreh die Karten um und finde die Paare: die Uhr und ihre Zeit!',
+ memoTask:'Dreh die Karten um und finde die Paare: die Uhr und ihre Zeit!', wakeTask:t=>`Pufi schläft. Er muss um ${t} aufwachen. Stell den Wecker!`, ring:'⏰ Klingeln!', wakeWrong:t=>`Der Wecker zeigt ${t}. Dann wacht Pufi zu einer anderen Zeit auf. Versuch es nochmal!`, wakeDone:'Guten Morgen, Pufi!', balTask:t=>`Fang den Ballon, der ${t} zeigt!`,
  ovItems:[['🎂','den Kuchen'],['🍕','die Pizza'],['🍪','die Kekse'],['🍞','das Brot']], dur:m=>({60:'eine Stunde',120:'zwei Stunden',30:'eine halbe Stunde',15:'eine Viertelstunde',45:'eine Dreiviertelstunde',90:'eineinhalb Stunden'})[m],
  ovTask:(it,t,d)=>`Pufi schiebt ${it} um ${t} in den Ofen. Er muss ${d} backen. Dreh den Minutenzeiger vorwärts und drück Fertig!`, ovEarly:'Noch nicht fertig! Dreh weiter.', ovBurn:'Oje, zu lange! Es ist ein bisschen verbrannt. Versuch es nochmal!', ovDone:t=>`Ding! Fertig! Jetzt ist es ${t}.`,
  acts:[['⏰','Pufi wacht auf',420],['🪥','Zähne putzen',430],['🥣','Frühstück',450],['🎒','in den Kindergarten',480],['🍽️','Mittagessen',720],['😴','Mittagsschlaf',780],['🛝','im Park spielen',960],['🍝','Abendessen',1080],['🛁','baden',1140],['📖','Gutenachtgeschichte',1170],['🌙','schlafen gehen',1200]],
@@ -9234,11 +9274,11 @@ en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 
  done:s=>`Done! You won ${['','one star','two stars','three stars'][s]}!`,next:'▶ Next level',again:'↺ Again',toMenu:'⬅ Back',locked:'Finish the level before first.',
  ladder:['🕰️ hours','🌅 a day','🚃 7 days = a week','🎡 12 months = a year'],
  worlds:{clock:['🕰️','The clock'],day:['🌅','The day'],cal:['📅','Week and calendar'],seas:['🌳','The seasons']},
- games:{explore:['🕰️','Magic clock'],cuckoo:['🐦','Cuckoo clock'],pizza:['🍕','Pizza clock'],station:['🚂','The station'],memo:['🧩','Pairs'],oven:['⏳','How long?'],
+ games:{wake:['⏰','Wake Pufi up'],balloon:['🎈','Clock balloons'],explore:['🕰️','Magic clock'],cuckoo:['🐦','Cuckoo clock'],pizza:['🍕','Pizza clock'],station:['🚂','The station'],memo:['🧩','Pairs'],oven:['⏳','How long?'],
   order:['🧸','Order the day'],dayclk:['🌞','A day with Pufi'],moments:['🌗','Times of day'],ytm:['📆','Yesterday, today, tomorrow'],
   week:['🚃','The week train'],calm:['📅','My calendar'],months:['🎡','The month wheel'],
   tree:['🌳','The seasons tree'],dress:['🦊','Dress Pufi'],sort:['🧺','Sort the seasons']},
- lv:{cuckoo:['Count the cuckoo','Read the clock','Set the clock'],pizza:['Half past','Show half past','Quarter past','Quarter to','Show the quarters'],
+ lv:{wake:['O’clock','Half past','Quarters','5-minute steps'],balloon:['O’clock','Half past','Quarters'],cuckoo:['Count the cuckoo','Read the clock','Set the clock'],pizza:['Half past','Show half past','Quarter past','Quarter to','Show the quarters'],
   station:['O’clock','Half past','Quarters','5-minute steps','Any minute','24-hour clock'],memo:['O’clock and half past','Quarters','5 minutes'],
   oven:['One hour','Two hours','Half an hour','A quarter of an hour','Mixed'],order:['The morning','The whole day'],dayclk:['O’clock','Half past'],ytm:['Pufi’s story','Days of the week'],
   week:['Put the days in order','Which day comes after?','Which day comes before?'],calm:['Today, yesterday, tomorrow','Days of the week','Count the days'],months:['Months in order','Which month comes next?','Months and seasons']},
@@ -9255,7 +9295,7 @@ en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 
  pzRead:'What time is it? Look how much of the pizza is coloured.', pzSet:t=>`Show ${t}! Move the minute hand.`, pzHalf:'Half a pizza means half an hour: 30 minutes.', pzQuar:'One slice of pizza is a quarter of an hour: 15 minutes.',
  dest:[['🏔️','the mountains'],['🏖️','the seaside'],['👵','Grandma'],['🏰','the castle'],['🦁','the zoo'],['🌲','the forest']],
  stTask:(t,d)=>`The train to ${d} leaves at ${t}. Set the clock to the departure time!`, go:'🚂 Go!', stWrong:'Oops! The clock shows a different time. Try again!', st24:(d,t,p)=>`${d} means ${t} ${p}.`,
- memoTask:'Turn the cards and find the pairs: the clock and its time!',
+ memoTask:'Turn the cards and find the pairs: the clock and its time!', wakeTask:t=>`Pufi is asleep. He has to wake up at ${t}. Set the alarm clock!`, ring:'⏰ Ring!', wakeWrong:t=>`The alarm shows ${t}. Pufi would wake up at a different time. Try again!`, wakeDone:'Good morning, Pufi!', balTask:t=>`Catch the balloon that shows ${t}!`,
  ovItems:[['🎂','the cake'],['🍕','the pizza'],['🍪','the cookies'],['🍞','the bread']], dur:m=>({60:'one hour',120:'two hours',30:'half an hour',15:'a quarter of an hour',45:'three quarters of an hour',90:'an hour and a half'})[m],
  ovTask:(it,t,d)=>`Pufi puts ${it} in the oven at ${t}. It needs ${d}. Turn the minute hand forwards and press Done!`, ovEarly:'Not ready yet! Keep turning.', ovBurn:'Oops, too long! It got a bit burnt. Try again!', ovDone:t=>`Ding! Ready! Now it is ${t}.`,
  acts:[['⏰','Pufi wakes up',420],['🪥','brush teeth',430],['🥣','breakfast',450],['🎒','off to nursery',480],['🍽️','lunch',720],['😴','afternoon nap',780],['🛝','play in the park',960],['🍝','dinner',1080],['🛁','bath time',1140],['📖','bedtime story',1170],['🌙','go to sleep',1200]],
@@ -9286,7 +9326,9 @@ const seasonOf=mo=>mo>=2&&mo<=4?0:mo>=5&&mo<=7?1:mo>=8&&mo<=10?2:3;
 let data={prog:{},all:false,seen:{}}; try{ const d=JSON.parse(localStorage.getItem('tm_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
 const save=()=>{ try{ localStorage.setItem('tm_data',JSON.stringify(data)); }catch(e){} };
 const pill=()=>{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); };
-function award(n){ try{ stars+=(n||1); renderBar(); }catch(e){} pill(); }
+function award(n){ try{ stars+=(n||1); renderBar(); }catch(e){} pill(); burst(); }
+function burst(){ try{ const r=main.getBoundingClientRect(), E=['⭐','🌟','✨','🦊','⭐'];
+  for(let i=0;i<7;i++){ const b=el('div','tm-burst',E[i%E.length]); b.style.left=(r.width*.25+Math.random()*r.width*.5)+'px'; b.style.top=(r.height*.55+Math.random()*r.height*.2)+'px'; b.style.setProperty('--sx',(Math.random()*160-80)+'px'); b.style.animationDelay=(i*60)+'ms'; main.appendChild(b); setTimeout(()=>b.remove(),1700); } }catch(e){} }
 let back=null, curRestart=null, curNext=null, gen=0, curLevels=null, raf=0;
 function stopAll(){ try{ speechSynthesis.cancel(); }catch(e){} $('ov').hidden=true; gen++; cancelAnimationFrame(raf); }
 const rate=e=>e===0?3:e<=2?2:1;
@@ -9349,15 +9391,26 @@ const hx=(a,b,k)=>{ const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16)); cons
 function skyCols(t){ t=((t%1440)+1440)%1440; for(let i=0;i<SKY.length-1;i++){ const [a,c1,c2]=SKY[i],[b,d1,d2]=SKY[i+1]; if(t>=a&&t<=b){ const k=(t-a)/(b-a); return [hx(c1,d1,k),hx(c2,d2,k)]; } } return ['#5DB8F5','#D6F0FF']; }
 function sceneSVG(W,H,gy){ let s=`<defs><linearGradient id="tm-skg" x1="0" y1="0" x2="0" y2="1"><stop id="tm-s1" offset="0"/><stop id="tm-s2" offset="1"/></linearGradient></defs><rect width="${W}" height="${H}" rx="24" fill="url(#tm-skg)"/><g id="tm-stars">`;
   for(let i=0;i<26;i++) s+=`<circle cx="${W*.5+R(W*.5)}" cy="${R(gy-40)}" r="${1+R(3)}" fill="#fff"/>`;
-  s+=`</g><circle id="tm-sun" r="34" fill="#FFD54A" stroke="#FFB300" stroke-width="6"/><text id="tm-moon" font-size="56" text-anchor="middle">🌙</text>`;
+  s+=`</g><g id="tm-sun"><g style="transform-box:fill-box;transform-origin:center;animation:tmSpin 18s linear infinite">${[...Array(10)].map((_,i)=>`<line x1="0" y1="-46" x2="0" y2="-60" stroke="#FFC400" stroke-width="7" stroke-linecap="round" transform="rotate(${i*36})"/>`).join('')}</g><circle r="34" fill="#FFD54A" stroke="#FFB300" stroke-width="6"/><circle cx="-11" cy="-6" r="4" fill="#7A4A00"/><circle cx="11" cy="-6" r="4" fill="#7A4A00"/><path d="M-12 8 Q0 18 12 8" stroke="#7A4A00" stroke-width="4" fill="none" stroke-linecap="round"/></g><text id="tm-moon" font-size="56" text-anchor="middle">🌙</text>
+  <g id="tm-clouds">${[[60,40,8],[150,70,-14],[95,52,-27]].map(([y,fz,d])=>`<text x="0" y="${y}" font-size="${fz}" style="animation:tmCloud ${46+fz/2}s linear ${d}s infinite">☁️</text>`).join('')}</g>
+  <g id="tm-birds"><text x="0" y="110" font-size="26" style="animation:tmBird 14s linear infinite">🐦</text><text x="0" y="140" font-size="22" style="animation:tmBird 17s linear -6s infinite">🕊️</text></g>`;
   s+=`<path d="M0 ${gy} Q${W*.2} ${gy-40} ${W*.42} ${gy-6} T${W} ${gy-20} V${H} H0Z" fill="#7BC96F"/><path d="M0 ${gy+30} Q${W*.3} ${gy+5} ${W*.6} ${gy+28} T${W} ${gy+20} V${H} H0Z" fill="#5DB35A"/>`;
-  s+=`<text x="${W*.88}" y="${gy+10}" font-size="64" text-anchor="middle">🏡</text><text id="tm-pufi" x="${W*.1}" y="${gy+30}" font-size="58" text-anchor="middle">🦊</text>`;
+  s+=`<rect id="tm-win" x="${W*.88-14}" y="${gy-22}" width="16" height="14" rx="3" fill="#FFE27A" opacity="0"/><text x="${W*.88}" y="${gy+10}" font-size="64" text-anchor="middle">🏡</text>
+  <g id="tm-pufiG" style="transition:transform 1.2s ease"><text id="tm-pufi" x="0" y="${gy+30}" font-size="58" text-anchor="middle" style="animation:tmBob 1.6s ease-in-out infinite">🦊</text><text id="tm-pact" x="34" y="${gy-28}" font-size="34" text-anchor="middle"></text>
+  <g id="tm-zz" opacity="0"><text x="24" y="${gy-14}" font-size="26" style="animation:tmZ 2s linear infinite">💤</text><text x="30" y="${gy-14}" font-size="20" style="animation:tmZ 2s linear 1s infinite">💤</text></g></g>`;
   return s; }
 function updScene(svg,t,W,gy,x0,x1){ x0=x0==null?60:x0; x1=x1==null?W-60:x1; const [a,b]=skyCols(t); svg.querySelector('#tm-s1').setAttribute('stop-color',a); svg.querySelector('#tm-s2').setAttribute('stop-color',b);
   t=((t%1440)+1440)%1440; const sun=svg.querySelector('#tm-sun'), moon=svg.querySelector('#tm-moon'), st=svg.querySelector('#tm-stars');
   const day=t>=360&&t<=1200; const k=day?(t-360)/840:((t-1200+1440)%1440)/600; const x=x0+Math.min(1,k)*(x1-x0), y=gy-Math.sin(Math.PI*Math.min(1,k))*(gy-60)+10;
-  sun.setAttribute('cx',x); sun.setAttribute('cy',y); sun.setAttribute('opacity',day?1:0); moon.setAttribute('x',x); moon.setAttribute('y',y+18); moon.setAttribute('opacity',day?0:1);
-  st.setAttribute('opacity',t<330||t>1230?1:t<420?(420-t)/90:t>1140?(t-1140)/90:0); }
+  sun.setAttribute('transform',`translate(${x} ${y})`); sun.setAttribute('opacity',day?1:0); moon.setAttribute('x',x); moon.setAttribute('y',y+18); moon.setAttribute('opacity',day?0:1);
+  st.setAttribute('opacity',t<330||t>1230?1:t<420?(420-t)/90:t>1140?(t-1140)/90:0);
+  /* scena vie: nori ziua, păsări ziua, lumina în casă seara, Pufi face ce face la ora aceea */
+  const q=s=>svg.querySelector(s); const night=t<400||t>1215;
+  if(q('#tm-clouds')) q('#tm-clouds').setAttribute('opacity',night?.25:1); if(q('#tm-birds')) q('#tm-birds').setAttribute('opacity',night?0:1);
+  if(q('#tm-win')) q('#tm-win').setAttribute('opacity',t>1110||t<420?1:0);
+  const pg=q('#tm-pufiG'); if(pg){ const A=X().acts; let a=null; for(const x of A) if(x[2]<=t) a=x; const sleep=night||!a;
+    const px=sleep?W*.8:x0+((t-400)/820)*(x1-x0-80); pg.setAttribute('transform',`translate(${Math.max(40,Math.min(W*.8,px))} 0)`);
+    q('#tm-pact').textContent=sleep?'':a[0]; q('#tm-zz').setAttribute('opacity',sleep?1:0); q('#tm-pufi').textContent=sleep?'😴':'🦊'; } }
 
 function staticClock(t,id,r,o){ const s=clockSVG(id,r*1.2,r*1.2,r,o||{}); const ha=(t%720)/2, ma=(t%60)*6;
   return s.replace(`<g id="${id}-h">`,`<g id="${id}-h" transform="rotate(${ha} ${r*1.2} ${r*1.2})">`).replace(`<g id="${id}-m">`,`<g id="${id}-m" transform="rotate(${ma} ${r*1.2} ${r*1.2})">`); }
@@ -9401,6 +9454,7 @@ function cuckooHouse(){ return `<svg viewBox="0 0 900 470"><rect width="900" hei
   <text id="tm-cnt" x="760" y="160" font-size="70" font-weight="800" fill="#FF5D7A" text-anchor="middle"></text></svg>`; }
 async function sing(svg,n,show,myGen){ const door=svg.querySelector('#tm-door'), bird=svg.querySelector('#tm-bird'), cnt=svg.querySelector('#tm-cnt');
   for(let i=1;i<=n;i++){ if(myGen!==gen) return; door.style.transform='scaleX(-.15)'; bird.setAttribute('opacity','1'); bird.style.transform='translateY(14px) scale(1.35)'; cucu(); if(show) cnt.textContent=i;
+    { const nt=document.createElementNS(NS,'text'); nt.setAttribute('x',470+R(30)); nt.setAttribute('y',90); nt.setAttribute('font-size','34'); nt.textContent=pick(['🎵','🎶']); nt.style.setProperty('--nx',(R(120)-20)+'px'); nt.style.animation='tmNote 1.4s ease-out forwards'; nt.style.transformBox='fill-box'; svg.appendChild(nt); setTimeout(()=>nt.remove(),1500); }
     await wait(420); bird.style.transform=''; await wait(160); bird.setAttribute('opacity','0'); door.style.transform=''; await wait(260); } }
 function gCuckoo(li){ let ti=0, errs=0, busy=false, h=0; const F=frame('',PER,'🐦'); const myGen=gen;
   F.stage.innerHTML=cuckooHouse(); const svg=F.stage.firstChild; const c=makeClock(svg,'tc',450,282,118,{total:0,step:60,only:'h'}); c.locked=li<2;
@@ -9416,6 +9470,8 @@ function gCuckoo(li){ let ti=0, errs=0, busy=false, h=0; const F=frame('',PER,'�
   show(); }
 
 /* ---------- 3. ceasul-pizza ---------- */
+function pzParty(svg){ for(let i=0;i<8;i++){ const t=document.createElementNS(NS,'text'); const a=i/8*Math.PI*2; t.setAttribute('x',450); t.setAttribute('y',250); t.setAttribute('font-size','44'); t.setAttribute('text-anchor','middle'); t.textContent=pick(['🍕','🧀','🍅','🫒']);
+  t.style.transition='transform .9s cubic-bezier(.2,.8,.3,1),opacity .9s'; svg.appendChild(t); requestAnimationFrame(()=>requestAnimationFrame(()=>{ t.style.transform=`translate(${Math.cos(a)*300}px,${Math.sin(a)*190}px) rotate(${R(360)}deg)`; t.style.opacity='0'; })); setTimeout(()=>t.remove(),1000); } }
 function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'🍕'); const myGen=gen;
   F.stage.innerHTML=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#FFF4E0"/>${clockSVG('tc',450,235,205,{rim:'#E0A000'})}</svg>`; const svg=F.stage.firstChild;
   const read=li!==1&&li!==4, ms=li<=1?[30]:li===2?[15]:li===3?[45]:[15,30,45];
@@ -9427,10 +9483,11 @@ function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'�
       const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer,'tm-wide',qq); }
     else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:c.total%720},null))); } }
   async function answer(o,b){ if(busy) return; if(o.v!==tg%720){ errs++; if(b) b.classList.add('no'); boing(); F.say(tip()); return; }
-    busy=true; c.locked=true; if(b) b.classList.add('ok'); chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('pizza',li,errs); show(); }
+    busy=true; c.locked=true; if(b) b.classList.add('ok'); chime(); award(); F.dot(ti+1); pzParty(svg); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('pizza',li,errs); show(); }
   show(); }
 
 /* ---------- 4. gara ---------- */
+function puffs(svg,x,y,n){ for(let i=0;i<n;i++){ setTimeout(()=>{ const t=document.createElementNS(NS,'text'); t.setAttribute('x',x+i*55); t.setAttribute('y',y); t.setAttribute('font-size','46'); t.textContent='☁️'; t.style.transformBox='fill-box'; t.style.transformOrigin='center'; t.style.animation='tmSteam 1.4s ease-out forwards'; svg.appendChild(t); setTimeout(()=>t.remove(),1500); },i*220); } }
 function gStation(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'🚂'); const myGen=gen; const step=[60,30,15,5,1,15][li], h24=li===5;
   F.stage.innerHTML=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#DFF1FF"/><rect x="0" y="380" width="900" height="90" fill="#C9B8A0"/>
     ${[...Array(19)].map((_,i)=>`<rect x="${i*50}" y="408" width="30" height="10" fill="#7A5A3A"/>`).join('')}<line x1="0" y1="405" x2="900" y2="405" stroke="#555" stroke-width="5"/><line x1="0" y1="422" x2="900" y2="422" stroke="#555" stroke-width="5"/>
@@ -9446,7 +9503,7 @@ function gStation(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,
     let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
     F.say(X().stTask(digi(tg,h24),d[1])); F.ctrl.appendChild(btn(X().go,'go',answer)); }
   async function answer(){ if(busy) return; if(c.total%720!==tg%720){ errs++; boing(); F.say(X().stWrong); return; }
-    busy=true; c.locked=true; toot(); tr.style.transform='translateX(1000px)'; chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg);
+    busy=true; c.locked=true; toot(); tr.style.transform='translateX(1000px)'; puffs(svg,90,330,6); chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg);
     const msg=h24?X().st24(digi(tg,true),tSay(h,m),X().parts[partOf(tg)]):X().itIs(tSay(h,m)); await spW(msg,2300); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('station',li,errs); show(); }
   show(); }
 
@@ -9476,13 +9533,13 @@ function gOven(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'👩‍�
   const svg=F.stage.firstChild, food=svg.querySelector('#tm-food'), smoke=svg.querySelector('#tm-smoke');
   let st=0, dur=60, it=null; const c=makeClock(svg,'tc',260,235,200,{step:5,only:'m',onChange:t=>grow(t)});
   function grow(t){ const k=(t-st)/dur; food.style.transform=`scale(${.55+Math.min(1,k)*.6})`; food.style.filter=k>1.05?`brightness(${Math.max(.35,1-(k-1)*1.6)})`:'none'; smoke.setAttribute('opacity',k>1.05?1:0); svg.querySelector('#tm-glow').setAttribute('opacity',.25+Math.min(1,k)*.4); }
-  async function show(){ F.ctrl.innerHTML=''; dur=pick(DL); it=pick(X().ovItems); food.textContent=it[0]; st=RR(1,10)*60+(li>=2?pick([0,15,30]):0); c.min=st; c.max=st+180; c.locked=false; await c.set(st); grow(st);
+  async function show(){ F.ctrl.innerHTML=''; food.style.animation=''; dur=pick(DL); it=pick(X().ovItems); food.textContent=it[0]; st=RR(1,10)*60+(li>=2?pick([0,15,30]):0); c.min=st; c.max=st+180; c.locked=false; await c.set(st); grow(st);
     const ha=(st%720)/2, ma=(st%60)*6; svg.querySelector('#tm-ghost').innerHTML=`<line x1="260" y1="235" x2="260" y2="135" stroke="#2E6BD6" stroke-width="16" stroke-linecap="round" transform="rotate(${ha} 260 235)"/><line x1="260" y1="235" x2="260" y2="67" stroke="#FF5D7A" stroke-width="10" stroke-linecap="round" transform="rotate(${ma} 260 235)"/>`;
     const [h,m]=hmOf(st); F.say(X().ovTask(it[1],tSay(h,m),X().dur(dur))); F.ctrl.appendChild(btn(X().ok,'go',answer)); }
   async function answer(){ if(busy) return; const el_=c.total-st;
     if(el_<dur){ errs++; boing(); F.say(X().ovEarly); return; }
     if(el_>dur){ errs++; boing(); F.say(X().ovBurn); await wait(1200); if(myGen!==gen) return; await c.set(st,true); grow(st); return; }
-    busy=true; c.locked=true; ding(); chime(); award(); F.dot(ti+1); try{ confetti(14); }catch(e){} const [h,m]=hmOf(c.total); await spW(X().ovDone(tSay(h,m)),1500); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('oven',li,errs); show(); }
+    busy=true; c.locked=true; ding(); chime(); award(); F.dot(ti+1); try{ confetti(14); }catch(e){} puffs(svg,640,190,3); food.style.animation='tmJump .7s ease 2'; const [h,m]=hmOf(c.total); await spW(X().ovDone(tSay(h,m)),1500); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('oven',li,errs); show(); }
   show(); }
 
 /* ---------- 7. ordonează ziua ---------- */
@@ -9598,7 +9655,7 @@ function gMonths(li){ let ti=0, errs=0, busy=false, k=0; const N=li===0?1:PER; c
   for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).addEventListener('click',()=>tap(i));
   async function tap(i){ if(busy) return; const p=svg.querySelector('#tm-wm'+i); wc.textContent=SEM[seasonOf(i)];
     if(li===0){ if(i!==k){ errs++; boing(); return; } p.setAttribute('opacity','.55'); blip(); sp(M[i]); k++; if(k===12){ busy=true; chime(); award(); F.dot(1); await spW(X().ladder[3].replace(/^\S+\s/,''),1200); if(myGen!==gen) return; levelDone('months',0,errs); } return; }
-    if(li===1){ if(i!==tg){ errs++; boing(); return; } busy=true; p.setAttribute('opacity','.55'); chime(); award(); F.dot(ti+1); await spW(M[i],800); nx(); } else sp(M[i]); }
+    if(li===1){ if(i!==tg){ errs++; boing(); return; } busy=true; p.setAttribute('opacity','.55'); svg.style.transition='transform 1.2s cubic-bezier(.3,1.3,.6,1)'; svg.style.transform=`rotate(${(svg._r=(svg._r||0)+360)}deg)`; chime(); award(); F.dot(ti+1); await spW(M[i],800); nx(); } else sp(M[i]); }
   function show(){ F.ctrl.innerHTML=''; for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).setAttribute('opacity','1');
     if(li===0){ F.say(X().moOrder); return; }
     const m=R(12); if(li===1){ tg=(m+1)%12; F.say(X().moAfter(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.7'); }
@@ -9612,10 +9669,11 @@ function gTree(){ const F=frame('',0,'🌳'); const myGen=gen; let s=seasonOf(ne
   const row=el('div','tm-seas'); const bs=[0,1,2,3].map(i=>{ const b=el('button',null,`${SEM[i]} ${X().seasT[i]}`); b.onclick=()=>{ s=i; draw(); }; row.appendChild(b); return b; }); F.ctrl.appendChild(row);
   function draw(){ bs.forEach((b,i)=>b.setAttribute('aria-pressed',i===s)); const sky=['#CFEFFF','#9ED8FF','#D9E6F2','#E3ECF5'][s], gr=['#8FD47F','#6CC25C','#C9A66B','#FFFFFF'][s];
     let h=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="${sky}"/><path d="M0 380 Q450 340 900 380 V470 H0Z" fill="${gr}" ${s===3?'stroke="#D0DCE8" stroke-width="3"':''}/>`;
-    h+=`<path d="M430 390 L440 250 L380 190 M440 250 L445 200 L500 160 M445 230 L520 205 M440 290 L360 250" stroke="#7A4A22" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M420 392 Q450 300 438 240 L462 240 Q455 300 480 392Z" fill="#7A4A22"/>`;
+    h+=`<g style="transform-origin:450px 392px;animation:tmSway 2.8s ease-in-out infinite alternate">`; h+=`<path d="M430 390 L440 250 L380 190 M440 250 L445 200 L500 160 M445 230 L520 205 M440 290 L360 250" stroke="#7A4A22" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M420 392 Q450 300 438 240 L462 240 Q455 300 480 392Z" fill="#7A4A22"/>`;
     const crown=[[450,170,120],[360,200,80],[540,200,85],[400,120,75],[500,115,80],[450,90,70]];
-    if(s<3) crown.forEach(([x,y,r],i)=>{ const col=s===0?['#B9E8A8','#A8E09A'][i%2]:s===1?['#3FAE4F','#4CBB5C'][i%2]:['#F2A33A','#E4572E','#F6C445'][i%3]; h+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${s===0?.85:1}"/>`; });
+    const endTree='</g>'; if(s<3) crown.forEach(([x,y,r],i)=>{ const col=s===0?['#B9E8A8','#A8E09A'][i%2]:s===1?['#3FAE4F','#4CBB5C'][i%2]:['#F2A33A','#E4572E','#F6C445'][i%3]; h+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${s===0?.85:1}"/>`; });
     else h+=`<path d="M380 190 q-30 -10 -40 -40 M500 160 q20 -30 50 -35 M520 205 q30 0 50 -20 M445 200 q-5 -40 10 -70" stroke="#7A4A22" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M372 186 l-10 -8 M495 156 l14 -6" stroke="#fff" stroke-width="9" stroke-linecap="round"/>`;
+    h+=endTree+(s===1?`<text x="110" y="90" font-size="80" style="animation:tmSpin 16s linear infinite;transform-box:fill-box;transform-origin:center">☀️</text>`:'')+(s===2?[...Array(14)].map((_,i)=>`<text x="${R(900)}" y="${-30-R(300)}" font-size="22" style="animation:tmRain ${1.4+Math.random()}s linear ${-Math.random()*2}s infinite" pointer-events="none">💧</text>`).join(''):'')+(s===0?`<text x="120" y="90" font-size="60" style="animation:tmBob 2s ease-in-out infinite">🌈</text>`:'');
     h+=`<g id="tm-fx"></g><text x="760" y="420" font-size="64" text-anchor="middle">${s===1?'🧺':''}</text><text id="tm-bk" x="760" y="370" font-size="34" font-weight="800" text-anchor="middle" fill="#24325F"></text><g id="tm-items"></g></svg>`;
     F.stage.innerHTML=h; const svg=F.stage.firstChild, it=svg.querySelector('#tm-items'), fx=svg.querySelector('#tm-fx'); F.say(X().treeHi[s]);
     const spots=[[380,170],[420,120],[470,100],[520,140],[560,200],[330,210],[450,190],[500,210],[400,220],[350,160],[480,60],[540,100],[420,60],[590,180]];
@@ -9656,10 +9714,54 @@ function gSort(){ let ti=0, errs=0, busy=false; const N=8; const F=frame(X().sor
   async function answer(i,b){ if(busy) return; if(i!==pool[ti][1]){ errs++; b.classList.add('no'); boing(); return; } busy=true; cnt[i]++; b.querySelector('.c').textContent='🧺 '+cnt[i]; chime(); award(); F.dot(ti+1); await spW(X().seasT[i],700); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('sort',0,errs); show(); }
   show(); }
 
+
+/* ---------- 17. trezește-l pe Pufi (ceasul deșteptător) ---------- */
+function gWake(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'⏰'); const myGen=gen; const step=[60,30,15,5][li];
+  F.stage.innerHTML=`<svg viewBox="0 0 900 470"><defs><linearGradient id="tm-wk" x1="0" y1="0" x2="0" y2="1"><stop id="tm-wk1" offset="0" stop-color="#14204F"/><stop id="tm-wk2" offset="1" stop-color="#2E3A78"/></linearGradient></defs>
+    <rect width="900" height="470" rx="24" fill="#F6E7D2"/><rect x="0" y="360" width="900" height="110" fill="#D9B48A"/>
+    <rect x="540" y="40" width="300" height="210" rx="14" fill="url(#tm-wk)" stroke="#8A5A2B" stroke-width="10"/><line x1="690" y1="40" x2="690" y2="250" stroke="#8A5A2B" stroke-width="8"/>
+    <text id="tm-wkSky" x="760" y="130" font-size="58" text-anchor="middle">🌙</text><g id="tm-wkSt">${[[580,80],[640,150],[800,190],[720,75],[610,210]].map(([x,y],i)=>`<text x="${x}" y="${y}" font-size="20" style="animation:tmTwinkle ${1.4+i*.3}s ease-in-out infinite">⭐</text>`).join('')}</g>
+    <rect id="tm-curL" x="530" y="30" width="80" height="235" rx="10" fill="#E86B8A" style="transition:transform 1s ease;transform-origin:530px 30px"/><rect id="tm-curR" x="770" y="30" width="80" height="235" rx="10" fill="#E86B8A" style="transition:transform 1s ease;transform-origin:850px 30px"/>
+    <rect x="470" y="300" width="390" height="70" rx="20" fill="#7FB3FF"/><rect x="470" y="270" width="80" height="60" rx="18" fill="#FFFFFF"/><rect x="540" y="292" width="320" height="56" rx="18" fill="#FFC8D8"/>
+    <g id="tm-wkP" style="transform-origin:600px 300px"><text id="tm-wkF" x="600" y="300" font-size="86" text-anchor="middle">😴</text>
+    <g id="tm-wkZ"><text x="640" y="230" font-size="34" style="animation:tmZ 2.2s linear infinite">💤</text><text x="655" y="230" font-size="26" style="animation:tmZ 2.2s linear 1.1s infinite">💤</text></g></g>
+    <rect x="70" y="380" width="250" height="30" rx="8" fill="#8A5A2B"/>
+    <g id="tm-alarm" style="transform-origin:195px 230px"><circle cx="135" cy="80" r="26" fill="#FF5D7A"/><circle cx="255" cy="80" r="26" fill="#FF5D7A"/>${clockSVG('tc',195,230,150,{rim:'#FF5D7A',mnums:li>=3})}<line x1="120" y1="372" x2="140" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/><line x1="270" y1="372" x2="250" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/></g></svg>`;
+  const svg=F.stage.firstChild, q=x=>svg.querySelector(x); const c=makeClock(svg,'tc',195,230,150,{step,only:step>=60?'h':null});
+  function night(){ q('#tm-wk1').setAttribute('stop-color','#14204F'); q('#tm-wk2').setAttribute('stop-color','#2E3A78'); q('#tm-wkSky').textContent='🌙'; q('#tm-wkSt').setAttribute('opacity',1); q('#tm-curL').style.transform=''; q('#tm-curR').style.transform=''; q('#tm-wkF').textContent='😴'; q('#tm-wkZ').setAttribute('opacity',1); q('#tm-wkP').style.animation=''; q('#tm-alarm').style.animation=''; }
+  async function show(){ F.ctrl.innerHTML=''; night(); const h=RR(5,9), m=step>=60?0:R(60/step)*step; tg=h*60+m;
+    let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
+    F.say(X().wakeTask(tSay(h,m))); F.ctrl.appendChild(btn(X().ring,'go',answer)); F.ctrl.appendChild(btn(X().listen,'',()=>F.say(X().wakeTask(tSay(h,m))))); }
+  async function answer(){ if(busy) return; if(c.total%720!==tg%720){ errs++; boing(); const [a,b]=hmOf(c.total%720||720); F.say(X().wakeWrong(tSay(a,b))); return; }
+    busy=true; c.locked=true; q('#tm-alarm').style.animation='tmShake .35s linear 5'; for(let i=0;i<6;i++) setTimeout(()=>snd(i%2?1760:1320,.12,'square',.07),i*170);
+    await wait(1100); if(myGen!==gen) return; q('#tm-wk1').setAttribute('stop-color','#FFB27A'); q('#tm-wk2').setAttribute('stop-color','#BFE6FF'); q('#tm-wkSky').textContent='🌞'; q('#tm-wkSt').setAttribute('opacity',0);
+    q('#tm-curL').style.transform='scaleX(.35)'; q('#tm-curR').style.transform='scaleX(.35)'; q('#tm-wkZ').setAttribute('opacity',0); q('#tm-wkF').textContent='🦊'; q('#tm-wkP').style.animation='tmJump .6s ease 3';
+    chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().wakeDone+' '+X().itIs(tSay(h,m)),1800); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('wake',li,errs); show(); }
+  show(); }
+
+/* ---------- 18. baloanele cu ore ---------- */
+function gBalloon(li){ let ti=0, errs=0, busy=false, tg=0; const N=6; const F=frame('',N,'🎈'); const myGen=gen; const ms=[[0],[0,30],[0,15,30,45]][li];
+  const sky=el('div'); sky.style.cssText='position:relative;width:100%;height:100%;overflow:hidden;border-radius:24px;background:linear-gradient(#8FD3FF,#E6F7FF)';
+  sky.innerHTML=`<div style="position:absolute;left:0;top:12%;font-size:60px;animation:tmCloud 40s linear infinite">☁️</div><div style="position:absolute;left:0;top:40%;font-size:44px;animation:tmCloud 55s linear -20s infinite">☁️</div>`;
+  F.stage.appendChild(sky); const lab=el('div','tm-read'); F.ctrl.appendChild(lab); const COLS=['#FF6B8A','#FFC83D','#7BD389','#6FA8FF','#B58CFF','#FF9F5A'];
+  let alive=[];
+  function spawn(t,slot,delay){ const b=el('div'); const col=pick(COLS); const sz='clamp(92px,15vh,140px)';
+    b.style.cssText=`position:absolute;left:${6+slot*18.5}%;bottom:-200px;width:${sz};cursor:pointer;animation:tmFloatUp ${8+Math.random()*3}s linear ${delay}s forwards;display:flex;flex-direction:column;align-items:center`;
+    b.innerHTML=`<div style="width:${sz};height:calc(${sz} * 1.15);border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 35% 30%,#fff9 0 12%,${col} 13%);display:flex;align-items:center;justify-content:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.08)"><svg viewBox="0 0 120 120" style="width:78%;height:auto">${staticClock(t,'bl'+Math.random().toString(36).slice(2,7),50)}</svg></div><div style="width:2px;height:70px;background:#555"></div>`;
+    b.dataset.t=t; b.onclick=()=>pop(b); b.addEventListener('animationend',e=>{ if(e.animationName==='tmFloatUp'){ b.remove(); if(!busy&&myGen===gen&&!sky.querySelector(`[data-t="${tg}"]`)) round(true); } }); sky.appendChild(b); alive.push(b); }
+  function round(again){ if(myGen!==gen) return; sky.querySelectorAll('[data-t]').forEach(x=>x.remove()); const set=new Set(); if(!again){ const h=RR(1,12), m=pick(ms); tg=h*60+m; }
+    set.add(tg); while(set.size<5){ const v=RR(1,12)*60+pick(ms); if(v%720!==tg%720) set.add(v); } shuf([...set]).forEach((t,i)=>spawn(t,i,i*.35+Math.random()*.4));
+    const [h,m]=hmOf(tg); lab.innerHTML=`🎯 <b>${tShort(h,m)}</b>`; if(!again) F.say(X().balTask(tSay(h,m))); }
+  async function pop(b){ if(busy) return; const t=+b.dataset.t; if(t%720!==tg%720){ errs++; boing(); b.firstChild.style.animation='tmShake .4s'; setTimeout(()=>{ if(b.firstChild) b.firstChild.style.animation=''; },450); const [h,m]=hmOf(t); sp(tSay(h,m)); return; }
+    busy=true; snd(220,.08,'square',.12); b.style.animationPlayState='paused'; b.firstChild.style.animation='tmPop .35s forwards'; chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=N) return levelDone('balloon',li,errs); round(false); }
+  F.ctrl.appendChild(btn(X().listen,'',()=>{ const [h,m]=hmOf(tg); sp(X().balTask(tSay(h,m))); }));
+  round(false); }
+
 /* ================= meniuri ================= */
-const WORLDS={clock:['explore','cuckoo','pizza','station','memo','oven'],day:['order','dayclk','moments','ytm'],cal:['week','calm','months'],seas:['tree','dress','sort']};
+const WORLDS={clock:['explore','balloon','cuckoo','pizza','station','memo','oven'],day:['wake','order','dayclk','moments','ytm'],cal:['week','calm','months'],seas:['tree','dress','sort']};
 const WBG={clock:'#FFE9A8',day:'#FFD9C2',cal:'#D9E4FF',seas:'#CDEFD2'};
-const RUN={explore:gExplore,cuckoo:gCuckoo,pizza:gPizza,station:gStation,memo:gMemo,oven:gOven,order:gOrder,dayclk:gDayClk,moments:gMoments,ytm:gYtm,week:gWeek,calm:gCal,months:gMonths,tree:gTree,dress:gDress,sort:gSort};
+const RUN={wake:gWake,balloon:gBalloon,explore:gExplore,cuckoo:gCuckoo,pizza:gPizza,station:gStation,memo:gMemo,oven:gOven,order:gOrder,dayclk:gDayClk,moments:gMoments,ytm:gYtm,week:gWeek,calm:gCal,months:gMonths,tree:gTree,dress:gDress,sort:gSort};
 const FREE=['explore','tree'];
 const nLv=k=>FREE.includes(k)?0:(X().lv[k]||[0]).length;
 const gotStars=k=>[...Array(nLv(k))].reduce((s,_,i)=>s+(data.prog[k+i]||0),0);
@@ -10271,7 +10373,7 @@ const hl=document.getElementById('hm-langs'); if(hl) new MutationObserver(paint)
    Pe web nu se blochează nimic. În aplicație decide aplicația nativă (iap.status):
    true = totul deblocat (cumpărat, perioada gratuită de lansare sau instalat înainte de data-limită). */
 (()=>{
-const FREE={mw:['add','cmp','sb','ten'],tm:['explore','cuckoo','pizza','order'],rd:['alpha','fish','hunt','read','story'],ch:['learn','stars'],cg:['easy','two'],
+const FREE={mw:['add','cmp','sb','ten'],tm:['explore','balloon','cuckoo','pizza','wake','order'],rd:['alpha','fish','hunt','read','story'],ch:['learn','stars'],cg:['easy','two'],
   gm:['geo','tan'],rb:['prog','gar'],sa:['w0'],pq:['0','1'],nt:[]};
 const TXT={ro:{msg:'Jocul acesta e în versiunea completă.',ask:'Roagă un părinte să te ajute.',par:'👨‍👩‍👧 Pentru părinți',close:'✖ Închide'},
  de:{msg:'Dieses Spiel gehört zur Vollversion.',ask:'Frag einen Erwachsenen um Hilfe.',par:'👨‍👩‍👧 Für Eltern',close:'✖ Schließen'},
