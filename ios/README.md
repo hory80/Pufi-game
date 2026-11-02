@@ -19,7 +19,7 @@ xcodegen                       # generează PufiStars.xcodeproj
 open PufiStars.xcodeproj
 ```
 
-În Xcode: **Signing & Capabilities → Team** (contul tău), păstrează Bundle ID `ch.hory.pufistars`, adaugă o imagine 1024×1024 în `Assets.xcassets/AppIcon`, apoi Run pe iPad.
+În Xcode: **Signing & Capabilities → Team** (contul tău), păstrează Bundle ID `com.horace.pufistars`, adaugă o imagine 1024×1024 în `Assets.xcassets/AppIcon`, apoi Run pe iPad.
 
 La fiecare build, scriptul „Sync web game” recopiază automat `index.html` din rădăcina repo-ului — deci după `git pull` doar dai Run.
 
@@ -60,3 +60,36 @@ Testele verifică jocul împachetat, bridge-ul real WKWebView, vocea nativă,
 Debug IAP fără cheie, copia progresului, blocarea navigării externe, poarta și
 orientările. Calitatea microfonului, recunoașterea românei pe aparat și
 cumpărările reale trebuie verificate pe dispozitiv.
+
+## Lansare gratuită și utilizatori existenți
+
+Bundle identifier-ul confirmat de Hory este **`com.horace.pufistars`**. Modifică
+configurația în `project.yml`, nu doar proiectul Xcode generat. Pictograma este
+păstrată în Git la `PufiStars/Assets.xcassets/AppIcon.appiconset/PufiIcon-1024.png`;
+`xcodegen` și sincronizarea jocului nu o regenerează și nu o șterg.
+
+Până la **15 decembrie 2026, ora 00:00 Europe/Zurich**
+(`2026-12-14T23:00:00Z`) accesul este complet. După această dată, rămâne complet
+pentru utilizatorii cu o dată originală de achiziție anterioară limitei, verificată
+prin StoreKit `AppTransaction.shared`, sau cu entitlement RevenueCat `premium`.
+Eligibilitatea timpurie se păstrează în Keychain pe aparat. Pe un aparat nou,
+tranzacția verificată a aceluiași Apple ID permite restabilirea eligibilității.
+Dacă StoreKit nu răspunde, `iap.status` folosește rezultatul local după cel mult
+3 secunde; o cerere StoreKit aflată în curs nu este duplicată. Pagina jocului se
+încarcă independent de această verificare.
+
+În Debug, implicit totul este deblocat. Pentru scenarii deterministe, adaugă în
+**Scheme → Run → Arguments** sau la `simctl launch`:
+
+| Scenariu | Argumente |
+| --- | --- |
+| Înainte de limită | `-PufiNow 2026-12-14T22:59:59Z -PufiOriginalPurchase none` |
+| Utilizator vechi după limită | `-PufiNow 2026-12-15T00:00:00Z -PufiOriginalPurchase 2026-12-14T22:59:59Z` |
+| Utilizator nou după limită | `-PufiNow 2026-12-15T00:00:00Z -PufiOriginalPurchase none` |
+| Utilizator nou cu versiunea completă | `-PufiNow 2026-12-15T00:00:00Z -PufiOriginalPurchase none -PufiPremium true` |
+
+Oricare dintre aceste argumente activează un scenariu izolat: fără StoreKit,
+RevenueCat sau modificarea Keychain-ului real. `PufiPremium` simulează un
+entitlement activ; nu efectuează o cumpărătură. Toate argumentele sunt excluse din
+Release. Data-limită este strictă: o achiziție exact la limită nu califică pentru
+acces permanent gratuit.
