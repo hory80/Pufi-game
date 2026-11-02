@@ -11,6 +11,7 @@ struct GateRequest: Identifiable {
 
 /// Legătura dintre jocul JavaScript și serviciile native.
 /// JS: `await native.call('speak', {text, lang})`; evenimente: `native.on('asr.partial', fn)`.
+@MainActor
 final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
     weak var webView: WKWebView?
     @Published var gateRequest: GateRequest?
@@ -54,6 +55,7 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
             reply(id, recognition.availability(lang: lang))
         case "asr.start":
             speech.stop()
+            recorder.stop()
             let words = a["words"] as? [String] ?? []
             RecognitionService.authorize { [weak self] ok in
                 guard let self else { return }
@@ -70,10 +72,13 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
         case "asr.stop":
             recognition.stop(); reply(id, true)
         case "asr.playLast":
+            recognition.stop()
             recorder.play(url: recognition.lastURL) { [weak self] in self?.reply(id, true) }
 
         // vocea părintelui
         case "rec.start":
+            speech.stop()
+            recognition.stop()
             let key = a["key"] as? String ?? "praise1"
             RecorderService.authorize { [weak self] ok in
                 guard let self else { return }

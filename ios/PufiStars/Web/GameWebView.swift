@@ -34,7 +34,18 @@ struct GameWebView: UIViewRepresentable {
         bridge.webView = webView
 
         if let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "WebContent") {
-            webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            // Blochează și resursele externe (de exemplu fonturi), nu doar navigarea.
+            let rules = #"[{"trigger":{"url-filter":"^https?://"},"action":{"type":"block"}}]"#
+            WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: "PufiOffline", encodedContentRuleList: rules
+            ) { rules, error in
+                guard let rules, error == nil else {
+                    webView.loadHTMLString("<h1>Offline protection could not be loaded.</h1>", baseURL: nil)
+                    return
+                }
+                controller.add(rules)
+                webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            }
         } else {
             webView.loadHTMLString("<h1 style='font-family:sans-serif'>Run ios/sync_web.sh, then build again.</h1>", baseURL: nil)
         }

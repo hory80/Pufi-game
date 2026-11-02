@@ -43,9 +43,11 @@ struct ParentalGateView: View {
         .padding(32)
         .onAppear {
             var set = Set([a * b])
-            while set.count < 4 { set.insert(a * b + Int.random(in: -12...12)) }
-            options = set.filter { $0 > 0 }.shuffled()
-            if !options.contains(a * b) { options[0] = a * b; options.shuffle() }
+            while set.count < 4 {
+                let candidate = a * b + Int.random(in: -12...12)
+                if candidate > 0 { set.insert(candidate) }
+            }
+            options = set.shuffled()
         }
     }
 }
