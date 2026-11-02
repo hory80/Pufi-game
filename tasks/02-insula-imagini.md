@@ -437,7 +437,35 @@ Art style: premium children's mobile game art, soft 3D clay / vinyl-toy render, 
 
 ## Raport (completează Codex)
 
-- Instrument folosit:
-- Transparență: reală / magenta
-- Generate OK:
-- Probleme:
+- Data: 2 noiembrie 2026. Branch: `assets/insula-imagini`.
+- Instrument folosit: instrumentul integrat OpenAI `imagegen`, câte o imagine per apel. Nu s-au desenat imagini cu cod sau SVG. Blocurile de prompt au fost trimise integral; s-au adăugat doar instrucțiuni de dimensiune și, la regenerări, clarificări ale marginilor/conturului deja cerute.
+- Transparență: **reală**, verificată cu `sips` și citirea canalului alfa (interval 0–255, pixeli complet transparenți și complet opaci). Niciun fundal magenta și niciun caroiaj pictat. Cele două fundaluri sunt opace.
+- Generate: **toate cele 18 imagini obligatorii**, plus `a-bunny.png` și `a-bear.png`. Numele sunt exact cele din listă. Animalele opționale 21–30 nu au fost generate în această etapă.
+- Dimensiuni: `bg-day.png` și `bg-night.png` = **1536×1024**; toate celelalte 18 imagini = **1024×1024**. Instrumentul a returnat uneori alte rezoluții; fișierele pătrate selectate au fost redimensionate cu `sips`, păstrând alfa. Prima variantă portret a turnului a fost respinsă, nu deformată într-un pătrat.
+- Consecvență: noaptea este o editare a zilei; mersul/somnul/săritura folosesc `pufi-idle` drept referință; ouăle crăpat/deschis folosesc `egg-1`; cele două animale folosesc `pufi-idle` pentru stil. Stilul, paleta și lumina au fost verificate vizual.
+- Control vizual: obiecte întregi, fără text, cifre, logo sau watermark; pajiștea centrală este goală; sunt câte doi palmieri pe fiecare latură; cadranul turnului are 12 puncte, fără cifre și fără limbi. Fundalul de noapte nu adaugă lună sau stele.
+- Planșă de control: **`isl/raw/_contact-sheet.png`**, 1600×1120, 20 miniaturi cu numele fișierelor, verificată vizual pe fundal deschis. Textul din această planșă este doar etichetarea cerută, nu apare în asseturi.
+
+### Regenerări și abateri rămase
+
+Au fost necesare regenerări pentru încadrare și eliminarea halourilor. Maximum trei încercări per asset: `b-time`, `b-read`, `b-math`, `b-world`, `egg-3` au avut câte trei; `b-shapes` și `b-chess` câte două; restul câte una. Variantele respinse nu sunt incluse în repo.
+
+**Nu toate proporțiile procentuale din prompt au ieșit exact.** Fișierele au dimensiunile corecte și obiectele nu sunt tăiate, dar următoarele abateri rămân pentru ajustarea încadrării la optimizare:
+
+| Asset | Abatere după ultima încercare |
+|---|---|
+| `b-math.png` | Marginea de sus este aproximativ 5,3%, sub minimul cerut de 6%; baza/umbra ajunge la aproximativ 95,7% din înălțime. Necesită puțin spațiu transparent suplimentar. |
+| `b-time.png`, `b-read.png` | Baza/umbra ajunge la aproximativ 94,2–94,4%, în loc de 92%. |
+| `egg-3.png` | Baza/umbra ajunge la aproximativ 83,3%, în loc de 92%; trebuie aliniată mai jos față de oul întreg la integrare. |
+| `pufi-jump.png` | Primii pixeli ai conturului sunt la y=61 din 1024, practic 6% (aproximativ un pixel sub pragul strict). |
+| Fundaluri | Insula este mai lată decât ținta aproximativă de 86%; compoziția este identică între zi și noapte și centrul rămâne liber. |
+
+Măsurătorile sprite-urilor folosesc conturul alfa >16/255 și includ umbra. Unele lățimi/înălțimi ale obiectelor diferă de procentele orientative din prompt; nu sunt promise puncte de ancorare identice între toate ipostazele. Pe contururile PNG pot rămâne mici franjuri de antialiasing; variantele cu halouri mari au fost respinse. Cele două animale au primit și eșarfe de la referința de stil.
+
+### Verificarea aplicației și integrarea
+
+- Compilare iPad (A16), iOS 26.5: **PASS**. Aplicația instalată și pornită; pagina jocului verificată vizual.
+- Compilare iPhone 17 Pro, iOS 26.5: **PASS**. Aplicația instalată și pornită; pagina jocului verificată vizual.
+- Loguri locale: `/tmp/pufi-assets-ipad-build.log`, `/tmp/pufi-assets-iphone-build.log`. Capturi: `/tmp/pufi-assets-ipad.png`, `/tmp/pufi-assets-iphone.png`. Verificarea aplicației acoperă versiunea web de la `e518acc`; nu este un test de integrare a imaginilor noi.
+- Acest PR livrează imagini sursă și planșa de control; nu schimbă `index.html`, codul iOS sau `sync_web.sh`. Imaginile noi nu sunt încă folosite de joc.
+- Pentru Claude: optimizează imaginile, ajustează încadrarea/punctele de ancorare unde este indicat mai sus și integrează-le în Insulă. Copierea asseturilor optimizate în pachetul offline iOS trebuie tratată odată cu integrarea; actualul `sync_web.sh` copiază doar `index.html`, `foto/`, `imn/`, `fotbal/`.
