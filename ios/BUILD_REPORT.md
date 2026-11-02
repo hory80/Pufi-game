@@ -1,6 +1,6 @@
 # Pufi — free-launch entitlement implementation report
 
-Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `c06d159`.
+Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `1d5b54c`.
 Task: `ios/tasks/01-free-until-dec-15.md`.
 
 The app now grants full access before **15 December 2026, 00:00 Europe/Zurich**
@@ -60,7 +60,7 @@ Environment: Xcode 27.0 (27A266a), XcodeGen 2.46.0, RevenueCat 5.101.0;
 iPad (A16) and iPhone 17 Pro, iOS 26.5. Build output is under `/tmp` because
 Finder metadata in the synced Documents folder can interfere with signing.
 
-- iPhone full suite: **PASS — 19 tests**, zero failures.
+- iPhone full suite: **PASS — 19 tests**, zero failures after simulator restart; rotation assertions unchanged.
 - iPad full suite: **PASS — 19 tests**, zero failures after simulator restart; rotation assertions unchanged.
 - Release build: **PASS**; installed and launched on iPad with the confirmed bundle ID and compiled AppIcon.
 - Release Debug-override exclusion: **PASS**; override flag strings absent from the Release executable. Launching Release with test arguments still loads the real policy path.
@@ -74,15 +74,15 @@ Finder metadata in the synced Documents folder can interfere with signing.
 
 The first paywall test used Romanian purchase labels, but the current web page
 uses English fallback labels; the final test verifies the actual buy/restore
-controls. One earlier iPad run ignored a requested orientation change; its
-rotation assertion was kept intact and the simulator restarted for a full rerun.
+controls. Earlier simulator runs ignored a requested orientation change; the
+rotation assertion was kept intact and each affected simulator restarted for a full rerun.
 The app-source concurrency warning found during compilation was corrected.
 Xcode's no-AppIntents metadata notice and simulator audio/QoS diagnostics remain.
 
 Final local result bundles (not committed):
 
-- iPad: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-10-23-+0100.xcresult`
-- iPhone: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-07-48-+0100.xcresult`
+- iPad: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-15-27-+0100.xcresult`
+- iPhone: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-21-05-+0100.xcresult`
 
 Reproduce (repeat with the iPhone simulator destination):
 
@@ -109,12 +109,12 @@ is a separate web follow-up.
 ## Required setup by Hory before release
 
 1. Use the App Store Connect app record matching **`com.horace.pufistars`** (create it only if none exists) and select Hory's Apple Developer Team in Xcode for physical-device signing. Reuse the existing record for updates; no Team ID was invented.
-2. Create the **non-consumable** `unlock_all` in that app's In-App Purchases.
-3. Enable **Family Sharing** for the product if desired.
+2. Create the **non-consumable** `unlock_all` in that app's In-App Purchases. [Apple setup](https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/overview-for-configuring-in-app-purchases/).
+3. Enable **Family Sharing** for the product if desired. [Apple Family Sharing](https://developer.apple.com/documentation/storekit/supporting-family-sharing-in-your-app).
 4. Set the product's price, localization and review information.
 5. Submit the first IAP together with this app version for App Review.
 6. In RevenueCat, connect this app/product, create entitlement **`premium`**, attach `unlock_all`, and place its package in the **current offering**.
-7. Set this app's public iOS SDK key (`appl_…`) in `PurchaseService.swift`; the placeholder is unchanged.
+7. Set this app's public iOS SDK key (`appl_…`) in `PurchaseService.swift`; the placeholder is unchanged. [RevenueCat SDK configuration](https://www.revenuecat.com/docs/getting-started/configuring-sdk).
 8. Test StoreKit/RevenueCat purchase, cancellation, restore, offline relaunch, and original-download eligibility on real devices/Apple IDs before release.
 
 An app's bundle ID is its store identity and cannot be changed on an existing
