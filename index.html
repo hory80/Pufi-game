@@ -8281,6 +8281,11 @@ window.RDAQ={open,close,add,pool,iconSVG,hungryCount,T:()=>T(),SP,fishSVG};
 .hm-card .s{font-size:.95rem;font-weight:700;opacity:.75}
 .hm-par{position:absolute;inset:0;z-index:2;background:rgba(36,50,95,.5);display:flex;align-items:center;justify-content:center}
 .hm-par>div{background:#fff;border-radius:24px;padding:18px 22px;display:flex;flex-direction:column;gap:12px;align-items:center;max-width:92%}
+.hm-par>div.hm-lp{display:grid!important;grid-template-columns:repeat(3,1fr);gap:10px;width:min(640px,92vw);padding:18px}
+.hm-lpb{display:flex;align-items:center;gap:10px;width:100%;height:58px;padding:0 14px;border:3px solid #dfe6f5;border-radius:18px;background:#f6f8ff;font:inherit;font-size:1.1rem;font-weight:800;color:#24325f;white-space:nowrap;overflow:hidden;cursor:pointer;box-sizing:border-box}
+.hm-lpb .f{font-size:1.6rem;line-height:1;flex:none}.hm-lpb .n{overflow:hidden;text-overflow:ellipsis}
+.hm-lpb.cur{background:#3ecf8e;border-color:#2bb57a;color:#fff}
+@media (max-width:560px){.hm-par>div.hm-lp{grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}.hm-lpb{font-size:.95rem;gap:7px;padding:0 9px;height:52px}.hm-lpb .f{font-size:1.35rem}}
 .hm-par select{font:inherit;font-size:1.1rem;padding:6px;border-radius:12px;max-width:80vw}
 #sa-root{z-index:55!important}
 #gHome{background:var(--sun)!important;flex:0 0 auto!important}
@@ -8611,8 +8616,8 @@ function parents(){ const ov=document.createElement('div'); ov.className='hm-par
   const cb=document.createElement('button'); cb.className='rb-b go'; cb.textContent=H().close; cb.onclick=()=>{ if(v) ph.replaceWith(v); ov.remove(); }; box.appendChild(cb);
   root.appendChild(ov); if(window.__parentsExtra) window.__parentsExtra(box); }
 function paintLangs(){ const box=$('langs'); const cur=LANG_ALL.find(x=>x[0]===lang)||LANG_ALL[0]; box.innerHTML=''; const b=document.createElement('button'); b.textContent=cur[1]+' '+cur[2]+' ▾'; b.setAttribute('aria-pressed','true'); b.onclick=langPicker; box.appendChild(b); }
-function langPicker(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); box.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-width:640px;width:92%'; ov.appendChild(box);
-  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='rb-b'+(c===lang?' go':''); b.style.fontSize='1.2rem'; b.textContent=f+' '+n; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
+function langPicker(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); box.className='hm-lp'; ov.appendChild(box);
+  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='hm-lpb'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
   ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
 function setAppLang(c){ if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
 /* buton Acasă în pagina principală */
