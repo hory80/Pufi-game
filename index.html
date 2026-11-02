@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cut">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -11064,6 +11064,23 @@ paint();
   const NM={caras:['de giebel','Giebel','De giebel is een goudkleurige, rustige vis. Hij houdt van planten en wormpjes.'],crap:['de karper','Karper','De karper heeft snorharen om eten te zoeken in de modder.'],pastrav:['de forel','Forel','De forel woont in koude bergbeekjes. Hij heeft zwarte stippen en een roze streep.'],biban:['de baars','Baars','De baars heeft strepen op zijn rug en rode vinnen. Hij jaagt op visjes.'],somn:['de meerval','Meerval','De meerval heeft lange snorharen en eet bijna alles. Hij jaagt ’s nachts.'],stiuca:['de snoek','Snoek','De snoek is de grote jager van de rivier. Hij verstopt zich en valt bliksemsnel aan!'],rac:['de rivierkreeft','Rivierkreeft','De rivierkreeft heeft scharen en loopt achteruit. Hij maakt de bodem schoon.'],testoasa:['de schildpad','Schildpad','De waterschildpad draagt haar huisje op haar rug.'],plev:['het visje','Visje','']};
   for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
   const FD={alg:'de algen',worm:'de wormen',ins:'de insecten',plev:'de visjes'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>
+<style>
+/* fără zoom la dublu-tap (ex. 1 apoi 1 = 11) și fără ciupit pentru mărire */
+html,body,*{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,[role=button],.sp-keys button,.mw-ans button,.sa-ans button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+</style>
+<script>
+(()=>{
+/* viewport fix: fără mărire, nici în artefact, nici în aplicație */
+try{ let m=document.querySelector('meta[name=viewport]'); if(!m){ m=document.createElement('meta'); m.name='viewport'; document.head.appendChild(m); }
+  m.content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover'; }catch(e){}
+const stop=e=>{ try{ e.preventDefault(); }catch(_){} };
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stop,{passive:false}));
+document.addEventListener('dblclick',stop,{passive:false});
+document.addEventListener('touchmove',e=>{ if(e.touches&&e.touches.length>1) stop(e); },{passive:false});
 })();
 </script>
 <script>
