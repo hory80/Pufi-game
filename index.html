@@ -1,12 +1,4 @@
-<!doctype html>
-<html lang="ro">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cut">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Adunări cu Stele</title>
+<title>Pufi – Școala jocurilor</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
 <style>
 /* Layout: one-screen play area — game tabs + options on top, star bar, then either the counting card with three answer tiles or a 2×2 grid of big flags. Single bright look by choice. */
@@ -425,9 +417,6 @@ button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 @keyframes rdPulse{50%{transform:scale(1.35)}}
 @media (prefers-reduced-motion:reduce){.rd-fish{animation:none}.rd-pad .pulse,.rd-alphaCard,.rd-emoji,.rd-wagon.full{animation:none}}
 </style>
-</head>
-<body>
-
 
 <div class="start" id="start">
   <div class="parade">🍎🚗🇨🇭🇷🇴🇩🇪</div>
@@ -2000,6 +1989,7 @@ $('sayBtn').onclick=()=>{ if(task.text) speak(task.text); };
 $('task').onclick=()=>{ if(task.text) speak(task.text); };
 $('newBtn').onclick=()=>{ if(view==='play'){ busy=false; newTask(); } };
 addEventListener('resize',()=>{ if(!root.hidden&&view==='play') sizeBoard(); });
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play') openGame(mode); else showMenu(); });
 window.openChess=()=>{ root.hidden=false; showMenu(); };
 window.__chess={pseudo,legal,allLegal,isMate,inCheck,parse,MATES,doMove,genStars,genCapture,genEscape};
 })();
@@ -2600,6 +2590,7 @@ function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hid
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
 $('task').onclick=()=>{ if(task.say) speak(task.say); };
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'&&game) openGame(game); else showMenu(); });
 window.openReading=()=>{ root.hidden=false; showMenu(); };
 window.__rd={glyph,parseStroke,ALPHA,WORDS};
 window.__rdData={AQTX,ALPHA,WORDS,STORIES,STX,FISHTX,VOC,GRA,GRANB,POSDROP,HUNTLONG,HUNTL,FAM,POSL,X2,GU,GL,GD,MARKS};
@@ -2988,6 +2979,7 @@ $('owl').onclick=rep; $('task').onclick=rep;
 $('ovNext').onclick=()=>startLevel(Math.min(li+1,LV.length-1));
 $('ovAgain').onclick=()=>startLevel(li);
 $('ovMap').onclick=showMenu;
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'){ if(freeMode) startFree(); else startLevel(li); } else showMenu(); });
 window.openSoroban=()=>{ root.hidden=false; showMenu(); };
 window.saLabel=()=>{ const b=document.getElementById('sbAcad'); if(b) b.textContent=X().acad; if(!root.hidden){ if(view==='menu') showMenu(); else labels(); } };
 /* legătura cu pagina principală */
@@ -7718,6 +7710,7 @@ function garage(){
 }
 
 /* ================= intrare ================= */
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; const Z={home,prog:zoneProg,mech:zoneMech,sens:zoneSens,circ:zoneCirc,col:zoneCol}; if(Z[view]) Z[view](); else if(view==='gar'&&typeof garage==='function') garage(); else if(curRestart) curRestart(); else home(); });
 window.openRobo=()=>{ root.hidden=false; home(); };
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gRobo')){ const b=document.createElement('button'); b.id='gRobo'; b.className='pufiTab'; b.textContent='🤖 RoboPufi'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} window.openRobo(); };
   const ref=document.getElementById('gRead'); if(ref&&ref.nextSibling) tabs.insertBefore(b,ref.nextSibling); else tabs.appendChild(b); } }catch(e){}
@@ -8035,6 +8028,8 @@ function measGame(){
 }
 
 /* ================= intrare ================= */
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; menu=__rm(menu); geoGame=__rm(geoGame); tanGame=__rm(tanGame); cubeGame=__rm(cubeGame); measGame=__rm(measGame);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openShapes=()=>{ root.hidden=false; menu(); };
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gShapes')){ const b=document.createElement('button'); b.id='gShapes'; b.className='pufiTab'; b.textContent='📐 Forme';
   b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} window.openShapes(); }; const ref=document.getElementById('gRobo'); if(ref&&ref.nextSibling) tabs.insertBefore(b,ref.nextSibling); else tabs.appendChild(b); }
@@ -8260,6 +8255,7 @@ function card(a){ const f=a.f, s=SP[f.sp], hg=hunger(f), host=ov.querySelector('
   c.querySelector('#aq-ok').onclick=()=>c.remove(); c.onclick=e=>{ if(e.target===c) c.remove(); };
   c.querySelector('#aq-mv').onclick=()=>{ f.tank=f.tank==='main'?'pred':'main'; save(); c.remove(); snd(400,.15); build(); }; }
 window.RDAQ={open,close,add,pool,iconSVG,hungryCount,T:()=>T(),SP,fishSVG};
+(window.__LR=window.__LR||[]).push(()=>{ if(ov) try{ labels(); }catch(e){} });
 })();
 </script>
 
@@ -8575,6 +8571,8 @@ function gBox(li){ const L=BOXL[li]; let ti=0, errs=0, busy=false, t=null, x=0; 
   show(); }
 
 /* ================= intrare ================= */
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; home=__rm(home); levels=__rm(levels); play=__rm(play);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openMath=()=>{ root.hidden=false; home(); };
 window.__mw={genAdd,ADDL,BOXL};
 })();
@@ -8620,6 +8618,7 @@ function paintLangs(){ const box=$('langs'); const cur=LANG_ALL.find(x=>x[0]===l
 function langPicker(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); box.className='hm-lp'; ov.appendChild(box);
   LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='hm-lpb'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
   ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
+(window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden) render(); });
 function setAppLang(c){ if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
 /* buton Acasă în pagina principală */
 try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gHome')){ const b=document.createElement('button'); b.id='gHome'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} if(mainReturn==='math'&&window.openMath){ window.openMath(); root.hidden=false; } else root.hidden=false; render(); }; tabs.insertBefore(b,tabs.firstChild); } }catch(e){}
@@ -9002,6 +9001,7 @@ $('hint').onclick=()=>{ hints=!hints; try{localStorage.setItem('cg_hints',hints?
 $('undo').onclick=undo; $('tipB').onclick=giveTip; $('new').onclick=()=>{ D.save=null; save(); newGame(); };
 $('say').onclick=()=>sp($('status').dataset.say||''); $('status').onclick=()=>sp($('status').dataset.say||'');
 addEventListener('resize',()=>{ if(!root.hidden&&view==='play') sizeBoard(); });
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='play'){ top(); render(); try{ status(turnText()); }catch(e){} } else showSetup(); });
 window.openChessGame=()=>{ root.hidden=false; showSetup(); };
 window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){return G},get nodes(){return nodes}};
 })();
@@ -9664,6 +9664,8 @@ function levels(k){ stopAll(); const w=worldOf(k); back=()=>world(w); curLevels=
   main.appendChild(g); sp(X().games[k][1]); }
 function play(k,i){ stopAll(); const w=worldOf(k); back=nLv(k)>1?()=>levels(k):()=>world(w); curRestart=()=>play(k,i); $('all').hidden=true; $('title').textContent=X().games[k][0]+' '+X().games[k][1]; RUN[k](i); }
 function levelDone(k,i,errs){ award(); finish(k+i,rate(errs),i<nLv(k)-1?()=>play(k,i+1):null); }
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; home=__rm(home); world=__rm(world); levels=__rm(levels); play=__rm(play);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
 window.openTime=()=>{ root.hidden=false; home(); };
 window.__tm={tSay,digi,skyCols,data,play};
 })();
@@ -10039,6 +10041,7 @@ function loop(now){ try{ const dt=Math.min(.05,(now-lastT)/1000); lastT=now;
   catch(err){ try{ console.warn('pq',err); if(P){ unstick(P); state=state==='map'?'map':'play'; anim=null; } }catch(_){} }
   requestAnimationFrame(loop); }
 resize(); MAIN=W=LV(0).main; P=newP(2*TS,GY*TS); requestAnimationFrame(loop);
+(window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden&&state==='map') showMap(); });
 window.openPufi=lg=>{ root.hidden=false; resize(); $('mute').textContent=muted?'🔇':'🔊'; showMap(); };
 window.__pq={start:startLevel,get P(){return P},get W(){return W},get state(){return state},keys,press:k=>{ if(k==='j') jumpPress=true; if(k==='d') downPress=true; },grow,LV,set hearts(v){hearts=v}};
 })();
@@ -10171,6 +10174,46 @@ const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
   const FD={alg:'le alghe',worm:'i vermi',ins:'gli insetti',plev:'i pesciolini'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
 })();
 </script>
+<style>
+.lp-grp{display:inline-flex;align-items:center;gap:0;flex:none;margin-left:auto}
+.lp-mini{display:inline-flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;font:inherit;font-size:1.25rem;line-height:1;border:3px solid #dfe6f5;background:#fff;border-radius:999px;padding:4px 9px;cursor:pointer;margin-right:6px;flex:none;box-shadow:0 2px 0 rgba(36,50,95,.12)}
+.lp-mini:active{transform:translateY(1px)}
+.lp-ov{position:fixed;inset:0;z-index:99999;background:rgba(36,50,95,.5);display:flex;align-items:center;justify-content:center}
+.lp-box{background:#fff;border-radius:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(640px,92vw);padding:18px;box-sizing:border-box}
+.lp-b{display:flex;align-items:center;gap:10px;width:100%;height:58px;padding:0 14px;border:3px solid #dfe6f5;border-radius:18px;background:#f6f8ff;font:inherit;font-size:1.1rem;font-weight:800;color:#24325f;white-space:nowrap;overflow:hidden;cursor:pointer;box-sizing:border-box}
+.lp-b .f{font-size:1.6rem;line-height:1;flex:none}.lp-b .n{overflow:hidden;text-overflow:ellipsis}
+.lp-b.cur{background:#3ecf8e;border-color:#2bb57a;color:#fff}
+@media (max-width:560px){.lp-box{grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}.lp-b{font-size:.95rem;gap:7px;padding:0 9px;height:52px}.lp-b .f{font-size:1.35rem}.lp-mini{font-size:1.1rem;padding:3px 7px}}
+</style>
+<script>
+/* buton de limbă lângă stele, în fiecare ecran — schimbă limba fără întoarcere la start */
+(()=>{
+const flag=()=>((LANG_ALL.find(x=>x[0]===lang)||LANG_ALL[0])[1]);
+function paint(){ document.querySelectorAll('.lp-mini').forEach(b=>{ b.textContent=flag(); b.setAttribute('aria-label',(LANG_ALL.find(x=>x[0]===lang)||[])[2]||''); }); }
+function switchLang(c){
+  if(c===lang) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(window.__setLang) window.__setLang(c); else lang=c;
+  (window.__LR||[]).forEach(f=>{ try{ f(); }catch(e){ console.warn('lang refresh',e); } });
+  paint();
+}
+function picker(){
+  const ov=document.createElement('div'); ov.className='lp-ov'; const box=document.createElement('div'); box.className='lp-box'; ov.appendChild(box);
+  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='lp-b'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`;
+    b.onclick=()=>{ ov.remove(); switchLang(c); }; box.appendChild(b); });
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; document.body.appendChild(ov);
+}
+window.__switchLang=switchLang; window.__langPicker=picker;
+const IDS=['stars','ch-stars','rd-stars','sa-stars','cg-stars','gm-stars','mw-stars','rb-stars','tm-stars'];
+function add(){ IDS.forEach(id=>document.querySelectorAll('[id="'+id+'"]').forEach(p=>{ const host=id==='stars'?p.parentElement:p; if(host.parentElement&&host.parentElement.classList.contains('lp-grp')) return;
+  const g=document.createElement('span'); g.className='lp-grp'; host.parentElement.insertBefore(g,host);
+  const b=document.createElement('span'); b.className='lp-mini'; b.setAttribute('role','button'); b.tabIndex=0; b.onclick=e=>{ e.stopPropagation(); picker(); };
+  g.appendChild(b); g.appendChild(host); })); paint(); }
+add();
+/* butonul mare de pe start folosește aceeași schimbare */
+const hl=document.getElementById('hm-langs'); if(hl) new MutationObserver(paint).observe(hl,{childList:true,subtree:true});
+})();
+</script>
 <script>
 /* Nederlands — vissennamen */
 (()=>{ const lg='nl', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
@@ -10216,6 +10259,3 @@ const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
 /* după încărcarea pachetelor de limbă: reaplică textele paginii principale */
 try{ if(typeof applyLang==='function') applyLang(); }catch(e){}
 </script>
-
-</body>
-</html>
