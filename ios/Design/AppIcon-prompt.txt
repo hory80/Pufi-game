@@ -1,0 +1,5 @@
+Generation mode: built-in image_gen.
+Final asset: ../PufiStars/Assets.xcassets/AppIcon.appiconset/PufiIcon-1024.png
+Generated square artwork resized to 1024x1024 for Xcode; opaque RGB PNG.
+
+Use case: logo-brand. Create a polished square 1024x1024 iOS app icon for Pufi, a warm educational game for young children. The existing game's mascot is a friendly orange fox and its interface uses sky blue, golden yellow and deep navy. A single adorable, clever orange fox face with cream cheeks and large friendly dark eyes, paired with one small golden star suggesting learning and achievement. Bold simple silhouette, joyful premium children's illustration, soft rounded shapes and restrained dimensional shading, excellent readability at small app-icon sizes. Center the fox prominently with generous safe margins. Solid opaque sky-blue background extending fully to all four edges. No text, letters, numbers, watermark, border, mockup, or pre-rounded outer corners; Apple applies the icon mask. Deliver the icon artwork itself, one square image.
