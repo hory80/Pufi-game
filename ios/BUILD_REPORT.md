@@ -2,6 +2,14 @@
 
 Date: 2026-11-02. Branch: `ios-build`; base: `main`.
 
+**Status: draft PR; upstream web regression blocks acceptance after rebase.**
+The native app builds. Before rebase, all 14 simulator tests passed. The required
+pull from `main` brought in `4b298eb` (base now `a288e58`), which removed the
+HTML document scaffold, UTF-8 charset and mobile viewport metadata. The bundled
+game now displays corrupted Unicode and does not initialize `__parentsGate`;
+bridge integration tests time out. Restore the web document metadata before
+merging and repeat both simulator suites. Per the task, `index.html` was not edited.
+
 ## Changes, by file
 
 - `PufiStars/Services/SpeechService.swift`: isolate speech state on the main actor for the current SDK's Sendable delegate; stop paused utterances too.
@@ -12,7 +20,7 @@ Date: 2026-11-02. Branch: `ios-build`; base: `main`.
 - `PufiStars/Web/GameWebView.swift`: install a WebKit rule blocking HTTP(S) resources before loading the bundled game, including its external Google Fonts stylesheet. External navigation remains blocked. This does not block native StoreKit/RevenueCat or Apple speech services.
 - `PufiStars/UI/ParentalGateView.swift`: always provide four positive answer choices.
 - `project.yml`: add hosted bridge integration and UI test targets to the reproducible XcodeGen scheme.
-- `PufiStarsTests/BridgeTests.swift`: exercise the real bundled game and WKWebView bridge: language/voice selection, native speech word events, Debug IAP, backup storage, gate resolution, blocked external navigation and absent recording playback.
+- `PufiStarsTests/BridgeTests.swift`: report document encoding and helper availability on initialization timeout; exercise the real bundled game and WKWebView bridge: language/voice selection, native speech word events, Debug IAP, backup storage, gate resolution, blocked external navigation and absent recording playback.
 - `PufiStarsUITests/GameUITests.swift`: verify orientations, language persistence across termination/relaunch, cancelled/successful parental gate, recording/play/delete, and entry into story read-aloud with system permissions. Save layout screenshots in test results.
 - `README.md`: preserve the required bundle ID; document simulator tests and the temporary DerivedData workaround for iCloud metadata.
 - `BUILD_REPORT.md`: this report.
@@ -40,22 +48,32 @@ xcodebuild -project PufiStars.xcodeproj -scheme PufiStars \
   -parallel-testing-enabled NO -collect-test-diagnostics never test
 ```
 
-## Final results
+## Results before and after the required rebase
 
-Both complete simulator suites passed: **7/7 tests on iPad (A16)** and
-**7/7 tests on iPhone 17 Pro**, with zero test failures. The app builds for both.
-Final result bundles (local, not committed):
+On the original web baseline `55683ef`, both complete simulator suites passed:
+**7/7 tests on iPad (A16)** and **7/7 tests on iPhone 17 Pro**, with zero failures.
+The app built for both. Result bundles (local, not committed):
 
 - `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_12-59-38-+0100.xcresult`
 - `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_13-01-01-+0100.xcresult`
 
-Earlier test failures were corrected accessibility queries (switches versus buttons,
-scrolling to offscreen controls, and Apple's speech-permission disclosure prefix),
-plus the Documents-folder signing metadata issue. The final suites pass without
-suppressing functional assertions. Screenshots use full-screen capture to avoid
-an XCTest app-screenshot rotation artifact.
+Earlier baseline test failures were corrected accessibility queries (switches
+versus buttons, scrolling to offscreen controls, and Apple's permission text
+prefix), plus the Documents-folder signing metadata issue. Full-screen captures
+avoid an XCTest app-screenshot rotation artifact.
 
-## Checklist
+After `git pull --rebase origin main`, web baseline `a288e58` fails game/bridge
+initialization checks. The iPad screenshot confirms corrupted emoji/diacritics;
+this is a real upstream failure, not an assertion to suppress. Final rebase
+verification: the iPad test build succeeds, but **0/7 tests pass** (all four
+hosted tests fail the game-integration setup; all three UI tests fail on the
+corrupted/missing controls). An iPhone diagnostic test also fails the same
+initialization check. Its captured diagnostic is `charset: windows-1252`,
+`native: object`, `gate: undefined`: the native shim exists, but the web
+integration helpers do not. Both final simulator app builds succeed. The draft is
+blocked on the upstream fix, rather than weakening tests or changing web files.
+
+## Checklist on original web baseline `55683ef`
 
 | Check | Result and scope |
 | --- | --- |
@@ -78,7 +96,16 @@ an XCTest app-screenshot rotation artifact.
 
 ## Web-game changes to hand to the web maintainer
 
-These findings are from source inspection; `index.html` was left unchanged.
+`index.html` was left unchanged.
+
+**Blocking after rebase — document start (`index.html:1`):** restore
+`<!doctype html>`, `<html lang="ro">`, `<head>`, `<meta charset="utf-8">`, and
+`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`,
+with the corresponding head/body document structure. Commit `4b298eb` removed
+the original scaffold. Without the charset, Unicode is visibly corrupted and
+the native integration script does not initialize; without the viewport, mobile
+layout is also at risk. This must be corrected by the web maintainer, then synced
+and retested. The findings below are additional source-inspection follow-ups.
 
 1. `openCard`, `openStory`, reading Back handlers and other navigation paths call browser `speechSynthesis.cancel()`. Native `AVSpeechSynthesizer` speech is separate and can continue after navigation. Route cancellation through `native.call('stopSpeak')` as well when the bridge exists.
 2. `window.__nativeKaraoke` calculates word offsets against the original text, then sends text transformed by `fixSpeech` and the language-specific Pufi replacement. A length-changing replacement shifts later native UTF-16 word offsets. Derive offsets from exactly the spoken text, or preserve a mapping back to displayed words.

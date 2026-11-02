@@ -43,7 +43,8 @@ final class BridgeTests: XCTestCase {
             if try await js(condition) as? Bool == true { return }
             try await Task.sleep(nanoseconds: 100_000_000)
         }
-        XCTFail("Timed out: \(condition)")
+        let diagnostic = try await js("JSON.stringify({charset:document.characterSet,title:document.title,native:typeof window.native,gate:typeof window.__parentsGate,body:document.body.innerText.slice(0,200)})")
+        XCTFail("Timed out: \(condition); document: \(diagnostic ?? "unavailable")")
     }
 
     func testBundledGameLanguageVoiceAndDebugPurchases() async throws {
