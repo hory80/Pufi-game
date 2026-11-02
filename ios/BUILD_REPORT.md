@@ -1,6 +1,6 @@
 # Pufi — free-launch entitlement implementation report
 
-Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `1d5b54c`.
+Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `59a4e71` (including Pufi’s Island).
 Task: `ios/tasks/01-free-until-dec-15.md`.
 
 The app now grants full access before **15 December 2026, 00:00 Europe/Zurich**
@@ -24,6 +24,7 @@ no generated WebContent, Xcode project, DerivedData, or secrets are committed.
 - `PufiStars/Services/PurchaseService.swift`: combine the policy with verified StoreKit evidence and RevenueCat's cached/current CustomerInfo; bound status waits to three seconds; coalesce StoreKit requests; preserve known data on fetch errors. `iap.status`, `iap.buy`, and `iap.restore` return the policy result. Already-entitled users are not sent into another purchase.
 - `PufiStars/Web/GameWebView.swift`: log content-rule compilation failure and still load the bundled game. External-navigation blocking remains in place; the content rule is installed when compilation succeeds.
 - `PufiStarsTests/EntitlementPolicyTests.swift`: cutoff/time-zone boundaries, all four scenarios, missing StoreKit/offline evidence, and Keychain persistence across new store instances.
+- `PufiStarsUITests/GameUITests.swift`: scroll the first recording row into the visible area before tapping on tall home pages.
 - `PufiStarsUITests/EntitlementUITests.swift`: all four Debug scenarios; new users after the cutoff see the lock on “Lumea numerelor → Strada vecinilor,” enter the paywall, pass the native parental gate, and reach buy/restore controls.
 - `project.yml`, `README.md`, `CODEX_PROMPT.md`: retain the confirmed bundle ID through XcodeGen; document the policy and simulator overrides.
 - `PufiStars/Assets.xcassets/AppIcon.appiconset/Contents.json`, `PufiIcon-1024.png`, `Design/AppIcon-prompt.txt`: retain the generated fox/star icon and its original prompt in Git.
@@ -76,13 +77,19 @@ The first paywall test used Romanian purchase labels, but the current web page
 uses English fallback labels; the final test verifies the actual buy/restore
 controls. Earlier simulator runs ignored a requested orientation change; the
 rotation assertion was kept intact and each affected simulator restarted for a full rerun.
+The new Island banner made the home page taller. On iPhone the existing
+recording test tapped its first recording row beneath the status bar; an exported
+UI hierarchy confirmed the button at y=24, above the web view’s visible area.
+The test now scrolls the row below the status bar before tapping; all recording,
+playback and deletion assertions remain. The microphone permission was explicitly
+granted in the simulator during diagnosis; a new permission prompt was not tested.
 The app-source concurrency warning found during compilation was corrected.
 Xcode's no-AppIntents metadata notice and simulator audio/QoS diagnostics remain.
 
 Final local result bundles (not committed):
 
-- iPad: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-15-27-+0100.xcresult`
-- iPhone: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-21-05-+0100.xcresult`
+- iPad: `/tmp/pufi-derived/Logs/Test/Test-PufiStars-2026.11.02_17-31-19-+0100.xcresult`
+- iPhone: `/tmp/pufi-island-iphone/Logs/Test/Test-PufiStars-2026.11.02_17-31-12-+0100.xcresult`
 
 Reproduce (repeat with the iPhone simulator destination):
 
