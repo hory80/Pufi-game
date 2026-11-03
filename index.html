@@ -10263,7 +10263,8 @@ window.__micRead=({spans,row,task,alive,onDone})=>{ const W=spans.map(o=>norm(o.
     if(j>i){ i=j; last=Date.now(); mark(); try{ tick(); }catch(e){} if(i>=W.length) finish(); } };
   const onEnd=()=>{ if(active&&!done&&alive()){ base=i; setTimeout(start,250); } };
   N.on('asr.partial',onPart); N.on('asr.end',onEnd);
-  async function start(){ if(!active||!alive()) return cleanup(); const ok=await N.call('asr.start',{lang,words:[...new Set(spans.map(o=>o.sp.textContent.replace(/[.,!?:]/g,'')))]}); if(!(ok===true||(ok&&ok.ok))){ task.textContent=Y().micNo+(ok&&ok.reason?' ('+ok.reason+')':''); ind.remove(); active=false; cleanup(); } }
+  let asked=false;
+  async function start(){ if(!active||!alive()) return cleanup(); if(!asked){ asked=true; if(window.__micEnsure&&!(await window.__micEnsure())){ task.textContent=Y().micNo; ind.remove(); active=false; return cleanup(); } } const ok=await N.call('asr.start',{lang,words:[...new Set(spans.map(o=>o.sp.textContent.replace(/[.,!?:]/g,'')))]}); if(!(ok===true||(ok&&ok.ok))){ task.textContent=Y().micNo; ind.remove(); active=false; cleanup(); if(window.__micFail) window.__micFail(ok&&ok.reason); } }
   spans.forEach((o,j)=>{ o.sp.onclick=async()=>{ if(!active) return; await N.call('asr.stop'); await window.__nativeSay(o.sp.textContent.replace(/[.,!?:]/g,'')); if(j===i){ i++; mark(); if(i>=W.length) return finish(); } base=i; last=Date.now(); start(); }; });
   const timer=setInterval(()=>{ if(!alive()){ cleanup(); return; } if(active&&Date.now()-last>5000&&spans[i]) spans[i].sp.classList.add('help'); },500);
   function cleanup(){ clearInterval(timer); N.off('asr.partial',onPart); N.off('asr.end',onEnd); if(active){ active=false; N.call('asr.stop'); } }
@@ -12452,6 +12453,62 @@ paint();
 })();
 </script>
 <style>
+.mp-ov{position:fixed;inset:0;z-index:99995;background:rgba(36,50,95,.55);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.mp-box{background:#fff;border-radius:26px;width:min(560px,94vw);padding:18px 20px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;color:#24325f;font-family:var(--display)}
+.mp-box .big{font-size:3rem;line-height:1}
+.mp-box h3{margin:0;font-size:clamp(1.3rem,3.4vw,1.7rem)}
+.mp-box p{margin:0;font-weight:700;font-size:clamp(1rem,2.5vw,1.15rem);line-height:1.4}
+.mp-box ol{margin:0;text-align:left;font-weight:700;line-height:1.5;padding-left:1.3em}
+.mp-box .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.mp-box button{font:inherit;font-weight:800;font-size:clamp(1rem,2.5vw,1.2rem);border:3px solid #24325f;background:#fff;color:#24325f;border-radius:999px;padding:6px 18px;min-height:50px;cursor:pointer}
+.mp-box button.go{background:#3ECF8E;border-color:#2bb57a;color:#fff}
+.mp-box code{font-size:.8em;opacity:.6}
+</style>
+<script>
+(()=>{
+/* Microfonul: întrebăm frumos înainte de cererea sistemului; dacă e refuzat, explicăm cum se pornește */
+const TX={
+ ro:{t:'🎤 Microfonul',ask:'Ca să te asculte când citești sau ca să scrie ce dictezi, Pufi are nevoie de microfon și de recunoașterea vorbirii. iPad-ul te va întreba acum.',yes:'✔ Da, permite',no:'✖ Nu acum',off:'Microfonul nu merge încă pentru Pufi.',how:'Un părinte îl poate porni din Setări:',s1:'Confidențialitate și securitate → Microfon → Pufi',s2:'Confidențialitate și securitate → Recunoaștere vorbire → Pufi',s3:'General → Tastatură → Activează dictarea',lang:'Recunoașterea vorbirii poate să nu fie disponibilă acum pentru această limbă. Verifică dictarea și conexiunea la internet.',open:'⚙️ Deschide Setările',ok:'Am înțeles'},
+ de:{t:'🎤 Mikrofon',ask:'Damit Pufi dir beim Lesen zuhören oder dein Diktat aufschreiben kann, braucht er das Mikrofon und die Spracherkennung. Das iPad fragt dich gleich.',yes:'✔ Ja, erlauben',no:'✖ Nicht jetzt',off:'Das Mikrofon funktioniert für Pufi noch nicht.',how:'Ein Erwachsener kann es in den Einstellungen einschalten:',s1:'Datenschutz & Sicherheit → Mikrofon → Pufi',s2:'Datenschutz & Sicherheit → Spracherkennung → Pufi',s3:'Allgemein → Tastatur → Diktierfunktion aktivieren',lang:'Die Spracherkennung ist für diese Sprache gerade vielleicht nicht verfügbar. Prüfe die Diktierfunktion und die Internetverbindung.',open:'⚙️ Einstellungen öffnen',ok:'Verstanden'},
+ en:{t:'🎤 Microphone',ask:'To listen while you read, or to write down what you dictate, Pufi needs the microphone and speech recognition. The iPad will ask you now.',yes:'✔ Yes, allow',no:'✖ Not now',off:'The microphone does not work for Pufi yet.',how:'A grown-up can turn it on in Settings:',s1:'Privacy & Security → Microphone → Pufi',s2:'Privacy & Security → Speech Recognition → Pufi',s3:'General → Keyboard → Enable Dictation',lang:'Speech recognition may not be available for this language right now. Check Dictation and the internet connection.',open:'⚙️ Open Settings',ok:'Got it'},
+ fr:{t:'🎤 Micro',ask:'Pour t’écouter lire ou écrire ce que tu dictes, Pufi a besoin du micro et de la reconnaissance vocale. L’iPad va te le demander.',yes:'✔ Oui, autoriser',no:'✖ Pas maintenant',off:'Le micro ne fonctionne pas encore pour Pufi.',how:'Un adulte peut l’activer dans Réglages :',s1:'Confidentialité et sécurité → Micro → Pufi',s2:'Confidentialité et sécurité → Reconnaissance vocale → Pufi',s3:'Général → Clavier → Activer la dictée',lang:'La reconnaissance vocale n’est peut-être pas disponible pour cette langue en ce moment. Vérifie la dictée et la connexion internet.',open:'⚙️ Ouvrir Réglages',ok:'J’ai compris'},
+ it:{t:'🎤 Microfono',ask:'Per ascoltarti mentre leggi o scrivere ciò che detti, Pufi ha bisogno del microfono e del riconoscimento vocale. L’iPad te lo chiederà ora.',yes:'✔ Sì, consenti',no:'✖ Non ora',off:'Il microfono non funziona ancora per Pufi.',how:'Un adulto può attivarlo in Impostazioni:',s1:'Privacy e sicurezza → Microfono → Pufi',s2:'Privacy e sicurezza → Riconoscimento vocale → Pufi',s3:'Generali → Tastiera → Abilita dettatura',lang:'Il riconoscimento vocale potrebbe non essere disponibile ora per questa lingua. Controlla la dettatura e la connessione a internet.',open:'⚙️ Apri Impostazioni',ok:'Ho capito'},
+ es:{t:'🎤 Micrófono',ask:'Para escucharte mientras lees o escribir lo que dictas, Pufi necesita el micrófono y el reconocimiento de voz. El iPad te lo preguntará ahora.',yes:'✔ Sí, permitir',no:'✖ Ahora no',off:'El micrófono todavía no funciona para Pufi.',how:'Un adulto puede activarlo en Ajustes:',s1:'Privacidad y seguridad → Micrófono → Pufi',s2:'Privacidad y seguridad → Reconocimiento de voz → Pufi',s3:'General → Teclado → Activar dictado',lang:'Puede que el reconocimiento de voz no esté disponible ahora para este idioma. Revisa el dictado y la conexión a internet.',open:'⚙️ Abrir Ajustes',ok:'Entendido'},
+ pt:{t:'🎤 Microfone',ask:'Para ouvir você ler ou escrever o que você dita, o Pufi precisa do microfone e do reconhecimento de fala. O iPad vai perguntar agora.',yes:'✔ Sim, permitir',no:'✖ Agora não',off:'O microfone ainda não funciona para o Pufi.',how:'Um adulto pode ativá-lo em Ajustes:',s1:'Privacidade e Segurança → Microfone → Pufi',s2:'Privacidade e Segurança → Reconhecimento de Fala → Pufi',s3:'Geral → Teclado → Ativar Ditado',lang:'O reconhecimento de fala pode não estar disponível agora para este idioma. Verifique o Ditado e a conexão com a internet.',open:'⚙️ Abrir Ajustes',ok:'Entendi'},
+ nl:{t:'🎤 Microfoon',ask:'Om te luisteren als je leest of om op te schrijven wat je dicteert, heeft Pufi de microfoon en spraakherkenning nodig. De iPad vraagt het je nu.',yes:'✔ Ja, sta toe',no:'✖ Niet nu',off:'De microfoon werkt nog niet voor Pufi.',how:'Een volwassene kan hem aanzetten in Instellingen:',s1:'Privacy en beveiliging → Microfoon → Pufi',s2:'Privacy en beveiliging → Spraakherkenning → Pufi',s3:'Algemeen → Toetsenbord → Schakel dicteren in',lang:'Spraakherkenning is voor deze taal nu misschien niet beschikbaar. Controleer dicteren en de internetverbinding.',open:'⚙️ Open Instellingen',ok:'Begrepen'},
+ pl:{t:'🎤 Mikrofon',ask:'Żeby słuchać, jak czytasz, albo zapisać to, co dyktujesz, Pufi potrzebuje mikrofonu i rozpoznawania mowy. iPad zaraz o to zapyta.',yes:'✔ Tak, zezwól',no:'✖ Nie teraz',off:'Mikrofon jeszcze nie działa dla Pufiego.',how:'Dorosły może go włączyć w Ustawieniach:',s1:'Prywatność i ochrona → Mikrofon → Pufi',s2:'Prywatność i ochrona → Rozpoznawanie mowy → Pufi',s3:'Ogólne → Klawiatura → Włącz dyktowanie',lang:'Rozpoznawanie mowy może być teraz niedostępne dla tego języka. Sprawdź dyktowanie i połączenie z internetem.',open:'⚙️ Otwórz Ustawienia',ok:'Rozumiem'},
+ hu:{t:'🎤 Mikrofon',ask:'Hogy Pufi meghallgasson olvasás közben, vagy leírja, amit diktálsz, szüksége van a mikrofonra és a beszédfelismerésre. Az iPad most megkérdez.',yes:'✔ Igen, engedélyezem',no:'✖ Most nem',off:'A mikrofon még nem működik Pufinál.',how:'Egy felnőtt bekapcsolhatja a Beállításokban:',s1:'Adatvédelem és biztonság → Mikrofon → Pufi',s2:'Adatvédelem és biztonság → Beszédfelismerés → Pufi',s3:'Általános → Billentyűzet → Diktálás engedélyezése',lang:'Lehet, hogy a beszédfelismerés most nem érhető el ezen a nyelven. Ellenőrizd a diktálást és az internetkapcsolatot.',open:'⚙️ Beállítások megnyitása',ok:'Értem'},
+ uk:{t:'🎤 Мікрофон',ask:'Щоб слухати, як ти читаєш, або записати те, що ти диктуєш, Пуфі потрібні мікрофон і розпізнавання мовлення. iPad зараз запитає.',yes:'✔ Так, дозволити',no:'✖ Не зараз',off:'Мікрофон поки не працює для Пуфі.',how:'Дорослий може ввімкнути його в Параметрах:',s1:'Приватність і безпека → Мікрофон → Pufi',s2:'Приватність і безпека → Розпізнавання мовлення → Pufi',s3:'Загальні → Клавіатура → Увімкнути диктування',lang:'Розпізнавання мовлення для цієї мови зараз може бути недоступне. Перевірте диктування та інтернет.',open:'⚙️ Відкрити Параметри',ok:'Зрозуміло'},
+ ru:{t:'🎤 Микрофон',ask:'Чтобы слушать, как ты читаешь, или записать то, что ты диктуешь, Пуфи нужны микрофон и распознавание речи. iPad сейчас спросит.',yes:'✔ Да, разрешить',no:'✖ Не сейчас',off:'Микрофон пока не работает для Пуфи.',how:'Взрослый может включить его в Настройках:',s1:'Конфиденциальность и безопасность → Микрофон → Pufi',s2:'Конфиденциальность и безопасность → Распознавание речи → Pufi',s3:'Основные → Клавиатура → Включить диктовку',lang:'Распознавание речи для этого языка сейчас может быть недоступно. Проверьте диктовку и интернет.',open:'⚙️ Открыть Настройки',ok:'Понятно'}};
+const X=()=>TX[lang]||TX.en;
+const N=()=>window.native;
+const sayT=t=>{ try{ return typeof say==='function'?say(t):null; }catch(e){} };
+const LS={get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }};
+/* comenzile noi pot lipsi într-o aplicație mai veche: nu așteptăm la nesfârșit */
+const call=(cmd,a,ms)=>Promise.race([N().call(cmd,a||{}),new Promise(r=>setTimeout(()=>r(undefined),ms||1500))]);
+function dlg(html,btns){ return new Promise(res=>{ const ov=document.createElement('div'); ov.className='mp-ov'; const b=document.createElement('div'); b.className='mp-box'; ov.appendChild(b);
+  b.innerHTML=html+`<div class="row">${btns.map((x,i)=>`<button data-i="${i}" class="${x.go?'go':''}">${x.t}</button>`).join('')}</div>`; document.body.appendChild(ov);
+  b.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>{ ov.remove(); res(btns[+e.dataset.i].v); }); }); }
+/* înainte de prima pornire: explicăm de ce cerem microfonul */
+window.__micEnsure=async()=>{ if(!N()) return true;
+  const st=await call('asr.perm');
+  if(st&&typeof st==='object'){ const denied=/denied|restricted/.test(st.speech||'')||/denied/.test(st.mic||'');
+    if(denied){ window.__micFail('speech-denied'); return false; }
+    if(/notDetermined|undetermined/.test((st.speech||'')+(st.mic||''))){ sayT(X().ask); const ok=await dlg(`<div class="big">🎤</div><h3>${X().t}</h3><p>${X().ask}</p>`,[{t:X().yes,v:true,go:1},{t:X().no,v:false}]); try{ speechSynthesis.cancel(); }catch(e){} return ok; }
+    return true; }
+  /* aplicație fără asr.perm: întrebăm o singură dată */
+  if(LS.get('mic_asked')) return true;
+  sayT(X().ask); const ok=await dlg(`<div class="big">🎤</div><h3>${X().t}</h3><p>${X().ask}</p>`,[{t:X().yes,v:true,go:1},{t:X().no,v:false}]); try{ speechSynthesis.cancel(); }catch(e){}
+  if(ok) LS.set('mic_asked','1'); return ok; };
+/* dacă nu merge: arătăm motivul și pașii pentru părinte */
+window.__micFail=async reason=>{ const r=String(reason||''); const langIssue=/unavailable|no-recognizer/.test(r);
+  const html=`<div class="big">🎤</div><h3>${X().off}</h3>${langIssue?`<p>${X().lang}</p>`:''}<p>${X().how}</p><ol><li>${X().s1}</li><li>${X().s2}</li><li>${X().s3}</li></ol>${r?`<code>${r.replace(/[<>&]/g,'')}</code>`:''}`;
+  sayT(X().off+' '+X().how);
+  const v=await dlg(html,[{t:X().open,v:'open',go:1},{t:X().ok,v:'ok'}]); try{ speechSynthesis.cancel(); }catch(e){}
+  if(v==='open'&&N()){ let okGate=true; try{ if(window.__parentsGate) okGate=!!(await window.__parentsGate()); }catch(e){} if(okGate){ const done=await call('openSettings',{},2500); if(done===undefined||done===false) dlg(`<p>${X().how}</p><ol><li>${X().s1}</li><li>${X().s2}</li><li>${X().s3}</li></ol>`,[{t:X().ok,v:1}]); } } };
+})();
+</script>
+<style>
 /* ===== Povestea mea: textul scris, lipit sau dictat de părinte ===== */
 .rd-card.my{background:#FFF3B0;box-shadow:0 8px 0 #E8C95A}
 .rd-card.mynew{background:#fff;border:3px dashed #5B7FDE;box-shadow:none}
@@ -12538,15 +12595,15 @@ function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; c
   const N=window.native; let rec=false, base='', onP=null, onE=null;
   const db=box.querySelector('[data-a=dict]'); if(!N) db.hidden=true;
   const stopRec=()=>{ if(!rec) return; rec=false; db.textContent=X().dict; $x.classList.remove('rec'); try{ N.off('asr.partial',onP); N.off('asr.end',onE); N.call('asr.stop'); }catch(e){} };
-  db.onclick=async()=>{ if(rec) return stopRec(); rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):'';
+  db.onclick=async()=>{ if(rec) return stopRec(); if(window.__micEnsure&&!(await window.__micEnsure())) return; rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):'';
     onP=p=>{ if(!rec) return; $x.value=base+(p.text||''); cnt(); if(p.final){ base=$x.value.replace(/\s*$/,' '); } };
     onE=()=>{ if(rec){ base=$x.value.replace(/\s*$/,' '); setTimeout(()=>{ if(rec) N.call('asr.start',{lang,words:[]}); },250); } };
-    N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!(ok===true||(ok&&ok.ok))){ stopRec(); const n=box.querySelector('.my-note'); if(n) n.textContent='🎤 ✖'+(ok&&ok.reason?' ('+ok.reason+')':'')+' — '+X().kb; } };
+    N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!(ok===true||(ok&&ok.ok))){ stopRec(); if(window.__micFail) window.__micFail(ok&&ok.reason); } };
   const close=()=>{ stopRec(); ov.remove(); };
   box.querySelector('[data-a=x]').onclick=close;
   box.querySelector('[data-a=save]').onclick=()=>{ const text=$x.value.trim(); if(!text){ $x.placeholder=X().empty; $x.focus(); return; }
     const L2=list(), o={ic,title:$t.value.trim()||X().def,text:lim?text.slice(0,lim):text}; if(i>=0) L2[i]=o; else L2.push(o); LS.set('rd_my',L2); close(); refresh(); };
-  const d=box.querySelector('[data-a=del]'); if(d) d.onclick=()=>{ const L2=list(); L2.splice(i,1); LS.set('rd_my',L2); close(); refresh(); };
+  const d=box.querySelector('[data-a=del]'); let sure=false; if(d) d.onclick=()=>{ if(!sure){ sure=true; d.textContent=X().del+' ?'; d.style.background='#E8505B'; d.style.color='#fff'; setTimeout(()=>{ if(sure){ sure=false; d.textContent=X().del; d.style.background=''; d.style.color=''; } },4000); return; } const L2=list(); L2.splice(i,1); LS.set('rd_my',L2); close(); refresh(); };
   setTimeout(()=>{ (i>=0?$x:$t).focus(); },50); }
 /* reafișează lista de povești dacă e deschisă */
 function refresh(){ const g=document.querySelector('.rd-stories'); if(!g||!openStoryRef) return; g.querySelectorAll('.rd-card.my,.rd-card.mynew').forEach(e=>e.remove()); window.__rdMy(g,openStoryRef); }

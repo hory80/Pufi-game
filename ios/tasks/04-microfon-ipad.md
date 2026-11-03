@@ -28,6 +28,15 @@ Coduri de folosit:
 
 Scrie același motiv și cu `NSLog("Pufi ASR: …")`.
 
+## 1b. Două comenzi noi în bridge (jocul le folosește deja; dacă lipsesc, după 1,5 s trece mai departe)
+
+- **`asr.perm`** → `{"speech":"authorized|denied|restricted|notDetermined","mic":"granted|denied|undetermined"}`. Doar citește starea, fără să întrebe. Folosește `SFSpeechRecognizer.authorizationStatus()` și `AVAudioApplication.shared.recordPermission`.
+- **`openSettings`** → deschide pagina aplicației din Setări (`UIApplication.openSettingsURLString`) și răspunde `true`. Jocul o apelează doar după poarta pentru părinți.
+
+Cum le folosește jocul:
+- **La prima pornire a microfonului:** dacă starea e `notDetermined` / `undetermined`, jocul arată întâi o explicație („Pufi are nevoie de microfon…”, cu „Da, permite” / „Nu acum”). Abia după „Da” apelează `asr.start`, care declanșează cererea iOS.
+- **Dacă permisiunea e refuzată:** jocul arată pașii din Setări și butonul „⚙️ Deschide Setările”.
+
 ## 2. Verifică și repară cauzele probabile
 
 - **`Info.plist`:** există `NSMicrophoneUsageDescription` și `NSSpeechRecognitionUsageDescription`, cu texte clare.
