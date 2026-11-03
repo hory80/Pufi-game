@@ -10263,7 +10263,7 @@ window.__micRead=({spans,row,task,alive,onDone})=>{ const W=spans.map(o=>norm(o.
     if(j>i){ i=j; last=Date.now(); mark(); try{ tick(); }catch(e){} if(i>=W.length) finish(); } };
   const onEnd=()=>{ if(active&&!done&&alive()){ base=i; setTimeout(start,250); } };
   N.on('asr.partial',onPart); N.on('asr.end',onEnd);
-  async function start(){ if(!active||!alive()) return cleanup(); const ok=await N.call('asr.start',{lang,words:[...new Set(spans.map(o=>o.sp.textContent.replace(/[.,!?:]/g,'')))]}); if(!ok){ task.textContent=Y().micNo; ind.remove(); active=false; cleanup(); } }
+  async function start(){ if(!active||!alive()) return cleanup(); const ok=await N.call('asr.start',{lang,words:[...new Set(spans.map(o=>o.sp.textContent.replace(/[.,!?:]/g,'')))]}); if(!(ok===true||(ok&&ok.ok))){ task.textContent=Y().micNo+(ok&&ok.reason?' ('+ok.reason+')':''); ind.remove(); active=false; cleanup(); } }
   spans.forEach((o,j)=>{ o.sp.onclick=async()=>{ if(!active) return; await N.call('asr.stop'); await window.__nativeSay(o.sp.textContent.replace(/[.,!?:]/g,'')); if(j===i){ i++; mark(); if(i>=W.length) return finish(); } base=i; last=Date.now(); start(); }; });
   const timer=setInterval(()=>{ if(!alive()){ cleanup(); return; } if(active&&Date.now()-last>5000&&spans[i]) spans[i].sp.classList.add('help'); },500);
   function cleanup(){ clearInterval(timer); N.off('asr.partial',onPart); N.off('asr.end',onEnd); if(active){ active=false; N.call('asr.stop'); } }
@@ -12541,7 +12541,7 @@ function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; c
   db.onclick=async()=>{ if(rec) return stopRec(); rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):'';
     onP=p=>{ if(!rec) return; $x.value=base+(p.text||''); cnt(); if(p.final){ base=$x.value.replace(/\s*$/,' '); } };
     onE=()=>{ if(rec){ base=$x.value.replace(/\s*$/,' '); setTimeout(()=>{ if(rec) N.call('asr.start',{lang,words:[]}); },250); } };
-    N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!ok) stopRec(); };
+    N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!(ok===true||(ok&&ok.ok))){ stopRec(); const n=box.querySelector('.my-note'); if(n) n.textContent='🎤 ✖'+(ok&&ok.reason?' ('+ok.reason+')':'')+' — '+X().kb; } };
   const close=()=>{ stopRec(); ov.remove(); };
   box.querySelector('[data-a=x]').onclick=close;
   box.querySelector('[data-a=save]').onclick=()=>{ const text=$x.value.trim(); if(!text){ $x.placeholder=X().empty; $x.focus(); return; }
