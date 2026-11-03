@@ -502,8 +502,44 @@ Art style: premium children's mobile game art, soft 3D clay / vinyl-toy render, 
 
 ## Raport (completează Codex)
 
-- Instrument folosit:
-- Transparență: reală / magenta
-- Generate OK:
-- Probleme:
-- Secțiunea C, baza (x, y-jos) original vs etapa 1 vs etapa 2, pentru fiecare clădire:
+- Data: 2 noiembrie 2026. Branch: `assets/insula-etapa3`; bază verificată: `main` la `c3ebf9a`.
+- Instrument folosit: **OpenAI `imagegen` integrat**, câte o imagine per apel, în ordinea A, B, C, D. Blocurile de prompt au fost trimise integral; s-au adăugat numai instrucțiuni de dimensiune și clarificări ale marginilor/alfa ori coordonatelor bazei deja cerute. Nu s-au desenat asseturi cu cod/SVG și nu s-a folosit CLI/API.
+- Generate: **toate cele 39 de imagini**, cu numele exacte din listă: A = 12 decorațiuni, B = 4 imagini de iarnă, C = 16 variante de clădiri, D = 4 ipostaze Pufi și 3 obiecte mici. Niciun asset anterior nu a fost înlocuit.
+- Transparență: **reală** pentru toate cele **38 de sprite-uri**; `bg-winter.png` este opac. Verificare cu `sips` și citirea alfa (interval 0–255, incluzând pixeli complet transparenți și complet opaci). Niciun fundal magenta și niciun caroiaj pictat.
+- Dimensiuni: `bg-winter.png` = **1536×1024**; toate celelalte = **1024×1024**. Instrumentul a livrat sprite-uri pătrate la altă rezoluție; normalizare cu `sips`, păstrând alfa. Nu s-au modificat pozițiile sprite-urilor prin script după generare.
+- Referințe: fundalul de iarnă este o editare a `bg-day.png`; fiecare variantă C este o editare a clădirii sale originale, nu a celeilalte etape; toate cele cinci ipostaze Pufi noi folosesc `pufi-idle.png`. Imaginile de intrare au fost inspectate înainte de editare.
+- Control vizual: obiecte întregi, fără text, cifre, logo sau watermark. Cele două note muzicale din `pufi-dance` sunt formele cerute în prompt. Centrul insulei de iarnă rămâne gol; nu s-au adăugat fulgi care cad, soare, lună sau obiecte centrale. Turnul cu ceas nu are limbi sau cifre.
+- Planșă: **`isl/raw/_contact-sheet-3.png`**, **1600×2240**, grilă cu 5 coloane și toate cele 39 de imagini etichetate; verificată vizual pe fundal deschis. Etichetele apar numai pe planșă.
+
+### Regenerări și probleme
+
+- Au fost folosite maximum trei încercări per asset: `d-carousel` și `d-balloon` câte **3**; `d-treehouse`, `d-kite`, `d-picnic`, `pufi-winter`, `b-time-2` câte **2**; restul câte **1**. Variantele respinse rămân în afara repo-ului.
+- Regenerările au corectat margini prea mici, halouri mari și extinderea laterală a bazei prin țiglele de lângă turn. La `d-carousel` a fost selectată varianta a doua, cu contur mai curat decât celelalte.
+- **Abatere rămasă: `d-carousel.png`** are marginea superioară a conturului alfa >16 la y=50/1024 (aproximativ **4,9%**, față de minimum 6%); umbra ajunge la y=969. Este întreg și transparent, dar necesită puțin spațiu suplimentar la optimizare. Limita de trei încercări a fost respectată.
+- Celelalte 37 de sprite-uri trec pragul de minimum 6% sus/stânga/dreapta pentru conturul măsurat. Procentele orientative de lățime/înălțime și distanța bazei față de marginea de jos rămân aproximative; se pot uniformiza la optimizare. Baza originalelor C a fost prioritară față de o nouă aliniere generică la 92%.
+- Pot rămâne franjuri fine de antialiasing și pixeli aproape transparenți în afara conturului vizibil, inclusiv în imaginile originale. Variantele cu halouri mari au fost respinse. Editările sunt coerente vizual, dar nu sunt identice pixel cu pixel în regiunile reconstruite.
+
+### Secțiunea C — alinierea bazei
+
+**Toate cele 16 variante trec toleranța de 8 px** în măsurarea de mai jos: maxim **6 px pe x** și **5 px pe y**.
+
+Metodă identică pentru original și variante: pe canvasul final 1024×1024 se folosește alfa **>16/255**, incluzând partea vizibilă a umbrei. `y-jos` este ultimul rând al acestui contur (indexare de la 0). `x` este centrul extinderii orizontale a alfa în ultimii 48 de pixeli de la bază, ca să măsoare baza, nu schela din vârf. Pragul exclude zgomotul aproape transparent din originale; alfa nenulă fără prag poate ajunge până la marginea canvasului și nu descrie precis baza vizibilă. Trecerea acestui control nu înseamnă identitate a întregii siluete.
+
+| Clădire | Original (x, y-jos) | Etapa 1 | Etapa 2 | Max. Δx / Δy față de original | Rezultat |
+|---|---|---|---|---|---|
+| `b-time` | (508, 964) | (508.5, 967) | (510, 969) | 2 / 5 | PASS |
+| `b-read` | (502, 966) | (501.5, 969) | (502, 968) | 0.5 / 3 | PASS |
+| `b-math` | (509, 979) | (510, 983) | (509, 984) | 1 / 5 | PASS |
+| `b-world` | (510.5, 915) | (510, 917) | (510, 917) | 0.5 / 2 | PASS |
+| `b-shapes` | (496.5, 940) | (498, 944) | (498.5, 945) | 2 / 5 | PASS |
+| `b-robo` | (528.5, 947) | (531, 952) | (530.5, 949) | 2.5 / 5 | PASS |
+| `b-chess` | (510, 931) | (509, 932) | (508, 933) | 2 / 2 | PASS |
+| `b-pufi` | (498, 947) | (504, 949) | (503, 949) | 6 / 2 | PASS |
+
+### Compilare și pornire
+
+- iPad (A16), iOS 26.5: **BUILD PASS**; aplicația instalată și pornită. Control vizual al paginii: **PASS**.
+- iPhone 17 Pro, iOS 26.5: **BUILD PASS**; aplicația instalată și pornită. Control vizual al paginii: **PASS**.
+- Loguri locale: `/tmp/pufi-stage3-ipad-build.log`, `/tmp/pufi-stage3-iphone-build.log`; capturi: `/tmp/pufi-stage3-ipad.png`, `/tmp/pufi-stage3-iphone.png`.
+- Verificarea aplicației se referă la versiunea existentă de la baza indicată, nu la integrarea asseturilor noi. Acestea rămân în `isl/raw/` pentru Claude. Nu s-au modificat `index.html`, codul iOS sau scriptul de sincronizare.
+- Pentru Claude: optimizează și integrează noile asseturi; păstrează canvasul și coordonatele bazei pentru stadiile C, ajustează marginea caruselului și verifică imaginile pe fundalul real al insulei. Copierea asseturilor optimizate în pachetul offline iOS trebuie verificată odată cu integrarea.
