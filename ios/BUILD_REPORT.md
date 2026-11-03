@@ -47,34 +47,40 @@ există în configurație și în aplicația compilată. Bundle ID păstrat:
 | TTS în timpul ascultării pe iPad fizic | PASS: oprire ASR înainte de TTS, sesiunea finală `.playback` |
 | `openSettings` pe iPad fizic | PASS: răspuns `true` la deschiderea URL-ului oficial al paginii aplicației |
 
-În proba fizică nu s-a rostit text: `partialCount=0` în ambele limbi. Aceasta
-confirmă pornirea audio, nu transcrierea, dictarea sau avansarea ramei în poveste.
-Reluarea prin rețea nu a fost necesară pe iPad și nu este declarată verificată
-acolo; condițiile/limita sunt acoperite de teste. Când este folosită, audio poate
-fi prelucrat de serviciul Apple; logul consemnează reluarea, fără textul copilului.
+## Probe cu voce reală pe iPad, împreună cu Hory
 
-## Probe încă blocate pe iPad-ul fizic
+După autorizarea automatizării, o sesiune Xcode/runner a rămas blocată la
+lansare. Au fost oprite sesiunea de depanare și serviciul de test, apoi Pufi a
+fost redeschis normal din iconiță. Hory a confirmat că jocul se afișează normal;
+ecranul negru „Automation Running” aparținea sesiunii de test. Nu a fost nevoie
+de modificarea jocului pentru a reveni la lansarea normală.
 
-Testul prin interfață nu a putut inițializa automatizarea:
-`Timed out while enabling automation mode`. La a doua încercare, Xcode a raportat
-explicit `Developer App Certificate is not trusted` pentru
-`com.horace.PufiStarsUITests.xctrunner` și a indicat Setări → General → VPN și
-administrare dispozitiv → Developer App. Certificatul aplicației de test trebuie
-autorizat pe iPad de către Hory. Device Hub a rămas la `Connecting display…`.
-Citirea stării și testele native de mai sus au funcționat,
-dar acest lucru nu înlocuiește testele cerute prin interfață.
+Testele vocale de mai jos sunt probe manuale pe iPad-ul fizic, confirmate de
+Hory în această sesiune; nu sunt prezentate drept teste UI automate:
 
-Rămân de verificat, cu acces la interfața iPad-ului și voce reală:
+| Probă, cu permisiuni acceptate | Rezultat |
+|---|---|
+| Română → Povești → „Pufi și mingea” → „Citesc cu voce” | PASS: textul auzit apare și rama avansează pe cuvinte |
+| Română → „Poveste nouă” → „Dictează” | PASS: textul rostit apare în câmp |
+| English → Stories → „Pufi and the Ball” → „I read aloud” | PASS: textul auzit apare și cuvintele avansează |
+| English → „New story” → „Dictate” | PASS: textul rostit apare în câmp |
 
-- permisiuni refuzate pe iPad, codul exact și revenirea prin Setări după poartă;
-- permisiuni acceptate: „Pufi și mingea” și dictarea unei povești, în română și engleză,
-  cu `asr.partial`, text în câmp și rama care avansează;
-- starea „Activează dictarea” din Setări → General → Tastatură.
+Proba cu microfonul refuzat și revenirea prin Setări sunt în curs.
+Starea „Activează dictarea” din Setări → General → Tastatură urmează să fie notată.
 
-Stările Microfon și Recunoaștere vorbire sunt confirmate prin API ca acceptate;
-comutatoarele din interfața Setări nu au fost inspectate vizual. Hory a fost
-rugat să verifice deblocarea, cablul, UI Automation și certificatul Developer App. PR-ul rămâne
-draft până la completarea probelor fizice; nu se face merge.
+Probele native inițiale au fost fără voce (`partialCount=0`); cele patru probe
+manuale de mai sus confirmă acum transcrierea și comportamentul în joc.
+Reluarea prin rețea nu a fost necesară în proba nativă și nu este declarată
+verificată pe iPad; condițiile/limita sunt acoperite de teste. Când este folosită,
+audio poate fi prelucrat de serviciul Apple; logul consemnează reluarea, fără
+textul copilului.
+
+Automatizarea UI rămâne limitată de instalarea/lansarea runner-ului: Xcode a
+raportat și `Developer App Certificate is not trusted`, deși Pufi și runner-ul
+folosesc același certificat și Hory a confirmat autorizarea lui. Device Hub a
+clarificat separat că partajarea ecranului necesită iPadOS 27 sau mai nou;
+iPad-ul fizic rulează 26.6.1. Aceste limitări nu au fost confundate cu rezultatele
+probelor vocale efectuate direct în Pufi.
 
 ## Observație pentru partea web (fără modificare în acest PR)
 
