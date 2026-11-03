@@ -437,6 +437,21 @@ Art style: premium children's mobile game art, soft 3D clay / vinyl-toy render, 
 
 ## Raport (completează Codex)
 
+### Etapa 2 — animalele 21–30
+
+- Data: 2 noiembrie 2026. Branch: `assets/insula-animale`; bază: `main` la `b3f2ad6`.
+- Generate și salvate în `isl/raw/`: **`a-panda.png`, `a-koala.png`, `a-lion.png`, `a-piglet.png`, `a-frog.png`, `a-penguin.png`, `a-duck.png`, `a-owl.png`, `a-turtle.png`, `a-hedgehog.png`**. Setul de 30 de imagini este acum complet.
+- Instrument: OpenAI `imagegen` integrat, un apel per animal, în ordinea 21–30. Fiecare prompt din blocul `text` a fost trimis integral, cu `pufi-idle.png` ca referință **doar pentru stil**. S-au adăugat numai instrucțiuni de dimensiune și clarificarea de a nu copia îmbrăcămintea/accesoriile referinței.
+- Format: toate cele zece sunt **PNG 1024×1024 cu transparență reală**, verificate cu `sips` și citirea canalului alfa. Alfa include atât 0 cât și 255; nu există fundal magenta sau caroiaj pictat. Rezoluția pătrată furnizată de instrument a fost normalizată cu `sips`, păstrând alfa.
+- Control vizual: animale întregi, spațiu liber de minimum 6% sus/stânga/dreapta, fără text, cifre, logo sau watermark; paletă și lumină consecvente. Cele zece animale noi nu au haine sau accesorii. Micile umbre de contact sunt păstrate.
+- Regenerări: panda a necesitat **două încercări**; prima variantă adăugase un rucsac și eșarfă, a fost respinsă și nu este inclusă. Celelalte nouă au trecut din prima încercare.
+- Încadrare: procentele orientative de 46% lățime / 62% înălțime nu sunt identice pentru toate animalele. Conturul alfa >16/255, inclusiv umbra, ocupă aproximativ 46,8–59,5% din lățime și 60,6–77,3% din înălțime; baza ajunge la 86,8–91,9% din înălțime, față de ținta 92%. La integrare se pot uniformiza scara și punctele de ancorare. Nu sunt obiecte tăiate; pe contur pot exista mici franjuri de antialiasing.
+- Planșa **`isl/raw/_contact-sheet.png`** a fost actualizată la **1600×1680**, grilă 5×6, toate cele **30** de imagini cu numele dedesubt, și verificată vizual pe fundal deschis. Asseturile etapei 1, inclusiv iepurașul, ursul și referința Pufi, sunt păstrate fără modificări.
+- Compilare iPad (A16) și iPhone 17 Pro, iOS 26.5: **PASS** pentru ambele; aplicația a fost instalată și pornită pe fiecare simulator, iar pagina încărcată a fost verificată vizual. Loguri locale: `/tmp/pufi-animals-ipad-build.log`, `/tmp/pufi-animals-iphone-build.log`; capturi: `/tmp/pufi-animals-ipad.png`, `/tmp/pufi-animals-iphone.png`.
+- PR-ul livrează numai cele zece imagini noi, planșa actualizată și acest raport. Nu modifică `index.html`, codul iOS sau integrarea în joc. Compilarea/pornirea verifică aplicația existentă de la baza de mai sus, nu integrarea noilor sprite-uri. Claude poate optimiza și integra setul complet în Insulă; rămâne valabilă observația de mai jos despre copierea asseturilor optimizate în pachetul offline.
+
+### Etapa 1 — raport inițial (istoric)
+
 - Data: 2 noiembrie 2026. Branch: `assets/insula-imagini`.
 - Instrument folosit: instrumentul integrat OpenAI `imagegen`, câte o imagine per apel. Nu s-au desenat imagini cu cod sau SVG. Blocurile de prompt au fost trimise integral; s-au adăugat doar instrucțiuni de dimensiune și, la regenerări, clarificări ale marginilor/conturului deja cerute.
 - Transparență: **reală**, verificată cu `sips` și citirea canalului alfa (interval 0–255, pixeli complet transparenți și complet opaci). Niciun fundal magenta și niciun caroiaj pictat. Cele două fundaluri sunt opace.
