@@ -660,7 +660,7 @@ const SAYFIX={
 const DE_N=['null','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf','zwölf','dreizehn','vierzehn','fünfzehn','sechzehn','siebzehn','achtzehn','neunzehn'];
 const DE_T=['','','zwanzig','dreißig','vierzig','fünfzig','sechzig','siebzig','achtzig','neunzig'];
 function deNum(n){ if(n<20) return DE_N[n]; const t=Math.floor(n/10),u=n%10; return u?(u===1?'ein':DE_N[u])+'und'+DE_T[t]:DE_T[t]; }
-function fixRoFem(t){ return t.replace(/\b(\d+) (stele|stea|mutări|silabe|bile|litere|cifre|zeci|unități|sute|ture|steluțe|perle|greșeli)\b/g,(m,n,w)=>{ n=+n;
+function fixRoFem(t){ return t.replace(/\b(\d+) (?:de )?(stele|stea|mutări|silabe|bile|litere|cifre|zeci|unități|sute|ture|steluțe|perle|greșeli|ore|minute|zile|luni|săptămâni|ori|dăți|felii)\b/g,(m,n,w)=>{ n=+n;
   const f=n===1?'o':n===2?'două':n===12?'douăsprezece':(n>20&&n%10===2)?(n-2)+' și două':(n>20&&n%10===1)?(n-1)+' și una':String(n); if(n===1&&w==='stele') w='stea'; return f+(n>=20?' de ':' ')+w; }); }
 function fixSpeech(t){ const f=SAYFIX[lang]||{}; for(const k in f) t=t.split(k).join(f[k]); if(lang==='ro') t=fixRoFem(t);
   if(lang==='de') t=t.replace(/\b\d{1,2}\b/g,m=>deNum(+m));
@@ -9164,7 +9164,11 @@ window.__cg={startPos,legal,make,pick,gen,inCheck,attacked,rootScores,get G(){re
 const $=id=>document.getElementById('tm-'+id), root=$('root'), main=$('main');
 const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
+/* în română ora e de genul feminin: „ora două”, „ora douăsprezece”; „12:00” se citește „ora douăsprezece” */
+const roTime=t=>{ if(typeof t!=='string') return t;
+  t=t.replace(/\b(\d{1,2}):(\d{2})\b/g,(x,h,m)=>{ h=+h; m=+m; const H=h===0?'douăsprezece':roF(h); return 'ora '+H+(m?' și '+roMin(m):''); }).replace(/\bla ora ora\b/g,'la ora').replace(/\bora ora\b/g,'ora');
+  const b=t.match(/^\s*(\d{1,2})\s*$/); if(b) return roF(+b[1])||'zero'; return t; };
+const sp=t=>(typeof say==='function')?say(lang==='ro'?roTime(t):t):Promise.resolve(false);
 const spW=(t,ms)=>Promise.all([sp(t),wait(ms)]);
 const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 const pick=a=>a[R(a.length)];
