@@ -39,11 +39,11 @@ struct GameWebView: UIViewRepresentable {
             WKContentRuleListStore.default().compileContentRuleList(
                 forIdentifier: "PufiOffline", encodedContentRuleList: rules
             ) { rules, error in
-                guard let rules, error == nil else {
-                    webView.loadHTMLString("<h1>Offline protection could not be loaded.</h1>", baseURL: nil)
-                    return
+                if let rules, error == nil {
+                    controller.add(rules)
+                } else {
+                    NSLog("Pufi offline content rule failed: %@", error?.localizedDescription ?? "No rule list")
                 }
-                controller.add(rules)
                 webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
             }
         } else {

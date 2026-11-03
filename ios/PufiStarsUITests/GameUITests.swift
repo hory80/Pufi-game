@@ -61,6 +61,12 @@ final class GameUITests: XCTestCase {
         app.buttons[String(numbers[0] * numbers[1])].tap()
         let record = app.buttons.matching(NSPredicate(format: "label IN %@", ["⏺ Înregistrează", "⏺ Aufnehmen", "⏺ Record"])).firstMatch
         XCTAssertTrue(record.waitForExistence(timeout: 10))
+        // A taller home page can leave the first recording row beneath the status bar.
+        for _ in 0..<5 {
+            if record.frame.minY > app.frame.minY + 100 { break }
+            app.webViews.firstMatch.swipeDown()
+        }
+        XCTAssertTrue(record.isHittable)
         record.tap()
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         if springboard.alerts.firstMatch.waitForExistence(timeout: 3) {
