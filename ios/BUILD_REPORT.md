@@ -1,3 +1,91 @@
+# Task 04 — diagnostic microfon pe iPad
+
+Data: 3 noiembrie 2026. Branch: `ios/microfon-diagnostic`. Bază web: `3a9c561`.
+Sarcină: `ios/tasks/04-microfon-ipad.md`, inclusiv secțiunea 1b.
+
+## Cauza și modificările
+
+Cauza exactă a eșecului inițial de pe iPad nu a fost reprodusă: pe dispozitivul
+conectat permisiunile sunt deja acceptate, iar noua versiune pornește motorul
+în română și engleză. Versiunea anterioară pierdea motivul oricărui eșec,
+întorcând numai `false`. Au fost corectate și riscurile identificate în pornirea audio.
+
+- `RecognitionService.swift`: starea permisiunilor fără dialoguri; motivele exacte
+  cerute de sarcină; activarea sesiunii înainte de citirea formatului, o încercare
+  cu `inputFormat` dacă `outputFormat` este invalid și refuzul formatului invalid
+  înainte de `installTap`; callback audio fără acces la MainActor; o singură
+  reluare cu rețeaua permisă dacă recunoașterea locală eșuează în primele 3 secunde
+  fără text. `stop()` elimină tap-ul și restabilește `.playback` după ascultare.
+- `Bridge.swift`: `asr.start` păstrează `true` la succes, întoarce `{ok:false,reason}`
+  și `NSLog("Pufi ASR: …")` la eșec; `asr.perm` și `openSettings`; oprirea ASR
+  înainte de TTS; cererile de autorizare întârziate nu mai pot reporni o ascultare
+  anulată. Erorile apărute după pornire sunt logate și însoțesc `asr.end`.
+- `RecorderService.swift`, `GameWebView.swift`: izolarea explicită a callback-urilor
+  de autorizare și navigare, pentru verificarea strictă a concurenței. Blocarea
+  navigării externe rămâne verificată de testul existent.
+- `BridgeTests.swift`, `RecognitionServiceTests.swift`: teste pentru permisiuni,
+  refuz, format, reluare și pornirea reală urmată de TTS pe dispozitiv.
+- `README.md`: contractul comenzilor și comportamentul reluării prin rețea.
+
+Descrierile `NSMicrophoneUsageDescription` și `NSSpeechRecognitionUsageDescription`
+există în configurație și în aplicația compilată. Bundle ID păstrat:
+`com.horace.pufistars`. Niciun fișier web nu a fost modificat.
+
+## Rezultate confirmate
+
+| Verificare | Rezultat |
+|---|---|
+| Build iPad (A16), iOS 26.5 Simulator | PASS |
+| Build iPhone 17 Pro, iOS 26.5 Simulator | PASS; și `SWIFT_STRICT_CONCURRENCY=complete`, fără avertismente de concurență în aplicație |
+| Suită nativă iPad Simulator | 18 teste, 0 eșecuri, 2 omise explicit: refuzul nu era setat, microfonul fizic lipsește |
+| Suită nativă iPhone Simulator cu microfon refuzat în sistem | 18 teste, 0 eșecuri, 1 omis explicit: microfonul fizic lipsește |
+| Refuz microfon în simulator | `{ok:false,reason:"mic-denied"}`; log `Pufi ASR: mic-denied`; starea inițială a permisiunii a fost restabilită după probă |
+| Build, semnare și instalare pe iPad HR, iPad Pro 11-inch generația 4, iPadOS 26.6.1 | PASS; echipa deja configurată local, fără ștergerea aplicației/progresului |
+| `asr.perm` pe iPad fizic | PASS: `speech=authorized`, `mic=granted`; interogarea nu a schimbat starea |
+| `asr.available` pe iPad fizic | `available=true`, `onDevice=true` atât pentru `ro-RO`, cât și pentru `en-GB` |
+| `asr.start` pe iPad fizic, `words:[]`, română și engleză | PASS: `true`; 3 secunde de ascultare în fiecare limbă, fără erori sau reluare prin rețea |
+| TTS în timpul ascultării pe iPad fizic | PASS: oprire ASR înainte de TTS, sesiunea finală `.playback` |
+| `openSettings` pe iPad fizic | PASS: răspuns `true` la deschiderea URL-ului oficial al paginii aplicației |
+
+În proba fizică nu s-a rostit text: `partialCount=0` în ambele limbi. Aceasta
+confirmă pornirea audio, nu transcrierea, dictarea sau avansarea ramei în poveste.
+Reluarea prin rețea nu a fost necesară pe iPad și nu este declarată verificată
+acolo; condițiile/limita sunt acoperite de teste. Când este folosită, audio poate
+fi prelucrat de serviciul Apple; logul consemnează reluarea, fără textul copilului.
+
+## Probe încă blocate pe iPad-ul fizic
+
+Testul prin interfață nu a putut inițializa automatizarea:
+`Timed out while enabling automation mode`. La a doua încercare, Xcode a raportat
+explicit `Developer App Certificate is not trusted` pentru
+`com.horace.PufiStarsUITests.xctrunner` și a indicat Setări → General → VPN și
+administrare dispozitiv → Developer App. Certificatul aplicației de test trebuie
+autorizat pe iPad de către Hory. Device Hub a rămas la `Connecting display…`.
+Citirea stării și testele native de mai sus au funcționat,
+dar acest lucru nu înlocuiește testele cerute prin interfață.
+
+Rămân de verificat, cu acces la interfața iPad-ului și voce reală:
+
+- permisiuni refuzate pe iPad, codul exact și revenirea prin Setări după poartă;
+- permisiuni acceptate: „Pufi și mingea” și dictarea unei povești, în română și engleză,
+  cu `asr.partial`, text în câmp și rama care avansează;
+- starea „Activează dictarea” din Setări → General → Tastatură.
+
+Stările Microfon și Recunoaștere vorbire sunt confirmate prin API ca acceptate;
+comutatoarele din interfața Setări nu au fost inspectate vizual. Hory a fost
+rugat să verifice deblocarea, cablul, UI Automation și certificatul Developer App. PR-ul rămâne
+draft până la completarea probelor fizice; nu se face merge.
+
+## Observație pentru partea web (fără modificare în acest PR)
+
+În `index.html`, `window.__micEnsure` apelează întotdeauna
+`window.__micFail('speech-denied')` când detectează orice permisiune refuzată,
+inclusiv `mic=denied` și `speech=restricted`. Pentru diagnosticul exact, Claude
+ar trebui să păstreze motivul real (`mic-denied` / `speech-restricted` /
+`speech-denied`). Bridge-ul întoarce separat stările corecte și codurile corecte.
+
+---
+
 # Pufi — free-launch entitlement implementation report
 
 Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `59a4e71` (including Pufi’s Island).

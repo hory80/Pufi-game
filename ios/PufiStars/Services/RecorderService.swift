@@ -18,7 +18,7 @@ final class RecorderService: NSObject, AVAudioPlayerDelegate {
         return folder.appendingPathComponent((safe.isEmpty ? "voice" : safe) + ".m4a")
     }
 
-    static func authorize(_ done: @escaping (Bool) -> Void) {
+    static func authorize(_ done: @escaping @MainActor @Sendable (Bool) -> Void) {
         AVAudioApplication.requestRecordPermission { granted in
             DispatchQueue.main.async { done(granted) }
         }

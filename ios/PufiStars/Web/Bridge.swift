@@ -20,6 +20,7 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
     private let recognition = RecognitionService()
     private let recorder = RecorderService()
     private let store = ProgressStore()
+    private var recognitionGeneration = UUID()
 
     // MARK: JS -> Swift
     func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -33,6 +34,7 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
         let lang = a["lang"] as? String ?? "ro"
         switch cmd {
         case "speak":
+            stopRecognition()
             let text = a["text"] as? String ?? ""
             let rate = (a["rate"] as? Double).map { Float($0) } ?? 0.9
             let words = a["words"] as? Bool ?? false
@@ -53,32 +55,45 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
         // recunoașterea vocii (copilul citește cu voce tare)
         case "asr.available":
             reply(id, recognition.availability(lang: lang))
+        case "asr.perm":
+            reply(id, RecognitionService.permissions())
+        case "openSettings":
+            guard let url = URL(string: UIApplication.openSettingsURLString) else { reply(id, false); return }
+            UIApplication.shared.open(url, options: [:]) { [weak self] opened in
+                DispatchQueue.main.async { self?.reply(id, opened) }
+            }
         case "asr.start":
             speech.stop()
             recorder.stop()
+            stopRecognition()
+            let generation = recognitionGeneration
             let words = a["words"] as? [String] ?? []
-            RecognitionService.authorize { [weak self] ok in
+            RecognitionService.authorize { [weak self] failure in
                 guard let self else { return }
-                guard ok else { self.reply(id, false); return }
+                guard self.recognitionGeneration == generation else {
+                    self.recognitionFailed(id, "other:cancelled")
+                    return
+                }
+                if let failure { self.recognitionFailed(id, failure.reason); return }
                 do {
                     try self.recognition.start(lang: lang, words: words,
                         onText: { [weak self] text, isFinal in self?.emit("asr.partial", ["text": text, "final": isFinal]) },
-                        onEnd: { [weak self] in self?.emit("asr.end", [:]) })
+                        onEnd: { [weak self] reason in self?.emit("asr.end", reason.map { ["reason": $0] } ?? [:]) })
                     self.reply(id, true)
                 } catch {
-                    self.reply(id, false)
+                    self.recognitionFailed(id, (error as? RecognitionFailure)?.reason ?? "other:" + error.localizedDescription)
                 }
             }
         case "asr.stop":
-            recognition.stop(); reply(id, true)
+            stopRecognition(); reply(id, true)
         case "asr.playLast":
-            recognition.stop()
+            stopRecognition()
             recorder.play(url: recognition.lastURL) { [weak self] in self?.reply(id, true) }
 
         // vocea părintelui
         case "rec.start":
             speech.stop()
-            recognition.stop()
+            stopRecognition()
             let key = a["key"] as? String ?? "praise1"
             RecorderService.authorize { [weak self] ok in
                 guard let self else { return }
@@ -113,6 +128,16 @@ final class Bridge: NSObject, ObservableObject, WKScriptMessageHandler {
         default:
             reply(id, NSNull())
         }
+    }
+
+    private func stopRecognition() {
+        recognitionGeneration = UUID()
+        recognition.stop()
+    }
+
+    private func recognitionFailed(_ id: Int, _ reason: String) {
+        NSLog("Pufi ASR: %@", reason)
+        reply(id, ["ok": false, "reason": reason])
     }
 
     func finishGate(_ request: GateRequest, passed: Bool) {
