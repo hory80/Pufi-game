@@ -2302,6 +2302,7 @@ function gStory(){
   storyTok++; const stg=$('stage'); stg.innerHTML=''; msg(''); setTask(R().storyTask);
   const g=el('div','rd-stories'); stg.appendChild(g);
   STORIES[LG()].forEach((s,i)=>{ const b=el('button','rd-card',`<span class="ic">${s[0]}</span><span class="nm">${s[1]}</span>`); b.id='rd-s'+i; b.onclick=()=>openStory(s); g.appendChild(b); });
+  if(window.__rdMy) try{ window.__rdMy(g,openStory); }catch(e){}
 }
 function openStory(s){
   storyTok++; try{ speechSynthesis.cancel(); }catch(e){} const stg=$('stage'); stg.innerHTML=''; msg('');
@@ -11506,7 +11507,7 @@ const hl=document.getElementById('hm-langs'); if(hl) new MutationObserver(paint)
    Pe web nu se blochează nimic. În aplicație decide aplicația nativă (iap.status):
    true = totul deblocat (cumpărat, perioada gratuită de lansare sau instalat înainte de data-limită). */
 (()=>{
-const FREE={mw:['add','cmp','sb','ten'],tm:['explore','balloon','cuckoo','pizza','wake','order'],rd:['alpha','fish','hunt','read','story'],ch:['learn','stars'],cg:['easy','two'],
+const FREE={mw:['add','cmp','sb','ten'],tm:['explore','balloon','cuckoo','pizza','wake','order'],rd:['alpha','fish','hunt','read','story','my'],ch:['learn','stars'],cg:['easy','two'],
   gm:['geo','tan'],rb:['prog','gar'],sa:['w0','sprint','g0','g1','g2','g3','g4'],pq:['0','1'],nt:[]};
 const TXT={ro:{msg:'Jocul acesta e în versiunea completă.',ask:'Roagă un părinte să te ajute.',par:'👨‍👩‍👧 Pentru părinți',close:'✖ Închide'},
  de:{msg:'Dieses Spiel gehört zur Vollversion.',ask:'Frag einen Erwachsenen um Hilfe.',par:'👨‍👩‍👧 Für Eltern',close:'✖ Schließen'},
@@ -11549,6 +11550,106 @@ window.__gate=(mod,key)=>{ if(!isLocked(mod,key)) return false; paywall(); retur
 /* starea vine de la aplicația nativă; la schimbare reafișăm ecranele */
 window.__setPremium=v=>{ const was=window.__premium; window.__premium=!!v; paint(); if(was!==window.__premium) (window.__LR||[]).forEach(f=>{ try{ f(); }catch(e){} }); };
 paint();
+})();
+</script>
+<style>
+/* ===== Povestea mea: textul scris, lipit sau dictat de părinte ===== */
+.rd-card.my{background:#FFF3B0;box-shadow:0 8px 0 #E8C95A}
+.rd-card.mynew{background:#fff;border:3px dashed #5B7FDE;box-shadow:none}
+.rd-card .my-ed{position:absolute;top:6px;right:8px;font-size:1.3rem;background:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.my-ov{position:fixed;inset:0;z-index:99990;background:rgba(36,50,95,.55);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);box-sizing:border-box}
+.my-box{background:#fff;border-radius:26px;width:min(720px,96vw);max-height:100%;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;color:#24325f;font-family:var(--display);box-sizing:border-box}
+.my-box h3{margin:0;font-size:clamp(1.3rem,3.4vw,1.8rem)}
+.my-box input,.my-box textarea{font:inherit;font-size:clamp(1.05rem,2.6vw,1.3rem);border:3px solid #DCE3F2;border-radius:16px;padding:10px 12px;color:#24325f;width:100%;box-sizing:border-box;font-weight:700;-webkit-user-select:text;user-select:text;touch-action:auto}
+.my-box textarea{min-height:min(36vh,260px);resize:vertical;line-height:1.45}
+.my-box textarea.rec{border-color:#FF5D7A;box-shadow:0 0 0 4px rgba(255,93,122,.2)}
+.my-ics{display:flex;gap:6px;flex-wrap:wrap}
+.my-ics button{font-size:1.6rem;width:52px;height:52px;border-radius:14px;border:3px solid #E6ECF7;background:#F7FAFF;cursor:pointer}
+.my-ics button.on{border-color:#5B7FDE;background:#E8EEFF}
+.my-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.my-row button{font:inherit;font-weight:800;font-size:clamp(1rem,2.5vw,1.2rem);border:3px solid #24325f;background:#fff;color:#24325f;border-radius:999px;padding:6px 16px;min-height:48px;cursor:pointer}
+.my-row button.go{background:#3ECF8E;border-color:#2bb57a;color:#fff}
+.my-row button.red{border-color:#E8505B;color:#E8505B}
+.my-cnt{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;opacity:.75}
+.my-cnt.over{color:#E8505B;opacity:1}
+.my-note{font-weight:700;font-size:.95rem;opacity:.75;margin:0}
+</style>
+<script>
+(()=>{
+const TX={
+ ro:{card:'✍️ Povestea mea',neu:'➕ Poveste nouă',title:'Titlul poveștii',ph:'Scrie, lipește sau dictează textul aici…',paste:'📋 Lipește',dict:'🎤 Dictează',stop:'⏹ Gata',save:'💾 Salvează',del:'🗑 Șterge',close:'✖ Închide',kb:'Poți dicta și cu microfonul 🎤 de pe tastatură.',free:m=>`Versiunea gratuită: o poveste de până la ${m} de caractere.`,empty:'Scrie întâi un text.',def:'Povestea mea',head:'Povestea scrisă de părinte'},
+ de:{card:'✍️ Meine Geschichte',neu:'➕ Neue Geschichte',title:'Titel der Geschichte',ph:'Schreibe, füge ein oder diktiere den Text hier…',paste:'📋 Einfügen',dict:'🎤 Diktieren',stop:'⏹ Fertig',save:'💾 Speichern',del:'🗑 Löschen',close:'✖ Schließen',kb:'Du kannst auch mit dem Mikrofon 🎤 der Tastatur diktieren.',free:m=>`Gratisversion: eine Geschichte mit bis zu ${m} Zeichen.`,empty:'Schreib zuerst einen Text.',def:'Meine Geschichte',head:'Geschichte von Mama oder Papa'},
+ en:{card:'✍️ My story',neu:'➕ New story',title:'Story title',ph:'Type, paste or dictate the text here…',paste:'📋 Paste',dict:'🎤 Dictate',stop:'⏹ Done',save:'💾 Save',del:'🗑 Delete',close:'✖ Close',kb:'You can also dictate with the 🎤 microphone on the keyboard.',free:m=>`Free version: one story of up to ${m} characters.`,empty:'Write some text first.',def:'My story',head:'A story written by a parent'},
+ fr:{card:'✍️ Mon histoire',neu:'➕ Nouvelle histoire',title:'Titre de l’histoire',ph:'Écris, colle ou dicte le texte ici…',paste:'📋 Coller',dict:'🎤 Dicter',stop:'⏹ Fini',save:'💾 Enregistrer',del:'🗑 Supprimer',close:'✖ Fermer',kb:'Tu peux aussi dicter avec le micro 🎤 du clavier.',free:m=>`Version gratuite : une histoire de ${m} caractères maximum.`,empty:'Écris d’abord un texte.',def:'Mon histoire',head:'Une histoire écrite par un parent'},
+ it:{card:'✍️ La mia storia',neu:'➕ Nuova storia',title:'Titolo della storia',ph:'Scrivi, incolla o detta il testo qui…',paste:'📋 Incolla',dict:'🎤 Detta',stop:'⏹ Fatto',save:'💾 Salva',del:'🗑 Elimina',close:'✖ Chiudi',kb:'Puoi anche dettare con il microfono 🎤 della tastiera.',free:m=>`Versione gratuita: una storia fino a ${m} caratteri.`,empty:'Scrivi prima un testo.',def:'La mia storia',head:'Una storia scritta da un genitore'},
+ es:{card:'✍️ Mi cuento',neu:'➕ Cuento nuevo',title:'Título del cuento',ph:'Escribe, pega o dicta el texto aquí…',paste:'📋 Pegar',dict:'🎤 Dictar',stop:'⏹ Listo',save:'💾 Guardar',del:'🗑 Borrar',close:'✖ Cerrar',kb:'También puedes dictar con el micrófono 🎤 del teclado.',free:m=>`Versión gratuita: un cuento de hasta ${m} caracteres.`,empty:'Escribe primero un texto.',def:'Mi cuento',head:'Un cuento escrito por mamá o papá'},
+ pt:{card:'✍️ Minha história',neu:'➕ Nova história',title:'Título da história',ph:'Escreva, cole ou dite o texto aqui…',paste:'📋 Colar',dict:'🎤 Ditar',stop:'⏹ Pronto',save:'💾 Salvar',del:'🗑 Apagar',close:'✖ Fechar',kb:'Você também pode ditar com o microfone 🎤 do teclado.',free:m=>`Versão gratuita: uma história de até ${m} caracteres.`,empty:'Escreva um texto primeiro.',def:'Minha história',head:'Uma história escrita por um dos pais'},
+ nl:{card:'✍️ Mijn verhaal',neu:'➕ Nieuw verhaal',title:'Titel van het verhaal',ph:'Typ, plak of dicteer de tekst hier…',paste:'📋 Plakken',dict:'🎤 Dicteren',stop:'⏹ Klaar',save:'💾 Opslaan',del:'🗑 Verwijderen',close:'✖ Sluiten',kb:'Je kunt ook dicteren met de microfoon 🎤 op het toetsenbord.',free:m=>`Gratis versie: één verhaal van maximaal ${m} tekens.`,empty:'Schrijf eerst een tekst.',def:'Mijn verhaal',head:'Een verhaal geschreven door een ouder'},
+ pl:{card:'✍️ Moja bajka',neu:'➕ Nowa bajka',title:'Tytuł bajki',ph:'Napisz, wklej albo podyktuj tekst tutaj…',paste:'📋 Wklej',dict:'🎤 Dyktuj',stop:'⏹ Gotowe',save:'💾 Zapisz',del:'🗑 Usuń',close:'✖ Zamknij',kb:'Możesz też dyktować mikrofonem 🎤 na klawiaturze.',free:m=>`Wersja darmowa: jedna bajka, maksymalna liczba znaków: ${m}.`,empty:'Najpierw napisz tekst.',def:'Moja bajka',head:'Bajka napisana przez rodzica'},
+ hu:{card:'✍️ Az én mesém',neu:'➕ Új mese',title:'A mese címe',ph:'Írd be, illeszd be vagy diktáld ide a szöveget…',paste:'📋 Beillesztés',dict:'🎤 Diktálás',stop:'⏹ Kész',save:'💾 Mentés',del:'🗑 Törlés',close:'✖ Bezárás',kb:'A billentyűzet 🎤 mikrofonjával is diktálhatsz.',free:m=>`Ingyenes verzió: egy mese, legfeljebb ennyi karakter: ${m}.`,empty:'Előbb írj be egy szöveget.',def:'Az én mesém',head:'Szülő által írt mese'},
+ uk:{card:'✍️ Моя казка',neu:'➕ Нова казка',title:'Назва казки',ph:'Напишіть, вставте або продиктуйте текст тут…',paste:'📋 Вставити',dict:'🎤 Диктувати',stop:'⏹ Готово',save:'💾 Зберегти',del:'🗑 Видалити',close:'✖ Закрити',kb:'Можна диктувати й мікрофоном 🎤 на клавіатурі.',free:m=>`Безкоштовна версія: одна казка, символів не більше: ${m}.`,empty:'Спершу напишіть текст.',def:'Моя казка',head:'Казка від батьків'},
+ ru:{card:'✍️ Моя сказка',neu:'➕ Новая сказка',title:'Название сказки',ph:'Напишите, вставьте или продиктуйте текст здесь…',paste:'📋 Вставить',dict:'🎤 Диктовать',stop:'⏹ Готово',save:'💾 Сохранить',del:'🗑 Удалить',close:'✖ Закрыть',kb:'Можно диктовать и микрофоном 🎤 на клавиатуре.',free:m=>`Бесплатная версия: одна сказка, символов не больше: ${m}.`,empty:'Сначала напишите текст.',def:'Моя сказка',head:'Сказка от родителей'}};
+const X=()=>TX[lang]||TX.en;
+const FREE_LEN=150, FREE_N=1;
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const list=()=>LS.get('rd_my',[]);
+const locked=()=>!!(window.__isLocked&&window.__isLocked('rd','myplus'));
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICS=['📝','🦊','🌈','🚀','🐶','🏰','🌻','⚽'];
+/* silabe colorate pentru română (reguli simple: V-CV, VC-CV, VC-CCV) */
+function syllRo(w){ const V='aeiouăâîAEIOUĂÂÎ', isV=c=>V.includes(c); if(w.length<4) return w;
+  const out=[]; let cur='', i=0; const L=[...w];
+  while(i<L.length){ cur+=L[i];
+    if(isV(L[i])){ let j=i+1; while(j<L.length&&isV(L[j])) j++; /* grupuri de vocale rămân împreună */
+      if(j>i+1){ cur+=L.slice(i+1,j).join(''); i=j-1; }
+      let k=i+1, c=0; while(k<L.length&&!isV(L[k])){ c++; k++; }
+      if(k>=L.length){ cur+=L.slice(i+1).join(''); out.push(cur); return out.join('·'); }
+      if(c===1){ out.push(cur); cur=''; }
+      else if(c===2){ const pair=(L[i+1]+L[i+2]).toLowerCase(); if(/^(ch|gh|[bcdfghptv][lr])$/.test(pair)){ out.push(cur); cur=''; } else { cur+=L[i+1]; out.push(cur); cur=''; i++; } }
+      else if(c>=3){ cur+=L[i+1]; out.push(cur); cur=''; i++; } }
+    i++; }
+  if(cur) out.push(cur); return out.join('·'); }
+function prep(text){ let t=text.replace(/\r/g,'').replace(/[<>]/g,'').replace(/\n+/g,'. ').replace(/\s+/g,' ').replace(/\.\s*\./g,'.').trim(); if(!t) return '';
+  if(!/[.!?]$/.test(t)) t+='.';
+  if(lang==='ro') t=t.split(' ').map(w=>{ const m=w.match(/^([^\p{L}]*)([\p{L}-]+)([^\p{L}]*)$/u); return m?m[1]+syllRo(m[2])+m[3]:w; }).join(' ');
+  return t; }
+async function gate(){ try{ if(window.__parentsGate&&window.native) return !!(await window.__parentsGate()); }catch(e){} return true; }
+let openStoryRef=null;
+window.__rdMy=(grid,openStory)=>{ openStoryRef=openStory;
+  list().forEach((st,i)=>{ const b=document.createElement('button'); b.className='rd-card my'; b.innerHTML=`<span class="ic">${st.ic||'📝'}</span><span class="nm">${esc(st.title||X().def)}</span><span class="my-ed" data-e="1">✏️</span>`;
+    b.onclick=async e=>{ if(e.target.closest('[data-e]')){ e.stopPropagation(); if(await gate()) editor(i); return; } openStory([st.ic||'📝',esc(st.title||X().def),prep(st.text)]); }; grid.appendChild(b); });
+  const nb=document.createElement('button'); nb.className='rd-card mynew'; nb.dataset.lk='rd:my'; nb.innerHTML=`<span class="ic">✍️</span><span class="nm">${X().neu}</span>`;
+  nb.onclick=async()=>{ if(locked()&&list().length>=FREE_N){ if(window.__paywall) window.__paywall(); return; } if(await gate()) editor(-1); }; grid.appendChild(nb); };
+function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; const lim=locked()?FREE_LEN:0;
+  const ov=document.createElement('div'); ov.className='my-ov'; const box=document.createElement('div'); box.className='my-box'; ov.appendChild(box);
+  box.innerHTML=`<h3>${X().card}</h3><div class="my-ics">${ICS.map(c=>`<button data-ic="${c}" class="${c===st.ic?'on':''}">${c}</button>`).join('')}</div>
+   <input id="my-t" maxlength="40" placeholder="${X().title}"><textarea id="my-x" placeholder="${X().ph}"></textarea>
+   <div class="my-row"><button data-a="paste">${X().paste}</button><button data-a="dict">${X().dict}</button><span class="my-cnt" id="my-c"></span></div>
+   <p class="my-note">${X().kb}${lim?' '+X().free(lim):''}</p>
+   <div class="my-row"><button class="go" data-a="save">${X().save}</button>${i>=0?`<button class="red" data-a="del">${X().del}</button>`:''}<button data-a="x">${X().close}</button></div>`;
+  document.body.appendChild(ov); const $t=box.querySelector('#my-t'), $x=box.querySelector('#my-x'), $c=box.querySelector('#my-c'); $t.value=st.title||''; $x.value=st.text||''; let ic=st.ic||'📝';
+  const cnt=()=>{ const n=$x.value.length; $c.textContent=lim?`${n} / ${lim}`:String(n); $c.classList.toggle('over',!!lim&&n>lim); if(lim&&n>lim){ $x.value=$x.value.slice(0,lim); cnt(); } };
+  $x.addEventListener('input',cnt); cnt();
+  box.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{ ic=b.dataset.ic; box.querySelectorAll('[data-ic]').forEach(x=>x.classList.toggle('on',x===b)); });
+  box.querySelector('[data-a=paste]').onclick=async()=>{ try{ const t=await navigator.clipboard.readText(); if(t){ $x.value=($x.value?$x.value+' ':'')+t; cnt(); } }catch(e){ $x.focus(); } };
+  /* dictare: în aplicație folosim recunoașterea vorbirii; în browser, microfonul tastaturii */
+  const N=window.native; let rec=false, base='', onP=null, onE=null;
+  const db=box.querySelector('[data-a=dict]'); if(!N) db.hidden=true;
+  const stopRec=()=>{ if(!rec) return; rec=false; db.textContent=X().dict; $x.classList.remove('rec'); try{ N.off('asr.partial',onP); N.off('asr.end',onE); N.call('asr.stop'); }catch(e){} };
+  db.onclick=async()=>{ if(rec) return stopRec(); rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):'';
+    onP=p=>{ if(!rec) return; $x.value=base+(p.text||''); cnt(); if(p.final){ base=$x.value.replace(/\s*$/,' '); } };
+    onE=()=>{ if(rec){ base=$x.value.replace(/\s*$/,' '); setTimeout(()=>{ if(rec) N.call('asr.start',{lang,words:[]}); },250); } };
+    N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!ok) stopRec(); };
+  const close=()=>{ stopRec(); ov.remove(); };
+  box.querySelector('[data-a=x]').onclick=close;
+  box.querySelector('[data-a=save]').onclick=()=>{ const text=$x.value.trim(); if(!text){ $x.placeholder=X().empty; $x.focus(); return; }
+    const L2=list(), o={ic,title:$t.value.trim()||X().def,text:lim?text.slice(0,lim):text}; if(i>=0) L2[i]=o; else L2.push(o); LS.set('rd_my',L2); close(); refresh(); };
+  const d=box.querySelector('[data-a=del]'); if(d) d.onclick=()=>{ const L2=list(); L2.splice(i,1); LS.set('rd_my',L2); close(); refresh(); };
+  setTimeout(()=>{ (i>=0?$x:$t).focus(); },50); }
+/* reafișează lista de povești dacă e deschisă */
+function refresh(){ const g=document.querySelector('.rd-stories'); if(!g||!openStoryRef) return; g.querySelectorAll('.rd-card.my,.rd-card.mynew').forEach(e=>e.remove()); window.__rdMy(g,openStoryRef); }
+(window.__LR=window.__LR||[]).push(()=>refresh());
+window.__mySyll=syllRo; window.__myPrep=prep;
 })();
 </script>
 <script>
