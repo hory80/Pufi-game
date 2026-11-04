@@ -12512,6 +12512,10 @@ window.__micFail=async reason=>{ const r=String(reason||''); const langIssue=/un
 /* ===== Povestea mea: textul scris, lipit sau dictat de părinte ===== */
 .rd-card.my{background:#FFF3B0;box-shadow:0 8px 0 #E8C95A}
 .rd-card.mynew{background:#fff;border:3px dashed #5B7FDE;box-shadow:none}
+.rd-stage>.rd-story,.rd-stage>.rd-stories{flex:0 1 auto;min-height:0}
+.rd-stories{overflow-y:auto;align-content:start;padding:4px 4px 14px;-webkit-overflow-scrolling:touch}
+.rd-card .my-del{position:absolute;top:6px;left:8px;font-size:1.2rem;background:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.rd-card .my-del.sure{background:#E8505B;color:#fff;width:auto;padding:0 10px;border-radius:999px}
 .rd-card .my-ed{position:absolute;top:6px;right:8px;font-size:1.3rem;background:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.15)}
 .my-ov{position:fixed;inset:0;z-index:99990;background:rgba(36,50,95,.55);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);box-sizing:border-box}
 .my-box{background:#fff;border-radius:26px;width:min(720px,96vw);max-height:100%;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;color:#24325f;font-family:var(--display);box-sizing:border-box}
@@ -12575,8 +12579,11 @@ function prep(text){ let t=text.replace(/\r/g,'').replace(/[<>]/g,'').replace(/\
 async function gate(){ try{ if(window.__parentsGate&&window.native) return !!(await window.__parentsGate()); }catch(e){} return true; }
 let openStoryRef=null;
 window.__rdMy=(grid,openStory)=>{ openStoryRef=openStory;
-  list().forEach((st,i)=>{ const b=document.createElement('button'); b.className='rd-card my'; b.innerHTML=`<span class="ic">${st.ic||'📝'}</span><span class="nm">${esc(st.title||X().def)}</span><span class="my-ed" data-e="1">✏️</span>`;
-    b.onclick=async e=>{ if(e.target.closest('[data-e]')){ e.stopPropagation(); if(await gate()) editor(i); return; } openStory([st.ic||'📝',esc(st.title||X().def),prep(st.text)]); }; grid.appendChild(b); });
+  list().forEach((st,i)=>{ const b=document.createElement('button'); b.className='rd-card my'; b.innerHTML=`<span class="ic">${st.ic||'📝'}</span><span class="nm">${esc(st.title||X().def)}</span><span class="my-ed" data-e="1">✏️</span><span class="my-del" data-d="1">🗑</span>`;
+    b.onclick=async e=>{ const dz=e.target.closest('[data-d]'); if(dz){ e.stopPropagation();
+      if(!dz.classList.contains('sure')){ if(!(await gate())) return; dz.classList.add('sure'); dz.textContent='🗑 ?'; setTimeout(()=>{ if(dz.isConnected){ dz.classList.remove('sure'); dz.textContent='🗑'; } },4000); return; }
+      const L2=list(); L2.splice(i,1); LS.set('rd_my',L2); refresh(); return; }
+    if(e.target.closest('[data-e]')){ e.stopPropagation(); if(await gate()) editor(i); return; } openStory([st.ic||'📝',esc(st.title||X().def),prep(st.text)]); }; grid.appendChild(b); });
   const nb=document.createElement('button'); nb.className='rd-card mynew'; nb.dataset.lk='rd:my'; nb.innerHTML=`<span class="ic">✍️</span><span class="nm">${X().neu}</span>`;
   nb.onclick=async()=>{ if(locked()&&list().length>=FREE_N){ if(window.__paywall) window.__paywall(); return; } if(await gate()) editor(-1); }; grid.appendChild(nb); };
 function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; const lim=locked()?FREE_LEN:0;
@@ -12592,12 +12599,15 @@ function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; c
   box.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{ ic=b.dataset.ic; box.querySelectorAll('[data-ic]').forEach(x=>x.classList.toggle('on',x===b)); });
   box.querySelector('[data-a=paste]').onclick=async()=>{ try{ const t=await navigator.clipboard.readText(); if(t){ $x.value=($x.value?$x.value+' ':'')+t; cnt(); } }catch(e){ $x.focus(); } };
   /* dictare: în aplicație folosim recunoașterea vorbirii; în browser, microfonul tastaturii */
-  const N=window.native; let rec=false, base='', onP=null, onE=null;
+  const N=window.native; let rec=false, base='', seg='', onP=null, onE=null, keep='';
   const db=box.querySelector('[data-a=dict]'); if(!N) db.hidden=true;
-  const stopRec=()=>{ if(!rec) return; rec=false; db.textContent=X().dict; $x.classList.remove('rec'); try{ N.off('asr.partial',onP); N.off('asr.end',onE); N.call('asr.stop'); }catch(e){} };
-  db.onclick=async()=>{ if(rec) return stopRec(); if(window.__micEnsure&&!(await window.__micEnsure())) return; rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):'';
-    onP=p=>{ if(!rec) return; $x.value=base+(p.text||''); cnt(); if(p.final){ base=$x.value.replace(/\s*$/,' '); } };
-    onE=()=>{ if(rec){ base=$x.value.replace(/\s*$/,' '); setTimeout(()=>{ if(rec) N.call('asr.start',{lang,words:[]}); },250); } };
+  const stopRec=()=>{ if(!rec) return; keep=$x.value; rec=false; db.textContent=X().dict; $x.classList.remove('rec'); try{ N.off('asr.partial',onP); N.off('asr.end',onE); N.call('asr.stop').then(()=>{ if($x.value!==keep){ $x.value=keep; cnt(); } }); }catch(e){} setTimeout(()=>{ if(!rec&&keep&&$x.value!==keep){ $x.value=keep; cnt(); } },400); };
+  db.onclick=async()=>{ if(rec) return stopRec(); if(window.__micEnsure&&!(await window.__micEnsure())) return; rec=true; db.textContent=X().stop; $x.classList.add('rec'); base=$x.value?$x.value.replace(/\s*$/,' '):''; seg='';
+    onP=p=>{ if(!rec) return; const t=(p.text||'').trim(); if(!t) return;
+      /* iPad-ul poate reîncepe transcrierea după o pauză: păstrăm ce s-a spus înainte */
+      if(seg&&t.length<seg.length*.7&&!t.toLowerCase().startsWith(seg.slice(0,Math.min(6,seg.length)).toLowerCase())){ base=(base+seg).replace(/\s*$/,' '); }
+      seg=t; $x.value=base+seg; cnt(); if(p.final){ base=$x.value.replace(/\s*$/,' '); seg=''; } };
+    onE=()=>{ if(rec){ base=$x.value.replace(/\s*$/,' '); seg=''; setTimeout(()=>{ if(rec) N.call('asr.start',{lang,words:[]}); },250); } };
     N.on('asr.partial',onP); N.on('asr.end',onE); const ok=await N.call('asr.start',{lang,words:[]}); if(!(ok===true||(ok&&ok.ok))){ stopRec(); if(window.__micFail) window.__micFail(ok&&ok.reason); } };
   const close=()=>{ stopRec(); ov.remove(); };
   box.querySelector('[data-a=x]').onclick=close;
@@ -12608,6 +12618,8 @@ function editor(i){ const L=list(), st=i>=0?L[i]:{ic:'📝',title:'',text:''}; c
 /* reafișează lista de povești dacă e deschisă */
 function refresh(){ const g=document.querySelector('.rd-stories'); if(!g||!openStoryRef) return; g.querySelectorAll('.rd-card.my,.rd-card.mynew').forEach(e=>e.remove()); window.__rdMy(g,openStoryRef); }
 (window.__LR=window.__LR||[]).push(()=>refresh());
+/* la poveștile lungi, cuvântul citit acum rămâne mereu la vedere */
+{ const rr=document.getElementById('rd-root'); if(rr){ let lastHl=null; new MutationObserver(ms=>{ for(const m of ms){ const t=m.target; if(t.classList&&t.classList.contains('rd-w')&&t.classList.contains('hl')&&t!==lastHl){ lastHl=t; const box=t.closest('.rd-story'); if(box&&box.scrollHeight>box.clientHeight+4){ const r=t.getBoundingClientRect(), br=box.getBoundingClientRect(); if(r.top<br.top+10||r.bottom>br.bottom-10) box.scrollTo({top:box.scrollTop+(r.top-br.top)-br.height*.35,behavior:'smooth'}); } } } }).observe(rr,{subtree:true,attributes:true,attributeFilter:['class']}); } }
 window.__mySyll=syllRo; window.__myPrep=prep;
 })();
 </script>
