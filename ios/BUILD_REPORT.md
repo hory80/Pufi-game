@@ -132,3 +132,7 @@ is a separate web follow-up.
 An app's bundle ID is its store identity and cannot be changed on an existing
 uploaded app record. The confirmed original ID must match the record used for
 updates and IAP. [Apple bundle ID guidance](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleidentifier).
+
+## 4 noiembrie 2026 — materiale App Store, 12 limbi
+
+216 capturi și 72 clipuri reale din simulatoare, câte 9 PNG + 3 × 30 s pentru fiecare limbă și fiecare familie iPhone/iPad. Livrare locală: `~/Downloads/Pufi-AppStore-2026-11-04/`; [ghid](AppStoreMedia/README.md) și [raport complet](AppStoreMedia/CAPTURE_REPORT.md). Audit fișiere: PASS, 0 erori; toate imaginile au RGB identic cu originalele. Build iPhone/iPad și lansare normală: PASS. Clipuri fără sunet, cu AAC silențios pentru compatibilitate. Verificarea suplimentară a testelor entitlement are 7/8 teste trecute; testul existent de persistare Keychain nu trece în simulatorul nesemnat (3 aserțiuni). Sesiunea de captură este omisă corect în rularea normală. Codul produsului și `index.html` rămân nemodificate. Detalii despre ocolirea blocajului iCloud și observația privind titlurile lungi ale insulei sunt în raport.
