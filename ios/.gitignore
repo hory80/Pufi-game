@@ -2,3 +2,7 @@ PufiStars/WebContent/
 *.xcodeproj/
 xcuserdata/
 DerivedData/
+
+# Local App Store exports are delivered as folders, not multi-GB Git objects.
+AppStoreMedia/2026-11-04/
+tools/__pycache__/
