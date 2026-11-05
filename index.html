@@ -10665,6 +10665,53 @@ window.__saArena=m=>{ const b=el('button','sa-arena',`<span class="ic">🏁</spa
 window.__sp={genSeq,genItem,BELT};
 })();
 </script>
+<style>
+.cr-ov{position:fixed;inset:0;z-index:99996;background:rgba(36,50,95,.55);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 10px) 10px calc(env(safe-area-inset-bottom,0px) + 10px);box-sizing:border-box}
+.cr-box{background:#fff;border-radius:24px;width:min(900px,96vw);max-height:100%;display:flex;flex-direction:column;color:#24325f;font-family:var(--display);box-sizing:border-box;overflow:hidden}
+.cr-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:2px solid #E6ECF7}
+.cr-hd h3{flex:1;margin:0;font-size:clamp(1.2rem,3vw,1.6rem)}
+.cr-hd button,.cr-tabs button{font:inherit;font-weight:800;border:3px solid #24325f;background:#fff;color:#24325f;border-radius:999px;padding:4px 14px;min-height:44px;cursor:pointer}
+.cr-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px}.cr-tabs button.on{background:#5B7FDE;border-color:#5B7FDE;color:#fff}
+.cr-list{overflow:auto;padding:4px 16px 16px;-webkit-user-select:text;user-select:text;font-family:system-ui,-apple-system,sans-serif}
+.cr-it{border-bottom:1px solid #EEF2F8;padding:8px 0;font-size:.92rem;line-height:1.4}
+.cr-it b{font-size:1rem}.cr-it .u{color:#5E6A8F;word-break:break-all;font-size:.82rem}
+.cr-it .st{font-size:.75rem;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px;background:#FFF3B0}
+.cr-it .st.ok{background:#D8F3E3}
+.cr-note{font-size:.85rem;color:#5E6A8F;padding:0 16px 8px;margin:0;font-family:system-ui,sans-serif}
+</style>
+<script>
+(()=>{
+/* Credite și licențe (pentru părinți). Linkurile apar ca text, nu se pot deschide din aplicație. */
+const TX={ro:{btn:'📜 Credite și licențe',t:'📜 Credite și licențe',foto:'Monumente',fotbal:'Fotbaliști',imn:'Imnuri',close:'✖ Închide',src:'Sursa',lic:'Licența',mod:'Modificări',unk:'Sursa originală nu e încă verificată.',note:'Fotografiile și înregistrările provin de la Wikimedia Commons și sunt folosite conform licențelor indicate. Linkurile sunt afișate ca text.',ok:'verificat',pend:'în verificare'},
+ de:{btn:'📜 Quellen und Lizenzen',t:'📜 Quellen und Lizenzen',foto:'Sehenswürdigkeiten',fotbal:'Fußballer',imn:'Hymnen',close:'✖ Schließen',src:'Quelle',lic:'Lizenz',mod:'Änderungen',unk:'Die Originalquelle ist noch nicht geprüft.',note:'Die Fotos und Aufnahmen stammen von Wikimedia Commons und werden gemäß den angegebenen Lizenzen verwendet. Links werden als Text angezeigt.',ok:'geprüft',pend:'in Prüfung'},
+ en:{btn:'📜 Credits and licences',t:'📜 Credits and licences',foto:'Landmarks',fotbal:'Footballers',imn:'Anthems',close:'✖ Close',src:'Source',lic:'Licence',mod:'Changes',unk:'The original source has not been verified yet.',note:'Photos and recordings come from Wikimedia Commons and are used under the licences shown. Links are shown as text.',ok:'verified',pend:'being checked'}};
+const X=()=>TX[lang]||TX.en;
+const LU=l=>{ l=(l||'').trim(); let m=l.match(/^CC BY(-SA)? (\d\.\d)(?: ([a-z]{2}))?$/i); if(m) return `https://creativecommons.org/licenses/by${m[1]?'-sa':''}/${m[2]}/${m[3]?m[3].toLowerCase()+'/':''}`;
+  if(/^CC0/i.test(l)) return 'https://creativecommons.org/publicdomain/zero/1.0/'; if(/^GFDL 1\.2/i.test(l)) return 'https://www.gnu.org/licenses/old-licenses/fdl-1.2.html'; return ''; };
+const esc=s=>String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function rows(kind){ const A=window.__ASSETS||{}; const out=[];
+  if(kind==='imn'){ const codes=Object.keys(A).filter(k=>k.startsWith('imn/')).map(k=>k.slice(4,-4)); const list=codes.length?codes:(typeof ANTHEMS!=='undefined'?[...ANTHEMS]:[]);
+    list.sort().forEach(c=>{ const a=A['imn/'+c+'.mp3']||{}; out.push({t:c,au:a.author,li:a.license,lu:a.license_url,src:a.page,mod:a.mods||'MP3, ~35 s',st:a.status}); }); return out; }
+  const cred=kind==='foto'?(typeof PHOTO_CRED!=='undefined'?PHOTO_CRED:{}):(typeof FB_CRED!=='undefined'?FB_CRED:{});
+  Object.keys(cred).sort().forEach(k=>{ const a=A[kind+'/'+k+'.jpg']||{}; const parts=String(cred[k]).split(' · '); const li=a.license||parts.pop(); const au=a.author||parts.join(' · ');
+    let name=k; try{ if(kind==='foto'&&typeof MON!=='undefined'){ const [c,i]=k.split('-'); const m=MON[c][+i-1]; name=m[3].split('|')[lang==='ro'?0:lang==='de'?1:2]; } if(kind==='fotbal'&&typeof FB!=='undefined'){ const [c,i]=k.split('-'); name=(FB[c]&&FB[c][+i-1]&&FB[c][+i-1][0])||k; } }catch(e){}
+    out.push({t:name,au,li,lu:a.license_url||LU(li),src:a.page,mod:a.mods||(kind==='fotbal'?'redimensionat (latura mare 500 px), JPEG':'redimensionat (lățime 720 px), JPEG'),st:a.status}); });
+  return out; }
+function open(){ const ov=document.createElement('div'); ov.className='cr-ov'; ov.innerHTML=`<div class="cr-box"><div class="cr-hd"><h3>${X().t}</h3><button data-x>${X().close}</button></div><div class="cr-tabs"><button data-k="foto" class="on">${X().foto}</button><button data-k="fotbal">${X().fotbal}</button><button data-k="imn">${X().imn}</button></div><p class="cr-note">${X().note}</p><div class="cr-list"></div></div>`;
+  document.body.appendChild(ov); const L=ov.querySelector('.cr-list');
+  const show=k=>{ ov.querySelectorAll('[data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+    L.innerHTML=rows(k).map(r=>`<div class="cr-it"><b>${esc(r.t)}</b>${r.st==='VERIFICAT'?`<span class="st ok">${X().ok}</span>`:`<span class="st">${X().pend}</span>`}<br>📷 ${esc(r.au||'—')} · ${X().lic}: ${esc(r.li||'—')}${r.lu?` <span class="u">${esc(r.lu)}</span>`:''}<br>${X().src}: ${r.src?`<span class="u">${esc(r.src)}</span>`:esc(X().unk)}<br>${X().mod}: ${esc(r.mod||'—')}</div>`).join(''); L.scrollTop=0; };
+  ov.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>show(b.dataset.k)); ov.querySelector('[data-x]').onclick=()=>ov.remove(); show('foto'); }
+window.openCredits=open;
+/* după audit: ce nu are sursa confirmată nu se mai afișează (poza → emoji, imnul → fără buton) */
+(()=>{ const A=window.__ASSETS||{}; if(!Object.keys(A).length) return; const bad=k=>A[k]&&A[k].status==='NEGĂSIT';
+  try{ if(typeof PHOTOS!=='undefined') [...PHOTOS].forEach(k=>{ if(bad('foto/'+k+'.jpg')) PHOTOS.delete(k); }); }catch(e){}
+  try{ if(typeof FB_PHOTOS!=='undefined') [...FB_PHOTOS].forEach(k=>{ if(bad('fotbal/'+k+'.jpg')) FB_PHOTOS.delete(k); }); }catch(e){}
+  try{ if(typeof ANTHEMS!=='undefined') [...ANTHEMS].forEach(c=>{ if(!A['imn/'+c+'.mp3']||A['imn/'+c+'.mp3'].status!=='VERIFICAT') ANTHEMS.delete(c); }); }catch(e){} })();
+const prev=window.__parentsExtra; window.__parentsExtra=async box=>{ if(prev) try{ await prev(box); }catch(e){} const b=document.createElement('button'); b.className='rb-b'; b.style.cssText='margin-top:8px'; b.textContent=X().btn; b.onclick=open; box.appendChild(b); };
+})();
+</script>
+<script>window.__ASSETS={};</script>
 <script>
 /* Español — nombres de los peces */
 (()=>{ const lg='es', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
