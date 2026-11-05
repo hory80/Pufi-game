@@ -47,6 +47,21 @@ Folderul temporar a fost șters după folosire, deci `credite.json` nu mai exist
 
 Pentru `foto/` (monumente) și `imn/` nu a fost găsit niciun script de descărcare.
 
+## Monumente (`foto/`) și imnuri (`imn/`): ce s-a putut afla
+
+- Au intrat în joc **între 11 și 13 octombrie 2026**: copia jocului `v25` (11.10) nu le are, `v30` (13.10) le are deja. Au fost descărcate într-o conversație anterioară, care nu face parte din istoricul acestei sesiuni. Nu s-a păstrat niciun script, nicio listă de fișiere și niciun `credite.json`.
+- `foto/`: 99 de fișiere JPEG, reencodate cu ffmpeg (Lavc60), în majoritate de 720 px lățime. Creditul înregistrat (autor + licență, în `PHOTO_CRED`) a venit tot din metadatele Commons (`Artist`, `LicenseShortName`), cu același format ca la fotbaliști.
+- `imn/`: 36 de fișiere MP3, toate de exact 35,03 s, reencodate cu ffmpeg (Lavf60), fără etichete și fără credite în joc. Nu există nicio informație despre sursă, interpret sau licență.
+- Pistă de căutat: conversațiile din claude.ai din 11–13 octombrie (cuvinte: „imn”, „monumente”, „Wikimedia”), Coșul de gunoi și folderul Descărcări de pe Mac (foldere `joc-*-temp`).
+
+## Alte materiale din joc
+
+- **Steagurile** sunt emoji de sistem (🇷🇴 etc.), afișate cu fontul Apple al dispozitivului, nu imagini incluse în aplicație.
+- **Harta lumii** (`MAP_BG`, `MAP_C` în `index.html`) e un contur SVG inclus în cod. **Sursa datelor geografice nu e documentată.** Dacă provine din Natural Earth, care e domeniu public, trebuie confirmat. Altfel, harta trebuie regenerată dintr-o sursă documentată.
+- **Imaginile Insulei lui Pufi** (`isl/raw/`) au fost generate pentru proiect cu Codex, după prompturile din `tasks/02-…` și `tasks/03-…`.
+- **Fontul Baloo 2** e inclus în cod, cu licența SIL Open Font License 1.1, care permite includerea în aplicații.
+- **Biblioteca de despărțire în silabe** (`hyphen`, Yevhen Tiurin) are licență ISC. Modelele de despărțire pentru fiecare limbă vin împreună cu ea, iar licențele lor trebuie listate din pachet.
+
 ## Modificări cunoscute
 
 - `fotbal/`: descărcate prin `poze_fotbal.py` din miniatura Commons de 500 px, convertite cu `sips` în JPEG calitate 70, latura mare 500 px. Decuparea nu se poate stabili fără originalul.
