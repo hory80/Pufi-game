@@ -16,7 +16,7 @@ Ce face, fără să ghicească:
     restricții (personality rights etc.);
   * scrie licenses/assets.json și ASSET_LICENSES.md. Nimic nu e completat din memorie.
 """
-import argparse, io, json, math, os, re, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
+import argparse, hashlib, io, json, math, os, re, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UA = {"User-Agent": "PufiAssetAudit/1.0 (family kids learning app 'Pufi'; license audit; https://github.com/hory80/Pufi-game) python-urllib"}
 try:
@@ -28,7 +28,8 @@ SRC = json.load(open(os.path.join(ROOT, "tools", "asset_sources.json")))
 CACHE = os.path.join(ROOT, "licenses", ".cache"); os.makedirs(CACHE, exist_ok=True)
 
 def get(url, binary=False, tries=6):
-    ck = os.path.join(CACHE, re.sub(r"[^A-Za-z0-9]", "_", url)[-180:])
+    # Shared query suffixes are identical for many files: hash the complete URL.
+    ck = os.path.join(CACHE, hashlib.sha256(url.encode("utf-8")).hexdigest())
     if os.path.exists(ck): return open(ck, "rb").read()
     for a in range(tries):
         try:
@@ -51,10 +52,10 @@ def dhash(im, n=8):
 def ham(a, b): return int((a != b).sum())
 
 def file_info(titles):
-    """Metadate pentru fișiere Commons (max 40 pe cerere)."""
+    """Metadate în loturi scurte: numele lungi pot depăși limita URI a serverului."""
     out = {}
-    for i in range(0, len(titles), 40):
-        d = api(CM, action="query", titles="|".join(titles[i:i + 40]), prop="imageinfo|revisions", rvprop="content", rvslots="main",
+    for i in range(0, len(titles), 10):
+        d = api(CM, action="query", titles="|".join(titles[i:i + 10]), prop="imageinfo|revisions", rvprop="content", rvslots="main",
                 iiprop="url|size|mime|extmetadata", iiurlwidth=320, iiextmetadatafilter="Artist|Credit|LicenseShortName|LicenseUrl|UsageTerms|AttributionRequired|Restrictions|Copyrighted|ImageDescription")
         for pg in d["query"].get("pages", []):
             if pg.get("missing") or "imageinfo" not in pg: continue
@@ -91,6 +92,8 @@ def match_photo(local, subject, author):
         except Exception: continue
         d = ham(lh, dhash(th)); ar = (f["w"] or 1) / (f["h"] or 1)
         if best is None or d < best[0]: best = (d, f, ar)
+        # No later candidate can improve on zero; tie handling stays unchanged.
+        if d == 0: break
     if not best: return None, None, lar
     return best[0], best[1], lar
 
