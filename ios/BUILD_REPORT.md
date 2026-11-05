@@ -132,3 +132,31 @@ is a separate web follow-up.
 An app's bundle ID is its store identity and cannot be changed on an existing
 uploaded app record. The confirmed original ID must match the record used for
 updates and IAP. [Apple bundle ID guidance](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleidentifier).
+
+
+## 2026-11-05 — App Store support, privacy and disclaimer pages
+
+Added static English/Romanian pages under `ios/store/` for the existing GitHub
+Pages site. Public contact: `iptvnou@gmail.com`, explicitly approved by Hory.
+Personal name removed on request. No app code or root web files changed.
+
+Privacy covers local progress/stories/birthday, recordings, optional Apple
+server speech processing, purchase verification/Keychain, support emails and
+GitHub hosting logs. RevenueCat remains unconfigured; update privacy disclosures
+before enabling it. Disclaimer preserves mandatory consumer/privacy rights and
+does not replace Wikimedia licensing or Apple Standard EULA.
+
+Validation: iPhone 17 Pro and iPad Pro 13-inch (M5), OS 26.5, `xcodebuild build`
+PASS with CODE_SIGNING_ALLOWED=NO. Installed/launched both; home screen visible.
+Built in `/tmp/PufiSupportBuild` from matching source/configuration/web content
+to avoid iCloud file coordination delays. Static links/anchors, contact address,
+EN/RO navigation and FAQ checked; mobile/tablet layout checked. No new unit tests
+needed for static pages. No physical-device voice or purchase tests performed.
+
+Publication awaits PR integration into `main` and the existing Pages deployment.
+Do not merge automatically. Then verify public HTTP 200 before entering URLs
+in App Store Connect. See `ios/store/README.md` for exact URLs and maintenance.
+
+Web follow-up for Claude: add readily accessible offline privacy/disclaimer text
+in `parents()` or `window.__parentsExtra`, keeping external navigation blocked.
+Wikimedia content-rights verification remains separate.
