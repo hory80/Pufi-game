@@ -34,6 +34,19 @@
 - `fotbal/PT-2.jpg` — „Panini · Public domain”. Domeniu public — motivul (vechime, lucrare guvernamentală, renunțare) și statutul în SUA nu se cunosc fără pagina sursă.
 - `fotbal/PT-3.jpg` — „Žan Kolman · Public domain”. Domeniu public — motivul (vechime, lucrare guvernamentală, renunțare) și statutul în SUA nu se cunosc fără pagina sursă.
 
+## Ce spune scriptul de descărcare (`poze_fotbal.py`, 13.10.2026)
+
+Scriptul a fost rulat pe Mac din `~/Pictures/joc-fotbal-temp/`. Pentru fiecare fotbalist a făcut, în ordine:
+
+1. A citit articolul **Wikipedia în engleză** cu titlul din listă (de ex. `XH-1 → "Xherdan Shaqiri"`) și a luat **imaginea principală a articolului** (`prop=pageimages`, `piprop=name`), cu redirecționări.
+2. A cerut pentru `File:<numele imaginii>` metadatele de pe **Wikimedia Commons** (`prop=imageinfo`, `iiprop=url|extmetadata`, `iiurlwidth=500`). Dacă fișierul nu era pe Commons (de ex. o imagine locală non-free), **l-a sărit** („poză ne-liberă”).
+3. A descărcat **miniatura de 500 px** (`thumburl`) și a convertit-o cu `sips` în JPEG calitate 70, latura mare de 500 px.
+4. A salvat în `~/Pictures/joc-fotbal-temp/credite.json`, pentru fiecare cheie: `nume` (titlul articolului), `autor` (câmpul `Artist`, fără HTML, **trunchiat la 80 de caractere**, de unde provine „Unknown authorUnknown author”) și `licenta` (`LicenseShortName`). **Numele fișierului Commons și linkul paginii NU au fost salvate.**
+
+Folderul temporar a fost șters după folosire, deci `credite.json` nu mai există; conținutul lui e cel din `FB_CRED`. Sursa se poate reconstitui exact: imaginea principală a aceluiași articol, **verificată prin comparare de imagine** cu fișierul local, pentru că imaginea principală a unui articol se poate schimba în timp. Asta face `tools/asset_audit.py`, care încearcă întâi exact candidatul folosit de script.
+
+Pentru `foto/` (monumente) și `imn/` nu a fost găsit niciun script de descărcare.
+
 ## Modificări cunoscute
 
 - `fotbal/`: descărcate prin `poze_fotbal.py` din miniatura Commons de 500 px, convertite cu `sips` în JPEG calitate 70, latura mare 500 px. Decuparea nu se poate stabili fără originalul.
