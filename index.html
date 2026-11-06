@@ -9798,6 +9798,8 @@ let back=null, curRestart=null, curNext=null, gen=0, curLevels=null, raf=0;
 function stopAll(){ try{ speechSynthesis.cancel(); }catch(e){} $('ov').hidden=true; gen++; cancelAnimationFrame(raf); }
 const rate=e=>e===0?3:e<=2?2:1;
 const PER=6;
+const RECENT={}; function fresh(k,f,n){ n=n||8; const H=RECENT[k]=RECENT[k]||[]; let v,s,i=0; do{ v=f(); s=JSON.stringify(v); i++; }while(H.includes(s)&&i<80); H.push(s); while(H.length>n) H.shift(); return v; }
+const m12=t=>((t%720)+720)%720;
 function frame(task,n,face){ main.innerHTML=''; const head=el('div','rb-head'); const fc=el('div','rb-face',`<div style="font-size:clamp(40px,7vh,58px);line-height:1">${face||'🦊'}</div>`); const bub=el('div','rb-bubble'); bub.textContent=task||'';
   const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(fc,bub,dots);
   const stage=el('div','tm-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=fc.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
@@ -9845,6 +9847,7 @@ function makeClock(svg,id,cx,cy,r,o={}){
   function move(e){ if(!drag) return; const [x,y]=ptIn(svg,e), a=ang(x,y), t=c.total, m=((t%60)+60)%60;
     if(drag==='m'){ let nm=Math.round(a/6/c.step)*c.step%60, dl=nm-m; if(dl<-30) dl+=60; if(dl>30) dl-=60; if(dl){ c.total=clampT(t+dl); if(c.total!==t) tickS(); } }
     else { const hh=Math.round((a*2-m)/60), base=((hh%12)+12)%12*60+m; let best=t, bd=1e9; for(const k of [-1440,-720,0,720,1440]){ const cand=base+k+Math.floor(t/1440)*1440; if(Math.abs(cand-t)<bd){ bd=Math.abs(cand-t); best=cand; } } if(best!==t){ c.total=clampT(best); tickS(); } }
+    if(c.min==null&&c.max==null) c.total=((c.total%1440)+1440)%1440;
     draw(); c.onChange&&c.onChange(c.total); }
   svg.addEventListener('pointermove',e=>{ if(drag){ e.preventDefault(); move(e); } });
   const up=()=>{ if(!drag) return; drag=null; c.onEnd&&c.onEnd(c.total); };
@@ -9923,12 +9926,12 @@ async function sing(svg,n,show,myGen){ const door=svg.querySelector('#tm-door'),
     await wait(420); bird.style.transform=''; await wait(160); bird.setAttribute('opacity','0'); door.style.transform=''; await wait(260); } }
 function gCuckoo(li){ let ti=0, errs=0, busy=false, h=0; const F=frame('',PER,'🐦'); const myGen=gen;
   F.stage.innerHTML=cuckooHouse(); const svg=F.stage.firstChild; const c=makeClock(svg,'tc',450,282,118,{total:0,step:60,only:'h'}); c.locked=li<2;
-  async function show(){ F.ctrl.innerHTML=''; svg.querySelector('#tm-cnt').textContent=''; let nh; do{ nh=RR(1,12); }while(nh===h); h=nh;
+  async function show(){ F.ctrl.innerHTML=''; svg.querySelector('#tm-cnt').textContent=''; h=fresh('cu'+li,()=>RR(1,12),7);
     if(li<2){ await c.set(h*60,true); if(myGen!==gen) return;
       if(li===0){ await F.say(X().cuCount); await sing(svg,h,false,myGen); } else F.say(X().cuRead);
       if(myGen!==gen) return; const set=new Set([h]); while(set.size<4){ const v=h+RR(-3,3); if(v>=1&&v<=12) set.add(v); }
       opts(F.ctrl,shuf([...set]).map(v=>({t:String(v),v})),answer,'big'); if(li===0) F.ctrl.appendChild(btn('🔁 🐦','',()=>{ if(!busy) sing(svg,h,false,myGen); })); }
-    else { c.locked=false; await c.set(((h+RR(2,9))%12)*60); F.say(X().cuSet(h)); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:(Math.round(c.total/60)%12)||12},null))); } }
+    else { c.locked=false; await c.set(((h+RR(2,9))%12)*60); F.say(X().cuSet(h)); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:(Math.round(m12(c.total)/60)%12)||12},null))); } }
   async function answer(o,b){ if(busy) return; if(o.v!==h){ errs++; if(b) b.classList.add('no'); boing(); if(li===2) F.say(X().cuSet(h)); return; }
     busy=true; if(b) b.classList.add('ok'); c.locked=true; if(li>0) await sing(svg,h,true,myGen); else svg.querySelector('#tm-cnt').textContent=h; if(myGen!==gen) return;
     chime(); award(); F.dot(ti+1); await spW(X().itIs(X().hourOnly(h)),900); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('cuckoo',li,errs); show(); }
@@ -9942,11 +9945,11 @@ function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'�
   const read=li!==1&&li!==4, ms=li<=1?[30]:li===2?[15]:li===3?[45]:[15,30,45];
   const c=makeClock(svg,'tc',450,235,205,{pizza:true,step:15,only:'m'}); c.locked=read;
   const tip=()=>X()[tg%60===30?'pzHalf':'pzQuar'];
-  async function show(){ F.ctrl.innerHTML=''; const h=RR(1,12), m=pick(ms); tg=h*60+m; const [H,M]=[h,m];
+  async function show(){ F.ctrl.innerHTML=''; const [h,m]=fresh('pz'+li,()=>[RR(1,12),pick(ms)],9); tg=h*60+m; const [H,M]=[h,m];
     if(read){ await c.set(tg,true); if(myGen!==gen) return; const qq=F.say(X().pzRead);
       const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>{ const v=((a%12)*60+b)%720; return {t:tShort(a,b),say:tShort(a,b),v,html:`<span class="dg">${digi(v||720)}</span><small>${tShort(a,b)}</small>`}; });
       const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer,'tm-wide',qq); }
-    else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:c.total%720},null))); } }
+    else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:m12(c.total)},null))); } }
   async function answer(o,b){ if(busy) return; if(o.v!==tg%720){ errs++; if(b) b.classList.add('no'); boing(); F.say(tip()); return; }
     busy=true; c.locked=true; if(b) b.classList.add('ok'); chime(); award(); F.dot(ti+1); pzParty(svg); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('pizza',li,errs); show(); }
   show(); }
@@ -9963,11 +9966,11 @@ function gStation(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,
   const svg=F.stage.firstChild, tr=svg.querySelector('#tm-train');
   const c=makeClock(svg,'tc',660,200,150,{step,only:step>=60?'h':null});
   async function show(){ F.ctrl.innerHTML=''; tr.style.transition='none'; tr.style.transform='translateX(0)'; void tr.getBoundingClientRect(); tr.style.transition='transform 2.2s ease-in';
-    const d=pick(X().dest); let h=h24?RR(13,22):RR(1,12), m=step>=60?0:R(60/step)*step; tg=h*60+m;
+    const d=pick(X().dest); const [h,m]=fresh('st'+li,()=>[h24?RR(13,22):RR(1,12),step>=60?0:R(60/step)*step],9); tg=h*60+m;
     svg.querySelector('#tm-dest').textContent=d[0]; svg.querySelector('#tm-dep').textContent=digi(tg,h24);
     let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
     F.say(X().stTask(digi(tg,h24),d[1])); F.ctrl.appendChild(btn(X().go,'go',answer)); }
-  async function answer(){ if(busy) return; if(c.total%720!==tg%720){ errs++; boing(); F.say(X().stWrong); return; }
+  async function answer(){ if(busy) return; if(m12(c.total)!==m12(tg)){ errs++; boing(); F.say(X().stWrong); return; }
     busy=true; c.locked=true; toot(); tr.style.transform='translateX(1000px)'; puffs(svg,90,330,6); chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg);
     const msg=h24?X().st24(digi(tg,true),tSay(h,m),X().parts[partOf(tg)]):X().itIs(tSay(h,m)); await spW(msg,2300); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('station',li,errs); show(); }
   show(); }
@@ -9998,7 +10001,7 @@ function gOven(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'👩‍�
   const svg=F.stage.firstChild, food=svg.querySelector('#tm-food'), smoke=svg.querySelector('#tm-smoke');
   let st=0, dur=60, it=null; const c=makeClock(svg,'tc',260,235,200,{step:5,only:'m',onChange:t=>grow(t)});
   function grow(t){ const k=(t-st)/dur; food.style.transform=`scale(${.55+Math.min(1,k)*.6})`; food.style.filter=k>1.05?`brightness(${Math.max(.35,1-(k-1)*1.6)})`:'none'; smoke.setAttribute('opacity',k>1.05?1:0); svg.querySelector('#tm-glow').setAttribute('opacity',.25+Math.min(1,k)*.4); }
-  async function show(){ F.ctrl.innerHTML=''; food.style.animation=''; dur=pick(DL); it=pick(X().ovItems); food.textContent=it[0]; st=RR(1,10)*60+(li>=2?pick([0,15,30]):0); c.min=st; c.max=st+180; c.locked=false; await c.set(st); grow(st);
+  async function show(){ F.ctrl.innerHTML=''; food.style.animation=''; const fv=fresh('ov'+li,()=>[pick(DL),R(X().ovItems.length),RR(1,10)*60+(li>=2?pick([0,15,30]):0)],6); dur=fv[0]; it=X().ovItems[fv[1]]; food.textContent=it[0]; st=fv[2]; c.min=st; c.max=st+180; c.locked=false; await c.set(st); grow(st);
     const ha=(st%720)/2, ma=(st%60)*6; svg.querySelector('#tm-ghost').innerHTML=`<line x1="260" y1="235" x2="260" y2="135" stroke="#2E6BD6" stroke-width="16" stroke-linecap="round" transform="rotate(${ha} 260 235)"/><line x1="260" y1="235" x2="260" y2="67" stroke="#FF5D7A" stroke-width="10" stroke-linecap="round" transform="rotate(${ma} 260 235)"/>`;
     const [h,m]=hmOf(st); F.say(X().ovTask(it[1],tSay(h,m),X().dur(dur))); F.ctrl.appendChild(btn(X().ok,'go',answer)); }
   async function answer(){ if(busy) return; const el_=c.total-st;
@@ -10025,14 +10028,19 @@ function gOrder(li){ let round=0, errs=0; const ROUNDS=3; const F=frame(X().ordT
   show(); }
 
 /* ---------- 8. o zi cu Pufi (ceas + cer) ---------- */
-function gDayClk(li){ const A=X().acts; const SEQ=li===0?[[0,420],[3,480],[4,720],[6,960],[7,1080],[10,1200]]:[[0,420],[2,450],[4,750],[6,990],[8,1170],[10,1230]];
+function daySeq(li){ const A=X().acts, st=li===0?60:30, offs=li===0?[-60,0,60]:[-30,0,30,60];
+  for(let tr=0;tr<80;tr++){ const idx=shuf([...A.keys()]).slice(0,6).sort((a,b)=>a-b); let prev=300, out=[];
+    for(const i of idx){ let t=Math.round(A[i][2]/st)*st+pick(offs); if(t<=prev) t=prev+st; if(Math.abs(t-A[i][2])>90||t>1290) break; out.push([i,t]); prev=t; }
+    if(out.length===6&&(li===0||out.some(([,t])=>t%60))&&new Set(out.map(([,t])=>m12(t))).size===6) return out; }
+  return li===0?[[0,420],[3,480],[4,720],[6,960],[7,1080],[10,1200]]:[[0,420],[2,450],[4,750],[6,990],[8,1170],[10,1230]]; }
+function gDayClk(li){ const A=X().acts; const SEQ=fresh('dc'+li,()=>daySeq(li),3);
   let ti=0, errs=0, busy=false; const F=frame('',SEQ.length,'🌞'); const myGen=gen; const W=1000,Hh=470,gy=400;
   F.stage.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}">${sceneSVG(W,Hh,gy)}${clockSVG('tc',300,232,182,{})}<text id="tm-act" x="760" y="300" font-size="120" text-anchor="middle" style="animation:tmBob 1.4s ease-in-out infinite"></text></svg>`;
   const svg=F.stage.firstChild; const c=makeClock(svg,'tc',300,232,182,{step:li===0?60:30,onChange:t=>updScene(svg,t,W,gy,540,960)});
   let cur=SEQ[0][1]-60; c.set(cur); updScene(svg,cur,W,gy,540,960);
   function show(){ F.ctrl.innerHTML=''; const [ai,t]=SEQ[ti]; svg.querySelector('#tm-act').textContent='❔'; c.locked=false; const [h,m]=hmOf(t);
     F.say(X().dcTask(A[ai][0]+' '+A[ai][1],tSay(h,m))); F.ctrl.appendChild(btn(X().ok,'go',answer)); }
-  async function answer(){ if(busy) return; const [ai,t]=SEQ[ti]; if(c.total%720!==t%720){ errs++; boing(); const [h,m]=hmOf(t); F.say(X().dcTask(A[ai][1],tSay(h,m))); return; }
+  async function answer(){ if(busy) return; const [ai,t]=SEQ[ti]; if(m12(c.total)!==m12(t)){ errs++; boing(); const [h,m]=hmOf(t); F.say(X().dcTask(A[ai][1],tSay(h,m))); return; }
     busy=true; c.locked=true; c.total=t+Math.floor(c.total/1440)*1440; c.draw(); updScene(svg,c.total,W,gy,540,960); svg.querySelector('#tm-act').textContent=A[ai][0]; chime(); award(); F.dot(ti+1);
     const [h,m]=hmOf(t); await spW(`${X().itIs(tSay(h,m))} ${A[ai][1]}!`,1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=SEQ.length) return levelDone('dayclk',li,errs); show(); }
   show(); }
@@ -10057,7 +10065,7 @@ function gYtm(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📆'); c
       const q=R(3); F.say(X().ytmQ[q]);
       opts(F.ctrl,shuf(pl.map((p,i)=>({html:`<span style="font-size:1.6em">${p[0]}</span>`,i}))),async(o,b)=>{ if(busy) return; if(o.i!==q){ errs++; b.classList.add('no'); boing(); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; }); return; }
         busy=true; b.classList.add('ok'); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; d.querySelector('.s').textContent=pl[i][1]; }); chime(); award(); F.dot(ti+1); await spW(pl[q][1],900); next(); }); }
-    else { const D=X().days, d=R(7), k=R(2), ans=(d+(k?1:6))%7; const strip=el('div','tm-tiles'); D.forEach((n,i)=>strip.appendChild(el('div','tm-tile',`<span class="e" style="font-size:1.6rem">${i===d?'⭐':i>=5?'🎈':'📘'}</span>${n}`))); F.stage.appendChild(strip);
+    else { const D=X().days, [d,k]=fresh('yt'+li,()=>[R(7),R(2)],6), ans=(d+(k?1:6))%7; const strip=el('div','tm-tiles'); D.forEach((n,i)=>strip.appendChild(el('div','tm-tile',`<span class="e" style="font-size:1.6rem">${i===d?'⭐':i>=5?'🎈':'📘'}</span>${n}`))); F.stage.appendChild(strip);
       const qq=F.say(X().ytmD(k,D[d])); const set=new Set([ans,d,(d+(k?6:1))%7]); while(set.size<3) set.add(R(7));
       opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],800); next(); },null,qq); } }
   async function next(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('ytm',li,errs); show(); }
@@ -10073,7 +10081,7 @@ function gWeek(li){ let ti=0, errs=0, busy=false; const N=li===0?2:PER; const F=
         if(i!==k){ errs++; boing(); sp(D[i]); return; } hideTile(b); b.classList.remove('tm-hint'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
         if(k===7){ busy=true; toot(); chime(); award(); F.dot(ti+1); w.style.transition='transform 2.4s ease-in'; await spW(X().weekend,1200); w.style.transform='translateX(-120vw)'; await wait(1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); } }; sayTile(tl,b,D[i],items); });
       wrap.append(w,tl); helpBtn(F,()=>{ if(k>=7||busy) return; errs++; tl.dataset.stop=1; blinkHint(tiles[k]); sp(k===0?X().first(D[0]):X().nextIs(D[k-1],D[k])); }); readAll(items,tl,qq); }
-    else { const d=R(7), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); const qq=F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
+    else { const d=fresh('wd'+li,()=>R(7),4), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); const qq=F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
       const set=new Set([ans]); while(set.size<3){ const v=R(7); if(v!==d) set.add(v); }
       opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],900); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); },null,qq);
       }
@@ -10100,7 +10108,7 @@ function gCal(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📅'); c
           opts(F.ctrl,shuf([...set]).map(v=>({t:String(v),v})),async(o,bb)=>{ if(o.v!==tgCount){ errs++; bb.classList.add('no'); boing(); return; } bb.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(String(tgCount),800); nx(); },'big'); } } });
     wrap.appendChild(cg.g); F.stage.appendChild(wrap);
     if(li===0){ const ks=[0,1,2].filter(k=>k===0||(k===1&&today<last)||(k===2&&today>1)); kind=pick(ks); target=today+[0,1,-1][kind]; F.say([X().calToday,X().calTom,X().calYes][kind]); }
-    else if(li===1){ const d=RR(1,last), wd=(cg.first+d-1)%7; const qq=F.say(X().calWd(d)); cg.bt[d].classList.add('mark'); const set=new Set([wd]); while(set.size<3) set.add(R(7));
+    else if(li===1){ const d=fresh('cw',()=>RR(1,last),8), wd=(cg.first+d-1)%7; const qq=F.say(X().calWd(d)); cg.bt[d].classList.add('mark'); const set=new Set([wd]); while(set.size<3) set.add(R(7));
       opts(F.ctrl,shuf([...set]).map(i=>({t:X().days[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==wd){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(X().days[wd],800); nx(); },null,qq); }
     else { target=Math.min(last,today+RR(3,9)); tgCount=target-today; cg.bt[target].style.outline='4px dashed var(--berry)'; F.say(X().calCount(target)); } }
   async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('calm',li,errs); show(); }
@@ -10123,7 +10131,7 @@ function gMonths(li){ let ti=0, errs=0, busy=false, k=0; const N=li===0?1:PER; c
     if(li===1){ if(i!==tg){ errs++; boing(); return; } busy=true; p.setAttribute('opacity','.55'); svg.style.transition='transform 1.2s cubic-bezier(.3,1.3,.6,1)'; svg.style.transform=`rotate(${(svg._r=(svg._r||0)+360)}deg)`; chime(); award(); F.dot(ti+1); await spW(M[i],800); nx(); } else sp(M[i]); }
   function show(){ F.ctrl.innerHTML=''; for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).setAttribute('opacity','1');
     if(li===0){ F.say(X().moOrder); return; }
-    const m=R(12); if(li===1){ tg=(m+1)%12; F.say(X().moAfter(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.7'); }
+    const m=fresh('mo'+li,()=>R(12),6); if(li===1){ tg=(m+1)%12; F.say(X().moAfter(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.7'); }
     else { const s=seasonOf(m); const qq=F.say(X().moSeas(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.6');
       opts(F.ctrl,[0,1,2,3].map(i=>({html:`${SEM[i]} ${X().seasT[i]}`,say:X().seasT[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==s){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(`${M[m]}: ${X().seas[s]}`,900); nx(); },null,qq); } }
   async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('months',li,errs); show(); }
@@ -10194,10 +10202,10 @@ function gWake(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'�
     <g id="tm-alarm" style="transform-origin:195px 230px"><circle cx="135" cy="80" r="26" fill="#FF5D7A"/><circle cx="255" cy="80" r="26" fill="#FF5D7A"/>${clockSVG('tc',195,230,150,{rim:'#FF5D7A',mnums:li>=3})}<line x1="120" y1="372" x2="140" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/><line x1="270" y1="372" x2="250" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/></g></svg>`;
   const svg=F.stage.firstChild, q=x=>svg.querySelector(x); const c=makeClock(svg,'tc',195,230,150,{step,only:step>=60?'h':null});
   function night(){ q('#tm-wk1').setAttribute('stop-color','#14204F'); q('#tm-wk2').setAttribute('stop-color','#2E3A78'); q('#tm-wkSky').textContent='🌙'; q('#tm-wkSt').setAttribute('opacity',1); q('#tm-curL').style.transform=''; q('#tm-curR').style.transform=''; q('#tm-wkF').textContent='😴'; q('#tm-wkZ').setAttribute('opacity',1); q('#tm-wkP').style.animation=''; q('#tm-alarm').style.animation=''; }
-  async function show(){ F.ctrl.innerHTML=''; night(); const h=RR(5,9), m=step>=60?0:R(60/step)*step; tg=h*60+m;
+  async function show(){ F.ctrl.innerHTML=''; night(); const [h,m]=fresh('wk'+li,()=>[RR(5,10),step>=60?0:R(60/step)*step],step>=60?4:9); tg=h*60+m;
     let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
     F.say(X().wakeTask(tSay(h,m))); F.ctrl.appendChild(btn(X().ring,'go',answer)); F.ctrl.appendChild(btn(X().listen,'',()=>F.say(X().wakeTask(tSay(h,m))))); }
-  async function answer(){ if(busy) return; if(c.total%720!==tg%720){ errs++; boing(); const [a,b]=hmOf(c.total%720||720); F.say(X().wakeWrong(tSay(a,b))); return; }
+  async function answer(){ if(busy) return; if(m12(c.total)!==m12(tg)){ errs++; boing(); const [a,b]=hmOf(m12(c.total)||720); F.say(X().wakeWrong(tSay(a,b))); return; }
     busy=true; c.locked=true; q('#tm-alarm').style.animation='tmShake .35s linear 5'; for(let i=0;i<6;i++) setTimeout(()=>snd(i%2?1760:1320,.12,'square',.07),i*170);
     await wait(1100); if(myGen!==gen) return; q('#tm-wk1').setAttribute('stop-color','#FFB27A'); q('#tm-wk2').setAttribute('stop-color','#BFE6FF'); q('#tm-wkSky').textContent='🌞'; q('#tm-wkSt').setAttribute('opacity',0);
     q('#tm-curL').style.transform='scaleX(.35)'; q('#tm-curR').style.transform='scaleX(.35)'; q('#tm-wkZ').setAttribute('opacity',0); q('#tm-wkF').textContent='🦊'; q('#tm-wkP').style.animation='tmJump .6s ease 3';
@@ -10214,7 +10222,7 @@ function gBalloon(li){ let ti=0, errs=0, busy=false, tg=0; const N=6; const F=fr
     b.style.cssText=`position:absolute;left:${6+slot*18.5}%;bottom:-200px;width:${sz};cursor:pointer;animation:tmFloatUp ${8+Math.random()*3}s linear ${delay}s forwards;display:flex;flex-direction:column;align-items:center`;
     b.innerHTML=`<div style="width:${sz};height:calc(${sz} * 1.15);border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 35% 30%,#fff9 0 12%,${col} 13%);display:flex;align-items:center;justify-content:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.08)"><svg viewBox="0 0 120 120" style="width:78%;height:auto">${staticClock(t,'bl'+Math.random().toString(36).slice(2,7),50)}</svg></div><div style="width:2px;height:70px;background:#555"></div>`;
     b.dataset.t=t; b.onclick=()=>pop(b); b.addEventListener('animationend',e=>{ if(e.animationName==='tmFloatUp'){ b.remove(); if(!busy&&myGen===gen&&!sky.querySelector(`[data-t="${tg}"]`)) round(true); } }); sky.appendChild(b); alive.push(b); }
-  function round(again){ if(myGen!==gen) return; sky.querySelectorAll('[data-t]').forEach(x=>x.remove()); const set=new Set(); if(!again){ const h=RR(1,12), m=pick(ms); tg=h*60+m; }
+  function round(again){ if(myGen!==gen) return; sky.querySelectorAll('[data-t]').forEach(x=>x.remove()); const set=new Set(); if(!again){ const [h,m]=fresh('bl'+li,()=>[RR(1,12),pick(ms)],8); tg=h*60+m; }
     set.add(tg); while(set.size<5){ const v=RR(1,12)*60+pick(ms); if(v%720!==tg%720) set.add(v); } shuf([...set]).forEach((t,i)=>spawn(t,i,i*.35+Math.random()*.4));
     const [h,m]=hmOf(tg); lab.innerHTML=`🎯 <b>${tShort(h,m)}</b>`; if(!again) F.say(X().balTask(tSay(h,m))); }
   async function pop(b){ if(busy) return; const t=+b.dataset.t; if(t%720!==tg%720){ errs++; boing(); b.firstChild.style.animation='tmShake .4s'; setTimeout(()=>{ if(b.firstChild) b.firstChild.style.animation=''; },450); const [h,m]=hmOf(t); sp(tSay(h,m)); return; }
