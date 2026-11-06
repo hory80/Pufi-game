@@ -6713,6 +6713,9 @@ for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.as
 .rb-flick{animation:rbAnt .2s infinite}
 .rb-spin2{animation:rbSpin .25s linear infinite;transform-box:fill-box;transform-origin:center}
 .rb-ani.happy .rb-anf{animation:rbJump .3s ease-in-out 2;transform-box:fill-box}.rb-ani.bump .rb-anf{animation:rbShake .45s;transform-box:fill-box}
+.rb-hl{filter:drop-shadow(0 0 10px #FFE45C) drop-shadow(0 0 5px #fff) brightness(1.35)}
+.rb-bat{animation:rbBatF 2.4s ease-in-out infinite alternate}@keyframes rbBatF{to{transform:translate(160px,40px)}}
+.rb-rain{animation:rbSmoke 0.9s linear infinite reverse}
 .rb-tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rb-tray button{font:inherit;font-size:2.2rem;border:3px solid var(--ink);background:#fff;border-radius:18px;padding:2px 12px;cursor:grab;touch-action:none;min-width:84px}
 .rb-tray button b{font-size:1rem;display:block;line-height:1}
@@ -6940,13 +6943,13 @@ $('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
 $('ovBack').onclick=()=>{ $('ov').hidden=true; back&&back(); };
 $('back').onclick=()=>{ stopAll(); if(back) back(); else close(); };
-$('all').onclick=()=>{ data.all=!data.all; save(); if(view==='prog') zoneProg(); else if(view==='circ') zoneCirc(); };
+$('all').onclick=()=>{ data.all=!data.all; save(); if(view==='prog') zoneProg(); else if(view==='circ') zoneCirc(); else if(view==='sg'&&lastSG) lastSG(); };
 function close(){ stopAll(); root.hidden=true; }
 let view='home';
 
 /* ================= acasă ================= */
 function zoneScore(z){
-  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?['lever','gears','bike','ramp']:z==='sens'?['light','line','touch','sonar','thermo','sort']:z==='col'?['tubes','shirts','guess']:null;
+  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?['lever','gears','bike','ramp']:z==='sens'?sensKeys():z==='col'?['tubes','shirts','guess']:null;
   if(!k){ let n=0,t=0; for(const c in PARTS) PARTS[c].forEach(([,need])=>{ t++; if(gstars()>=need) n++; }); return `🔓 ${n}/${t}`; }
   return `⭐ ${k.reduce((s,x)=>s+(data.prog[x]||0),0)}/${k.length*3}`;
 }
@@ -7131,7 +7134,6 @@ for(const l in TX2) Object.assign(TX[l],TX2[l]); window.__rbTX=TX;
 
 /* ================= 2. MAȘINI SIMPLE ================= */
 function zoneMech(){ stopAll(); view='mech'; setTop(false); back=home; menu3('mech',{lever,gears,bike,ramp}); }
-function zoneSens(){ stopAll(); view='sens'; setTop(false); back=home; menu3('sens',{light:lightGame,line:lineGame,touch:touchGame,sonar:sonarGame,thermo:thermoGame,sort:sortGame}); }
 function menu3(z,fns){ main.innerHTML=''; const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().zoneSay[z]; head.append(b); main.append(head);
   const g=el('div','rb-cards'); g.style.margin='auto';
   Object.keys(fns).forEach(k=>{ const s=data.prog[k]||0; const c=el('button','rb-card',`<span class="ic">${X()[z][k][0]}</span><span class="t">${X()[z][k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.onclick=()=>{ blip(); fns[k](); }; g.appendChild(c); });
@@ -7602,148 +7604,225 @@ function circLevel(li){
 }
 
 /* ================= 4. SENZORI ================= */
-const LR=[{bot:[130,400],pad:[780,130],box:[]},{bot:[130,420],pad:[780,420],box:[[420,190,70,330]]},{bot:[120,110],pad:[790,420],box:[[300,0,70,330],[560,190,70,330]]},{bot:[110,430],pad:[800,100],box:[[240,150,70,370],[470,0,70,330],[690,190,70,330]]}];
-function lightGame(){
-  stopAll(); view='light'; setTop(false); back=zoneSens; curRestart=lightGame; const myGen=gen;
-  let ri=0, busy=false; const F=frame(X().lightIntro,LR.length); F.bub.onclick=()=>sp(X().lightIntro);
-  let b, lt, svg, last;
-  function setup(){ const Lv=LR[ri]; b={x:Lv.bot[0],y:Lv.bot[1]}; lt={x:b.x+150,y:b.y-60};
-    let s=`<svg viewBox="0 0 900 520"><defs><radialGradient id="rb-lg"><stop offset="0" stop-color="#FFF7B0" stop-opacity=".95"/><stop offset=".5" stop-color="#FFE45C" stop-opacity=".35"/><stop offset="1" stop-color="#FFE45C" stop-opacity="0"/></radialGradient></defs><rect width="900" height="520" rx="24" fill="#1B2340"/>`;
-    for(let i=0;i<30;i++) s+=`<circle cx="${R(900)}" cy="${R(520)}" r="${1+R(2)}" fill="#fff" opacity=".5"/>`;
+/* ================= 4. SENZORI (v3: hartă de niveluri pentru fiecare senzor) ================= */
+const SX=()=>X().sx||{};
+let lastSG=null;
+function sensGrid(k,list,fn){ stopAll(); view='sg'; setTop(true); back=zoneSens; main.innerHTML=''; lastSG=()=>sensGrid(k,list,fn); curRestart=lastSG;
+  const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().sens[k][1]; b.onclick=()=>sp(X().sens[k][1]); head.append(b); main.append(head);
+  const kp='s'+k, g=el('div','rb-grid'); const cur=list.findIndex((_,i)=>isOpen(kp,i)&&!(data.prog[kp+i]>0));
+  list.forEach((L,i)=>{ const open=isOpen(kp,i), s=data.prog[kp+i]||0;
+    const c=el('button','rb-card'+(open?'':' lock')+(i===cur?' cur':''),`<span class="ic">${L.ic}</span><span class="n">${X().lvl(i+1)}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`);
+    c.onclick=()=>{ if(!open){ sp(X().locked); return; } blip(); fn(i); }; g.appendChild(c); });
+  main.appendChild(g); }
+const SENS={light:()=>LR,line:()=>LN,touch:()=>TCH,sonar:()=>SON,thermo:()=>TH,sort:()=>SRT};
+const SFN={light:li=>lightGame(li),line:li=>lineGame(li),touch:li=>touchGame(li),sonar:li=>sonarGame(li),thermo:li=>thermoGame(li),sort:li=>sortGame(li)};
+const sensKeys=()=>Object.keys(SENS).flatMap(k=>SENS[k]().map((_,i)=>'s'+k+i));
+function zoneSens(){ stopAll(); view='sens'; setTop(false); back=home; main.innerHTML=''; const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().zoneSay.sens; b.onclick=()=>sp(X().zoneSay.sens); head.append(b); main.append(head);
+  const g=el('div','rb-cards'); g.style.margin='auto';
+  Object.keys(SENS).forEach(k=>{ const L=SENS[k](), n=L.reduce((s,_,i)=>s+(data.prog['s'+k+i]||0),0); const c=el('button','rb-card',`<span class="ic">${X().sens[k][0]}</span><span class="t">${X().sens[k][1]}</span><span class="p">⭐ ${n}/${L.length*3}</span>`);
+    c.onclick=()=>{ blip(); sensGrid(k,L,SFN[k]); }; g.appendChild(c); });
+  main.appendChild(g); }
+const sNext=(k,li,fn)=>li<SENS[k]().length-1?()=>fn(li+1):null;
+const sBack=(k)=>()=>sensGrid(k,SENS[k](),SFN[k]);
+
+/* --- 1. lanterna: lumină, stele, întuneric, albine --- */
+const LR=[
+ {ic:'🔦',bot:[130,400],pad:[780,130],box:[]},
+ {ic:'🧱',bot:[130,420],pad:[780,420],box:[[420,190,70,330]]},
+ {ic:'🧱🧱',bot:[120,110],pad:[790,420],box:[[300,0,70,330],[560,190,70,330]]},
+ {ic:'⭐',bot:[450,260],pad:[790,260],box:[],stars:[[150,100],[150,420],[620,90]]},
+ {ic:'🌀',bot:[110,430],pad:[800,100],box:[[240,150,70,370],[470,0,70,330],[690,190,70,330]]},
+ {ic:'⭐🧱',bot:[110,110],pad:[800,420],box:[[260,0,60,300],[520,220,60,300]],stars:[[160,430],[420,90],[680,430]]},
+ {ic:'🌑',bot:[120,260],pad:[790,260],box:[[430,0,60,200],[430,320,60,200]],dark:true},
+ {ic:'🐝',bot:[110,260],pad:[800,260],box:[],bees:[[450,60,460,140]]},
+ {ic:'🐝🐝',bot:[110,430],pad:[800,90],box:[[300,180,60,340]],bees:[[520,60,460,170],[680,60,460,120]]},
+ {ic:'🌑⭐',bot:[110,110],pad:[800,430],box:[[280,0,60,330],[560,190,60,330]],stars:[[180,430],[450,100],[700,110]],dark:true},
+ {ic:'🌑🐝⭐',bot:[110,110],pad:[800,430],box:[[280,0,60,330]],bees:[[560,70,450,150]],stars:[[180,430],[460,100],[700,250]],dark:true}];
+function lightGame(li){ li=li||0;
+  stopAll(); view='light'; setTop(false); back=sBack('light'); curRestart=()=>lightGame(li); const myGen=gen;
+  const Lv=LR[li]; let busy=false, errs=0, b, lt, svg, last, stars=(Lv.stars||[]).map(s=>s.slice()), bees=(Lv.bees||[]).map(([x,y0,y1,v])=>({x,y0,y1,v,y:y0,d:1})), warned=false;
+  const intro=X().lightIntro+(Lv.stars?' '+SX().lStars:'')+(Lv.dark?' '+SX().lDark:'')+(Lv.bees?' '+SX().lBee:'');
+  const F=frame(intro,stars.length); F.bub.onclick=()=>sp(intro);
+  const R0=Lv.dark?115:170, REACH=Lv.dark?210:300;
+  function setup(){ b={x:Lv.bot[0],y:Lv.bot[1]}; lt={x:b.x+150,y:b.y-60};
+    let s=`<svg viewBox="0 0 900 520"><defs><radialGradient id="rb-lg"><stop offset="0" stop-color="#FFF7B0" stop-opacity=".95"/><stop offset=".5" stop-color="#FFE45C" stop-opacity=".35"/><stop offset="1" stop-color="#FFE45C" stop-opacity="0"/></radialGradient>${Lv.dark?`<mask id="rb-dm"><rect width="900" height="520" fill="#fff"/><circle id="rb-dmc" r="${R0}" fill="#000"/></mask>`:''}</defs><rect width="900" height="520" rx="24" fill="#1B2340"/>`;
+    for(let i=0;i<30;i++) s+=`<circle cx="${(i*173)%900}" cy="${(i*97)%520}" r="${1+i%2}" fill="#fff" opacity=".5"/>`;
     Lv.box.forEach(([x,y,w,h])=>s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#6B4A2B" stroke="#3E2A17" stroke-width="4"/>`);
-    s+=`<g transform="translate(${Lv.pad[0]} ${Lv.pad[1]})"><circle r="52" fill="#3BC48A" opacity=".35" class="rb-goal"/><circle r="40" fill="#2B2F3A" stroke="#3BC48A" stroke-width="5"/><text y="14" font-size="38" text-anchor="middle">⚡</text></g>`;
-    s+=`<circle id="rb-lt" r="170" fill="url(#rb-lg)" pointer-events="none"/><g id="rb-bot"><g class="rb-fc">${robo()}</g></g><g id="rb-torch" style="cursor:grab"><circle r="44" fill="rgba(255,255,255,.08)"/><text y="16" font-size="46" text-anchor="middle">🔦</text></g></svg>`;
-    F.stage.innerHTML=s; svg=F.stage.firstChild; draw();
+    s+=`<g id="rb-stars">${stars.map(([x,y],i)=>`<text data-i="${i}" x="${x}" y="${y+16}" font-size="46" text-anchor="middle" class="rb-goal">⭐</text>`).join('')}</g>`;
+    s+=`<circle id="rb-lt" r="${R0}" fill="url(#rb-lg)" pointer-events="none"/>`;
+    if(Lv.dark) s+=`<rect width="900" height="520" rx="24" fill="#03050C" opacity=".93" mask="url(#rb-dm)" pointer-events="none"/>`;
+    s+=`<g id="rb-pad" transform="translate(${Lv.pad[0]} ${Lv.pad[1]})"><circle r="52" fill="#3BC48A" opacity=".35" class="rb-goal"/><circle r="40" fill="#2B2F3A" stroke="#3BC48A" stroke-width="5"/><text y="14" font-size="38" text-anchor="middle">⚡</text></g>`;
+    s+=`<g id="rb-bees">${bees.map(()=>'<text font-size="52" text-anchor="middle">🐝</text>').join('')}</g>`;
+    s+=`<g id="rb-bot"><g class="rb-fc">${robo()}</g></g><g id="rb-torch" style="cursor:grab"><circle r="44" fill="rgba(255,255,255,.08)"/><text y="16" font-size="46" text-anchor="middle">🔦</text></g></svg>`;
+    F.stage.innerHTML=s; svg=F.stage.firstChild; padLock(); draw();
     const tr=svg.querySelector('#rb-torch'); let dg=false;
     tr.onpointerdown=e=>{ e.preventDefault(); dg=true; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
     svg.onpointerdown=e=>{ if(e.target.closest('#rb-torch')) return; dg=true; const p=pt(svg,e); lt={x:p.x,y:p.y}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
     svg.onpointermove=e=>{ if(!dg) return; const p=pt(svg,e); lt={x:clamp(p.x,20,880),y:clamp(p.y,20,500)}; };
-    svg.onpointerup=()=>dg=false;
-  }
-  const hit=(x,y)=>LR[ri].box.some(([bx,by,w,h])=>x>bx-34&&x<bx+w+34&&y>by-34&&y<by+h+34)||x<34||x>866||y<34||y>486;
-  function draw(){ const bt=svg.querySelector('#rb-bot'); bt.setAttribute('transform',`translate(${b.x} ${b.y+6}) scale(.66)`);
-    svg.querySelector('#rb-lt').setAttribute('cx',lt.x); svg.querySelector('#rb-lt').setAttribute('cy',lt.y); svg.querySelector('#rb-torch').setAttribute('transform',`translate(${lt.x} ${lt.y})`); }
+    svg.onpointerup=()=>dg=false; }
+  const padLock=()=>{ const p=svg.querySelector('#rb-pad'); p.style.opacity=stars.some(Boolean)?.4:1; };
+  const hit=(x,y)=>Lv.box.some(([bx,by,w,h])=>x>bx-34&&x<bx+w+34&&y>by-34&&y<by+h+34)||x<34||x>866||y<34||y>486;
+  function draw(){ svg.querySelector('#rb-bot').setAttribute('transform',`translate(${b.x} ${b.y+6}) scale(.66)`);
+    const l=svg.querySelector('#rb-lt'); l.setAttribute('cx',lt.x); l.setAttribute('cy',lt.y); const m=svg.querySelector('#rb-dmc'); if(m){ m.setAttribute('cx',lt.x); m.setAttribute('cy',lt.y); }
+    svg.querySelector('#rb-torch').setAttribute('transform',`translate(${lt.x} ${lt.y})`);
+    [...svg.querySelectorAll('#rb-bees text')].forEach((t,i)=>{ t.setAttribute('x',bees[i].x); t.setAttribute('y',bees[i].y+18); }); }
+  async function beeHit(){ busy=true; errs++; boing(); const bt=svg.querySelector('#rb-bot'); react(bt,'bump',600); F.set('🐝 '+SX().lBeeHit); await spW(SX().lBeeHit,700); if(myGen!==gen) return; b={x:Lv.bot[0],y:Lv.bot[1]}; busy=false; F.set(intro); }
   function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+    if(svg){ bees.forEach(q=>{ q.y+=q.d*q.v*dt; if(q.y>q.y1){ q.y=q.y1; q.d=-1; } if(q.y<q.y0){ q.y=q.y0; q.d=1; } }); }
     if(svg&&!busy){ const dx=lt.x-b.x, dy=lt.y-b.y, d=Math.hypot(dx,dy); const bt=svg.querySelector('#rb-bot'); let moving=false;
-      if(d<300&&d>26){ const v=150*dt, nx=b.x+dx/d*v, ny=b.y+dy/d*v; if(!hit(nx,ny)){ b.x=nx; b.y=ny; moving=true; } else if(!hit(nx,b.y)){ b.x=nx; moving=true; } else if(!hit(b.x,ny)){ b.y=ny; moving=true; } }
+      if(d<REACH&&d>26){ const v=150*dt, nx=b.x+dx/d*v, ny=b.y+dy/d*v; if(!hit(nx,ny)){ b.x=nx; b.y=ny; moving=true; } else if(!hit(nx,b.y)){ b.x=nx; moving=true; } else if(!hit(b.x,ny)){ b.y=ny; moving=true; } }
       bt.classList.toggle('go',moving); const lk=bt.querySelector('.rb-look'); if(lk&&d>1) lk.setAttribute('transform',`translate(${(dx/d*3).toFixed(1)} ${(dy/d*3).toFixed(1)})`);
       const fc=bt.querySelector('.rb-fc'); if(Math.abs(dx)>4) fc.style.transform=`scaleX(${dx<0?-1:1})`;
-      draw(); const pd=LR[ri].pad; if(Math.hypot(b.x-pd[0],b.y-pd[1])<44) win(); }
-    raf=requestAnimationFrame(loop); }
-  async function win(){ busy=true; chime(); award(); F.dot(ri+1); const bt=svg.querySelector('#rb-bot'); bt.classList.remove('go'); react(bt,'happy'); robo2(); F.set('🔋 '+X().lightOk);
-    await spW(X().lightOk,1500); if(myGen!==gen) return; ri++; if(ri>=LR.length){ cancelAnimationFrame(raf); return finish('light',3,null,null); } busy=false; setup(); F.set(X().lightIntro); }
-  setup(); sp(X().lightIntro); raf=requestAnimationFrame(loop);
+      stars.forEach((s,i)=>{ if(s&&Math.hypot(b.x-s[0],b.y-s[1])<44){ stars[i]=null; award(); snd(1320,.1,'sine',.1); setTimeout(()=>snd(1760,.12,'sine',.1),90); const t=svg.querySelector(`#rb-stars text[data-i="${i}"]`); if(t) t.remove(); F.dot(stars.filter(x=>!x).length); padLock(); } });
+      if(bees.some(q=>Math.hypot(b.x-q.x,b.y-q.y)<52)) beeHit();
+      const pd=Lv.pad; if(Math.hypot(b.x-pd[0],b.y-pd[1])<44){ if(stars.some(Boolean)){ if(!warned){ warned=true; F.set('⭐ '+SX().lStarsFirst); sp(SX().lStarsFirst); } } else win(); } }
+    if(svg) draw(); raf=requestAnimationFrame(loop); }
+  async function win(){ busy=true; chime(); award(); const bt=svg.querySelector('#rb-bot'); bt.classList.remove('go'); react(bt,'happy'); robo2(); F.set('🔋 '+X().lightOk);
+    await spW(X().lightOk,1200); if(myGen!==gen) return; cancelAnimationFrame(raf); finish('slight'+li,rate(errs),null,sNext('light',li,lightGame)); }
+  setup(); sp(intro); raf=requestAnimationFrame(loop);
 }
-const LN=[{bot:[110,260],bat:[790,260],rocks:[]},{bot:[110,410],bat:[790,120],rocks:[[450,260]]},{bot:[110,110],bat:[790,410],rocks:[[330,210],[580,330],[470,80]]},{bot:[110,420],bat:[800,100],rocks:[[300,420],[300,280],[560,120],[560,260],[700,380]]}];
-function lineGame(){
-  stopAll(); view='line'; setTop(false); back=zoneSens; curRestart=lineGame; const myGen=gen;
-  let ri=0, errs=0, pts=[], drawing=false, busy=false, svg; const F=frame(X().lineIntro,LN.length); F.bub.onclick=()=>sp(X().lineIntro);
-  function setup(){ const Lv=LN[ri]; pts=[];
+/* --- 2. linia: pietre, stele, ordine, cerneală puțină --- */
+const LN=[
+ {ic:'✏️',bot:[110,260],bat:[790,260],rocks:[]},
+ {ic:'🪨',bot:[110,410],bat:[790,120],rocks:[[450,260]]},
+ {ic:'🪨🪨',bot:[110,110],bat:[790,410],rocks:[[330,210],[580,330],[470,80]]},
+ {ic:'⭐',bot:[110,260],bat:[790,260],rocks:[],stars:[[300,100],[600,420]]},
+ {ic:'🐍',bot:[110,420],bat:[800,100],rocks:[[300,420],[300,280],[560,120],[560,260],[700,380]]},
+ {ic:'1️⃣2️⃣3️⃣',bot:[110,100],bat:[800,420],rocks:[[450,260]],stars:[[700,100],[200,420],[450,420]],order:true},
+ {ic:'🖋️',bot:[110,260],bat:[790,260],rocks:[[450,260],[450,150],[450,370]],ink:1150},
+ {ic:'🧱',bot:[100,100],bat:[800,420],rocks:[[250,60],[250,160],[250,260],[250,360],[520,460],[520,360],[520,260],[520,160]],stars:[[385,440]]},
+ {ic:'⭐🖋️',bot:[110,420],bat:[800,420],rocks:[[450,420],[450,320]],stars:[[450,120],[250,250],[650,250]],ink:1400},
+ {ic:'🏆',bot:[110,260],bat:[810,260],rocks:[[260,160],[260,360],[420,260],[580,140],[580,380],[720,260]],stars:[[420,90],[420,430],[720,100]],order:true}];
+function lineGame(li){ li=li||0;
+  stopAll(); view='line'; setTop(false); back=sBack('line'); curRestart=()=>lineGame(li); const myGen=gen;
+  const Lv=LN[li]; let errs=0, pts=[], len=0, drawing=false, busy=false, svg;
+  const intro=X().lineIntro+(Lv.stars?' '+(Lv.order?SX().nOrder:SX().nStars):'')+(Lv.ink?' '+SX().nInk:'');
+  const F=frame(intro,(Lv.stars||[]).length); F.bub.onclick=()=>sp(intro);
+  function setup(){ pts=[]; len=0; F.dot(0);
     let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#F4EFE6"/>`;
     for(let i=0;i<18;i++) s+=`<line x1="${i*50}" y1="0" x2="${i*50}" y2="520" stroke="#E6DED0" stroke-width="2"/>`;
     Lv.rocks.forEach(([x,y])=>s+=`<text x="${x}" y="${y+30}" font-size="90" text-anchor="middle">🪨</text>`);
+    (Lv.stars||[]).forEach(([x,y],i)=>s+=`<g class="rb-st" data-i="${i}"><text x="${x}" y="${y+18}" font-size="52" text-anchor="middle">⭐</text>${Lv.order?`<circle cx="${x+26}" cy="${y-24}" r="17" fill="#24325F" stroke="#fff" stroke-width="3"/><text x="${x+26}" y="${y-16}" font-size="22" font-weight="800" text-anchor="middle" fill="#fff">${i+1}</text>`:''}</g>`);
     s+=`<g transform="translate(${Lv.bat[0]} ${Lv.bat[1]})"><circle r="48" fill="#FFF3A6" class="rb-goal"/><text y="24" font-size="62" text-anchor="middle">🔋</text></g>`;
+    if(Lv.ink) s+=`<g transform="translate(300 488)"><rect width="300" height="20" rx="10" fill="#fff" stroke="#24325F" stroke-width="3"/><rect id="rb-ink" x="3" y="3" width="294" height="14" rx="7" fill="#4AA8FF"/><text x="-26" y="18" font-size="24" text-anchor="middle">🖋️</text></g>`;
     s+=`<path id="rb-ln" d="" stroke="#24325F" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g id="rb-bot"><g class="rb-fc">${robo()}</g><circle class="rb-antl" cx="0" cy="56" r="7" fill="#FF3B3B"/></g><text id="rb-fx" font-size="44" text-anchor="middle"></text></svg>`;
     F.stage.innerHTML=s; svg=F.stage.firstChild; place(Lv.bot[0],Lv.bot[1]);
-    svg.onpointerdown=e=>{ if(busy) return; const p=pt(svg,e); if(Math.hypot(p.x-Lv.bot[0],p.y-Lv.bot[1])>80){ sp(X().lineStart); return; } e.preventDefault(); drawing=true; pts=[[Lv.bot[0],Lv.bot[1]]]; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
-    svg.onpointermove=e=>{ if(!drawing) return; const p=pt(svg,e), l=pts[pts.length-1]; if(Math.hypot(p.x-l[0],p.y-l[1])>8){ pts.push([p.x,p.y]); svg.querySelector('#rb-ln').setAttribute('d','M'+pts.map(q=>q[0].toFixed(0)+' '+q[1].toFixed(0)).join(' L')); } };
-    svg.onpointerup=()=>{ drawing=false; };
-  }
+    svg.onpointerdown=e=>{ if(busy) return; const p=pt(svg,e); if(Math.hypot(p.x-Lv.bot[0],p.y-Lv.bot[1])>80){ sp(X().lineStart); return; } e.preventDefault(); drawing=true; pts=[[Lv.bot[0],Lv.bot[1]]]; len=0; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
+    svg.onpointermove=e=>{ if(!drawing) return; const p=pt(svg,e), l=pts[pts.length-1]; const dd=Math.hypot(p.x-l[0],p.y-l[1]); if(dd>8){ if(Lv.ink&&len+dd>Lv.ink){ if(len<Lv.ink){ len=Lv.ink; snd(220,.12,'triangle',.08); } return; } len+=dd; pts.push([p.x,p.y]); svg.querySelector('#rb-ln').setAttribute('d','M'+pts.map(q=>q[0].toFixed(0)+' '+q[1].toFixed(0)).join(' L')); const ink=svg.querySelector('#rb-ink'); if(ink) ink.setAttribute('width',Math.max(0,294*(1-len/Lv.ink)).toFixed(0)); } };
+    svg.onpointerup=()=>{ drawing=false; }; }
   const place=(x,y)=>svg.querySelector('#rb-bot').setAttribute('transform',`translate(${x} ${y}) scale(.62)`);
-  async function go(){ if(busy||pts.length<3) return; busy=true; const Lv=LN[ri], bt=svg.querySelector('#rb-bot'), fc=bt.querySelector('.rb-fc'); bt.classList.add('go');
+  async function fail(msg){ errs++; boing(); F.set(msg); await spW(msg,1000); if(myGen!==gen) return; busy=false; setup(); F.set(intro); }
+  async function go(){ if(busy||pts.length<3) return; busy=true; const bt=svg.querySelector('#rb-bot'), fc=bt.querySelector('.rb-fc'); bt.classList.add('go');
+    const S=Lv.stars||[]; let got=new Set(), nextI=0;
     for(let i=1;i<pts.length;i++){ if(myGen!==gen) return; const [x,y]=pts[i], [px]=pts[i-1]; if(Math.abs(x-px)>1) fc.style.transform=`scaleX(${x<px?-1:1})`;
-      if(Lv.rocks.some(([rx,ry])=>Math.hypot(x-rx,y-ry)<46)){ bt.classList.remove('go'); errs++; boing(); react(bt,'bump',500); const fx=svg.querySelector('#rb-fx'); fx.setAttribute('x',x); fx.setAttribute('y',y-60); fx.textContent='💫'; F.set(X().lineRock); await spW(X().lineRock,1200); if(myGen!==gen) return; busy=false; setup(); F.set(X().lineIntro); return; }
+      if(Lv.rocks.some(([rx,ry])=>Math.hypot(x-rx,y-ry)<46)){ bt.classList.remove('go'); react(bt,'bump',500); const fx=svg.querySelector('#rb-fx'); fx.setAttribute('x',x); fx.setAttribute('y',y-60); fx.textContent='💫'; return fail(X().lineRock); }
+      S.forEach(([sx,sy],k)=>{ if(got.has(k)||Math.hypot(x-sx,y-sy)>46) return; if(Lv.order&&k!==nextI) return; got.add(k); nextI++; award(); snd(1320,.1,'sine',.1); F.dot(got.size); const g=svg.querySelector(`.rb-st[data-i="${k}"]`); if(g) g.style.opacity=.25; });
       place(x,y); if(i%3===0) snd(700,.03,'square',.03); await wait(22); }
     bt.classList.remove('go'); const [ex,ey]=pts[pts.length-1];
-    if(Math.hypot(ex-Lv.bat[0],ey-Lv.bat[1])<70){ chime(); award(); F.dot(ri+1); react(bt,'happy'); robo2(); await spW(X().progWin,1500); if(myGen!==gen) return; ri++; busy=false; if(ri>=LN.length) return finish('line',rate(errs),null,null); setup(); F.set(X().lineIntro); return; }
-    errs++; boing(); F.set(X().lineEnd); await spW(X().lineEnd,900); busy=false; setup(); F.set(X().lineIntro); }
-  setup(); F.ctrl.append(btn(X().erase,'',()=>{ if(!busy) setup(); }),btn(X().run,'go',go)); sp(X().lineIntro);
+    if(got.size<S.length) return fail(Lv.order?SX().nOrderMiss:SX().nMiss);
+    if(Math.hypot(ex-Lv.bat[0],ey-Lv.bat[1])<70){ chime(); award(); react(bt,'happy'); robo2(); await spW(X().progWin,1200); if(myGen!==gen) return; return finish('sline'+li,rate(errs),null,sNext('line',li,lineGame)); }
+    fail(X().lineEnd); }
+  setup(); F.ctrl.append(btn(X().erase,'',()=>{ if(!busy) setup(); }),btn(X().run,'go',go)); sp(intro);
 }
-function touchGame(){
-  stopAll(); view='touch'; setTop(false); back=zoneSens; curRestart=touchGame; const myGen=gen;
-  const lk=data.look, parts=['head','ant','belly','wheels'].concat(lk.arms!=='none'?['arm']:[]);
+/* --- 3. atingere: găsește partea + „Pufi spune” (memorie de secvențe) --- */
+const TCH=[{ic:'🖐️',n:5},{ic:'🧠',seq:[2,2,3]},{ic:'🧠🧠',seq:[3,3,4]},{ic:'⚡🧠',seq:[3,4,4],fast:true},{ic:'🧠🧠🧠',seq:[4,5,5],fast:true},{ic:'🏆',seq:[5,6,7],fast:true}];
+const PTONE={head:660,ant:1320,belly:440,wheels:220,arm:880};
+function touchGame(li){ li=li||0;
+  stopAll(); view='touch'; setTop(false); back=sBack('touch'); curRestart=()=>touchGame(li); const myGen=gen;
+  const Lv=TCH[li], lk=data.look, parts=['head','ant','belly','wheels'].concat(lk.arms!=='none'?['arm']:[]);
   const pname=p=>X().parts[p==='wheels'?lk.wheels:p], pnameN=p=>(X().partsN||X().parts)[p==='wheels'?lk.wheels:p];
-  let n=0, errs=0, cur=null, busy=false; const F=frame(X().touchIntro,5);
+  let n=0, errs=0, cur=null, busy=false, seq=[], pos=0, round=0;
+  const F=frame(Lv.seq?SX().tSimon:X().touchIntro,Lv.seq?Lv.seq.length:Lv.n);
   F.stage.innerHTML=`<svg viewBox="-90 -105 180 170">${robo()}</svg>`; const svg=F.stage.firstChild;
+  function fx(p){ if(p==='ant'){ react(svg,'zap',900); [880,1320,880,1320].forEach((f,i)=>setTimeout(()=>snd(f,.06,'square',.06),i*90)); }
+    else if(p==='head'){ react(svg,'giggle',900); [600,700,800,700,600].forEach((f,i)=>setTimeout(()=>snd(f,.07,'sine',.1),i*80)); }
+    else if(p==='belly'){ react(svg,'love',1100); snd(500,.25,'sine',.12); }
+    else if(p==='wheels'){ react(svg,'go',900); snd(150,.4,'sawtooth',.05); }
+    else if(p==='arm'){ react(svg,'wave',1100); blip(); } }
+  const glow=p=>{ const g=svg.querySelector(`[data-part="${p}"]`); if(g){ g.classList.remove('rb-hl'); void g.getBoundingClientRect(); g.classList.add('rb-hl'); setTimeout(()=>g.classList.remove('rb-hl'),Lv.fast?380:600); } snd(PTONE[p],.25,'triangle',.12); };
+  async function show(){ busy=true; pos=0; F.set('👀 '+SX().tWatch); await spW(SX().tWatch,500); if(myGen!==gen) return;
+    for(const p of seq){ await wait(Lv.fast?260:420); if(myGen!==gen) return; glow(p); await wait(Lv.fast?380:600); }
+    if(myGen!==gen) return; F.set('👆 '+SX().tYou); sp(SX().tYou); busy=false; }
+  function newSeq(){ seq=[]; for(let i=0;i<Lv.seq[round];i++){ let p; do{ p=parts[R(parts.length)]; }while(seq.length&&p===seq[seq.length-1]); seq.push(p); } show(); }
   function ask(){ let p; do{ p=parts[R(parts.length)]; }while(p===cur&&parts.length>1); cur=p; const t=X().touchAsk(pname(p)); F.set('🖐️ '+t); sp(t); }
-  F.bub.onclick=()=>cur&&sp(X().touchAsk(pname(cur)));
-  function fx(p){ if(p==='ant'){ react(svg,'zap',1200); [880,1320,880,1320].forEach((f,i)=>setTimeout(()=>snd(f,.06,'square',.06),i*90)); }
-    else if(p==='head'){ react(svg,'giggle',1200); [600,700,800,700,600].forEach((f,i)=>setTimeout(()=>snd(f,.07,'sine',.1),i*80)); }
-    else if(p==='belly'){ react(svg,'love',1600); snd(500,.25,'sine',.12); }
-    else if(p==='wheels'){ react(svg,'go',1200); snd(150,.4,'sawtooth',.05); }
-    else if(p==='arm'){ react(svg,'wave',1600); blip(); } }
-  svg.onclick=async e=>{ const g=e.target.closest('[data-part]'); if(!g||busy) return; const p=g.dataset.part; fx(p);
-    if(p!==cur){ errs++; sp(X().touchWrong(pnameN(p))); return; }
-    busy=true; n++; F.dot(n); award(); try{ confetti(8); }catch(_){} await spW(X().touchOk(pnameN(p)),1200); if(myGen!==gen) return; busy=false;
-    if(n>=5) return finish('touch',rate(errs),null,null); ask(); };
-  spW(X().touchIntro,600).then(()=>{ if(myGen===gen) ask(); });
+  F.bub.onclick=()=>{ if(Lv.seq){ if(!busy) show(); } else cur&&sp(X().touchAsk(pname(cur))); };
+  svg.onclick=async e=>{ const g=e.target.closest('[data-part]'); if(!g||busy) return; const p=g.dataset.part;
+    if(Lv.seq){ glow(p); if(p!==seq[pos]){ errs++; busy=true; boing(); F.set('🔁 '+SX().tNo); await spW(SX().tNo,500); if(myGen!==gen) return; show(); return; }
+      pos++; if(pos<seq.length) return; busy=true; round++; F.dot(round); award(); try{ confetti(8); }catch(_){} await spW(SX().tOk,700); if(myGen!==gen) return;
+      if(round>=Lv.seq.length){ await spW(SX().tWhy,900); if(myGen!==gen) return; return finish('stouch'+li,rate(errs),null,sNext('touch',li,touchGame)); } newSeq(); return; }
+    fx(p); if(p!==cur){ errs++; sp(X().touchWrong(pnameN(p))); return; }
+    busy=true; n++; F.dot(n); award(); try{ confetti(8); }catch(_){} await spW(X().touchOk(pnameN(p)),1000); if(myGen!==gen) return; busy=false;
+    if(n>=Lv.n) return finish('stouch'+li,rate(errs),null,sNext('touch',li,touchGame)); ask(); };
+  if(Lv.seq) spW(SX().tSimon,600).then(()=>{ if(myGen===gen) newSeq(); }); else spW(X().touchIntro,600).then(()=>{ if(myGen===gen) ask(); });
 }
-
-/* ================= 5b. SENZORI NOI: distanță, termostat, culoare ================= */
-const SX=()=>X().sx||{};
-/* --- senzorul de distanță (ultrasunete, ca liliacul) --- */
-const SON=[{v:150,ob:'🧱'},{v:220,ob:'📦'},{v:300,ob:'🐈'},{v:540,ob:'🏰',auto:true}];
-const SON_TRG=[[70,'#FF5D7A'],[160,'#3BC48A'],[340,'#4AA8FF']];
-function sonarGame(){
-  stopAll(); view='sonar'; setTop(false); back=zoneSens; curRestart=sonarGame; const myGen=gen;
-  const OBX=790, Y=372, FR=42, DEC=1150;
-  let ri=0, errs=0, svg, bx, vel=0, run=false, brake=false, trig=null, last=0, beepT=0, waveT=0, waves=[], busy=false;
-  const F=frame(SX().sonIntro,SON.length); F.bub.onclick=()=>sp(F.bub.textContent);
+/* --- 4. senzorul de distanță (ultrasunete, ca liliacul) --- */
+const SON=[{ic:'🧱',v:150,ob:'🧱'},{ic:'📦',v:220,ob:'📦'},{ic:'🐈',v:300,ob:'🐈'},{ic:'🚩',v:540,ob:'🏰',auto:[[70,'#FF5D7A'],[160,'#3BC48A'],[340,'#4AA8FF']]},
+ {ic:'🌙',v:200,ob:'🌳',night:true},{ic:'🌙🏠',v:260,ob:'🏠',night:true},{ic:'🚩🚧',v:600,ob:'🚧',auto:[[350,'#4AA8FF'],[90,'#FF5D7A'],[195,'#3BC48A']]},{ic:'🌙⚡',v:340,ob:'🗻',night:true}];
+function sonarGame(li){ li=li||0;
+  stopAll(); view='sonar'; setTop(false); back=sBack('sonar'); curRestart=()=>sonarGame(li); const myGen=gen;
+  const L=SON[li], OBX=790, Y=372, FR=42, DEC=1150;
+  let errs=0, svg, bx, vel=0, run=false, brake=false, trig=null, last=0, beepT=0, waveT=0, waves=[], busy=false;
+  const intro=L.auto?SX().sonAuto:L.night?SX().sonNight:li===0?SX().sonIntro:SX().sonNext;
+  const F=frame(intro,0); F.bub.onclick=()=>sp(F.bub.textContent);
   const dist=()=>OBX-(bx+FR);
-  function setup(){ const L=SON[ri]; bx=90; vel=0; run=false; brake=false; trig=null; waves=[]; busy=false;
+  function setup(){ bx=90; vel=0; run=false; brake=false; trig=null; waves=[]; busy=false;
     let s=`<svg viewBox="0 0 900 520"><defs><linearGradient id="rb-sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8FF"/><stop offset="1" stop-color="#E6F6FF"/></linearGradient></defs><rect width="900" height="520" rx="24" fill="url(#rb-sk)"/>`;
     s+=`<circle cx="120" cy="110" r="40" fill="#FFE45C" opacity=".9"/><text x="560" y="120" font-size="54" opacity=".8">☁️</text><text x="300" y="80" font-size="40" opacity=".7">☁️</text>`;
     s+=`<rect x="0" y="420" width="900" height="100" fill="#7D8CA3"/>`; for(let i=0;i<12;i++) s+=`<rect x="${10+i*80}" y="468" width="44" height="8" rx="4" fill="#fff" opacity=".7"/>`;
     s+=`<rect x="${OBX-46}" y="421" width="46" height="40" fill="rgba(59,196,138,.45)" stroke="#fff" stroke-width="3" stroke-dasharray="8 6"/><text x="${OBX-23}" y="452" font-size="26" text-anchor="middle">🅿️</text>`;
-    s+=`<text x="${OBX-6}" y="428" font-size="${L.ob==='🧱'||L.ob==='🏰'?160:120}">${L.ob}</text>`;
-    if(L.auto) SON_TRG.forEach(([d,c],i)=>{ s+=`<g class="rb-flag" data-i="${i}" style="cursor:pointer"><rect x="${OBX-d-34}" y="200" width="68" height="236" fill="rgba(255,255,255,.01)"/><line x1="${OBX-d}" y1="250" x2="${OBX-d}" y2="436" stroke="${c}" stroke-width="7" stroke-dasharray="12 7"/><circle cx="${OBX-d}" cy="236" r="30" fill="${c}" stroke="#fff" stroke-width="4" class="rb-goal"/><text x="${OBX-d}" y="248" font-size="32" text-anchor="middle">📡</text></g>`; });
+    s+=`<text x="${OBX-6}" y="428" font-size="${'🧱🏰🗻🏠🌳'.includes(L.ob)?160:120}">${L.ob}</text>`;
+    if(L.auto) L.auto.forEach(([d,c],i)=>{ s+=`<g class="rb-flag" data-i="${i}" style="cursor:pointer"><rect x="${OBX-d-34}" y="200" width="68" height="236" fill="rgba(255,255,255,.01)"/><line x1="${OBX-d}" y1="250" x2="${OBX-d}" y2="436" stroke="${c}" stroke-width="7" stroke-dasharray="12 7"/><circle cx="${OBX-d}" cy="236" r="30" fill="${c}" stroke="#fff" stroke-width="4" class="rb-goal"/><text x="${OBX-d}" y="248" font-size="32" text-anchor="middle">📡</text></g>`; });
     s+=`<g id="rb-wv"></g><g id="rb-bot"><g class="rb-fc">${robo()}</g></g><text id="rb-fx" font-size="56" text-anchor="middle"></text>`;
+    if(L.night){ s+=`<rect width="900" height="520" rx="24" fill="#05070F" opacity=".96" pointer-events="none"/>`; for(let i=0;i<40;i++) s+=`<circle cx="${(i*151)%900}" cy="${(i*83)%400}" r="${1+i%2}" fill="#fff" opacity=".6"/>`; s+=`<text x="760" y="120" font-size="60">🌙</text><text class="rb-bat" x="200" y="200" font-size="48">🦇</text><text class="rb-bat" x="520" y="160" font-size="38" style="animation-delay:.6s">🦇</text>`; }
     s+=`<g transform="translate(260 28)"><rect width="380" height="34" rx="17" fill="#fff" stroke="#24325F" stroke-width="3"/><rect id="rb-mt" x="4" y="4" width="372" height="26" rx="13" fill="#3BC48A"/><text x="-30" y="28" font-size="32" text-anchor="middle">🦇</text><text id="rb-mtx" x="410" y="28" font-size="30" text-anchor="middle">🟢</text></g></svg>`;
-    F.stage.innerHTML=s; svg=F.stage.firstChild; place(); meter();
-    F.ctrl.innerHTML='';
-    if(L.auto){ svg.querySelectorAll('.rb-flag').forEach(g=>g.onclick=()=>{ if(run||busy) return; trig=SON_TRG[+g.dataset.i][0]; blip(); svg.querySelectorAll('.rb-flag').forEach(x=>x.style.opacity=x===g?1:.35); go(); });
-      const t=SX().sonAuto; F.set(t); sp(t); }
+    F.stage.innerHTML=s; svg=F.stage.firstChild; place(); meter(); F.ctrl.innerHTML='';
+    if(L.auto){ svg.querySelectorAll('.rb-flag').forEach(g=>g.onclick=()=>{ if(run||busy) return; trig=L.auto[+g.dataset.i][0]; blip(); svg.querySelectorAll('.rb-flag').forEach(x=>x.style.opacity=x===g?1:.35); go(); }); }
     else { const st=btn('🛑 STOP','go',stop); st.style.fontSize='1.9rem'; st.style.minWidth='200px'; st.style.background='#FF3B5C'; st.style.color='#fff';
-      F.ctrl.append(btn('▶️','',go),st); svg.onpointerdown=e=>{ if(run&&!brake){ e.preventDefault(); stop(); } };
-      const t=ri===0?SX().sonIntro:SX().sonNext; F.set(t); sp(t); } }
-  const place=()=>{ const b=svg.querySelector('#rb-bot'); b.setAttribute('transform',`translate(${bx} ${Y}) scale(.66)`); };
+      F.ctrl.append(btn('▶️','',go),st); svg.onpointerdown=e=>{ if(run&&!brake){ e.preventDefault(); stop(); } }; } }
+  const place=()=>{ svg.querySelector('#rb-bot').setAttribute('transform',`translate(${bx} ${Y}) scale(.66)`); };
   function meter(){ const d=Math.max(0,dist()), w=clamp(d/560,0.03,1)*372, c=d>260?'#3BC48A':d>110?'#FFD34A':d>45?'#FF9F43':'#FF3B5C';
     const m=svg.querySelector('#rb-mt'); m.setAttribute('width',w.toFixed(0)); m.setAttribute('fill',c); svg.querySelector('#rb-mtx').textContent=d>260?'🟢':d>110?'🟡':d>45?'🟠':'🔴'; }
-  function go(){ if(run||busy) return; run=true; brake=false; vel=SON[ri].v; last=0; svg.querySelector('#rb-bot').classList.add('go'); snd(300,.1,'sawtooth',.04); }
+  function go(){ if(run||busy) return; run=true; brake=false; vel=L.v; last=0; svg.querySelector('#rb-bot').classList.add('go'); snd(300,.1,'sawtooth',.04); }
   function stop(){ if(!run||brake) return; brake=true; snd(200,.12,'square',.06); }
   function drawWaves(){ svg.querySelector('#rb-wv').innerHTML=waves.map(w=>`<path d="M${w.x} ${Y-60} Q${w.x+(w.dir>0?26:-26)} ${Y-20} ${w.x} ${Y+20}" stroke="${w.dir>0?'#4AA8FF':'#B07CFF'}" stroke-width="6" fill="none" stroke-linecap="round" opacity="${w.dir>0?.9:.7}"/>`).join(''); }
-  async function end(d){ run=false; busy=true; const bt=svg.querySelector('#rb-bot'); bt.classList.remove('go'); const L=SON[ri]; let msg, ok=false;
+  async function end(d){ run=false; busy=true; const bt=svg.querySelector('#rb-bot'); bt.classList.remove('go'); let msg, ok=false;
+    if(L.night){ const n=svg.querySelector('rect[fill="#05070F"]'); if(n){ n.style.transition='opacity .6s'; n.style.opacity=.15; } }
     if(d<=0){ errs++; boing(); react(bt,'bump',600); const fx=svg.querySelector('#rb-fx'); fx.setAttribute('x',OBX-20); fx.setAttribute('y',Y-70); fx.textContent='💫'; msg=L.auto?SX().sonTooLate:SX().sonCrash; }
     else if(d<=48){ ok=true; msg=SX().sonPerfect; }
     else if(d<=120&&!L.auto){ ok=true; msg=SX().sonGood; }
-    else { if(L.auto) errs++; msg=L.auto?SX().sonTooEarly:SX().sonFar; }
-    if(ok){ chime(); award(); try{ confetti(10); }catch(_){} react(bt,'happy'); robo2(); F.dot(ri+1); msg+=' '+(SX().sonWhy[ri]||''); }
+    else { errs++; msg=L.auto?SX().sonTooEarly:SX().sonFar; }
+    const why=L.night?SX().sonNightWhy:L.auto?SX().sonWhy[3]:SX().sonWhy[Math.min(li,2)];
+    if(ok){ chime(); award(); try{ confetti(10); }catch(_){} react(bt,'happy'); robo2(); msg+=' '+why; }
     F.set((ok?'✅ ':'🔁 ')+msg); await spW(msg,1500); if(myGen!==gen) return;
-    if(ok){ ri++; if(ri>=SON.length){ cancelAnimationFrame(raf); return finish('sonar',rate(errs),null,null); } }
-    setup(); }
+    if(ok){ cancelAnimationFrame(raf); return finish('ssonar'+li,d<=48?Math.max(2,rate(errs)):Math.min(2,rate(errs)),null,sNext('sonar',li,sonarGame)); }
+    setup(); F.set(intro); }
   function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-(last||now))/1000); last=now;
     if(svg&&run){ if(trig!=null&&!brake&&dist()<=trig) brake=true;
-      if(brake){ vel=Math.max(0,vel-DEC*dt); }
+      if(brake) vel=Math.max(0,vel-DEC*dt);
       bx+=vel*dt; let d=dist(); if(d<0){ bx=OBX-FR; d=0; } place(); meter();
       waveT-=dt; if(waveT<=0&&vel>0){ waveT=.32; waves.push({x:bx+FR+10,dir:1}); snd(2400,.02,'sine',.02); }
-      waves.forEach(w=>{ w.x+=w.dir*900*dt; if(w.dir>0&&w.x>=OBX-8){ w.dir=-1; } }); waves=waves.filter(w=>!(w.dir<0&&w.x<=bx+FR)); drawWaves();
+      waves.forEach(w=>{ w.x+=w.dir*900*dt; if(w.dir>0&&w.x>=OBX-8) w.dir=-1; }); waves=waves.filter(w=>!(w.dir<0&&w.x<=bx+FR)); drawWaves();
       beepT-=dt; const iv=d<48?0.08:clamp(d/650,0.1,0.6); if(beepT<=0&&vel>0){ beepT=iv; snd(d<48?1500:1050,.05,'square',.05); }
       if(d<=0) end(0); else if(brake&&vel<=0) end(d); }
     raf=requestAnimationFrame(loop); }
-  setup(); raf=requestAnimationFrame(loop);
+  setup(); sp(intro); raf=requestAnimationFrame(loop);
 }
-/* --- termostatul din seră: senzor + regulă „dacă… atunci…” + acțiune --- */
+/* --- 5. sera: senzori + reguli „dacă… atunci…” --- */
 const TH=[
- {rules:['cold'],out:i=>2,night:i=>true,T0:20},
- {rules:['cold','hot'],out:i=>[4,4,5,8,14,22,30,36,38,37,33,26,18,10,6,4][i],night:i=>i<3||i>12,T0:19},
- {rules:['cold','hot','dark'],out:i=>[3,3,4,7,14,24,32,38,40,38,32,22,12,6,4,3][i],night:i=>i<4||i>11,T0:19}];
-const TACT=['heat','fan','lamp','none'], TIC={heat:'🔥',fan:'🌀',lamp:'💡',none:'💤',unset:'❓'}, TCOND={cold:'🥶',hot:'🥵',dark:'🌙'};
-function thermoGame(){
-  stopAll(); view='thermo'; setTop(false); back=zoneSens; curRestart=thermoGame; const myGen=gen;
-  let li=0, errs=0, rule={}, busy=false, svg;
-  const F=frame(SX().thIntro[0],TH.length); F.bub.onclick=()=>sp(F.bub.textContent);
-  const N=16;
-  function scene(T,step,st){ const L=TH[li], nt=L.night(step), out=L.out(step);
+ {ic:'❄️',rules:['cold'],out:i=>2,night:i=>true,T0:20},
+ {ic:'☀️',rules:['cold','hot'],out:i=>[4,4,5,8,14,22,30,36,38,37,33,26,18,10,6,4][i],night:i=>i<3||i>12,T0:19},
+ {ic:'🌙',rules:['cold','hot','dark'],out:i=>[3,3,4,7,14,24,32,38,40,38,32,22,12,6,4,3][i],night:i=>i<4||i>11,T0:19},
+ {ic:'💧',rules:['dry'],out:i=>22,night:i=>false,T0:22},
+ {ic:'🏜️',rules:['cold','hot','dry'],out:i=>[6,5,6,10,18,28,36,40,42,40,34,26,16,9,6,5][i],night:i=>i<3||i>12,T0:19},
+ {ic:'🏆',rules:['cold','hot','dark','dry'],out:i=>[2,2,3,8,16,26,34,39,41,39,33,24,14,6,3,2][i],night:i=>i<4||i>11,T0:19}];
+const TIC={heat:'🔥',fan:'🌀',lamp:'💡',water:'🚿',none:'💤',unset:'❓'}, TCOND={cold:'🥶',hot:'🥵',dark:'🌙',dry:'🏜️'};
+const thRule={};
+function thermoGame(li){ li=li||0;
+  stopAll(); view='thermo'; setTop(false); back=sBack('thermo'); curRestart=()=>thermoGame(li); const myGen=gen;
+  const L=TH[li], N=16; let errs=0, busy=false, svg; const rule=thRule;
+  const F=frame(SX().thIntro[li],0); F.bub.onclick=()=>sp(F.bub.textContent);
+  const opts=()=>['heat','fan'].concat(L.rules.includes('dark')?['lamp']:[]).concat(L.rules.includes('dry')?['water']:[]).concat(['none']);
+  function scene(T,M,step,st){ const nt=L.night(step), out=L.out(step), dry=L.rules.includes('dry');
     const sky=nt?'#1B2340':out>28?'#FFD27A':'#9FD8FF', p=clamp((T+5)/45,0,1), ty=420-p*300;
     let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="${sky}"/>`;
     if(nt){ for(let i=0;i<22;i++) s+=`<circle cx="${(i*137)%880+10}" cy="${(i*61)%160+14}" r="2" fill="#fff" opacity=".7"/>`; s+=`<text x="${120+step*42}" y="96" font-size="58">🌙</text>`; }
@@ -7752,78 +7831,82 @@ function thermoGame(){
     s+=`<path d="M170 190 L450 110 L730 190 Z" fill="rgba(210,240,255,.55)" stroke="#FFFFFF" stroke-width="5"/><rect x="170" y="190" width="560" height="250" fill="rgba(210,240,255,.35)" stroke="#fff" stroke-width="5"/>`;
     for(let i=1;i<4;i++) s+=`<line x1="${170+i*140}" y1="190" x2="${170+i*140}" y2="440" stroke="#fff" stroke-width="3" opacity=".7"/>`;
     s+=`<rect x="0" y="440" width="900" height="80" fill="#6E8B3D"/>`;
-    const plant=st.dead==='cold'?'🥶':st.dead==='hot'?'🥀':st.dead==='dark'?'🥀':st.g>=12?'🌻':st.g>=8?'🌷':st.g>=4?'🌿':'🌱';
-    [260,370,480,590].forEach((x,i)=>{ s+=`<path d="M${x-30} 400 L${x+30} 400 L${x+22} 440 L${x-22} 440 Z" fill="#C46A3A"/><text x="${x}" y="${398-(st.g>=8?6:0)}" font-size="${st.g>=8?62:48}" text-anchor="middle" class="${st.g>=12&&!st.dead?'rb-sway':''}">${plant}</text>`; });
-    const on=st.on||{};
+    const plant=st.dead==='cold'?'🥶':st.dead?'🥀':st.g>=12?'🌻':st.g>=8?'🌷':st.g>=4?'🌿':'🌱', on=st.on||{};
+    const soil=dry?(M<35?'#D9B98A':M<60?'#9C6B3E':'#5E3B1E'):'#6B4423';
+    [260,370,480,590].forEach(x=>{ s+=`<path d="M${x-30} 400 L${x+30} 400 L${x+22} 440 L${x-22} 440 Z" fill="#C46A3A"/><rect x="${x-28}" y="398" width="56" height="8" rx="3" fill="${soil}"/><text x="${x}" y="${398-(st.g>=8?6:0)}" font-size="${st.g>=8?62:48}" text-anchor="middle" class="${st.g>=12&&!st.dead?'rb-sway':''}">${plant}</text>`; });
+    if(on.water) s+=`<g class="rb-rain">${[250,320,390,460,530,600].map((x,i)=>`<text x="${x}" y="${250+(i%2)*40}" font-size="26">💧</text>`).join('')}</g><text x="420" y="240" font-size="40">🚿</text>`;
+    if(dry) s+=`<g transform="translate(270 470)"><rect width="300" height="18" rx="9" fill="rgba(255,255,255,.5)" stroke="#24325F" stroke-width="2"/><rect width="${3*clamp(M,0,100)}" height="18" rx="9" fill="${M<35?'#FF9F43':'#4AA8FF'}"/><text x="-24" y="17" font-size="22" text-anchor="middle">💧</text></g>`;
     s+=`<g transform="translate(690 330)"><rect x="-24" y="-40" width="48" height="80" rx="10" fill="${on.heat?'#FF7A45':'#8D99AB'}"/>${[0,1,2].map(i=>`<rect x="${-16+i*12}" y="-32" width="6" height="64" rx="3" fill="${on.heat?'#FFD34A':'#5A6070'}"/>`).join('')}${on.heat?'<text y="-52" font-size="34" text-anchor="middle" class="rb-flick">🔥</text>':''}</g>`;
     s+=`<g transform="translate(220 280)"><circle r="34" fill="#E3E9F3" stroke="#8D99AB" stroke-width="3"/><g class="${on.fan?'rb-spin2':''}">${[0,120,240].map(a=>`<ellipse rx="8" ry="26" cy="-14" fill="#4AA8FF" transform="rotate(${a})"/>`).join('')}<circle r="7" fill="#24325F"/></g></g>`;
     s+=`<g transform="translate(450 205)"><line y1="-20" y2="6" stroke="#5A6070" stroke-width="4"/><path d="M-26 6 L26 6 L16 26 L-16 26Z" fill="#5A6070"/>${on.lamp?'<path d="M-16 26 L-120 190 L120 190 L16 26Z" fill="#FFF3A0" opacity=".45"/><circle cy="30" r="12" fill="#FFE45C"/>':'<circle cy="30" r="10" fill="#C9D3E0"/>'}</g>`;
-    s+=`<g transform="translate(70 0)"><rect x="-22" y="110" width="44" height="320" rx="22" fill="#fff" stroke="#24325F" stroke-width="4"/><rect x="-14" y="${420-((18+5)/45)*300}" width="28" height="${((26-18)/45)*300}" fill="#3BC48A" opacity=".45"/><rect x="-9" y="${ty}" width="18" height="${430-ty}" rx="9" fill="${T<14?'#4AA8FF':T>29?'#FF3B3B':'#FF6B3B'}" style="transition:all .3s"/><circle cy="440" r="26" fill="${T<14?'#4AA8FF':T>29?'#FF3B3B':'#FF6B3B'}" stroke="#24325F" stroke-width="4"/><text y="100" font-size="34" text-anchor="middle">${T<14?'🥶':T>29?'🥵':'🙂'}</text></g>`;
+    const tc=T<14?'#4AA8FF':T>29?'#FF3B3B':'#FF6B3B';
+    s+=`<g transform="translate(70 0)"><rect x="-22" y="110" width="44" height="320" rx="22" fill="#fff" stroke="#24325F" stroke-width="4"/><rect x="-14" y="${420-((18+5)/45)*300}" width="28" height="${((26-18)/45)*300}" fill="#3BC48A" opacity=".45"/><rect x="-9" y="${ty}" width="18" height="${430-ty}" rx="9" fill="${tc}"/><circle cy="440" r="26" fill="${tc}" stroke="#24325F" stroke-width="4"/><text y="100" font-size="34" text-anchor="middle">${T<14?'🥶':T>29?'🥵':'🙂'}</text></g>`;
     s+=`<g transform="translate(800 400) scale(.5)"><g class="rb-fc">${robo()}</g></g><text x="836" y="330" font-size="30">🌡️</text>`;
-    s+=`<rect x="170" y="470" width="560" height="14" rx="7" fill="rgba(255,255,255,.4)"/><rect x="170" y="470" width="${(step/(N-1))*560}" height="14" rx="7" fill="#FFD34A"/><text x="${170+(step/(N-1))*560}" y="508" font-size="22" text-anchor="middle">${nt?'🌙':'☀️'}</text></svg>`;
+    s+=`<rect x="170" y="${dry?500:470}" width="560" height="12" rx="6" fill="rgba(255,255,255,.4)"/><rect x="170" y="${dry?500:470}" width="${(step/(N-1))*560}" height="12" rx="6" fill="#FFD34A"/></svg>`;
     F.stage.innerHTML=s; svg=F.stage.firstChild; }
-  function panel(){ const L=TH[li]; F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
+  function panel(){ F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
     L.rules.forEach(c=>{ const r=el('div','rb-rule'); const ci=el('button','rb-rc',TCOND[c]); ci.onclick=()=>sp(SX().thCond[c]);
-      const a=el('button','rb-ra',TIC[rule[c]||'unset']); a.onclick=()=>{ if(busy) return; const opts=L.rules.includes('dark')?TACT:TACT.filter(x=>x!=='lamp'); const i=opts.indexOf(rule[c]); rule[c]=opts[(i+1)%opts.length]; a.textContent=TIC[rule[c]]; snd(700,.05,'square',.06); sp(SX().thCond[c]+', '+SX().thAct[rule[c]]); };
+      const a=el('button','rb-ra',TIC[opts().includes(rule[c])?rule[c]:'unset']); a.onclick=()=>{ if(busy) return; const o=opts(); const i=o.indexOf(rule[c]); rule[c]=o[(i+1)%o.length]; a.textContent=TIC[rule[c]]; snd(700,.05,'square',.06); sp(SX().thCond[c]+', '+SX().thAct[rule[c]]); };
       r.append(ci,el('span','rb-arr','➜'),a); box.appendChild(r); });
     F.ctrl.append(box,btn('▶️','go',runDay)); }
-  function setup(){ const L=TH[li]; L.rules.forEach(c=>{ if(!(c in rule)) rule[c]=undefined; }); scene(L.T0,0,{g:0}); panel(); const t=SX().thIntro[li]; F.set(t); sp(t); }
-  async function runDay(){ if(busy) return; const L=TH[li]; if(L.rules.some(c=>!rule[c])){ sp(SX().thUnset); F.set(SX().thUnset); return; }
-    busy=true; let T=L.T0, st={g:0}, frz=0, hot=0, dk=0;
+  async function runDay(){ if(busy) return; if(L.rules.some(c=>!opts().includes(rule[c]))){ sp(SX().thUnset); F.set(SX().thUnset); return; }
+    busy=true; let T=L.T0, M=70, st={g:0}, frz=0, hot=0, dk=0, dr=0; const dry=L.rules.includes('dry'), dark=L.rules.includes('dark');
     for(let i=0;i<N;i++){ if(myGen!==gen) return; const out=L.out(i), nt=L.night(i);
-      const sense={cold:T<18,hot:T>26,dark:nt}, on={}; L.rules.forEach(c=>{ if(sense[c]&&rule[c]&&rule[c]!=='none') on[rule[c]]=true; });
-      T+= (out-T)*0.3 + (on.heat?5:0) - (on.fan?5:0);
-      if(T<12) frz++; if(T>32) hot++; if(L.rules.includes('dark')&&nt&&!on.lamp) dk++;
-      if(T>=15&&T<=29&&!(L.rules.includes('dark')&&nt&&!on.lamp)) st.g++;
-      if(frz>=2) st.dead='cold'; else if(hot>=2) st.dead='hot'; else if(dk>=4) st.dead='dark';
-      st.on=on; scene(T,i,st); if(on.heat) snd(180,.15,'sawtooth',.03); if(on.fan) snd(120,.15,'triangle',.05);
+      const sense={cold:T<18,hot:T>26,dark:nt,dry:M<40}, on={}; L.rules.forEach(c=>{ if(sense[c]&&rule[c]!=='none') on[rule[c]]=true; });
+      T+=(out-T)*0.3+(on.heat?5:0)-(on.fan?5:0);
+      if(dry){ M-=5+(T>26?5:0); if(on.water) M=Math.min(100,M+25); }
+      if(T<12) frz++; if(T>32) hot++; if(dark&&nt&&!on.lamp) dk++; if(dry&&M<12) dr++;
+      if(T>=15&&T<=29&&!(dark&&nt&&!on.lamp)&&!(dry&&M<20)) st.g++;
+      if(frz>=2) st.dead='cold'; else if(hot>=2) st.dead='hot'; else if(dk>=4) st.dead='dark'; else if(dr>=2) st.dead='dry';
+      st.on=on; scene(T,M,i,st); if(on.heat) snd(180,.15,'sawtooth',.03); if(on.fan) snd(120,.15,'triangle',.05); if(on.water) snd(1800,.05,'sine',.03);
       if(st.dead) break; await wait(430); }
     if(myGen!==gen) return;
-    if(st.dead){ errs++; boing(); const m=st.dead==='cold'?SX().thFrz:st.dead==='hot'?SX().thHot:SX().thDark; F.set('🔁 '+m); await spW(m,1000); if(myGen!==gen) return; busy=false; scene(L.T0,0,{g:0}); return; }
-    chime(); award(); try{ confetti(14); }catch(_){} F.dot(li+1); const m=SX().thOk[li]; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return;
-    li++; busy=false; if(li>=TH.length) return finish('thermo',rate(errs),null,null); setup(); }
-  setup();
+    if(st.dead){ errs++; boing(); const m={cold:SX().thFrz,hot:SX().thHot,dark:SX().thDark,dry:SX().thDry}[st.dead]; F.set('🔁 '+m); await spW(m,1000); if(myGen!==gen) return; busy=false; scene(L.T0,70,0,{g:0}); return; }
+    chime(); award(); try{ confetti(14); }catch(_){} const m=SX().thOk[li]; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return;
+    finish('sthermo'+li,rate(errs),null,sNext('thermo',li,thermoGame)); }
+  scene(L.T0,70,0,{g:0}); panel(); sp(SX().thIntro[li]);
 }
-/* --- senzorul de culoare: banda de sortare --- */
-const SFOOD={r:['🍓','🍎','🍒','🍅'],y:['🍌','🍋','🌽','🧀'],g:['🥦','🍏','🥒','🥝']}, SCOL={r:'#FF3B3B',y:'#FFD21E',g:'#3BC48A'};
-const SANI=[['bunny','🐰','g'],['monkey','🐵','y'],['bear','🐻','r']];
-function sortGame(){
-  stopAll(); view='sort'; setTop(false); back=zoneSens; curRestart=sortGame; const myGen=gen;
-  let round=0, errs=0, n=0, cur=null, busy=false, svg, rule={};
-  const F=frame(SX().sortIntro,2); F.bub.onclick=()=>sp(F.bub.textContent);
-  const AY=[110,260,410];
+/* --- 6. senzorul de culoare: banda de sortare --- */
+const SFOOD={r:['🍓','🍎','🍒','🍅'],y:['🍌','🍋','🌽','🧀'],g:['🥦','🍏','🥒','🥝'],b:['🫐','🐟','🧊']}, SCOL={r:'#FF3B3B',y:'#FFD21E',g:'#3BC48A',b:'#4AA8FF'};
+const SANI0=[['bunny','🐰','g'],['monkey','🐵','y'],['bear','🐻','r'],['penguin','🐧','b']];
+const SRT=[{ic:'🎨',n:3,man:6},{ic:'🤖',n:3,prog:9},{ic:'🐧',n:4,man:8},{ic:'🤖🐧',n:4,prog:12,fast:true},{ic:'🔀',n:4,prog:12,fast:true,mix:true}];
+function sortGame(li){ li=li||0;
+  stopAll(); view='sort'; setTop(false); back=sBack('sort'); curRestart=()=>sortGame(li); const myGen=gen;
+  const Lv=SRT[li]; let SANI=SANI0.slice(0,Lv.n).map(a=>a.slice()); const COLS=SANI.map(a=>a[2]);
+  if(Lv.mix){ let c; do{ c=COLS.slice().sort(()=>Math.random()-.5); }while(c.some((x,i)=>x===SANI[i][2])); SANI.forEach((a,i)=>a[2]=c[i]); }
+  let errs=0, n=0, cur=null, busy=false, svg, rule={};
+  const intro=Lv.mix?SX().sortMix:Lv.prog?SX().sortProg:Lv.n===4?SX().sortPeng:SX().sortIntro;
+  const F=frame(intro,0); F.bub.onclick=()=>sp(F.bub.textContent);
+  const H=Lv.n===4?100:124, AY=SANI.map((_,i)=>Lv.n===4?72+i*124:110+i*150);
   function scene(){ let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#FFF4E0"/><rect y="420" width="900" height="100" fill="#E9D7B8"/>`;
     s+=`<rect x="30" y="300" width="560" height="46" rx="23" fill="#3A4256"/><line class="rb-belt" x1="52" y1="323" x2="568" y2="323" stroke="#8D99AB" stroke-width="10" stroke-dasharray="18 14"/>`;
     [60,560].forEach(x=>s+=`<circle cx="${x}" cy="323" r="20" fill="#5A6070" stroke="#2B2F3A" stroke-width="4"/>`);
     s+=`<g transform="translate(330 150)"><rect x="-56" y="-40" width="112" height="70" rx="18" fill="#24325F"/><circle r="22" cy="-5" fill="#1E2A4A" stroke="#8D99AB" stroke-width="4"/><circle id="rb-eye" r="12" cy="-5" fill="#9AA5B8"/><text x="0" y="-52" font-size="34" text-anchor="middle">🎨</text><path id="rb-beam" d="M-24 30 L-60 140 L60 140 L24 30Z" fill="#fff" opacity=".15"/></g>`;
-    s+=`<path d="M600 320 Q650 300 690 ${AY[1]}" stroke="#C9D3E0" stroke-width="0" fill="none"/>`;
-    SANI.forEach(([k,e,c],i)=>{ s+=`<g class="rb-ani" data-k="${k}" style="cursor:pointer"><rect x="660" y="${AY[i]-66}" width="210" height="124" rx="24" fill="#fff" stroke="#24325F" stroke-width="4"/><text x="730" y="${AY[i]+20}" font-size="74" text-anchor="middle" class="rb-anf">${e}</text><ellipse cx="820" cy="${AY[i]+30}" rx="38" ry="14" fill="${SCOL[c]}" stroke="#24325F" stroke-width="3"/><text x="820" y="${AY[i]+12}" font-size="34" text-anchor="middle">${round===0?SFOOD[c][0]:'🥣'}</text></g>`; });
-    s+=`<g id="rb-item" style="transition:transform .7s ease-in-out"><text font-size="70" text-anchor="middle" y="24">${cur?cur.e:''}</text></g><text id="rb-fx2" font-size="46" text-anchor="middle"></text>`;
+    SANI.forEach(([k,e,c],i)=>{ s+=`<g class="rb-ani" data-k="${k}" style="cursor:pointer"><rect x="660" y="${AY[i]-H/2}" width="210" height="${H}" rx="22" fill="#fff" stroke="#24325F" stroke-width="4"/><text x="730" y="${AY[i]+H*.18}" font-size="${H*.6}" text-anchor="middle" class="rb-anf">${e}</text><ellipse cx="820" cy="${AY[i]+H*.25}" rx="36" ry="13" fill="${SCOL[c]}" stroke="#24325F" stroke-width="3"/><text x="820" y="${AY[i]+H*.1}" font-size="${H*.28}" text-anchor="middle">${Lv.prog?'🥣':SFOOD[c][0]}</text></g>`; });
+    s+=`<g id="rb-item"><text font-size="70" text-anchor="middle" y="24">${cur?cur.e:''}</text></g><text id="rb-fx2" font-size="46" text-anchor="middle"></text>`;
     s+=`<g transform="translate(110 430) scale(.55)"><g class="rb-fc">${robo()}</g></g></svg>`;
-    F.stage.innerHTML=s; svg=F.stage.firstChild;
-    svg.querySelectorAll('.rb-ani').forEach(g=>g.onclick=()=>pick(g.dataset.k)); }
+    F.stage.innerHTML=s; svg=F.stage.firstChild; svg.querySelectorAll('.rb-ani').forEach(g=>g.onclick=()=>pick(g.dataset.k)); }
   const mv=(x,y,ms)=>{ const it=svg.querySelector('#rb-item'); it.style.transition=`transform ${ms||700}ms ease-in-out`; it.style.transform=`translate(${x}px,${y}px)`; };
-  const look=(c)=>{ const e=svg.querySelector('#rb-eye'), b=svg.querySelector('#rb-beam'); e.setAttribute('fill',c?SCOL[c]:'#9AA5B8'); b.setAttribute('fill',c?SCOL[c]:'#fff'); b.setAttribute('opacity',c?.45:.15); };
-  function newItem(){ const cs=['r','y','g']; const c=cs[R(3)]; return {c,e:SFOOD[c][R(4)]}; }
-  async function feed(){ if(myGen!==gen) return; cur=newItem(); scene(); mv(40,300,0); await wait(40); mv(330,300,round===0?1000:450); await wait(round===0?1050:480); if(myGen!==gen) return;
-    look(cur.c); snd(900,.08,'sine',.08); }
-  async function fly(k,ok){ const i=SANI.findIndex(a=>a[0]===k); mv(800,AY[i]-10,round===0?600:300); await wait(round===0?650:330); if(myGen!==gen) return;
-    const g=svg.querySelectorAll('.rb-ani')[i]; if(ok){ snd(660,.08); setTimeout(()=>snd(990,.1),90); react(g,'happy',600); } else { boing(); react(g,'bump',600); const fx=svg.querySelector('#rb-fx2'); fx.setAttribute('x',730); fx.setAttribute('y',AY[i]-60); fx.textContent='🤢'; } }
-  async function pick(k){ if(round!==0||busy||!cur) return; busy=true; const ok=SANI.find(a=>a[0]===k)[2]===cur.c;
-    sp(SX().colN[cur.c]); await fly(k,ok); if(myGen!==gen) return;
+  const look=c=>{ const e=svg.querySelector('#rb-eye'), b=svg.querySelector('#rb-beam'); e.setAttribute('fill',c?SCOL[c]:'#9AA5B8'); b.setAttribute('fill',c?SCOL[c]:'#fff'); b.setAttribute('opacity',c?.45:.15); };
+  const T1=Lv.prog?(Lv.fast?300:450):1000;
+  async function feed(){ if(myGen!==gen) return; const c=COLS[R(COLS.length)]; cur={c,e:SFOOD[c][R(SFOOD[c].length)]}; scene(); mv(40,300,0); await wait(40); mv(330,300,T1); await wait(T1+50); if(myGen!==gen) return; look(cur.c); snd(900,.08,'sine',.08); }
+  async function fly(k,ok){ const i=SANI.findIndex(a=>a[0]===k), t=Lv.prog?(Lv.fast?220:300):600; mv(800,AY[i]-10,t); await wait(t+30); if(myGen!==gen) return;
+    const g=svg.querySelectorAll('.rb-ani')[i]; if(ok){ snd(660,.08); setTimeout(()=>snd(990,.1),90); react(g,'happy',600); } else { boing(); react(g,'bump',600); const fx=svg.querySelector('#rb-fx2'); fx.setAttribute('x',730); fx.setAttribute('y',AY[i]-40); fx.textContent='🤢'; } }
+  const wants=k=>SANI.find(a=>a[0]===k)[2];
+  async function pick(k){ if(Lv.prog||busy||!cur) return; busy=true; const ok=wants(k)===cur.c; sp(SX().colN[cur.c]); await fly(k,ok); if(myGen!==gen) return;
     if(!ok){ errs++; const m=SX().sortWrong(SX().an[k]); F.set(m); await spW(m,900); if(myGen!==gen) return; scene(); mv(330,300,0); look(cur.c); busy=false; return; }
-    n++; award(); if(n>=6){ F.dot(1); chime(); await spW(SX().sortMan,1200); if(myGen!==gen) return; round=1; return progRound(); }
+    n++; award(); F.set(intro); if(n>=Lv.man){ chime(); try{ confetti(14); }catch(_){} await spW(SX().sortMan,1200); if(myGen!==gen) return; return finish('ssort'+li,rate(errs),null,sNext('sort',li,sortGame)); }
     busy=false; await feed(); }
-  function progRound(){ cur=null; busy=false; scene(); F.set(SX().sortProg); sp(SX().sortProg); F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
-    ['r','y','g'].forEach(c=>{ const r=el('div','rb-rule'); const ci=el('button','rb-rc',`<span style="display:inline-block;width:34px;height:34px;border-radius:50%;background:${SCOL[c]};border:3px solid #24325F;vertical-align:middle"></span>`); ci.onclick=()=>sp(SX().colN[c]);
-      const a=el('button','rb-ra',rule[c]?SANI.find(x=>x[0]===rule[c])[1]:'❓'); a.onclick=()=>{ if(busy) return; const i=SANI.findIndex(x=>x[0]===rule[c]); rule[c]=SANI[(i+1)%3][0]; a.textContent=SANI.find(x=>x[0]===rule[c])[1]; snd(700,.05,'square',.06); sp(SX().colN[c]+', '+SX().an[rule[c]]); };
+  function progPanel(){ F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
+    COLS.forEach(c=>{ const r=el('div','rb-rule'); const ci=el('button','rb-rc',`<span style="display:inline-block;width:34px;height:34px;border-radius:50%;background:${SCOL[c]};border:3px solid #24325F;vertical-align:middle"></span>`); ci.onclick=()=>sp(SX().colN[c]);
+      const a=el('button','rb-ra','❓'); a.onclick=()=>{ if(busy) return; const i=SANI.findIndex(x=>x[0]===rule[c]); rule[c]=SANI[(i+1)%SANI.length][0]; a.textContent=SANI.find(x=>x[0]===rule[c])[1]; snd(700,.05,'square',.06); sp(SX().colN[c]+', '+SX().an[rule[c]]); };
       r.append(ci,el('span','rb-arr','➜'),a); box.appendChild(r); });
     F.ctrl.append(box,btn('▶️','go',auto)); }
-  async function auto(){ if(busy) return; if(['r','y','g'].some(c=>!rule[c])){ sp(SX().thUnset); return; } busy=true;
-    for(let i=0;i<9;i++){ await feed(); if(myGen!==gen) return; const k=rule[cur.c], ok=SANI.find(a=>a[0]===k)[2]===cur.c; await fly(k,ok); if(myGen!==gen) return;
-      if(!ok){ errs++; const m=SX().sortWrong(SX().an[k])+' '+SX().sortFix; F.set('🔁 '+m); await spW(m,900); if(myGen!==gen) return; busy=false; return; } }
-    F.dot(2); chime(); award(); try{ confetti(16); }catch(_){} const m=SX().sortWhy; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return; finish('sort',rate(errs),null,null); }
-  scene(); F.ctrl.innerHTML=''; spW(SX().sortIntro,300).then(()=>{ if(myGen===gen) feed(); });
+  async function auto(){ if(busy) return; if(COLS.some(c=>!rule[c])){ sp(SX().thUnset); return; } busy=true;
+    for(let i=0;i<Lv.prog;i++){ await feed(); if(myGen!==gen) return; const k=rule[cur.c], ok=wants(k)===cur.c; await fly(k,ok); if(myGen!==gen) return;
+      if(!ok){ errs++; const m=SX().sortWrong(SX().an[k])+' '+SX().sortFix; F.set('🔁 '+m); await spW(m,900); if(myGen!==gen) return; busy=false; return; } award(); }
+    chime(); try{ confetti(16); }catch(_){} const m=SX().sortWhy; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return; finish('ssort'+li,rate(errs),null,sNext('sort',li,sortGame)); }
+  scene(); F.ctrl.innerHTML=''; if(Lv.prog){ progPanel(); sp(intro); } else spW(intro,300).then(()=>{ if(myGen===gen) feed(); });
 }
 
 /* ================= 6. LABORATORUL DE CULORI ================= */
@@ -13530,6 +13613,112 @@ hu:{menu:{sonar:['🦇','A távolságérzékelő'],thermo:['🌡️','Az üvegh�
 };
 const R=(window.L10N&&L10N.rb)||{}, T=window.__rbTX||{};
 for(const l in M){ const o=T[l]||R[l]; if(!o) continue; const {menu,...sx}=M[l]; o.sx=sx; o.sens=Object.assign({},o.sens||{},menu); }
+})();
+</script>
+<script>
+/* Robotică › Senzori v3: texte pentru nivelurile noi (stele, întuneric, albine, cerneală, „Pufi spune”, noapte, umiditate, pinguin) */
+(function(){
+const M={
+ro:{lStars:'Adună toate stelele, apoi du-l la încărcător.',lStarsFirst:'Mai întâi adună toate stelele!',lDark:'E întuneric! RoboPufi vede doar lumina de aproape.',lBee:'Atenție la albine!',lBeeHit:'Au! Albina l-a speriat. Încă o dată!',
+ nStars:'Drumul trebuie să treacă pe la toate stelele.',nOrder:'Treci pe la stele în ordine: unu, doi, trei!',nInk:'Ai puțină cerneală, desenează un drum scurt!',nMiss:'Ai uitat o stea! Mai desenează o dată.',nOrderMiss:'Stelele trebuie luate în ordine: unu, doi, trei!',
+ tSimon:'Pufi spune! RoboPufi îți arată niște părți care se aprind. Ține minte ordinea și atinge-le la fel!',tWatch:'Uită-te și ascultă!',tYou:'Acum tu!',tNo:'Ups! Hai să vedem din nou.',tOk:'Bravo, ai ținut minte!',tWhy:'Roboții țin minte pași în ordine. Asta e un program!',
+ sonNight:'E noapte și nu se vede nimic! Ca un liliac, ascultă bipurile și uită-te la bară. Când piuie foarte repede, apasă STOP!',sonNightWhy:'Ai parcat pe întuneric, doar cu senzorul! Așa vânează liliecii noaptea.',
+ thIntro:[,,,'Pământul se usucă! Senzorul de umiditate simte când pământul e uscat. Ce face RoboPufi?','Deșert! Ziua e foarte cald și pământul se usucă repede. Fă reguli pentru frig, cald și uscăciune.','Marele test al grădinarului: patru senzori, patru reguli!'],
+ thOk:[,,,'Bravo! Senzorul de umiditate simte pământul uscat și pornește udatul. Așa merg stropitorile automate!','Super! Sera ta se descurcă și în deșert!','Campion grădinar! Patru senzori lucrează împreună, ca într-o seră adevărată.'],
+ thCond:{dry:'Când pământul e uscat'},thAct:{water:'pornește udatul'},thDry:'Pământul s-a uscat și plantele s-au ofilit. Ce trebuie să facă RoboPufi când pământul e uscat?',
+ colN:{b:'Albastru'},an:{penguin:'Pinguinul'},sortPeng:'A venit și pinguinul! El vrea mâncare albastră. Atinge animalul potrivit!',sortMix:'Surpriză! Animalele și-au schimbat gusturile. Uită-te la culoarea din bolul fiecăruia și programează din nou!'},
+de:{lStars:'Sammle alle Sterne und bring ihn dann zur Ladestation.',lStarsFirst:'Sammle zuerst alle Sterne!',lDark:'Es ist dunkel! RoboPufi sieht nur das Licht ganz in der Nähe.',lBee:'Vorsicht, Bienen!',lBeeHit:'Au! Die Biene hat ihn erschreckt. Nochmal!',
+ nStars:'Der Weg muss an allen Sternen vorbeiführen.',nOrder:'Fahr der Reihe nach zu den Sternen: eins, zwei, drei!',nInk:'Du hast wenig Tinte, zeichne einen kurzen Weg!',nMiss:'Du hast einen Stern vergessen! Zeichne nochmal.',nOrderMiss:'Die Sterne müssen der Reihe nach eingesammelt werden: eins, zwei, drei!',
+ tSimon:'Pufi sagt! RoboPufi zeigt dir Teile, die aufleuchten. Merk dir die Reihenfolge und tippe sie genauso an!',tWatch:'Schau und hör gut zu!',tYou:'Jetzt du!',tNo:'Hoppla! Schauen wir nochmal.',tOk:'Super, du hast es dir gemerkt!',tWhy:'Roboter merken sich Schritte der Reihe nach. Das ist ein Programm!',
+ sonNight:'Es ist Nacht und man sieht nichts! Hör wie eine Fledermaus auf das Piepen und schau auf den Balken. Wenn es ganz schnell piept, drück STOPP!',sonNightWhy:'Du hast im Dunkeln geparkt, nur mit dem Sensor! So jagen Fledermäuse nachts.',
+ thIntro:[,,,'Die Erde trocknet aus! Der Feuchtigkeitssensor spürt, wann die Erde trocken ist. Was macht RoboPufi?','Wüste! Tagsüber ist es sehr heiß, und die Erde trocknet schnell. Mach Regeln für kalt, heiß und trocken.','Der große Gärtner-Test: vier Sensoren, vier Regeln!'],
+ thOk:[,,,'Super! Der Feuchtigkeitssensor spürt die trockene Erde und schaltet die Bewässerung ein. So funktionieren automatische Sprinkler!','Toll! Dein Gewächshaus schafft es sogar in der Wüste!','Gärtner-Champion! Vier Sensoren arbeiten zusammen, wie in einem echten Gewächshaus.'],
+ thCond:{dry:'Wenn die Erde trocken ist'},thAct:{water:'schalte die Bewässerung ein'},thDry:'Die Erde ist ausgetrocknet und die Pflanzen sind verwelkt. Was soll RoboPufi tun, wenn die Erde trocken ist?',
+ colN:{b:'Blau'},an:{penguin:'Der Pinguin'},sortPeng:'Jetzt ist auch der Pinguin da! Er will blaues Essen. Tippe auf das richtige Tier!',sortMix:'Überraschung! Die Tiere haben ihren Geschmack geändert. Schau auf die Farbe in jeder Schüssel und programmiere neu!'},
+en:{lStars:'Collect all the stars, then take him to the charger.',lStarsFirst:'Collect all the stars first!',lDark:'It is dark! RoboPufi only sees the light when it is close.',lBee:'Watch out for the bees!',lBeeHit:'Ouch! The bee scared him. Try again!',
+ nStars:'The path must go past all the stars.',nOrder:'Visit the stars in order: one, two, three!',nInk:'You have little ink, draw a short path!',nMiss:'You forgot a star! Draw again.',nOrderMiss:'The stars must be collected in order: one, two, three!',
+ tSimon:'Pufi says! RoboPufi shows you parts that light up. Remember the order and tap them the same way!',tWatch:'Watch and listen!',tYou:'Now you!',tNo:'Oops! Let’s watch again.',tOk:'Well done, you remembered!',tWhy:'Robots remember steps in order. That is a program!',
+ sonNight:'It is night and you cannot see anything! Like a bat, listen to the beeps and watch the bar. When it beeps really fast, press STOP!',sonNightWhy:'You parked in the dark, using only the sensor! That is how bats hunt at night.',
+ thIntro:[,,,'The soil is drying out! The moisture sensor feels when the soil is dry. What does RoboPufi do?','Desert! In the day it is very hot and the soil dries fast. Make rules for cold, hot and dry.','The great gardener test: four sensors, four rules!'],
+ thOk:[,,,'Well done! The moisture sensor feels the dry soil and turns on the watering. That is how automatic sprinklers work!','Great! Your greenhouse even copes in the desert!','Gardening champion! Four sensors work together, like in a real greenhouse.'],
+ thCond:{dry:'When the soil is dry'},thAct:{water:'turn on the watering'},thDry:'The soil dried out and the plants wilted. What should RoboPufi do when the soil is dry?',
+ colN:{b:'Blue'},an:{penguin:'The penguin'},sortPeng:'The penguin is here too! He wants blue food. Tap the right animal!',sortMix:'Surprise! The animals changed their tastes. Look at the colour in each bowl and program again!'},
+fr:{lStars:'Ramasse toutes les étoiles, puis emmène-le au chargeur.',lStarsFirst:'Ramasse d’abord toutes les étoiles !',lDark:'Il fait noir ! RoboPufi ne voit la lumière que de près.',lBee:'Attention aux abeilles !',lBeeHit:'Aïe ! L’abeille lui a fait peur. Encore une fois !',
+ nStars:'Le chemin doit passer par toutes les étoiles.',nOrder:'Passe par les étoiles dans l’ordre : un, deux, trois !',nInk:'Tu as peu d’encre, dessine un chemin court !',nMiss:'Tu as oublié une étoile ! Dessine encore.',nOrderMiss:'Il faut prendre les étoiles dans l’ordre : un, deux, trois !',
+ tSimon:'Pufi a dit ! RoboPufi te montre des parties qui s’allument. Retiens l’ordre et touche-les pareil !',tWatch:'Regarde et écoute !',tYou:'À toi !',tNo:'Oups ! Regardons encore.',tOk:'Bravo, tu t’en es souvenu !',tWhy:'Les robots retiennent des étapes dans l’ordre. C’est un programme !',
+ sonNight:'C’est la nuit, on ne voit rien ! Comme une chauve-souris, écoute les bips et regarde la barre. Quand ça bipe très vite, appuie sur STOP !',sonNightWhy:'Tu t’es garé dans le noir, juste avec le capteur ! C’est ainsi que chassent les chauves-souris la nuit.',
+ thIntro:[,,,'La terre se dessèche ! Le capteur d’humidité sent quand la terre est sèche. Que fait RoboPufi ?','Le désert ! Le jour il fait très chaud et la terre sèche vite. Fais des règles pour le froid, le chaud et le sec.','Le grand test du jardinier : quatre capteurs, quatre règles !'],
+ thOk:[,,,'Bravo ! Le capteur d’humidité sent la terre sèche et lance l’arrosage. C’est comme ça que marchent les arroseurs automatiques !','Super ! Ta serre tient même dans le désert !','Champion jardinier ! Quatre capteurs travaillent ensemble, comme dans une vraie serre.'],
+ thCond:{dry:'Quand la terre est sèche'},thAct:{water:'lance l’arrosage'},thDry:'La terre s’est desséchée et les plantes ont fané. Que doit faire RoboPufi quand la terre est sèche ?',
+ colN:{b:'Bleu'},an:{penguin:'Le pingouin'},sortPeng:'Le pingouin est arrivé ! Il veut de la nourriture bleue. Touche le bon animal !',sortMix:'Surprise ! Les animaux ont changé de goûts. Regarde la couleur dans chaque bol et programme à nouveau !'},
+es:{lStars:'Recoge todas las estrellas y luego llévalo al cargador.',lStarsFirst:'¡Primero recoge todas las estrellas!',lDark:'¡Está oscuro! RoboPufi solo ve la luz cuando está cerca.',lBee:'¡Cuidado con las abejas!',lBeeHit:'¡Ay! La abeja lo asustó. ¡Otra vez!',
+ nStars:'El camino debe pasar por todas las estrellas.',nOrder:'¡Pasa por las estrellas en orden: uno, dos, tres!',nInk:'Tienes poca tinta, ¡dibuja un camino corto!',nMiss:'¡Olvidaste una estrella! Dibuja otra vez.',nOrderMiss:'¡Las estrellas hay que cogerlas en orden: uno, dos, tres!',
+ tSimon:'¡Pufi dice! RoboPufi te enseña partes que se iluminan. ¡Recuerda el orden y tócalas igual!',tWatch:'¡Mira y escucha!',tYou:'¡Ahora tú!',tNo:'¡Uy! Vamos a verlo otra vez.',tOk:'¡Bravo, lo has recordado!',tWhy:'Los robots recuerdan pasos en orden. ¡Eso es un programa!',
+ sonNight:'¡Es de noche y no se ve nada! Como un murciélago, escucha los pitidos y mira la barra. ¡Cuando pite muy rápido, pulsa STOP!',sonNightWhy:'¡Has aparcado a oscuras, solo con el sensor! Así cazan los murciélagos de noche.',
+ thIntro:[,,,'¡La tierra se seca! El sensor de humedad nota cuándo la tierra está seca. ¿Qué hace RoboPufi?','¡Desierto! De día hace mucho calor y la tierra se seca rápido. Haz reglas para el frío, el calor y la sequedad.','¡La gran prueba del jardinero: cuatro sensores, cuatro reglas!'],
+ thOk:[,,,'¡Bravo! El sensor de humedad nota la tierra seca y enciende el riego. ¡Así funcionan los aspersores automáticos!','¡Genial! ¡Tu invernadero aguanta hasta en el desierto!','¡Campeón jardinero! Cuatro sensores trabajan juntos, como en un invernadero de verdad.'],
+ thCond:{dry:'Cuando la tierra está seca'},thAct:{water:'enciende el riego'},thDry:'La tierra se secó y las plantas se marchitaron. ¿Qué debe hacer RoboPufi cuando la tierra está seca?',
+ colN:{b:'Azul'},an:{penguin:'El pingüino'},sortPeng:'¡Ha llegado el pingüino! Quiere comida azul. ¡Toca el animal correcto!',sortMix:'¡Sorpresa! Los animales han cambiado de gustos. ¡Mira el color de cada cuenco y programa otra vez!'},
+it:{lStars:'Raccogli tutte le stelle, poi portalo al caricatore.',lStarsFirst:'Prima raccogli tutte le stelle!',lDark:'È buio! RoboPufi vede la luce solo da vicino.',lBee:'Attenzione alle api!',lBeeHit:'Ahi! L’ape l’ha spaventato. Ancora una volta!',
+ nStars:'La strada deve passare da tutte le stelle.',nOrder:'Passa dalle stelle in ordine: uno, due, tre!',nInk:'Hai poco inchiostro, disegna una strada corta!',nMiss:'Hai dimenticato una stella! Disegna di nuovo.',nOrderMiss:'Le stelle vanno prese in ordine: uno, due, tre!',
+ tSimon:'Pufi dice! RoboPufi ti mostra delle parti che si illuminano. Ricorda l’ordine e toccale allo stesso modo!',tWatch:'Guarda e ascolta!',tYou:'Ora tocca a te!',tNo:'Ops! Guardiamo di nuovo.',tOk:'Bravo, te lo sei ricordato!',tWhy:'I robot ricordano i passi in ordine. Questo è un programma!',
+ sonNight:'È notte e non si vede niente! Come un pipistrello, ascolta i bip e guarda la barra. Quando suona velocissimo, premi STOP!',sonNightWhy:'Hai parcheggiato al buio, solo con il sensore! Così cacciano i pipistrelli di notte.',
+ thIntro:[,,,'La terra si secca! Il sensore di umidità sente quando la terra è secca. Cosa fa RoboPufi?','Deserto! Di giorno fa caldissimo e la terra si secca in fretta. Fai regole per il freddo, il caldo e il secco.','La grande prova del giardiniere: quattro sensori, quattro regole!'],
+ thOk:[,,,'Bravo! Il sensore di umidità sente la terra secca e accende l’irrigazione. Così funzionano gli irrigatori automatici!','Super! La tua serra resiste anche nel deserto!','Campione giardiniere! Quattro sensori lavorano insieme, come in una vera serra.'],
+ thCond:{dry:'Quando la terra è secca'},thAct:{water:'accendi l’irrigazione'},thDry:'La terra si è seccata e le piante sono appassite. Cosa deve fare RoboPufi quando la terra è secca?',
+ colN:{b:'Blu'},an:{penguin:'Il pinguino'},sortPeng:'È arrivato il pinguino! Vuole cibo blu. Tocca l’animale giusto!',sortMix:'Sorpresa! Gli animali hanno cambiato gusti. Guarda il colore in ogni ciotola e programma di nuovo!'},
+pt:{lStars:'Apanha todas as estrelas e depois leva-o ao carregador.',lStarsFirst:'Primeiro apanha todas as estrelas!',lDark:'Está escuro! O RoboPufi só vê a luz quando está perto.',lBee:'Cuidado com as abelhas!',lBeeHit:'Ai! A abelha assustou-o. Outra vez!',
+ nStars:'O caminho tem de passar por todas as estrelas.',nOrder:'Passa pelas estrelas por ordem: um, dois, três!',nInk:'Tens pouca tinta, desenha um caminho curto!',nMiss:'Esqueceste uma estrela! Desenha outra vez.',nOrderMiss:'As estrelas têm de ser apanhadas por ordem: um, dois, três!',
+ tSimon:'O Pufi diz! O RoboPufi mostra-te partes que se acendem. Lembra-te da ordem e toca-lhes da mesma maneira!',tWatch:'Olha e ouve!',tYou:'Agora tu!',tNo:'Ups! Vamos ver outra vez.',tOk:'Muito bem, lembraste-te!',tWhy:'Os robôs lembram-se de passos por ordem. Isso é um programa!',
+ sonNight:'É de noite e não se vê nada! Como um morcego, ouve os apitos e olha para a barra. Quando apitar muito depressa, carrega em STOP!',sonNightWhy:'Estacionaste às escuras, só com o sensor! É assim que os morcegos caçam à noite.',
+ thIntro:[,,,'A terra está a secar! O sensor de humidade sente quando a terra está seca. O que faz o RoboPufi?','Deserto! De dia está muito calor e a terra seca depressa. Faz regras para o frio, o calor e a secura.','O grande teste do jardineiro: quatro sensores, quatro regras!'],
+ thOk:[,,,'Muito bem! O sensor de humidade sente a terra seca e liga a rega. É assim que funcionam os aspersores automáticos!','Boa! A tua estufa aguenta até no deserto!','Campeão jardineiro! Quatro sensores trabalham juntos, como numa estufa a sério.'],
+ thCond:{dry:'Quando a terra está seca'},thAct:{water:'liga a rega'},thDry:'A terra secou e as plantas murcharam. O que deve fazer o RoboPufi quando a terra está seca?',
+ colN:{b:'Azul'},an:{penguin:'O pinguim'},sortPeng:'Chegou o pinguim! Ele quer comida azul. Toca no animal certo!',sortMix:'Surpresa! Os animais mudaram de gostos. Olha para a cor em cada tigela e programa outra vez!'},
+nl:{lStars:'Verzamel alle sterren en breng hem dan naar de oplader.',lStarsFirst:'Verzamel eerst alle sterren!',lDark:'Het is donker! RoboPufi ziet het licht alleen van dichtbij.',lBee:'Pas op voor de bijen!',lBeeHit:'Au! De bij liet hem schrikken. Nog een keer!',
+ nStars:'Het pad moet langs alle sterren gaan.',nOrder:'Ga op volgorde langs de sterren: één, twee, drie!',nInk:'Je hebt weinig inkt, teken een kort pad!',nMiss:'Je bent een ster vergeten! Teken opnieuw.',nOrderMiss:'De sterren moeten op volgorde: één, twee, drie!',
+ tSimon:'Pufi zegt! RoboPufi laat je delen zien die oplichten. Onthoud de volgorde en tik ze net zo aan!',tWatch:'Kijk en luister!',tYou:'Nu jij!',tNo:'Oeps! We kijken nog een keer.',tOk:'Goed zo, je hebt het onthouden!',tWhy:'Robots onthouden stappen op volgorde. Dat is een programma!',
+ sonNight:'Het is nacht en je ziet niets! Luister net als een vleermuis naar de piepjes en kijk naar de balk. Als het heel snel piept, druk op STOP!',sonNightWhy:'Je hebt in het donker geparkeerd, alleen met de sensor! Zo jagen vleermuizen ’s nachts.',
+ thIntro:[,,,'De aarde droogt uit! De vochtsensor voelt wanneer de aarde droog is. Wat doet RoboPufi?','Woestijn! Overdag is het heel heet en droogt de aarde snel uit. Maak regels voor koud, heet en droog.','De grote tuinierstest: vier sensoren, vier regels!'],
+ thOk:[,,,'Goed zo! De vochtsensor voelt de droge aarde en zet de sproeier aan. Zo werken automatische sproeiers!','Super! Jouw kas redt het zelfs in de woestijn!','Tuinkampioen! Vier sensoren werken samen, net als in een echte kas.'],
+ thCond:{dry:'Als de aarde droog is'},thAct:{water:'zet de sproeier aan'},thDry:'De aarde is uitgedroogd en de planten zijn verwelkt. Wat moet RoboPufi doen als de aarde droog is?',
+ colN:{b:'Blauw'},an:{penguin:'De pinguïn'},sortPeng:'De pinguïn is er ook! Hij wil blauw eten. Tik op het goede dier!',sortMix:'Verrassing! De dieren hebben een andere smaak. Kijk naar de kleur in elk bakje en programmeer opnieuw!'},
+pl:{lStars:'Zbierz wszystkie gwiazdki, a potem zaprowadź go do ładowarki.',lStarsFirst:'Najpierw zbierz wszystkie gwiazdki!',lDark:'Jest ciemno! RoboPufi widzi światło tylko z bliska.',lBee:'Uwaga na pszczoły!',lBeeHit:'Au! Pszczoła go wystraszyła. Jeszcze raz!',
+ nStars:'Droga musi przejść obok wszystkich gwiazdek.',nOrder:'Odwiedź gwiazdki po kolei: jeden, dwa, trzy!',nInk:'Masz mało atramentu, narysuj krótką drogę!',nMiss:'Zapomniałeś o gwiazdce! Narysuj jeszcze raz.',nOrderMiss:'Gwiazdki trzeba zbierać po kolei: jeden, dwa, trzy!',
+ tSimon:'Pufi mówi! RoboPufi pokazuje ci części, które się świecą. Zapamiętaj kolejność i dotknij ich tak samo!',tWatch:'Patrz i słuchaj!',tYou:'Teraz ty!',tNo:'Ups! Popatrzmy jeszcze raz.',tOk:'Brawo, zapamiętałeś!',tWhy:'Roboty pamiętają kroki po kolei. To jest program!',
+ sonNight:'Jest noc i nic nie widać! Jak nietoperz, słuchaj pikania i patrz na pasek. Kiedy pika bardzo szybko, naciśnij STOP!',sonNightWhy:'Zaparkowałeś w ciemności, tylko z czujnikiem! Tak polują nietoperze w nocy.',
+ thIntro:[,,,'Ziemia wysycha! Czujnik wilgotności czuje, kiedy ziemia jest sucha. Co robi RoboPufi?','Pustynia! W dzień jest bardzo gorąco i ziemia szybko wysycha. Zrób reguły na zimno, gorąco i suszę.','Wielki test ogrodnika: cztery czujniki, cztery reguły!'],
+ thOk:[,,,'Brawo! Czujnik wilgotności czuje suchą ziemię i włącza podlewanie. Tak działają automatyczne zraszacze!','Super! Twoja szklarnia daje radę nawet na pustyni!','Mistrz ogrodnik! Cztery czujniki pracują razem, jak w prawdziwej szklarni.'],
+ thCond:{dry:'Kiedy ziemia jest sucha'},thAct:{water:'włącz podlewanie'},thDry:'Ziemia wyschła i rośliny zwiędły. Co ma zrobić RoboPufi, kiedy ziemia jest sucha?',
+ colN:{b:'Niebieski'},an:{penguin:'Pingwin'},sortPeng:'Przyszedł też pingwin! On chce niebieskie jedzenie. Dotknij właściwego zwierzątka!',sortMix:'Niespodzianka! Zwierzątka zmieniły gusta. Popatrz na kolor w każdej misce i zaprogramuj jeszcze raz!'},
+uk:{lStars:'Збери всі зірочки, а потім відведи його до зарядки.',lStarsFirst:'Спершу збери всі зірочки!',lDark:'Темно! РобоПуфі бачить світло лише зблизька.',lBee:'Обережно, бджоли!',lBeeHit:'Ой! Бджола його налякала. Ще раз!',
+ nStars:'Шлях має пройти повз усі зірочки.',nOrder:'Пройди зірочки по черзі: один, два, три!',nInk:'У тебе мало чорнила, намалюй короткий шлях!',nMiss:'Ти забув зірочку! Намалюй ще раз.',nOrderMiss:'Зірочки треба збирати по черзі: один, два, три!',
+ tSimon:'Пуфі каже! РобоПуфі показує частини, які світяться. Запам’ятай порядок і торкнися їх так само!',tWatch:'Дивись і слухай!',tYou:'Тепер ти!',tNo:'Ой! Подивімося ще раз.',tOk:'Молодець, ти запам’ятав!',tWhy:'Роботи запам’ятовують кроки по черзі. Це програма!',
+ sonNight:'Ніч, і нічого не видно! Як кажан, слухай пищання й дивись на смужку. Коли пищить дуже швидко, натисни СТОП!',sonNightWhy:'Ти припаркувався в темряві, лише з датчиком! Так кажани полюють уночі.',
+ thIntro:[,,,'Земля висихає! Датчик вологості відчуває, коли земля суха. Що робить РобоПуфі?','Пустеля! Удень дуже спекотно, і земля швидко висихає. Зроби правила для холоду, спеки й сухості.','Великий іспит садівника: чотири датчики, чотири правила!'],
+ thOk:[,,,'Молодець! Датчик вологості відчуває суху землю й вмикає полив. Так працюють автоматичні поливалки!','Чудово! Твоя теплиця впорається навіть у пустелі!','Чемпіон-садівник! Чотири датчики працюють разом, як у справжній теплиці.'],
+ thCond:{dry:'Коли земля суха'},thAct:{water:'увімкни полив'},thDry:'Земля висохла, і рослини зів’яли. Що має робити РобоПуфі, коли земля суха?',
+ colN:{b:'Синій'},an:{penguin:'Пінгвін'},sortPeng:'Прийшов і пінгвін! Він хоче синю їжу. Торкнися правильної тваринки!',sortMix:'Несподіванка! Тваринки змінили смаки. Подивися на колір у кожній мисці й запрограмуй знову!'},
+ru:{lStars:'Собери все звёздочки, а потом отведи его к зарядке.',lStarsFirst:'Сначала собери все звёздочки!',lDark:'Темно! РобоПуфи видит свет только вблизи.',lBee:'Осторожно, пчёлы!',lBeeHit:'Ой! Пчела его напугала. Ещё раз!',
+ nStars:'Путь должен пройти мимо всех звёздочек.',nOrder:'Пройди звёздочки по порядку: один, два, три!',nInk:'У тебя мало чернил, нарисуй короткий путь!',nMiss:'Ты забыл звёздочку! Нарисуй ещё раз.',nOrderMiss:'Звёздочки нужно собирать по порядку: один, два, три!',
+ tSimon:'Пуфи говорит! РобоПуфи показывает части, которые светятся. Запомни порядок и нажми их так же!',tWatch:'Смотри и слушай!',tYou:'Теперь ты!',tNo:'Ой! Посмотрим ещё раз.',tOk:'Молодец, ты запомнил!',tWhy:'Роботы запоминают шаги по порядку. Это программа!',
+ sonNight:'Ночь, и ничего не видно! Как летучая мышь, слушай писк и смотри на полоску. Когда пищит очень быстро, нажми СТОП!',sonNightWhy:'Ты припарковался в темноте, только с датчиком! Так летучие мыши охотятся ночью.',
+ thIntro:[,,,'Земля высыхает! Датчик влажности чувствует, когда земля сухая. Что делает РобоПуфи?','Пустыня! Днём очень жарко, и земля быстро высыхает. Сделай правила для холода, жары и сухости.','Большой экзамен садовника: четыре датчика, четыре правила!'],
+ thOk:[,,,'Молодец! Датчик влажности чувствует сухую землю и включает полив. Так работают автоматические поливалки!','Отлично! Твоя теплица справляется даже в пустыне!','Чемпион-садовник! Четыре датчика работают вместе, как в настоящей теплице.'],
+ thCond:{dry:'Когда земля сухая'},thAct:{water:'включи полив'},thDry:'Земля высохла, и растения завяли. Что должен делать РобоПуфи, когда земля сухая?',
+ colN:{b:'Синий'},an:{penguin:'Пингвин'},sortPeng:'Пришёл и пингвин! Он хочет синюю еду. Нажми на нужного зверька!',sortMix:'Сюрприз! Зверьки поменяли вкусы. Посмотри на цвет в каждой миске и запрограммируй снова!'},
+hu:{lStars:'Gyűjtsd össze az összes csillagot, aztán vidd a töltőhöz.',lStarsFirst:'Előbb gyűjtsd össze az összes csillagot!',lDark:'Sötét van! RoboPufi csak közelről látja a fényt.',lBee:'Vigyázz, méhek!',lBeeHit:'Jaj! A méh megijesztette. Még egyszer!',
+ nStars:'Az útnak minden csillag mellett el kell mennie.',nOrder:'Menj a csillagokhoz sorban: egy, kettő, három!',nInk:'Kevés a tinta, rajzolj rövid utat!',nMiss:'Kihagytál egy csillagot! Rajzolj újra.',nOrderMiss:'A csillagokat sorban kell összeszedni: egy, kettő, három!',
+ tSimon:'Pufi mondja! RoboPufi megmutatja, melyik része világít. Jegyezd meg a sorrendet, és érintsd meg ugyanígy!',tWatch:'Figyelj és hallgasd!',tYou:'Most te!',tNo:'Hoppá! Nézzük meg újra.',tOk:'Ügyes, megjegyezted!',tWhy:'A robotok sorban megjegyzik a lépéseket. Ez egy program!',
+ sonNight:'Éjszaka van, és semmit sem látni! Mint egy denevér, figyeld a sípolást és a csíkot. Ha nagyon gyorsan sípol, nyomd meg a STOP-ot!',sonNightWhy:'Sötétben parkoltál, csak az érzékelővel! Így vadásznak éjjel a denevérek.',
+ thIntro:[,,,'Kiszárad a föld! A nedvességérzékelő érzi, ha száraz a föld. Mit csinál RoboPufi?','Sivatag! Nappal nagyon meleg van, és gyorsan kiszárad a föld. Készíts szabályokat a hidegre, a melegre és a szárazságra.','A nagy kertészpróba: négy érzékelő, négy szabály!'],
+ thOk:[,,,'Ügyes! A nedvességérzékelő érzi a száraz földet, és bekapcsolja az öntözést. Így működnek az automata locsolók!','Szuper! Az üvegházad még a sivatagban is boldogul!','Kertészbajnok! Négy érzékelő dolgozik együtt, mint egy igazi üvegházban.'],
+ thCond:{dry:'Ha száraz a föld'},thAct:{water:'kapcsold be az öntözést'},thDry:'Kiszáradt a föld, és elhervadtak a növények. Mit tegyen RoboPufi, ha száraz a föld?',
+ colN:{b:'Kék'},an:{penguin:'A pingvin'},sortPeng:'Megjött a pingvin is! Ő kék ételt szeretne. Érintsd meg a megfelelő állatot!',sortMix:'Meglepetés! Az állatok ízlése megváltozott. Nézd meg a színt minden tálban, és programozz újra!'}
+};
+const R=(window.L10N&&L10N.rb)||{}, T=window.__rbTX||{};
+for(const l in M){ const o=T[l]||R[l]; if(!o||!o.sx) continue; const x=o.sx, m=M[l];
+  for(const k in m){ const v=m[k]; if(Array.isArray(v)&&Array.isArray(x[k])) v.forEach((s,i)=>{ if(s!=null) x[k][i]=s; }); else if(v&&typeof v==='object'&&!Array.isArray(v)&&typeof v!=='function'&&x[k]) Object.assign(x[k],v); else x[k]=v; } }
 })();
 </script>
 <script>
