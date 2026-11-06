@@ -213,12 +213,17 @@ Secțiunile datate anterior descriu implementările istorice; starea actuală es
 - Build semnat și instalarea noului meniu pe telefon: **PASS**. Ultima schimbare
   exclusiv pentru aniversare nu este încă instalată: telefonul a devenit
   indisponibil înaintea acelei instalări. Nu a fost dezinstalată aplicația.
-- Înregistrarea/redarea reală a unei laude prin noile comenzi: confirmarea de la
-  utilizator este încă în așteptare; testul de bridge nu confirmă sunetul real.
+- **iPad HR fizic: build semnat, instalare și lansare PASS**, inclusiv ultima
+  ajustare a aniversării. Actualizare fără dezinstalare. Hory a confirmat:
+  „Se aude corect, meniul este în regulă” după înregistrarea și redarea unei
+  laude prin noile comenzi și verificarea meniului/butonului Închide.
+  Aceasta este o probă audio reală asistată de utilizator, separată de testele
+  automate cu bridge simulat.
 
 Jurnale: `/tmp/pufi-parents-phone-birthday.log`,
 `/tmp/pufi-parents-pad-birthday.log`, `/tmp/pufi-parents-release-build.log`,
-`/tmp/pufi-parents-physical-build.log`.
+`/tmp/pufi-parents-physical-build.log`,
+`/tmp/pufi-parents-ipad-physical-build.log`.
 Rezultate: `/tmp/PufiParentsPhoneBirthday.xcresult`,
 `/tmp/PufiParentsPadBirthday.xcresult`.
 Build/test în `/tmp/PufiIAPBuild`, publicare din clona curată `/tmp/PufiIAPPublish`
