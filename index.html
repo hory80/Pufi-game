@@ -6696,6 +6696,14 @@ for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.as
 .on.dim .rb-glass{fill:#FFF3B8}.on.dim .rb-rays{opacity:.3}.on.dim .rb-fan{animation-duration:1.2s}
 .rb-ledglow{transition:opacity .2s}.on .rb-ledglow{opacity:.45}.on.dim .rb-ledglow{opacity:.2}.on .rb-ledbody{opacity:1}
 .rb-bell{transform-box:fill-box;transform-origin:50% 0}.on .rb-bell{animation:rbShake .25s infinite}
+.on.faint .rb-glass{fill:#F6EFCF}.on.faint .rb-rays{opacity:.12}.on.faint .rb-ledglow{opacity:.1}
+.on.turbo .rb-fan{animation-duration:.12s}.on.turbo .rb-rays{filter:drop-shadow(0 0 8px #FFE45C)}
+.burnt .rb-ledbody{fill:#333!important;opacity:1}.burnt{filter:grayscale(1)}
+.rb-boom{animation:rbBoom .6s ease-out;transform-box:fill-box;transform-origin:center}@keyframes rbBoom{from{transform:scale(.2);opacity:0}60%{transform:scale(1.3);opacity:1}}
+.rb-smoke{animation:rbSmoke 1.6s ease-out infinite}@keyframes rbSmoke{from{transform:translateY(0);opacity:.9}to{transform:translateY(-40px);opacity:0}}
+.rb-pop{animation:rbBoom .4s ease-out;transform-box:fill-box;transform-origin:center}
+.sunny .rb-cell{animation:rbCell 1.4s ease-in-out infinite alternate}@keyframes rbCell{to{fill:#6FA2FF}}
+.rb-beam{animation:rbFlow .5s linear infinite}
 .rb-tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rb-tray button{font:inherit;font-size:2.2rem;border:3px solid var(--ink);background:#fff;border-radius:18px;padding:2px 12px;cursor:grab;touch-action:none;min-width:84px}
 .rb-tray button b{font-size:1rem;display:block;line-height:1}
@@ -7110,7 +7118,7 @@ en:{mech:{lever:['⚖️','The seesaw'],gears:['⚙️','Gears'],bike:['🚲','T
  andH:'The bulb must go off when you turn off either switch.',orH:'The bulb must light from each switch on its own.',indepH:'Each switch must turn on only its own LED.',masterH:'When you turn the switch off, everything must stop.',
  loose:'Grey wires carry no electricity. You can keep them or delete them.',swOut:'The bulb is on, but the switch is not on the path of the electricity! Put it between the battery and the bulb.',swLoose:'The switch is not connected to anything. Wire it into the circuit!'}
 };
-for(const l in TX2) Object.assign(TX[l],TX2[l]);
+for(const l in TX2) Object.assign(TX[l],TX2[l]); window.__rbTX=TX;
 
 /* ================= 2. MAȘINI SIMPLE ================= */
 function zoneMech(){ stopAll(); view='mech'; setTop(false); back=home; menu3('mech',{lever,gears,bike,ramp}); }
@@ -7383,20 +7391,29 @@ function ramp(){
 
 /* ================= 3. CIRCUITE (v2: calcul real al curentului) ================= */
 const CL=[
- {ic:'💡',c:[['bat','bat',450,450],['L1','bulb',450,170]],st:['🏚️','🏠'],chk:{on:['L1']},sol:[['bat.b','L1.b'],['L1.a','bat.a']]},
- {ic:'🔘',c:[['bat','bat',450,450],['L1','bulb',230,180],['S1','sw',660,210]],st:['🌑','🌕'],chk:{on:['L1'],sw:['S1']},sol:[['bat.b','S1.b'],['S1.a','L1.b'],['L1.a','bat.a']]},
- {ic:'🌀',c:[['bat','bat',450,450],['M1','motor',450,190]],st:['🥵','😎'],chk:{on:['M1']},sol:[['bat.b','M1.b'],['M1.a','bat.a']]},
- {ic:'🔔',c:[['bat','bat',450,450],['S1','sw',230,220],['Z1','buzz',660,200]],st:['🚪','🐶'],chk:{on:['Z1'],sw:['S1']},sol:[['bat.a','S1.a'],['S1.b','Z1.a'],['Z1.b','bat.b']]},
- {ic:'💡💡',c:[['bat','bat',450,450],['L1','bulb',240,170],['L2','bulb',660,170]],st:['🌑','🌗'],chk:{on:['L1','L2']},sol:[['bat.b','L2.b'],['L2.a','L1.b'],['L1.a','bat.a']]},
- {ic:'🔆',c:[['bat','bat',450,450],['L1','bulb',240,170],['L2','bulb',660,170]],st:['🌗','☀️'],chk:{bright:['L1','L2']},sol:[['bat.b','L1.b'],['L1.a','bat.a'],['bat.b','L2.b'],['L2.a','bat.a']]},
- {ic:'🔴',c:[['bat','bat',450,450],['D1','led',450,190,'#FF3B3B']],st:['⚫','🔴'],chk:{on:['D1']},sol:[['bat.b','D1.b'],['D1.a','bat.a']]},
- {ic:'🚦',c:[['bat','bat',450,455],['D1','led',250,170,'#FF3B3B'],['D2','led',650,170,'#2FD06A'],['S1','sw',230,330],['S2','sw',670,330]],st:['🚥','🚦'],chk:{bright:['D1','D2'],indep:[['S1','D1'],['S2','D2']]},sol:[['bat.b','S1.b'],['S1.a','D1.b'],['D1.a','bat.a'],['bat.b','S2.b'],['S2.a','D2.b'],['D2.a','bat.a']]},
- {ic:'🔐',c:[['bat','bat',450,455],['L1','bulb',450,150],['S1','sw',220,310],['S2','sw',680,310]],st:['🔒','🔓'],chk:{on:['L1'],and:['S1','S2']},sol:[['bat.b','S1.b'],['S1.a','S2.a'],['S2.b','L1.b'],['L1.a','bat.a']]},
- {ic:'🪜',c:[['bat','bat',450,455],['L1','bulb',450,150],['S1','sw',220,310],['S2','sw',680,310]],st:['🌚','🌝'],chk:{on:['L1'],or:['S1','S2']},sol:[['bat.b','S1.b'],['bat.b','S2.b'],['S1.a','L1.a'],['S2.a','L1.b'],['L1.a','L1.a']]},
- {ic:'🏡',c:[['bat','bat',450,455],['S1','sw',450,330],['L1','bulb',180,170],['M1','motor',450,160],['Z1','buzz',720,190]],st:['😴','🥳'],chk:{bright:['L1','M1','Z1'],master:'S1'},sol:[['bat.b','S1.b'],['S1.a','L1.b'],['S1.a','M1.b'],['S1.a','Z1.b'],['L1.a','bat.a'],['M1.a','bat.a'],['Z1.a','bat.a']]},
- {ic:'🧪',c:[['bat','bat',450,455],['L1','bulb',140,160],['L2','bulb',320,160],['D1','led',500,170,'#4AA8FF'],['M1','motor',690,160],['Z1','buzz',800,330],['S1','sw',200,330],['S2','sw',570,330]],st:null,chk:null,sol:[]}];
-CL[9].sol=[['bat.b','S1.b'],['bat.b','S2.b'],['S1.a','L1.b'],['S2.a','L1.b'],['L1.a','bat.a']];
-function terms(type,x,y){ if(type==='bat') return {a:[x-78,y],b:[x+78,y]}; if(type==='sw') return {a:[x-62,y],b:[x+62,y]}; return {a:[x-30,y+50],b:[x+30,y+50]}; }
+ {o:0,ic:'💡',c:[['bat','bat',450,450],['L1','bulb',450,170]],st:['🏚️','🏠'],chk:{on:['L1']},sol:[['bat.b','L1.b'],['L1.a','bat.a']]},
+ {o:1,ic:'🔘',c:[['bat','bat',450,450],['L1','bulb',230,180],['S1','sw',660,210]],st:['🌑','🌕'],chk:{on:['L1'],sw:['S1']},sol:[['bat.b','S1.b'],['S1.a','L1.b'],['L1.a','bat.a']]},
+ {o:2,ic:'🌀',c:[['bat','bat',450,450],['M1','motor',450,190]],st:['🥵','😎'],chk:{on:['M1']},sol:[['bat.b','M1.b'],['M1.a','bat.a']]},
+ {o:3,ic:'🔔',c:[['bat','bat',450,450],['S1','sw',230,220],['Z1','buzz',660,200]],st:['🚪','🐶'],chk:{on:['Z1'],sw:['S1']},sol:[['bat.a','S1.a'],['S1.b','Z1.a'],['Z1.b','bat.b']]},
+ {o:4,ic:'💡💡',c:[['bat','bat',450,450],['L1','bulb',240,170],['L2','bulb',660,170]],st:['🌑','🌗'],chk:{on:['L1','L2']},sol:[['bat.b','L2.b'],['L2.a','L1.b'],['L1.a','bat.a']]},
+ {o:5,ic:'🔆',c:[['bat','bat',450,450],['L1','bulb',240,170],['L2','bulb',660,170]],st:['🌗','☀️'],chk:{bright:['L1','L2']},sol:[['bat.b','L1.b'],['L1.a','bat.a'],['bat.b','L2.b'],['L2.a','bat.a']]},
+ {o:6,ic:'🔴',c:[['bat','bat',450,450],['D1','led',450,190,'#FF3B3B']],st:['⚫','🔴'],chk:{on:['D1']},sol:[['bat.b','D1.b'],['D1.a','bat.a']]},
+ {o:7,ic:'🚦',c:[['bat','bat',450,455],['D1','led',250,170,'#FF3B3B'],['D2','led',650,170,'#2FD06A'],['S1','sw',230,330],['S2','sw',670,330]],st:['🚥','🚦'],chk:{bright:['D1','D2'],indep:[['S1','D1'],['S2','D2']]},sol:[['bat.b','S1.b'],['S1.a','D1.b'],['D1.a','bat.a'],['bat.b','S2.b'],['S2.a','D2.b'],['D2.a','bat.a']]},
+ {o:8,ic:'🔐',c:[['bat','bat',450,455],['L1','bulb',450,150],['S1','sw',220,310],['S2','sw',680,310]],st:['🔒','🔓'],chk:{on:['L1'],and:['S1','S2']},sol:[['bat.b','S1.b'],['S1.a','S2.a'],['S2.b','L1.b'],['L1.a','bat.a']]},
+ {o:9,ic:'🪜',c:[['bat','bat',450,455],['L1','bulb',450,150],['S1','sw',220,310],['S2','sw',680,310]],st:['🌚','🌝'],chk:{on:['L1'],or:['S1','S2']},sol:[['bat.b','S1.b'],['bat.b','S2.b'],['S1.a','L1.b'],['S2.a','L1.b'],['L1.a','bat.a']]},
+ {o:10,ic:'🏡',c:[['bat','bat',450,455],['S1','sw',450,330],['L1','bulb',180,170],['M1','motor',450,160],['Z1','buzz',720,190]],st:['😴','🥳'],chk:{bright:['L1','M1','Z1'],master:'S1'},sol:[['bat.b','S1.b'],['S1.a','L1.b'],['S1.a','M1.b'],['S1.a','Z1.b'],['L1.a','bat.a'],['M1.a','bat.a'],['Z1.a','bat.a']]},
+ /* --- capitolul 2 --- */
+ {k:'mat',ic:'🥄',c:[['bat','bat',450,450],['L1','bulb',560,150],['G1','gap',250,250]],fx:[['bat.a','G1.a'],['G1.b','L1.a'],['L1.b','bat.b']],st:['🔍','🧠'],chk:{mat:true},sol:[]},
+ {k:'btn',ic:'🛎️',c:[['bat','bat',450,450],['P1','btn',230,230],['Z1','buzz',660,190]],st:['🚪','🎉'],chk:{press:3},sol:[['bat.a','P1.a'],['P1.b','Z1.a'],['Z1.b','bat.b']]},
+ {k:'ser',ic:'🔋🔋',c:[['bat','bat',260,450],['B2','bat',640,450],['M1','motor',450,170]],st:['🐢','🚀'],chk:{turbo:['M1']},sol:[['bat.b','B2.a'],['B2.b','M1.b'],['M1.a','bat.a']]},
+ {k:'pot',ic:'🎚️',c:[['bat','bat',450,450],['L1','bulb',230,170],['K1','pot',660,190]],st:['☀️','🌙'],chk:{seq:['potHi','potLo']},sol:[['bat.b','K1.b'],['K1.a','L1.b'],['L1.a','bat.a']]},
+ {k:'res',ic:'💥',c:[['bat','bat',270,455],['B2','bat',630,455],['D1','led',270,170,'#2FD06A'],['R1','res',640,230]],fx:[['bat.b','B2.a']],st:['😵','😎'],chk:{on:['D1','R1']},sol:[['B2.b','R1.b'],['R1.a','D1.b'],['D1.a','bat.a']]},
+ {k:'sun',ic:'🌞',c:[['V1','solar',260,290],['M1','motor',650,190]],sun:true,st:['🌻','🌻'],chk:{seq:['sunOn','sunOff']},sol:[['V1.b','M1.b'],['M1.a','V1.a']]},
+ {o:11,ic:'🧪',c:[['bat','bat',450,455],['L1','bulb',140,160],['L2','bulb',320,160],['D1','led',500,170,'#4AA8FF'],['M1','motor',690,160],['Z1','buzz',800,330],['S1','sw',200,330],['S2','sw',570,330]],st:null,chk:null,sol:[]}];
+const SRC=t=>t==='bat'||t==='solar', HORIZ=t=>t==='sw'||t==='btn'||t==='gap'||t==='res';
+const POTR=[0,.5,1.5,4];
+const MATS=[['spoon','🥄',1],['wood','🪵',0],['coin','🪙',1],['bear','🧸',0],['clip','📎',1],['crayon','🖍️',0]];
+function terms(type,x,y){ if(type==='bat') return {a:[x-78,y],b:[x+78,y]}; if(HORIZ(type)) return {a:[x-62,y],b:[x+62,y]}; if(type==='solar') return {a:[x-60,y+72],b:[x+60,y+72]}; return {a:[x-30,y+50],b:[x+30,y+50]}; }
 function compSVG(id,type,x,y,swOn,col){
   if(type==='bat') return `<g id="rb-c-${id}"><rect x="${x-62}" y="${y-30}" width="124" height="60" rx="10" fill="#2B2F3A"/><rect x="${x+14}" y="${y-30}" width="48" height="60" fill="#FFB21E"/><rect x="${x+62}" y="${y-12}" width="8" height="24" rx="2" fill="#9AA5B8"/><text x="${x+38}" y="${y+11}" font-size="32" font-weight="800" text-anchor="middle" fill="#2B2F3A">+</text><text x="${x-34}" y="${y+11}" font-size="34" font-weight="800" text-anchor="middle" fill="#fff">−</text><line x1="${x-62}" y1="${y}" x2="${x-78}" y2="${y}" stroke="#9AA5B8" stroke-width="5"/></g>`;
   if(type==='bulb') return `<g id="rb-c-${id}"><g class="rb-rays">${[0,45,90,135,180,225,270,315].map(a=>{ const r=a*Math.PI/180; return `<line x1="${x+Math.cos(r)*46}" y1="${y-30+Math.sin(r)*46}" x2="${x+Math.cos(r)*62}" y2="${y-30+Math.sin(r)*62}" stroke="#FFC83D" stroke-width="6" stroke-linecap="round"/>`; }).join('')}</g><circle class="rb-glass" cx="${x}" cy="${y-30}" r="36" fill="#EEF3FA" stroke="#9AA5B8" stroke-width="3"/><path d="M${x-10} ${y-6} L${x-8} ${y-26} Q${x-8} ${y-40} ${x-2} ${y-34} Q${x+2} ${y-28} ${x+4} ${y-36} Q${x+9} ${y-40} ${x+8} ${y-26} L${x+10} ${y-6}" stroke="#8D6E3F" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="${x-18}" y="${y+4}" width="36" height="26" rx="5" fill="#9AA5B8"/><path d="M${x-12} ${y+30} L${x-30} ${y+50} M${x+12} ${y+30} L${x+30} ${y+50}" stroke="#9AA5B8" stroke-width="5"/></g>`;
@@ -7404,67 +7421,95 @@ function compSVG(id,type,x,y,swOn,col){
   if(type==='motor') return `<g id="rb-c-${id}"><circle cx="${x}" cy="${y-24}" r="44" fill="#E3E9F3" stroke="#8D99AB" stroke-width="3"/><g transform="translate(${x} ${y-24})"><g class="rb-fan">${[0,120,240].map(a=>`<ellipse rx="10" ry="34" cy="-20" fill="#4AA8FF" transform="rotate(${a})"/>`).join('')}<circle r="9" fill="#24325F"/></g></g><path d="M${x-14} ${y+18} L${x-30} ${y+50} M${x+14} ${y+18} L${x+30} ${y+50}" stroke="#8D99AB" stroke-width="5"/></g>`;
   if(type==='buzz') return `<g id="rb-c-${id}"><g class="rb-waves"><path d="M${x+44} ${y-50} Q${x+60} ${y-24} ${x+44} ${y+2}" stroke="#FF5D7A" stroke-width="5" fill="none"/><path d="M${x+56} ${y-62} Q${x+80} ${y-24} ${x+56} ${y+14}" stroke="#FF5D7A" stroke-width="5" fill="none"/><path d="M${x-44} ${y-50} Q${x-60} ${y-24} ${x-44} ${y+2}" stroke="#FF5D7A" stroke-width="5" fill="none"/></g><g class="rb-bell"><rect x="${x-36}" y="${y-62}" width="72" height="76" rx="18" fill="#2B2F3A"/><circle cx="${x}" cy="${y-24}" r="22" fill="#5A6070"/><text x="${x}" y="${y-14}" font-size="28" text-anchor="middle">🔔</text></g><path d="M${x-14} ${y+14} L${x-30} ${y+50} M${x+14} ${y+14} L${x+30} ${y+50}" stroke="#8D99AB" stroke-width="5"/></g>`;
   if(type==='sw') return `<g id="rb-c-${id}" class="rb-sw" style="cursor:pointer"><rect x="${x-80}" y="${y-48}" width="160" height="80" rx="14" fill="rgba(255,255,255,.01)"/><rect x="${x-74}" y="${y+6}" width="148" height="18" rx="8" fill="#C9D3E0"/><line x1="${x-62}" y1="${y}" x2="${x+56}" y2="${y}" stroke="${swOn?'#3BC48A':'#FF5D7A'}" stroke-width="9" stroke-linecap="round" style="transform-origin:${x-62}px ${y}px;transform:rotate(${swOn?0:-32}deg);transition:transform .2s"/><circle cx="${x-62}" cy="${y}" r="7" fill="#24325F"/><text x="${x}" y="${y+50}" font-size="16" font-weight="800" text-anchor="middle" fill="#fff">${swOn?'ON':'OFF'}</text></g>`;
+  if(type==='btn') return `<g id="rb-c-${id}" class="rb-btn" style="cursor:pointer;touch-action:none"><rect x="${x-80}" y="${y-70}" width="160" height="110" rx="14" fill="rgba(255,255,255,.01)"/><line x1="${x-62}" y1="${y}" x2="${x-40}" y2="${y}" stroke="#9AA5B8" stroke-width="5"/><line x1="${x+40}" y1="${y}" x2="${x+62}" y2="${y}" stroke="#9AA5B8" stroke-width="5"/><rect x="${x-44}" y="${y-14}" width="88" height="34" rx="9" fill="#2B2F3A"/><g style="transform:translateY(${swOn?12:0}px);transition:transform .08s"><rect x="${x-10}" y="${y-36}" width="20" height="26" fill="#C9D3E0"/><ellipse cx="${x}" cy="${y-38}" rx="34" ry="16" fill="${swOn?'#C21F3A':'#FF3B5C'}" stroke="#7A0E22" stroke-width="3"/><ellipse cx="${x-10}" cy="${y-43}" rx="10" ry="4" fill="#fff" opacity=".5"/></g><text x="${x}" y="${y+46}" font-size="30" text-anchor="middle">👆</text></g>`;
+  if(type==='gap') return `<g id="rb-c-${id}"><rect x="${x-62}" y="${y-4}" width="30" height="8" fill="#B8C2D3"/><rect x="${x+32}" y="${y-4}" width="30" height="8" fill="#B8C2D3"/><rect x="${x-40}" y="${y-26}" width="14" height="52" rx="4" fill="#C77B2E" stroke="#7A4A1A" stroke-width="2"/><rect x="${x+26}" y="${y-26}" width="14" height="52" rx="4" fill="#C77B2E" stroke="#7A4A1A" stroke-width="2"/><rect x="${x-26}" y="${y-34}" width="52" height="68" rx="10" fill="rgba(255,255,255,.12)" stroke="#fff" stroke-width="3" stroke-dasharray="7 6" class="${col?'':'rb-need'}"/>${col?`<text class="rb-pop" x="${x}" y="${y+18}" font-size="50" text-anchor="middle">${col}</text>`:`<text x="${x}" y="${y+14}" font-size="36" text-anchor="middle" fill="#fff">?</text>`}</g>`;
+  if(type==='res') return `<g id="rb-c-${id}"><line x1="${x-62}" y1="${y}" x2="${x-36}" y2="${y}" stroke="#9AA5B8" stroke-width="5"/><line x1="${x+36}" y1="${y}" x2="${x+62}" y2="${y}" stroke="#9AA5B8" stroke-width="5"/><rect x="${x-38}" y="${y-17}" width="76" height="34" rx="15" fill="#E9CFA0" stroke="#9C7A45" stroke-width="3"/>${[['#8B4513',-22],['#111',-8],['#E53935',6],['#D4AF37',22]].map(([c,d])=>`<rect x="${x+d-3}" y="${y-17}" width="7" height="34" fill="${c}"/>`).join('')}<text x="${x}" y="${y-28}" font-size="26" text-anchor="middle">🐌</text></g>`;
+  if(type==='pot'){ const pos=swOn|0, ang=-120+pos*80; return `<g id="rb-c-${id}" class="rb-pot" style="cursor:pointer"><circle cx="${x}" cy="${y-24}" r="56" fill="rgba(255,255,255,.01)"/>${[0,1,2,3].map(i=>{ const a=(-120+i*80-90)*Math.PI/180; return `<circle cx="${x+Math.cos(a)*54}" cy="${y-24+Math.sin(a)*54}" r="${5+i*2}" fill="${i<=pos?'#FFD34A':'rgba(255,255,255,.35)'}"/>`; }).join('')}<circle cx="${x}" cy="${y-24}" r="40" fill="#2B2F3A" stroke="#8D99AB" stroke-width="4"/><g style="transform:rotate(${ang}deg);transform-origin:${x}px ${y-24}px;transition:transform .25s"><circle cx="${x}" cy="${y-24}" r="30" fill="#5A6070"/><rect x="${x-5}" y="${y-54}" width="10" height="26" rx="5" fill="#FFD34A"/></g><path d="M${x-14} ${y+14} L${x-30} ${y+50} M${x+14} ${y+14} L${x+30} ${y+50}" stroke="#8D99AB" stroke-width="5"/><text x="${x+62}" y="${y+30}" font-size="26">🔄</text></g>`; }
+  if(type==='solar') return `<g id="rb-c-${id}"><g transform="translate(${x} ${y}) skewX(-12)"><rect x="-86" y="-58" width="172" height="104" rx="8" fill="#1B3A7A" stroke="#C9D3E0" stroke-width="5"/>${[0,1,2,3].map(i=>[0,1].map(j=>`<rect class="rb-cell" x="${-78+i*41}" y="${-50+j*46}" width="36" height="40" fill="#2E63C9"/>`).join('')).join('')}</g><rect x="${x-6}" y="${y+46}" width="12" height="22" fill="#8D99AB"/><path d="M${x-30} ${y+56} L${x-60} ${y+72} M${x+30} ${y+56} L${x+60} ${y+72}" stroke="#8D99AB" stroke-width="5"/><text x="${x-84}" y="${y+86}" font-size="24" font-weight="800" fill="#fff">−</text><text x="${x+70}" y="${y+86}" font-size="22" font-weight="800" fill="#FFB21E">+</text></g>`;
 }
 function zoneCirc(){ view='circ'; levelGrid(CL,'c',circLevel,'circ'); }
-/* rezolvă circuitul: noduri = grupuri de terminale unite prin fire / întrerupătoare închise; becuri, motoare, sonerii, LED-uri = rezistențe de 1; bateria = 1 V */
+/* rezolvă circuitul (analiză nodală): fire, întrerupătoare/butoane închise, materiale conductoare = legături perfecte;
+   becuri, motoare, sonerii, LED-uri, rezistor = 1; potențiometru = POTR[poz]; sursă = 1 V cu rezistență internă .05 */
 function solveCircuit(L,wires,sw){
-  const T={}, type={}; L.c.forEach(([id,t,x,y])=>{ const q=terms(t,x,y); T[id+'.a']=q.a; T[id+'.b']=q.b; type[id]=t; });
+  sw=sw||{}; const T={}, type={}; L.c.forEach(([id,t,x,y])=>{ const q=terms(t,x,y); T[id+'.a']=q.a; T[id+'.b']=q.b; type[id]=t; });
   const keys=Object.keys(T), par={}; keys.forEach(k=>par[k]=k); const f=k=>par[k]===k?k:(par[k]=f(par[k])); const u=(a,b)=>{ par[f(a)]=f(b); };
-  wires.forEach(([a,b])=>u(a,b)); L.c.forEach(([id,t])=>{ if(t==='sw'&&sw[id]) u(id+'.a',id+'.b'); });
-  const G0=f('bat.a'), G1=f('bat.b'); const loads=L.c.filter(([id,t])=>t!=='bat'&&t!=='sw').map(([id,t])=>({id,t,a:f(id+'.a'),b:f(id+'.b')}));
-  if(G0===G1) return {short:true,I:{},T,f,bypass:[]};
+  wires.forEach(([a,b])=>{ if(T[a]&&T[b]) u(a,b); });
+  L.c.forEach(([id,t])=>{ if((t==='sw'||t==='btn'||t==='gap')&&sw[id]) u(id+'.a',id+'.b'); if(t==='pot'&&!POTR[sw[id]|0]) u(id+'.a',id+'.b'); });
+  const srcs=L.c.filter(([,t])=>SRC(t)).map(([id,t])=>({id,a:f(id+'.a'),b:f(id+'.b'),V:t==='bat'?1:(sw.__sun===false?0:1)}));
+  const loads=L.c.filter(([id,t])=>!SRC(t)&&t!=='sw'&&t!=='btn'&&t!=='gap'&&!(t==='pot'&&!POTR[sw[id]|0])).map(([id,t])=>({id,t,a:f(id+'.a'),b:f(id+'.b'),R:t==='pot'?POTR[sw[id]|0]:1}));
+  const shortS=srcs.filter(s=>s.a===s.b&&s.V>0);
+  if(shortS.length) return {short:true,I:{},T,f,bypass:[],rev:[],burnt:[],loads,srcs,src:shortS[0].id};
   const bypass=loads.filter(l=>l.a===l.b).map(l=>l.id);
-  let off=new Set(), V={}, rev=[];
-  for(let it=0;it<6;it++){
-    const nodes=[...new Set(keys.map(f))].filter(g=>g!==G0&&g!==G1), idx={}; nodes.forEach((g,i)=>idx[g]=i); const n=nodes.length;
-    const A=nodes.map(()=>new Array(n+1).fill(0)); nodes.forEach((g,i)=>A[i][i]+=1e-6);
-    const act=loads.filter(l=>!off.has(l.id)&&l.a!==l.b);
-    const vf=g=>g===G0?0:g===G1?1:null;
-    act.forEach(l=>{ [[l.a,l.b],[l.b,l.a]].forEach(([p,q])=>{ if(idx[p]==null) return; const i=idx[p]; A[i][i]+=1; if(idx[q]!=null) A[i][idx[q]]-=1; else A[i][n]+=vf(q); }); });
+  const G=srcs.length?srcs[0].a:f(keys[0]), g=20;
+  let off=new Set(), V={}, rev=[], burnt=[], I={};
+  for(let it=0;it<8;it++){
+    const nodes=[...new Set(keys.map(f))].filter(x=>x!==G), idx={}; nodes.forEach((x,i)=>idx[x]=i); const n=nodes.length;
+    const A=nodes.map(()=>new Array(n+1).fill(0)); nodes.forEach((x,i)=>A[i][i]+=1e-6);
+    const stamp=(p,q,c)=>{ if(idx[p]!=null){ A[idx[p]][idx[p]]+=c; if(idx[q]!=null) A[idx[p]][idx[q]]-=c; } if(idx[q]!=null){ A[idx[q]][idx[q]]+=c; if(idx[p]!=null) A[idx[q]][idx[p]]-=c; } };
+    loads.filter(l=>!off.has(l.id)&&l.a!==l.b).forEach(l=>stamp(l.a,l.b,1/l.R));
+    srcs.forEach(s=>{ if(s.a===s.b) return; stamp(s.a,s.b,g); if(idx[s.b]!=null) A[idx[s.b]][n]+=g*s.V; if(idx[s.a]!=null) A[idx[s.a]][n]-=g*s.V; });
     for(let i=0;i<n;i++){ let m=i; for(let r=i+1;r<n;r++) if(Math.abs(A[r][i])>Math.abs(A[m][i])) m=r; [A[i],A[m]]=[A[m],A[i]]; const p=A[i][i]||1e-12; for(let r=0;r<n;r++){ if(r===i) continue; const k=A[r][i]/p; if(k) for(let c=i;c<=n;c++) A[r][c]-=k*A[i][c]; } }
-    V={}; V[G0]=0; V[G1]=1; nodes.forEach((g,i)=>V[g]=A[i][n]/(A[i][i]||1e-12));
-    const bad=act.filter(l=>l.t==='led'&&V[l.a]-V[l.b]>0.02); if(!bad.length) break; bad.forEach(l=>{ off.add(l.id); rev.push(l.id); });
+    V={}; V[G]=0; nodes.forEach((x,i)=>V[x]=A[i][n]/(A[i][i]||1e-12));
+    I={}; loads.forEach(l=>{ I[l.id]=(off.has(l.id)||l.a===l.b)?0:Math.abs(V[l.a]-V[l.b])/l.R; });
+    const bad=loads.filter(l=>!off.has(l.id)&&l.t==='led'&&l.a!==l.b&&V[l.a]-V[l.b]>0.02);
+    const hot=loads.filter(l=>!off.has(l.id)&&l.t==='led'&&I[l.id]>1.4);
+    if(!bad.length&&!hot.length) break; bad.forEach(l=>{ off.add(l.id); rev.push(l.id); }); hot.forEach(l=>{ off.add(l.id); burnt.push(l.id); });
   }
-  const I={}; loads.forEach(l=>{ I[l.id]=(off.has(l.id)||l.a===l.b)?0:Math.abs(V[l.a]-V[l.b]); });
-  return {short:false,I,T,f,V,bypass,rev,loads,G0,G1};
+  loads.forEach(l=>{ if(off.has(l.id)) I[l.id]=0; });
+  const big=srcs.find(s=>s.a!==s.b&&Math.abs((V[s.b]-V[s.a]-s.V)*g)>4);
+  if(big) return {short:true,I:{},T,f,bypass:[],rev:[],burnt:[],loads,srcs,src:big.id};
+  return {short:false,I,T,f,V,bypass,rev,burnt,loads,srcs};
 }
 function circLevel(li){
   stopAll(); view='circL'; setTop(false); back=zoneCirc; curRestart=()=>circLevel(li); const myGen=gen;
-  const L=CL[li]; let wires=[], sw={}, errs=0, done=false, said={}, drag=null, ring=null;
-  L.c.forEach(([id,t])=>{ if(t==='sw') sw[id]=false; });
-  const F=frame(X().cg[li]); F.bub.onclick=()=>sp(X().cg[li]+' '+X().circIntro);
+  const L=CL[li], XC=()=>X().cm||{};
+  const G=()=>L.k?X().cx[L.k][0]:X().cg[L.o], W=()=>L.k?X().cx[L.k][1]:X().cwhy[L.o];
+  const nFx=(L.fx||[]).length; let wires=(L.fx||[]).map(w=>w.slice()), sw={}, errs=0, done=false, said={}, drag=null, ring=null, phase=0, presses=0, held=null, heldRang=false, placed=null, tested={};
+  L.c.forEach(([id,t])=>{ if(t==='sw'||t==='btn'||t==='gap') sw[id]=false; if(t==='pot') sw[id]=1; }); if(L.sun) sw.__sun=true;
+  const goalTxt=()=>L.chk&&L.chk.seq?XC()[L.chk.seq[phase]]||G():G();
+  const dotsN=L.chk&&L.chk.press?L.chk.press:L.chk&&L.chk.mat?MATS.length:L.chk&&L.chk.seq?L.chk.seq.length:0;
+  const F=frame(G(),dotsN); F.bub.onclick=()=>sp(goalTxt()+(L.o===0?' '+X().circIntro:''));
   const COLS2=['#FF5D7A','#4AA8FF','#FFD34A','#B07CFF','#FF9F43','#4BE0B0'];
-  const say1=(k,t)=>{ if(said[k]) return; said[k]=true; sp(t); };
-  function wireActive(E,i){ const [p,q]=wires[i]; const g=E.f(p); const cur=new Set(); const on=id=>E.I[id]>=0.3;
-    E.loads.forEach(l=>{ if(on(l.id)){ cur.add(l.id+'.a'); cur.add(l.id+'.b'); } }); if([...cur].length){ cur.add('bat.a'); cur.add('bat.b'); }
+  const srcTerm=k=>{ const id=k.split('.')[0], c=L.c.find(q=>q[0]===id); return c&&SRC(c[1]); };
+  function wireActive(E,i){ const [p,q]=wires[i]; const g=E.f(p); const cur=new Set(); const on=id=>E.I[id]>=0.12;
+    E.loads.forEach(l=>{ if(on(l.id)){ cur.add(l.id+'.a'); cur.add(l.id+'.b'); } }); if(cur.size) E.srcs.forEach(s=>{ cur.add(s.id+'.a'); cur.add(s.id+'.b'); });
     const adj={}; const add=(a,b,k)=>{ (adj[a]=adj[a]||[]).push([b,k]); (adj[b]=adj[b]||[]).push([a,k]); };
-    wires.forEach((w,k)=>{ if(E.f(w[0])===g) add(w[0],w[1],'w'+k); }); L.c.forEach(([id,t])=>{ if(t==='sw'&&sw[id]&&E.f(id+'.a')===g) add(id+'.a',id+'.b','s'+id); });
+    wires.forEach((w,k)=>{ if(E.f(w[0])===g) add(w[0],w[1],'w'+k); });
+    L.c.forEach(([id,t])=>{ if((t==='sw'||t==='btn'||t==='gap'||t==='pot')&&E.f(id+'.a')===g&&E.f(id+'.b')===g) add(id+'.a',id+'.b','s'+id); });
     const reach=(s)=>{ const seen=new Set([s]), st=[s]; while(st.length){ const x=st.pop(); (adj[x]||[]).forEach(([y,k])=>{ if(k==='w'+i||seen.has(y)) return; seen.add(y); st.push(y); }); } return seen; };
     const A=reach(p), B=reach(q); if(A.has(q)) return false; const has=S=>[...S].some(k=>cur.has(k)); return has(A)&&has(B); }
   function render(){ const E=solveCircuit(L,wires,sw); const T=E.T;
     let s='<svg viewBox="0 0 900 520"><rect x="10" y="10" width="880" height="500" rx="26" fill="#2F7D5B"/><rect x="22" y="22" width="856" height="476" rx="20" fill="#3B9B6F"/>';
     for(let i=0;i<16;i++) for(let j=0;j<9;j++) s+=`<circle cx="${60+i*52}" cy="${50+j*52}" r="2.5" fill="rgba(255,255,255,.18)"/>`;
+    if(L.sun){ const on=sw.__sun; s+=`<g id="rb-sky" style="cursor:pointer"><circle cx="120" cy="96" r="70" fill="${on?'rgba(255,230,90,.25)':'rgba(255,255,255,.06)'}" class="${on?'rb-goal':''}"/><text x="120" y="122" font-size="78" text-anchor="middle">${on?'☀️':'🌥️'}</text>${on?[0,1,2].map(i=>`<line class="rb-beam" x1="${170+i*12}" y1="${130+i*10}" x2="${222+i*8}" y2="${210+i*14}" stroke="#FFE45C" stroke-width="5" stroke-dasharray="8 10" stroke-linecap="round"/>`).join(''):''}</g>`; }
     if(L.st){ const lit=done||okNow; s+=`<text x="840" y="80" font-size="58" text-anchor="middle">${lit?L.st[1]:L.st[0]}</text>`; }
-    L.c.forEach(([id,type,x,y,col])=>{ const I=E.I[id]||0; const cls=I>=0.8?'on':I>=0.3?'on dim':''; s+=`<g class="${cls}">${compSVG(id,type,x,y,sw[id],col)}</g>`; });
+    L.c.forEach(([id,type,x,y,col])=>{ const I=E.I[id]||0; let cls=I>=1.5?'on turbo':I>=0.8?'on':I>=0.3?'on dim':I>=0.12?'on faint':''; if(E.burnt.includes(id)) cls='burnt'; if(type==='solar'&&sw.__sun) cls='sunny';
+      const st=type==='gap'?placed&&placed[1]:col; s+=`<g class="${cls}">${compSVG(id,type,x,y,sw[id],st)}</g>`;
+      if(E.burnt.includes(id)) s+=`<text class="rb-boom" x="${x}" y="${y-10}" font-size="64" text-anchor="middle">💥</text><text class="rb-smoke" x="${x+20}" y="${y-60}" font-size="40" text-anchor="middle">💨</text>`; });
     const wpath=(p,q)=>{ const mx=(p[0]+q[0])/2, my=Math.max(p[1],q[1])+50; return `M${p[0]} ${p[1]} Q${mx} ${my} ${q[0]} ${q[1]}`; };
-    wires.forEach((w,i)=>{ const d=wpath(T[w[0]],T[w[1]]); const act=!E.short&&wireActive(E,i);
-      s+=`<g opacity="${act?1:.55}"><path d="${d}" stroke="#1C2A40" stroke-width="13" fill="none" stroke-linecap="round"/><path class="rb-wire" data-i="${i}" d="${d}" stroke="${act||E.short?COLS2[i%6]:'#9AA5B8'}" stroke-width="8" fill="none" stroke-linecap="round" style="cursor:pointer"/></g>`;
-      if(act) s+=`<path class="rb-flow" d="${d}" stroke="#FFF59A" stroke-width="4" fill="none" stroke-linecap="round" pointer-events="none" style="animation-duration:${(0.9-0.5*Math.min(1,maxI(E))).toFixed(2)}s"/>`; });
-    if(E.short) s=s.replace(`id="rb-c-bat"`,`id="rb-c-bat" class="rb-hot"`)+`<text x="${L.c[0][2]}" y="${L.c[0][3]-40}" font-size="40" text-anchor="middle">🔥</text>`;
-    for(const k in T){ const [x,y]=T[k]; const plus=k==='bat.b', minus=k==='bat.a'; s+=`<circle class="rb-term" data-t="${k}" cx="${x}" cy="${y}" r="16" fill="${plus?'#FFB21E':minus?'#C9D3E0':'#fff'}" stroke="#24325F" stroke-width="4"/>`; }
+    wires.forEach((w,i)=>{ const d=wpath(T[w[0]],T[w[1]]); const act=!E.short&&wireActive(E,i); const fx=i<nFx;
+      s+=`<g opacity="${act||fx?1:.55}"><path d="${d}" stroke="#1C2A40" stroke-width="13" fill="none" stroke-linecap="round"/><path class="rb-wire" data-i="${i}" d="${d}" stroke="${act||E.short?COLS2[i%6]:fx?'#C9D3E0':'#9AA5B8'}" stroke-width="8" fill="none" stroke-linecap="round" style="cursor:${fx?'default':'pointer'}"/></g>`;
+      if(act) s+=`<path class="rb-flow" d="${d}" stroke="#FFF59A" stroke-width="4" fill="none" stroke-linecap="round" pointer-events="none" style="animation-duration:${(0.9-0.25*Math.min(2,maxI(E))).toFixed(2)}s"/>`; });
+    if(E.short){ const sc=L.c.find(c=>c[0]===E.src)||L.c[0]; s=s.replace(`id="rb-c-${sc[0]}"`,`id="rb-c-${sc[0]}" class="rb-hot"`)+`<text x="${sc[2]}" y="${sc[3]-40}" font-size="40" text-anchor="middle">🔥</text>`; }
+    for(const k in T){ if(L.chk&&L.chk.mat) break; const [x,y]=T[k]; const plus=srcTerm(k)&&k.endsWith('.b'), minus=srcTerm(k)&&k.endsWith('.a'); s+=`<circle class="rb-term" data-t="${k}" cx="${x}" cy="${y}" r="16" fill="${plus?'#FFB21E':minus?'#C9D3E0':'#fff'}" stroke="#24325F" stroke-width="4"/>`; }
     s+='<path id="rb-tmp" stroke="#fff" stroke-width="7" stroke-dasharray="10 8" fill="none" stroke-linecap="round" pointer-events="none"/><path id="rb-ghost" stroke="#FFF59A" stroke-width="8" stroke-dasharray="4 10" fill="none" stroke-linecap="round" pointer-events="none"/></svg>';
     F.stage.innerHTML=s; const svg=F.stage.firstChild;
     svg.querySelectorAll('.rb-term').forEach(c=>c.onpointerdown=e=>{ if(done) return; e.preventDefault(); drag={from:c.dataset.t}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} blip(); });
     svg.onpointermove=e=>{ if(!drag) return; const p=pt(svg,e), a=T[drag.from]; svg.querySelector('#rb-tmp').setAttribute('d',`M${a[0]} ${a[1]} L${p.x} ${p.y}`); };
     svg.onpointerup=e=>{ if(!drag) return; const p=pt(svg,e); let best=null,bd=42; for(const k in T){ const d=Math.hypot(T[k][0]-p.x,T[k][1]-p.y); if(d<bd){ bd=d; best=k; } }
       const f=drag.from; drag=null; if(best&&best!==f&&!wires.some(w=>(w[0]===f&&w[1]===best)||(w[1]===f&&w[0]===best))){ wires.push([f,best]); snd(660,.08); after(); } else render(); };
-    svg.querySelectorAll('.rb-wire').forEach(w=>w.onclick=()=>{ if(done) return; wires.splice(+w.dataset.i,1); snd(300,.08); after(); });
+    svg.querySelectorAll('.rb-wire').forEach(w=>w.onclick=()=>{ if(done||+w.dataset.i<nFx) return; wires.splice(+w.dataset.i,1); snd(300,.08); after(); });
     svg.querySelectorAll('.rb-sw').forEach(g=>g.onclick=()=>{ if(done) return; const id=g.id.replace('rb-c-',''); sw[id]=!sw[id]; snd(sw[id]?900:500,.06,'square',.08); after(); });
+    svg.querySelectorAll('.rb-pot').forEach(g=>g.onclick=()=>{ if(done) return; const id=g.id.replace('rb-c-',''); sw[id]=((sw[id]|0)+1)%4; [520,600,700,820].slice(0,sw[id]+1).forEach((fq,i)=>setTimeout(()=>snd(fq,.05,'square',.05),i*40)); after(); });
+    svg.querySelectorAll('.rb-btn').forEach(g=>g.onpointerdown=e=>{ if(done) return; e.preventDefault(); e.stopPropagation(); const id=g.id.replace('rb-c-',''); held=id; heldRang=false; sw[id]=true; snd(300,.05,'square',.06);
+      const up=()=>{ window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up); if(held!==id) return; held=null; sw[id]=false; after(); if(heldRang) onPress(); }; window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up); after(); });
+    const sky=svg.querySelector('#rb-sky'); if(sky) sky.onclick=()=>{ if(done) return; sw.__sun=!sw.__sun; snd(sw.__sun?990:330,.15,'sine',.1); after(); };
     return E;
   }
   const maxI=E=>Math.max(0,...Object.values(E.I||{}));
   function checkGoal(E){ const c=L.chk; if(!c||E.short) return {on:false,ok:false};
-    const on=(c.on||[]).every(id=>E.I[id]>=0.3)&&(c.bright||[]).every(id=>E.I[id]>=0.8)&&(c.sw||[]).every(id=>sw[id]);
+    if(c.mat||c.press||c.seq) return {on:false,ok:false};
+    const on=(c.on||[]).every(id=>E.I[id]>=0.3)&&(c.bright||[]).every(id=>E.I[id]>=0.8)&&(c.turbo||[]).every(id=>E.I[id]>=1.5)&&(c.sw||[]).every(id=>sw[id]);
     return {on,ok:on}; }
   function structure(){ const c=L.chk; const S=o=>solveCircuit(L,wires,Object.assign({},sw,o)); const lit=(E,id)=>E.I[id]>=0.3;
     if(c.sw){ for(const id of c.sw){ if(lit(S({[id]:false}),(c.on||c.bright)[0])) return 'masterH'; } }
@@ -7473,36 +7518,78 @@ function circLevel(li){
     if(c.indep){ for(const [s,d] of c.indep){ const E=S({[s]:false}); if(lit(E,d)) return 'indepH'; if(c.indep.some(([s2,d2])=>d2!==d&&!lit(E,d2))) return 'indepH'; } }
     if(c.master){ const E=S({[c.master]:false}); if((c.bright||[]).some(id=>lit(E,id))) return 'masterH'; }
     return null; }
-  function sound(E){ const z=L.c.filter(([id,t])=>t==='buzz'&&E.I[id]>=0.3); if(z.length&&!ring){ const play=()=>{ [0,1].forEach(i=>setTimeout(()=>{ snd(880,.18,'square',.07); setTimeout(()=>snd(660,.22,'square',.07),180); },i*450)); }; play(); ring=setInterval(play,1100); timers.push(ring); }
+  function sound(E){ const z=L.c.filter(([id,t])=>t==='buzz'&&E.I[id]>=0.3); if(z.length&&held) heldRang=true;
+    if(z.length&&!ring){ const play=()=>{ [0,1].forEach(i=>setTimeout(()=>{ snd(880,.18,'square',.07); setTimeout(()=>snd(660,.22,'square',.07),180); },i*450)); }; play(); ring=setInterval(play,1100); timers.push(ring); }
     if(!z.length&&ring){ clearInterval(ring); ring=null; } }
   let prevOn=new Set(), okNow=false, lastWarn='';
   function warn(key,msg,ids){ ids.forEach(id=>{ const g=F.stage.querySelector('#rb-c-'+id); if(g) g.classList.add('rb-warn'); }); F.set('⚠️ '+msg); F.bub.classList.add('rb-warnb'); if(key!==lastWarn){ lastWarn=key; boing(); sp(msg); } }
-  function clearWarn(){ if(lastWarn){ lastWarn=''; F.set(X().cg[li]); F.bub.classList.remove('rb-warnb'); } }
+  function clearWarn(){ if(lastWarn){ lastWarn=''; F.set(goalTxt()); F.bub.classList.remove('rb-warnb'); } }
+  async function win(){ if(done) return; done=true; okNow=true; render(); clearWarn(); chime(); award(); try{ confetti(14); }catch(e){} F.set('⚡ '+W()); await spW(X().circOk+' '+W(),2600); if(myGen!==gen) return; if(ring){ clearInterval(ring); ring=null; }
+    finish('c'+li,rate(errs),null,li<CL.length-1?()=>circLevel(li+1):null); }
+  function onPress(){ if(done||!L.chk.press) return; const E=solveCircuit(L,wires,sw); if(E.I.Z1>=0.3) return; presses++; F.dot(presses); chime(); if(presses>=L.chk.press) win(); else if(presses===1) sp(XC().press2); }
+  function phaseOK(k,E){ const S=o=>solveCircuit(L,wires,Object.assign({},sw,o));
+    if(k==='potHi') return E.I.L1>=0.8&&S({K1:3}).I.L1<0.6;
+    if(k==='potLo') return E.I.L1>=0.12&&E.I.L1<0.55&&S({K1:0}).I.L1>=0.8;
+    if(k==='sunOn') return sw.__sun&&E.I.M1>=0.3;
+    if(k==='sunOff') return !sw.__sun&&S({__sun:true}).I.M1>=0.3;
+    return false; }
   async function after(){ okNow=false; const E=render(); sound(E);
     if(E.short){ if(!said.short){ said.short=true; errs++; boing(); sp(X().shortC); } return; } said.short=false;
-    const nowOn=new Set(Object.keys(E.I).filter(id=>E.I[id]>=0.3)); nowOn.forEach(id=>{ if(!prevOn.has(id)){ const t=L.c.find(c=>c[0]===id)[1]; if(t==='motor') snd(140,.3,'sawtooth',.05); else if(t!=='buzz') snd(1200,.1,'sine',.08); } }); prevOn=nowOn;
-    if(!L.chk) return;
-    const g=checkGoal(E), c=L.chk, swIds=L.c.filter(([,t])=>t==='sw').map(([id])=>id);
+    const nowOn=new Set(Object.keys(E.I).filter(id=>E.I[id]>=0.3)); nowOn.forEach(id=>{ if(!prevOn.has(id)){ const t=L.c.find(c=>c[0]===id)[1]; if(t==='motor') snd(140,.3,'sawtooth',.05); else if(t!=='buzz'&&t!=='res'&&t!=='pot') snd(1200,.1,'sine',.08); } }); prevOn=nowOn;
+    if(!L.chk||done) return;
+    const c=L.chk, swIds=L.c.filter(([,t])=>t==='sw').map(([id])=>id);
+    if(E.burnt.length){ if(!said['b'+wires.length]){ said['b'+wires.length]=true; errs++; [200,140,90].forEach((fq,i)=>setTimeout(()=>snd(fq,.12,'sawtooth',.08),i*70)); } warn('burn',XC().burn,E.burnt); return; }
+    if(E.rev.length){ warn('rev',X().ledRev,E.rev); return; }
+    if(c.press){ const z=E.I.Z1>=0.3; if(z&&!held){ warn('btnOut',XC().btnOut,['P1']); return; }
+      const E2=solveCircuit(L,wires,Object.assign({},sw,{P1:true})); if(!held&&E2.I.Z1>=0.3&&!presses){ say1('pressNow',XC().press); }
+      if(E.bypass.length){ warn('bp',X().bypass(X().cn[L.c.find(k=>k[0]===E.bypass[0])[1]]),E.bypass); return; } clearWarn(); return; }
+    if(c.seq){ const k=c.seq[phase];
+      if(L.k==='pot'&&E.I.L1>=0.3&&Math.abs(solveCircuit(L,wires,Object.assign({},sw,{K1:0})).I.L1-solveCircuit(L,wires,Object.assign({},sw,{K1:3})).I.L1)<0.1){ warn('potOut',XC().potOut,['K1']); return; }
+      if(E.bypass.length){ warn('bp',X().bypass(X().cn[L.c.find(q=>q[0]===E.bypass[0])[1]]),E.bypass); return; }
+      clearWarn();
+      if(phaseOK(k,E)){ phase++; F.dot(phase); chime(); award(); try{ confetti(6); }catch(_){} if(phase>=c.seq.length) return win(); const nx=XC()[c.seq[phase]]; F.set(nx); sp(nx); }
+      else { if(wires.length>nFx) F.set(goalTxt()); if(L.k==='pot'&&k==='potHi'&&E.I.L1>=0.12) say1('turn',XC().turn); }
+      return; }
+    const g=checkGoal(E);
     const loose=swIds.find(id=>sw[id]&&!wires.some(w=>w[0].startsWith(id+'.')||w[1].startsWith(id+'.')));
     if(!g.on){
       if(loose&&wires.length){ warn('loose',X().swLoose,[loose]); return; }
+      if(c.turbo){ if(c.turbo.every(id=>E.I[id]>=0.3)){ warn('ser',XC().serH,['bat','B2']); return; }
+        if(wires.some(([p,q])=>(p==='bat.b'&&q==='B2.b')||(p==='B2.b'&&q==='bat.b')||(p==='bat.a'&&q==='B2.a')||(p==='B2.a'&&q==='bat.a'))&&wires.length>=3){ warn('opp',XC().oppH,['bat','B2']); return; } }
+      if(c.on&&c.on.includes('R1')&&E.I.D1>=0.3&&E.I.R1<0.3){ warn('resOut',XC().resOut,['R1']); return; }
       if(c.bright&&c.bright.every(id=>E.I[id]>=0.3)&&L.c.some(([id,t])=>t==='bulb'&&c.bright.includes(id))){ warn('dim',X().dim,c.bright); return; }
       if(c.sw&&!c.sw.every(id=>sw[id])&&(c.on||c.bright||[]).some(id=>E.I[id]>=0.3)){ warn('swOut',X().swOut,c.sw); return; }
       if(c.sw&&!c.sw.every(id=>sw[id])){ const o={}; c.sw.forEach(k=>o[k]=true); const E2=solveCircuit(L,wires,Object.assign({},sw,o)); if((c.on||[]).every(id=>E2.I[id]>=0.3)){ warn('swNow',X().swNow,c.sw); return; } }
-      if(E.rev.length){ warn('rev',X().ledRev,E.rev); return; }
       if(E.bypass.length){ warn('bp',X().bypass(X().cn[L.c.find(k=>k[0]===E.bypass[0])[1]]),E.bypass); return; }
       clearWarn(); return; }
     const st=structure(); if(st){ const msg=(st==='masterH')?X().swOut:X()[st]; warn(st,msg,swIds); return; }
-    okNow=true; render(); clearWarn();
-    if(!done){ done=true; chime(); award(); try{ confetti(14); }catch(e){} F.set('⚡ '+X().cwhy[li]); await spW(X().circOk+' '+X().cwhy[li],2600); if(myGen!==gen) return; if(ring){ clearInterval(ring); ring=null; }
-      finish('c'+li,rate(errs),null,li<CL.length-1?()=>circLevel(li+1):null); }
+    win();
   }
-  function hint(){ if(done||!L.sol.length) return; errs++; const E=solveCircuit(L,wires,sw);
-    const miss=L.sol.find(([p,q])=>E.f(p)!==E.f(q)); const svg=F.stage.firstChild, T=E.T;
+  const say1=(k,t)=>{ if(said[k]) return; said[k]=true; sp(t); };
+  function hint(){ if(done) return; if(L.chk&&L.chk.mat){ sp(XC().matH); return; } if(!L.sol.length) return; errs++; const E=solveCircuit(L,wires,sw);
+    const miss=L.sol.find(([p,q])=>E.f(p)!==E.f(q)&&!(L.c.some(([id,t])=>(t==='pot'||t==='btn')&&p.startsWith(id+'.')&&q.startsWith(id+'.')))); const svg=F.stage.firstChild, T=E.T;
     if(miss){ const a=T[miss[0]], b=T[miss[1]]; const g=svg.querySelector('#rb-ghost'); g.setAttribute('d',`M${a[0]} ${a[1]} L${b[0]} ${b[1]}`); g.classList.add('rb-need'); timers.push(setTimeout(()=>{ g.setAttribute('d',''); },2600)); blip(); }
-    else if(L.chk&&L.chk.sw) sp(X().swNow); }
-  render(); F.ctrl.append(btn(X().hint,'',hint),btn(X().clear,'',()=>{ if(done) return; wires=[]; said={}; after(); }));
-  sp(X().cg[li]+(li===0?' '+X().circIntro:''));
+    else if(L.chk&&L.chk.sw) sp(X().swNow);
+    else if(L.chk&&(L.chk.press||L.chk.seq)) sp(goalTxt()); }
+  /* nivelul cu materiale: prezice → testează → explică */
+  function matTray(){ F.ctrl.innerHTML=''; const tray=el('div','rb-tray');
+    MATS.forEach(([k,e,yes])=>{ const b=el('button','',`${e}<b>${tested[k]==null?'':tested[k]?'💡':'🌑'}</b>`); if(tested[k]!=null) b.style.opacity='.55';
+      b.onclick=()=>{ if(done||busyM) return; blip(); predict(k,e,yes); }; tray.appendChild(b); });
+    F.ctrl.append(tray); }
+  let busyM=false;
+  function predict(k,e,yes){ busyM=true; placed=[k,e]; sw.G1=false; render(); const nm=XC().obj[k];
+    F.ctrl.innerHTML=''; const box=el('div','rb-tray'); const q=XC().predQ(nm); F.set('🤔 '+q); sp(q);
+    const mk=(ic,ans)=>{ const b=el('button','',ic); b.style.fontSize='3rem'; b.onclick=()=>test(k,e,yes,ans); return b; };
+    box.append(mk('💡',1),mk('🌑',0)); F.ctrl.append(box); busyM=false; }
+  async function test(k,e,yes,ans){ if(busyM) return; busyM=true; sw.G1=!!yes; const E=render(); sound(E); if(yes) snd(1200,.12,'sine',.1); else snd(220,.15,'triangle',.08);
+    const nm=XC().obj[k]; const good=ans===yes; if(good){ award(); chime(); } else { errs++; }
+    tested[k]=yes; const n=Object.keys(tested).length; F.dot(n);
+    const msg=(good?XC().predOk:XC().predNo)+' '+(yes?XC().yes(nm):XC().no(nm)); F.set((yes?'💡 ':'🌑 ')+msg); await spW(msg,1800); if(myGen!==gen) return;
+    busyM=false; if(n>=MATS.length) return win(); placed=null; sw.G1=false; render(); F.set(G()); matTray(); }
+  render();
+  if(L.chk&&L.chk.mat) matTray();
+  else F.ctrl.append(btn(X().hint,'',hint),btn(X().clear,'',()=>{ if(done) return; wires=(L.fx||[]).map(w=>w.slice()); said={}; after(); }));
+  sp(G()+(L.o===0?' '+X().circIntro:''));
 }
 
 /* ================= 4. SENZORI ================= */
@@ -12709,6 +12796,375 @@ document.addEventListener('touchmove',e=>{ if(e.touches&&e.touches.length>1) sto
   const NM={caras:['o carássio','Carássio','O carássio é um peixe dourado e calmo. Ele gosta de plantas e minhocas.'],crap:['a carpa','Carpa','A carpa tem bigodinhos para procurar comida na lama.'],pastrav:['a truta','Truta','A truta vive nos riachos frios das montanhas. Tem pintas pretas e uma listra rosa.'],biban:['a perca','Perca','A perca tem listras nas costas e nadadeiras vermelhas. Ela caça peixinhos.'],somn:['o bagre','Bagre','O bagre tem bigodes compridos e come quase tudo. Ele caça de noite.'],stiuca:['o lúcio','Lúcio','O lúcio é o grande caçador dos rios. Ele se esconde e ataca rapidinho!'],rac:['o lagostim','Lagostim','O lagostim tem pinças e anda para trás. Ele limpa o fundo.'],testoasa:['a tartaruga','Tartaruga','A tartaruga-d’água leva a casa nas costas.'],plev:['o peixinho','Peixinho','']};
   for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
   const FD={alg:'as algas',worm:'as minhocas',ins:'os insetos',plev:'os peixinhos'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>
+<script>
+/* Robotică: traduceri lipsă (mecanică + circuite v2) pentru 9 limbi + textele capitolului 2 de circuite în 12 limbi */
+(function(){
+const A={
+fr:{lv:['Mets un lapin au même endroit de l’autre côté !','La balançoire est penchée ! Fais glisser le chien sur la planche, plus loin du milieu.','L’éléphant est lourd ! Une souris peut-elle le soulever ? Mets-la le plus loin possible !','Fais glisser un animal à droite pour que la balançoire soit droite !','Encore une ! Tu peux aussi utiliser deux animaux.'],
+ lvHeavyL:'Le côté gauche est plus lourd.',lvHeavyR:'Le côté droit est plus lourd.',lvPow:'Les tours montrent avec quelle force chaque côté pousse.',
+ gFacts:{fast:'Un vélo fonctionne pareil : le petit engrenage arrière tourne plus vite que les pédales !',dir:'Les horloges aussi : les engrenages se poussent les uns les autres.',chain:'L’engrenage du milieu transmet simplement le mouvement.'},
+ teeth:n=>`${n} dents`,
+ bike:['Appuie longtemps sur Pédaler ! Les pédales font tourner le grand engrenage, et la chaîne fait tourner le petit à l’arrière.','Fais un tour de pédale et compte : combien de fois la roue arrière tourne-t-elle ?','Fais la course avec l’escargot ! Choisis la bonne vitesse pour gagner.','En haut de la colline ! Choisis la vitesse qui rend la montée facile.','Dernière question : pour monter, tu choisis le grand ou le petit engrenage arrière ?'],
+ pedal:'🦶 Pédaler',oneTurn:'↻ Un tour de pédale',gEasy:'🐢 Facile',gMid:'🚲 Moyen',gFast:'🚀 Rapide',
+ bikeWhy:['La chaîne relie les deux engrenages. Quand tu pédales, la roue arrière tourne et le vélo avance !','Oui ! L’engrenage des pédales a deux fois plus de dents, donc la roue arrière tourne deux fois.','Tu as gagné ! Le petit engrenage arrière fait beaucoup de tours, tu vas vite sur le plat.','Tu as réussi ! Le grand engrenage arrière rend le pédalage facile, même si tu vas moins vite.','Exactement ! Le grand engrenage arrière est pour les côtes, le petit pour la vitesse.'],
+ lost:'L’escargot a gagné ! Essaie la vitesse rapide 🚀.',hard:'Ouf, c’est dur ! Essaie la vitesse facile 🐢.',bigCog:'🐢 Grand engrenage',smallCog:'🚀 Petit engrenage',countQ:'Combien de fois la roue arrière a-t-elle tourné ?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Allume l’ampoule !','Allume l’ampoule avec l’interrupteur !','Démarre le ventilateur pour rafraîchir RoboPufi !','Fais sonner la sonnette !','Allume deux ampoules, l’une après l’autre !','Allume les deux ampoules le plus fort possible !','Allume la LED rouge ! Attention : la LED a un plus et un moins.','Le feu tricolore : chaque LED avec son interrupteur !','Le coffre-fort : l’ampoule s’allume seulement si les deux interrupteurs sont allumés !','L’escalier : l’ampoule s’allume avec n’importe quel interrupteur !','La maison de RoboPufi : ampoule, ventilateur et sonnette, démarrés par un seul interrupteur !','Le labo : construis ce que tu veux !'],
+ cwhy:['L’électricité sort du plus, traverse l’ampoule et revient au moins. Un cercle complet !','L’interrupteur ouvre et ferme le chemin de l’électricité.','Le moteur transforme l’électricité en mouvement.','La sonnette transforme l’électricité en son !','Les ampoules l’une après l’autre se partagent l’électricité, alors elles brillent moins.','Quand chaque ampoule a son propre chemin vers la pile, les deux brillent fort !','La LED laisse passer l’électricité dans un seul sens.','Chaque LED a son interrupteur, comme un feu tricolore !','L’ampoule s’allume seulement avec les deux interrupteurs. Comme la porte d’un coffre-fort !','L’ampoule s’allume avec n’importe quel interrupteur. Comme la lumière de l’escalier !','Un seul interrupteur démarre toute la maison !',''],
+ dim:'Les ampoules sont faibles. Relie chaque ampoule directement à la pile !',ledRev:'La LED a un plus et un moins. Relie la patte plus de la LED vers le plus de la pile !',
+ bypass:c=>`Le fil contourne ${c} ! L’électricité prend le chemin le plus facile.`,cn:{bulb:'l’ampoule',motor:'le ventilateur',buzz:'la sonnette',led:'la LED',res:'la résistance',pot:'le bouton tournant'},
+ andH:'L’ampoule doit s’éteindre quand tu éteins n’importe quel interrupteur.',orH:'L’ampoule doit s’allumer avec chaque interrupteur tout seul.',indepH:'Chaque interrupteur doit allumer seulement sa LED.',masterH:'Quand tu éteins l’interrupteur, tout doit s’arrêter.',
+ loose:'Les fils gris ne portent pas d’électricité. Tu peux les garder ou les effacer.',swOut:'L’ampoule est allumée, mais l’interrupteur n’est pas sur le chemin de l’électricité ! Mets-le entre la pile et l’ampoule.',swLoose:'L’interrupteur n’est relié à rien. Branche-le dans le circuit !'},
+es:{lv:['¡Pon un conejo en el mismo sitio del otro lado!','¡El balancín está torcido! Arrastra el perro por la tabla, más lejos del centro.','¡El elefante pesa mucho! ¿Puede un ratón levantarlo? ¡Ponlo lo más lejos posible!','¡Arrastra un animal a la derecha para que el balancín quede recto!','¡Una más! También puedes usar dos animales.'],
+ lvHeavyL:'El lado izquierdo pesa más.',lvHeavyR:'El lado derecho pesa más.',lvPow:'Las torres muestran con cuánta fuerza empuja cada lado.',
+ gFacts:{fast:'¡La bicicleta funciona igual: el engranaje pequeño de atrás gira más rápido que los pedales!',dir:'Los relojes también: los engranajes se empujan unos a otros.',chain:'El engranaje del medio solo pasa el movimiento.'},
+ teeth:n=>`${n} dientes`,
+ bike:['¡Mantén pulsado Pedalear! Los pedales giran el engranaje grande y la cadena gira el pequeño de atrás.','Da una vuelta de pedal y cuenta: ¿cuántas veces gira la rueda de atrás?','¡Echa una carrera con el caracol! Elige la marcha correcta para ganar.','¡Cuesta arriba! Elige la marcha que hace fácil subir.','Última pregunta: para subir, ¿eliges el engranaje grande o el pequeño de atrás?'],
+ pedal:'🦶 Pedalear',oneTurn:'↻ Una vuelta de pedal',gEasy:'🐢 Fácil',gMid:'🚲 Media',gFast:'🚀 Rápida',
+ bikeWhy:['La cadena une los dos engranajes. ¡Cuando pedaleas, la rueda de atrás gira y la bici avanza!','¡Sí! El engranaje de los pedales tiene el doble de dientes, así que la rueda de atrás gira dos veces.','¡Ganaste! El engranaje pequeño de atrás da muchas vueltas, así vas rápido en llano.','¡Lo lograste! El engranaje grande de atrás hace fácil pedalear, aunque vayas más despacio.','¡Exacto! El engranaje grande de atrás es para cuestas, el pequeño para la velocidad.'],
+ lost:'¡Ganó el caracol! Prueba la marcha rápida 🚀.',hard:'¡Uf, qué difícil! Prueba la marcha fácil 🐢.',bigCog:'🐢 Engranaje grande',smallCog:'🚀 Engranaje pequeño',countQ:'¿Cuántas veces giró la rueda de atrás?',rampUp:'⬆',rampDown:'⬇',
+ cg:['¡Enciende la bombilla!','¡Enciende la bombilla con el interruptor!','¡Arranca el ventilador para refrescar a RoboPufi!','¡Haz sonar el timbre!','¡Enciende dos bombillas, una después de otra!','¡Enciende las dos bombillas lo más fuerte posible!','¡Enciende el LED rojo! Cuidado: el LED tiene un más y un menos.','El semáforo: ¡cada LED con su interruptor!','La caja fuerte: ¡la bombilla solo se enciende si los dos interruptores están encendidos!','La escalera: ¡la bombilla se enciende con cualquiera de los interruptores!','La casa de RoboPufi: ¡bombilla, ventilador y timbre, todo con un solo interruptor!','El laboratorio: ¡construye lo que quieras!'],
+ cwhy:['La electricidad sale del más, pasa por la bombilla y vuelve al menos. ¡Un círculo completo!','El interruptor abre y cierra el camino de la electricidad.','El motor convierte la electricidad en movimiento.','¡El timbre convierte la electricidad en sonido!','Las bombillas una tras otra se reparten la electricidad, por eso brillan menos.','¡Cuando cada bombilla tiene su propio camino a la pila, las dos brillan fuerte!','El LED deja pasar la electricidad en una sola dirección.','¡Cada LED tiene su interruptor, como un semáforo!','La bombilla solo se enciende con los dos interruptores. ¡Como la puerta de una caja fuerte!','La bombilla se enciende con cualquier interruptor. ¡Como la luz de la escalera!','¡Un solo interruptor pone en marcha toda la casa!',''],
+ dim:'Las bombillas brillan poco. ¡Conecta cada bombilla directamente a la pila!',ledRev:'El LED tiene un más y un menos. ¡Conecta la pata más del LED hacia el más de la pila!',
+ bypass:c=>`¡El cable rodea ${c}! La electricidad toma el camino más fácil.`,cn:{bulb:'la bombilla',motor:'el ventilador',buzz:'el timbre',led:'el LED',res:'la resistencia',pot:'la rueda'},
+ andH:'La bombilla debe apagarse al apagar cualquiera de los interruptores.',orH:'La bombilla debe encenderse con cada interruptor por separado.',indepH:'Cada interruptor debe encender solo su LED.',masterH:'Al apagar el interruptor, todo debe pararse.',
+ loose:'Los cables grises no llevan electricidad. Puedes dejarlos o borrarlos.',swOut:'¡La bombilla está encendida, pero el interruptor no está en el camino de la electricidad! Ponlo entre la pila y la bombilla.',swLoose:'El interruptor no está conectado a nada. ¡Conéctalo al circuito!'},
+it:{lv:['Metti un coniglio nello stesso punto dall’altra parte!','L’altalena è storta! Trascina il cane sull’asse, più lontano dal centro.','L’elefante è pesante! Un topolino può sollevarlo? Mettilo più lontano che puoi!','Trascina un animale a destra perché l’altalena sia dritta!','Ancora una! Puoi usare anche due animali.'],
+ lvHeavyL:'Il lato sinistro è più pesante.',lvHeavyR:'Il lato destro è più pesante.',lvPow:'Le torri mostrano quanto forte spinge ogni lato.',
+ gFacts:{fast:'La bicicletta funziona così: l’ingranaggio piccolo dietro gira più veloce dei pedali!',dir:'Anche gli orologi: gli ingranaggi si spingono a vicenda.',chain:'L’ingranaggio in mezzo passa solo il movimento.'},
+ teeth:n=>`${n} denti`,
+ bike:['Tieni premuto Pedala! I pedali girano l’ingranaggio grande e la catena gira quello piccolo dietro.','Fai un giro di pedale e conta: quante volte gira la ruota dietro?','Sfida la lumaca! Scegli la marcia giusta per vincere.','Su per la collina! Scegli la marcia che rende facile salire.','Ultima domanda: per salire scegli l’ingranaggio grande o quello piccolo dietro?'],
+ pedal:'🦶 Pedala',oneTurn:'↻ Un giro di pedale',gEasy:'🐢 Facile',gMid:'🚲 Media',gFast:'🚀 Veloce',
+ bikeWhy:['La catena collega i due ingranaggi. Quando pedali, la ruota dietro gira e la bici va avanti!','Sì! L’ingranaggio dei pedali ha il doppio dei denti, quindi la ruota dietro gira due volte.','Hai vinto! L’ingranaggio piccolo dietro fa tanti giri, così vai veloce in pianura.','Ce l’hai fatta! L’ingranaggio grande dietro rende facile pedalare, anche se vai più piano.','Esatto! L’ingranaggio grande dietro è per le salite, quello piccolo per la velocità.'],
+ lost:'Ha vinto la lumaca! Prova la marcia veloce 🚀.',hard:'Uff, che fatica! Prova la marcia facile 🐢.',bigCog:'🐢 Ingranaggio grande',smallCog:'🚀 Ingranaggio piccolo',countQ:'Quante volte ha girato la ruota dietro?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Accendi la lampadina!','Accendi la lampadina con l’interruttore!','Avvia il ventilatore per rinfrescare RoboPufi!','Fai suonare il campanello!','Accendi due lampadine, una dopo l’altra!','Accendi tutte e due le lampadine più forte che puoi!','Accendi il LED rosso! Attenzione: il LED ha un più e un meno.','Il semaforo: ogni LED con il suo interruttore!','La cassaforte: la lampadina si accende solo se tutti e due gli interruttori sono accesi!','Le scale: la lampadina si accende con uno qualsiasi degli interruttori!','La casa di RoboPufi: lampadina, ventilatore e campanello, tutto con un solo interruttore!','Il laboratorio: costruisci quello che vuoi!'],
+ cwhy:['L’elettricità esce dal più, passa nella lampadina e torna al meno. Un cerchio completo!','L’interruttore apre e chiude la strada dell’elettricità.','Il motore trasforma l’elettricità in movimento.','Il campanello trasforma l’elettricità in suono!','Le lampadine una dopo l’altra si dividono l’elettricità, quindi brillano meno.','Quando ogni lampadina ha la sua strada verso la pila, tutte e due brillano forte!','Il LED fa passare l’elettricità in una sola direzione.','Ogni LED ha il suo interruttore, come un semaforo!','La lampadina si accende solo con tutti e due gli interruttori. Come la porta di una cassaforte!','La lampadina si accende con qualsiasi interruttore. Come la luce delle scale!','Un solo interruttore accende tutta la casa!',''],
+ dim:'Le lampadine sono deboli. Collega ogni lampadina direttamente alla pila!',ledRev:'Il LED ha un più e un meno. Collega la gamba più del LED verso il più della pila!',
+ bypass:c=>`Il filo gira intorno a ${c}! L’elettricità prende la strada più facile.`,cn:{bulb:'la lampadina',motor:'il ventilatore',buzz:'il campanello',led:'il LED',res:'la resistenza',pot:'la manopola'},
+ andH:'La lampadina deve spegnersi quando spegni uno qualsiasi degli interruttori.',orH:'La lampadina deve accendersi con ogni interruttore da solo.',indepH:'Ogni interruttore deve accendere solo il suo LED.',masterH:'Quando spegni l’interruttore, tutto deve fermarsi.',
+ loose:'I fili grigi non portano elettricità. Puoi tenerli o cancellarli.',swOut:'La lampadina è accesa, ma l’interruttore non è sulla strada dell’elettricità! Mettilo tra la pila e la lampadina.',swLoose:'L’interruttore non è collegato a niente. Mettilo nel circuito!'},
+pt:{lv:['Põe um coelho no mesmo sítio do outro lado!','O baloiço está torto! Arrasta o cão pela tábua, mais longe do meio.','O elefante é pesado! Um rato consegue levantá-lo? Põe-no o mais longe possível!','Arrasta um animal para a direita para o baloiço ficar direito!','Mais uma! Também podes usar dois animais.'],
+ lvHeavyL:'O lado esquerdo é mais pesado.',lvHeavyR:'O lado direito é mais pesado.',lvPow:'As torres mostram com que força cada lado empurra.',
+ gFacts:{fast:'A bicicleta funciona assim: a roda dentada pequena de trás gira mais depressa do que os pedais!',dir:'Os relógios também: as rodas dentadas empurram-se umas às outras.',chain:'A roda dentada do meio só passa o movimento.'},
+ teeth:n=>`${n} dentes`,
+ bike:['Mantém carregado Pedalar! Os pedais giram a roda dentada grande e a corrente gira a pequena de trás.','Dá uma volta de pedal e conta: quantas vezes gira a roda de trás?','Corrida com o caracol! Escolhe a mudança certa para ganhar.','Subida! Escolhe a mudança que torna a subida fácil.','Última pergunta: para subir, escolhes a roda dentada grande ou a pequena de trás?'],
+ pedal:'🦶 Pedalar',oneTurn:'↻ Uma volta de pedal',gEasy:'🐢 Fácil',gMid:'🚲 Média',gFast:'🚀 Rápida',
+ bikeWhy:['A corrente liga as duas rodas dentadas. Quando pedalas, a roda de trás gira e a bicicleta anda!','Sim! A roda dos pedais tem o dobro dos dentes, por isso a roda de trás gira duas vezes.','Ganhaste! A roda dentada pequena de trás dá muitas voltas, por isso vais depressa no plano.','Conseguiste! A roda dentada grande de trás torna fácil pedalar, mesmo indo mais devagar.','Exatamente! A roda grande de trás é para subidas, a pequena é para velocidade.'],
+ lost:'O caracol ganhou! Experimenta a mudança rápida 🚀.',hard:'Ufa, que difícil! Experimenta a mudança fácil 🐢.',bigCog:'🐢 Roda grande',smallCog:'🚀 Roda pequena',countQ:'Quantas vezes girou a roda de trás?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Acende a lâmpada!','Acende a lâmpada com o interruptor!','Liga a ventoinha para refrescar o RoboPufi!','Faz tocar a campainha!','Acende duas lâmpadas, uma depois da outra!','Acende as duas lâmpadas o mais forte possível!','Acende o LED vermelho! Cuidado: o LED tem um mais e um menos.','O semáforo: cada LED com o seu interruptor!','O cofre: a lâmpada só acende se os dois interruptores estiverem ligados!','A escada: a lâmpada acende com qualquer um dos interruptores!','A casa do RoboPufi: lâmpada, ventoinha e campainha, tudo com um só interruptor!','O laboratório: constrói o que quiseres!'],
+ cwhy:['A eletricidade sai do mais, passa pela lâmpada e volta ao menos. Um círculo completo!','O interruptor abre e fecha o caminho da eletricidade.','O motor transforma eletricidade em movimento.','A campainha transforma eletricidade em som!','Lâmpadas uma depois da outra dividem a eletricidade, por isso brilham menos.','Quando cada lâmpada tem o seu caminho até à pilha, as duas brilham com força!','O LED só deixa passar a eletricidade num sentido.','Cada LED tem o seu interruptor, como um semáforo!','A lâmpada só acende com os dois interruptores. Como a porta de um cofre!','A lâmpada acende com qualquer interruptor. Como a luz da escada!','Um só interruptor liga a casa toda!',''],
+ dim:'As lâmpadas estão fracas. Liga cada lâmpada diretamente à pilha!',ledRev:'O LED tem um mais e um menos. Liga a perna mais do LED para o mais da pilha!',
+ bypass:c=>`O fio contorna ${c}! A eletricidade vai pelo caminho mais fácil.`,cn:{bulb:'a lâmpada',motor:'a ventoinha',buzz:'a campainha',led:'o LED',res:'a resistência',pot:'o botão rotativo'},
+ andH:'A lâmpada tem de apagar quando desligas qualquer um dos interruptores.',orH:'A lâmpada tem de acender com cada interruptor sozinho.',indepH:'Cada interruptor só deve acender o seu LED.',masterH:'Quando desligas o interruptor, tudo tem de parar.',
+ loose:'Os fios cinzentos não levam eletricidade. Podes deixá-los ou apagá-los.',swOut:'A lâmpada está acesa, mas o interruptor não está no caminho da eletricidade! Põe-no entre a pilha e a lâmpada.',swLoose:'O interruptor não está ligado a nada. Liga-o ao circuito!'},
+nl:{lv:['Zet een konijn op dezelfde plek aan de andere kant!','De wip staat scheef! Sleep de hond over de plank, verder van het midden.','De olifant is zwaar! Kan een muis hem optillen? Zet hem zo ver mogelijk weg!','Sleep een dier naar rechts zodat de wip recht staat!','Nog één! Je mag ook twee dieren gebruiken.'],
+ lvHeavyL:'De linkerkant is zwaarder.',lvHeavyR:'De rechterkant is zwaarder.',lvPow:'De torens laten zien hoe hard elke kant duwt.',
+ gFacts:{fast:'Een fiets werkt net zo: het kleine tandwiel achter draait sneller dan de trappers!',dir:'Klokken ook: de tandwielen duwen elkaar rond.',chain:'Het middelste tandwiel geeft de beweging alleen door.'},
+ teeth:n=>`${n} tanden`,
+ bike:['Houd Trappen ingedrukt! De trappers draaien het grote tandwiel en de ketting draait het kleine achteraan.','Trap één rondje en tel: hoe vaak draait het achterwiel?','Race tegen de slak! Kies de goede versnelling om te winnen.','De heuvel op! Kies de versnelling waarmee klimmen makkelijk is.','Laatste vraag: om te klimmen kies je het grote of het kleine tandwiel achter?'],
+ pedal:'🦶 Trappen',oneTurn:'↻ Eén rondje trappen',gEasy:'🐢 Makkelijk',gMid:'🚲 Midden',gFast:'🚀 Snel',
+ bikeWhy:['De ketting verbindt de twee tandwielen. Als je trapt, draait het achterwiel en rijdt de fiets!','Ja! Het trappertandwiel heeft twee keer zoveel tanden, dus het achterwiel draait twee keer.','Gewonnen! Het kleine tandwiel achter draait veel rondjes, dus je gaat snel op een vlakke weg.','Gelukt! Het grote tandwiel achter maakt trappen makkelijk, ook al ga je langzamer.','Precies! Het grote tandwiel achter is voor heuvels, het kleine voor snelheid.'],
+ lost:'De slak heeft gewonnen! Probeer de snelle versnelling 🚀.',hard:'Pff, dit is zwaar! Probeer de makkelijke versnelling 🐢.',bigCog:'🐢 Groot tandwiel',smallCog:'🚀 Klein tandwiel',countQ:'Hoe vaak draaide het achterwiel?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Laat het lampje branden!','Laat het lampje branden met de schakelaar!','Zet de ventilator aan om RoboPufi af te koelen!','Laat de bel rinkelen!','Laat twee lampjes branden, de een na de ander!','Laat beide lampjes zo fel mogelijk branden!','Laat de rode led branden! Let op: de led heeft een plus en een min.','Het stoplicht: elke led met zijn eigen schakelaar!','De kluis: het lampje brandt alleen als beide schakelaars aan staan!','De trap: het lampje gaat aan met elke schakelaar!','Het huis van RoboPufi: lamp, ventilator en bel, allemaal met één schakelaar!','Het lab: bouw wat je maar wilt!'],
+ cwhy:['De stroom gaat uit de plus, door het lampje en terug naar de min. Een hele cirkel!','De schakelaar opent en sluit de weg voor de stroom.','De motor maakt van stroom beweging.','De bel maakt van stroom geluid!','Lampjes na elkaar delen de stroom, dus ze branden zwakker.','Als elk lampje zijn eigen weg naar de batterij heeft, branden ze allebei fel!','De led laat de stroom maar één kant op door.','Elke led heeft zijn eigen schakelaar, net als een stoplicht!','Het lampje brandt alleen met beide schakelaars aan. Net als de deur van een kluis!','Het lampje gaat aan met elke schakelaar. Net als het licht op de trap!','Eén schakelaar zet het hele huis aan!',''],
+ dim:'De lampjes zijn zwak. Verbind elk lampje direct met de batterij!',ledRev:'De led heeft een plus en een min. Verbind het pluspootje van de led met de plus van de batterij!',
+ bypass:c=>`De draad gaat om ${c} heen! Stroom neemt de makkelijkste weg.`,cn:{bulb:'het lampje',motor:'de ventilator',buzz:'de bel',led:'de led',res:'de weerstand',pot:'de draaiknop'},
+ andH:'Het lampje moet uitgaan als je een van de schakelaars uitzet.',orH:'Het lampje moet met elke schakelaar alleen aangaan.',indepH:'Elke schakelaar mag alleen zijn eigen led aanzetten.',masterH:'Als je de schakelaar uitzet, moet alles stoppen.',
+ loose:'Grijze draden geven geen stroom. Je mag ze houden of wissen.',swOut:'Het lampje brandt, maar de schakelaar zit niet op de weg van de stroom! Zet hem tussen de batterij en het lampje.',swLoose:'De schakelaar is nergens mee verbonden. Zet hem in de kring!'},
+pl:{lv:['Postaw królika w tym samym miejscu po drugiej stronie!','Huśtawka jest krzywa! Przesuń psa po desce, dalej od środka.','Słoń jest ciężki! Czy mysz może go podnieść? Postaw ją jak najdalej!','Przesuń zwierzątko w prawo, żeby huśtawka była prosto!','Jeszcze raz! Możesz też użyć dwóch zwierzątek.'],
+ lvHeavyL:'Lewa strona jest cięższa.',lvHeavyR:'Prawa strona jest cięższa.',lvPow:'Wieże pokazują, jak mocno pcha każda strona.',
+ gFacts:{fast:'Rower działa tak samo: małe kółko z tyłu kręci się szybciej niż pedały!',dir:'Zegary też: zębatki popychają się nawzajem.',chain:'Środkowa zębatka tylko przekazuje ruch.'},
+ teeth:n=>`zęby: ${n}`,
+ bike:['Przytrzymaj Pedałuj! Pedały kręcą dużą zębatkę, a łańcuch kręci małą z tyłu.','Zrób jeden obrót pedałami i policz: ile razy obróci się tylne koło?','Wyścig ze ślimakiem! Wybierz dobry bieg, żeby wygrać.','Pod górkę! Wybierz bieg, z którym łatwo się wspinać.','Ostatnie pytanie: pod górkę wybierasz dużą czy małą zębatkę z tyłu?'],
+ pedal:'🦶 Pedałuj',oneTurn:'↻ Jeden obrót',gEasy:'🐢 Łatwy',gMid:'🚲 Średni',gFast:'🚀 Szybki',
+ bikeWhy:['Łańcuch łączy dwie zębatki. Kiedy pedałujesz, tylne koło się kręci i rower jedzie!','Tak! Zębatka przy pedałach ma dwa razy więcej zębów, więc tylne koło obraca się dwa razy.','Wygrałeś! Mała zębatka z tyłu robi dużo obrotów, więc jedziesz szybko po płaskim.','Udało się! Duża zębatka z tyłu sprawia, że pedałowanie jest łatwe, choć jedziesz wolniej.','Dokładnie! Duża zębatka z tyłu jest na górki, mała na szybką jazdę.'],
+ lost:'Ślimak wygrał! Spróbuj szybkiego biegu 🚀.',hard:'Uff, ale ciężko! Spróbuj łatwego biegu 🐢.',bigCog:'🐢 Duża zębatka',smallCog:'🚀 Mała zębatka',countQ:'Ile razy obróciło się tylne koło?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Zapal żarówkę!','Zapal żarówkę włącznikiem!','Włącz wiatrak, żeby ochłodzić RoboPufiego!','Niech zadzwoni dzwonek!','Zapal dwie żarówki, jedną za drugą!','Zapal obie żarówki jak najjaśniej!','Zapal czerwoną diodę! Uwaga: dioda ma plus i minus.','Sygnalizacja świetlna: każda dioda ze swoim włącznikiem!','Sejf: żarówka świeci tylko, gdy oba włączniki są włączone!','Schody: żarówka zapala się każdym włącznikiem!','Dom RoboPufiego: żarówka, wiatrak i dzwonek, wszystko jednym włącznikiem!','Laboratorium: zbuduj, co chcesz!'],
+ cwhy:['Prąd wychodzi z plusa, płynie przez żarówkę i wraca do minusa. Całe kółko!','Włącznik otwiera i zamyka drogę dla prądu.','Silnik zamienia prąd w ruch.','Dzwonek zamienia prąd w dźwięk!','Żarówki jedna za drugą dzielą się prądem, więc świecą słabiej.','Kiedy każda żarówka ma własną drogę do baterii, obie świecą jasno!','Dioda przepuszcza prąd tylko w jedną stronę.','Każda dioda ma swój włącznik, jak sygnalizacja świetlna!','Żarówka świeci tylko z oboma włącznikami. Jak drzwi sejfu!','Żarówka zapala się każdym włącznikiem. Jak światło na schodach!','Jeden włącznik uruchamia cały dom!',''],
+ dim:'Żarówki świecą słabo. Połącz każdą żarówkę prosto z baterią!',ledRev:'Dioda ma plus i minus. Połącz nóżkę plus diody z plusem baterii!',
+ bypass:c=>`Kabel omija ${c}! Prąd wybiera najłatwiejszą drogę.`,cn:{bulb:'żarówkę',motor:'wiatrak',buzz:'dzwonek',led:'diodę',res:'opornik',pot:'pokrętło'},
+ andH:'Żarówka musi zgasnąć, gdy wyłączysz którykolwiek włącznik.',orH:'Żarówka musi się zapalić od każdego włącznika osobno.',indepH:'Każdy włącznik może zapalać tylko swoją diodę.',masterH:'Kiedy wyłączysz włącznik, wszystko musi się zatrzymać.',
+ loose:'Szare kable nie niosą prądu. Możesz je zostawić albo usunąć.',swOut:'Żarówka świeci, ale włącznik nie jest na drodze prądu! Postaw go między baterią a żarówką.',swLoose:'Włącznik nie jest z niczym połączony. Podłącz go do obwodu!'},
+uk:{lv:['Посади зайчика на те саме місце з іншого боку!','Гойдалка перекошена! Пересунь собачку по дошці, далі від середини.','Слон важкий! Чи може мишка його підняти? Посади її якомога далі!','Пересунь тваринку праворуч, щоб гойдалка стала рівно!','Ще раз! Можна взяти й двох тваринок.'],
+ lvHeavyL:'Лівий бік важчий.',lvHeavyR:'Правий бік важчий.',lvPow:'Вежі показують, як сильно тисне кожен бік.',
+ gFacts:{fast:'Велосипед працює так само: маленька зірочка ззаду крутиться швидше за педалі!',dir:'Годинники теж: шестерні штовхають одна одну.',chain:'Середня шестерня лише передає рух.'},
+ teeth:n=>`зубців: ${n}`,
+ bike:['Тримай кнопку Крутити! Педалі крутять велику зірочку, а ланцюг крутить маленьку ззаду.','Зроби один оберт педалями і порахуй: скільки разів обернеться заднє колесо?','Перегони з равликом! Обери правильну передачу, щоб перемогти.','На гірку! Обери передачу, з якою легко підніматися.','Останнє питання: на гірку ти обираєш велику чи маленьку зірочку ззаду?'],
+ pedal:'🦶 Крутити',oneTurn:'↻ Один оберт',gEasy:'🐢 Легка',gMid:'🚲 Середня',gFast:'🚀 Швидка',
+ bikeWhy:['Ланцюг з’єднує дві зірочки. Коли крутиш педалі, заднє колесо крутиться і велосипед їде!','Так! Передня зірочка має вдвічі більше зубців, тому заднє колесо обертається двічі.','Ти переміг! Маленька зірочка ззаду робить багато обертів, тож ти швидко їдеш рівною дорогою.','Вийшло! Велика зірочка ззаду робить крутити легко, хоч їдеш повільніше.','Саме так! Велика зірочка ззаду — для гірок, маленька — для швидкості.'],
+ lost:'Равлик переміг! Спробуй швидку передачу 🚀.',hard:'Ох, як важко! Спробуй легку передачу 🐢.',bigCog:'🐢 Велика зірочка',smallCog:'🚀 Маленька зірочка',countQ:'Скільки разів обернулося заднє колесо?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Засвіти лампочку!','Засвіти лампочку вимикачем!','Увімкни вентилятор, щоб охолодити РобоПуфі!','Нехай задзвонить дзвоник!','Засвіти дві лампочки, одну за одною!','Засвіти обидві лампочки якомога яскравіше!','Засвіти червоний світлодіод! Обережно: у світлодіода є плюс і мінус.','Світлофор: кожен світлодіод зі своїм вимикачем!','Сейф: лампочка світить, лише коли обидва вимикачі увімкнені!','Сходи: лампочка вмикається будь-яким вимикачем!','Дім РобоПуфі: лампочка, вентилятор і дзвоник — усе одним вимикачем!','Лабораторія: будуй що хочеш!'],
+ cwhy:['Струм виходить із плюса, проходить через лампочку й повертається до мінуса. Повне коло!','Вимикач відкриває й закриває шлях для струму.','Мотор перетворює струм на рух.','Дзвоник перетворює струм на звук!','Лампочки одна за одною ділять струм, тому світять слабше.','Коли кожна лампочка має свій шлях до батарейки, обидві світять яскраво!','Світлодіод пропускає струм лише в один бік.','Кожен світлодіод має свій вимикач, як світлофор!','Лампочка світить лише з обома вимикачами. Як двері сейфа!','Лампочка вмикається будь-яким вимикачем. Як світло на сходах!','Один вимикач запускає весь дім!',''],
+ dim:'Лампочки світять слабко. З’єднай кожну лампочку прямо з батарейкою!',ledRev:'У світлодіода є плюс і мінус. З’єднай плюсову ніжку світлодіода з плюсом батарейки!',
+ bypass:c=>`Провід обходить ${c}! Струм обирає найлегший шлях.`,cn:{bulb:'лампочку',motor:'вентилятор',buzz:'дзвоник',led:'світлодіод',res:'резистор',pot:'регулятор'},
+ andH:'Лампочка має згаснути, коли вимикаєш будь-який вимикач.',orH:'Лампочка має вмикатися кожним вимикачем окремо.',indepH:'Кожен вимикач має вмикати лише свій світлодіод.',masterH:'Коли вимикаєш вимикач, усе має зупинитися.',
+ loose:'Сірі дроти не несуть струму. Можеш залишити їх або стерти.',swOut:'Лампочка світить, але вимикач не стоїть на шляху струму! Постав його між батарейкою і лампочкою.',swLoose:'Вимикач ні до чого не під’єднаний. Під’єднай його до кола!'},
+ru:{lv:['Посади зайчика на то же место с другой стороны!','Качели перекосились! Передвинь собачку по доске, дальше от середины.','Слон тяжёлый! Может ли мышка его поднять? Посади её как можно дальше!','Передвинь зверька вправо, чтобы качели стали ровно!','Ещё раз! Можно взять и двух зверьков.'],
+ lvHeavyL:'Левая сторона тяжелее.',lvHeavyR:'Правая сторона тяжелее.',lvPow:'Башни показывают, как сильно давит каждая сторона.',
+ gFacts:{fast:'Велосипед работает так же: маленькая звёздочка сзади крутится быстрее педалей!',dir:'Часы тоже: шестерёнки толкают друг друга.',chain:'Средняя шестерёнка только передаёт движение.'},
+ teeth:n=>`зубцов: ${n}`,
+ bike:['Держи кнопку Крутить! Педали крутят большую звёздочку, а цепь крутит маленькую сзади.','Сделай один оборот педалями и посчитай: сколько раз повернётся заднее колесо?','Гонка с улиткой! Выбери правильную передачу, чтобы победить.','В горку! Выбери передачу, с которой легко подниматься.','Последний вопрос: в горку ты выбираешь большую или маленькую звёздочку сзади?'],
+ pedal:'🦶 Крутить',oneTurn:'↻ Один оборот',gEasy:'🐢 Лёгкая',gMid:'🚲 Средняя',gFast:'🚀 Быстрая',
+ bikeWhy:['Цепь соединяет две звёздочки. Когда крутишь педали, заднее колесо крутится и велосипед едет!','Да! У передней звёздочки вдвое больше зубцов, поэтому заднее колесо поворачивается два раза.','Ты победил! Маленькая звёздочка сзади делает много оборотов, и ты быстро едешь по ровной дороге.','Получилось! Большая звёздочка сзади делает педали лёгкими, хотя едешь медленнее.','Точно! Большая звёздочка сзади — для горок, маленькая — для скорости.'],
+ lost:'Улитка победила! Попробуй быструю передачу 🚀.',hard:'Ох, как тяжело! Попробуй лёгкую передачу 🐢.',bigCog:'🐢 Большая звёздочка',smallCog:'🚀 Маленькая звёздочка',countQ:'Сколько раз повернулось заднее колесо?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Зажги лампочку!','Зажги лампочку выключателем!','Включи вентилятор, чтобы охладить РобоПуфи!','Пусть зазвенит звонок!','Зажги две лампочки, одну за другой!','Зажги обе лампочки как можно ярче!','Зажги красный светодиод! Осторожно: у светодиода есть плюс и минус.','Светофор: каждый светодиод со своим выключателем!','Сейф: лампочка горит, только когда оба выключателя включены!','Лестница: лампочка включается любым выключателем!','Дом РобоПуфи: лампочка, вентилятор и звонок — всё одним выключателем!','Лаборатория: строй что хочешь!'],
+ cwhy:['Ток выходит из плюса, проходит через лампочку и возвращается к минусу. Полный круг!','Выключатель открывает и закрывает путь для тока.','Мотор превращает ток в движение.','Звонок превращает ток в звук!','Лампочки одна за другой делят ток, поэтому светят слабее.','Когда у каждой лампочки свой путь к батарейке, обе светят ярко!','Светодиод пропускает ток только в одну сторону.','У каждого светодиода свой выключатель, как у светофора!','Лампочка горит только с обоими выключателями. Как дверь сейфа!','Лампочка включается любым выключателем. Как свет на лестнице!','Один выключатель запускает весь дом!',''],
+ dim:'Лампочки светят слабо. Соедини каждую лампочку прямо с батарейкой!',ledRev:'У светодиода есть плюс и минус. Соедини плюсовую ножку светодиода с плюсом батарейки!',
+ bypass:c=>`Провод обходит ${c}! Ток выбирает самый лёгкий путь.`,cn:{bulb:'лампочку',motor:'вентилятор',buzz:'звонок',led:'светодиод',res:'резистор',pot:'регулятор'},
+ andH:'Лампочка должна гаснуть, когда выключаешь любой выключатель.',orH:'Лампочка должна включаться каждым выключателем отдельно.',indepH:'Каждый выключатель должен включать только свой светодиод.',masterH:'Когда выключаешь выключатель, всё должно остановиться.',
+ loose:'Серые провода не несут ток. Можно оставить их или стереть.',swOut:'Лампочка горит, но выключатель не стоит на пути тока! Поставь его между батарейкой и лампочкой.',swLoose:'Выключатель ни к чему не подключён. Подключи его к цепи!'},
+hu:{lv:['Tegyél egy nyuszit ugyanoda a másik oldalon!','Ferde a mérleghinta! Húzd a kutyát a deszkán, messzebb a közepétől.','Az elefánt nehéz! Fel tudja emelni egy egér? Tedd olyan messzire, amennyire csak lehet!','Húzz egy állatot jobbra, hogy egyenes legyen a hinta!','Még egyet! Két állatot is használhatsz.'],
+ lvHeavyL:'A bal oldal nehezebb.',lvHeavyR:'A jobb oldal nehezebb.',lvPow:'A tornyok mutatják, milyen erősen nyom az egyes oldal.',
+ gFacts:{fast:'A bicikli is így működik: a hátsó kis fogaskerék gyorsabban forog, mint a pedál!',dir:'Az órák is: a fogaskerekek egymást forgatják.',chain:'A középső fogaskerék csak továbbadja a mozgást.'},
+ teeth:n=>`${n} fog`,
+ bike:['Tartsd nyomva a Pedálozz gombot! A pedál a nagy fogaskereket forgatja, a lánc pedig a hátsó kicsit.','Tekerj egy kört és számolj: hányszor fordul a hátsó kerék?','Versenyezz a csigával! Válaszd a jó sebességet, hogy nyerj!','Fel a dombra! Válaszd azt a sebességet, amivel könnyű felmenni.','Utolsó kérdés: emelkedőn a hátsó nagy vagy kis fogaskereket választod?'],
+ pedal:'🦶 Pedálozz',oneTurn:'↻ Egy kör',gEasy:'🐢 Könnyű',gMid:'🚲 Közepes',gFast:'🚀 Gyors',
+ bikeWhy:['A lánc összeköti a két fogaskereket. Ha pedálozol, forog a hátsó kerék, és megy a bicikli!','Igen! A pedálnál lévő fogaskeréknek kétszer annyi foga van, ezért a hátsó kerék kétszer fordul.','Nyertél! A hátsó kis fogaskerék sokat fordul, így sík úton gyorsan mész.','Sikerült! A hátsó nagy fogaskerékkel könnyű tekerni, még ha lassabban is mész.','Pontosan! A hátsó nagy fogaskerék a dombra való, a kicsi a gyorsasághoz.'],
+ lost:'A csiga nyert! Próbáld a gyors sebességet 🚀.',hard:'Hű, de nehéz! Próbáld a könnyű sebességet 🐢.',bigCog:'🐢 Nagy fogaskerék',smallCog:'🚀 Kis fogaskerék',countQ:'Hányszor fordult a hátsó kerék?',rampUp:'⬆',rampDown:'⬇',
+ cg:['Kapcsold fel az izzót!','Kapcsold fel az izzót a kapcsolóval!','Indítsd el a ventilátort, hogy lehűtsd RoboPufit!','Szólaltasd meg a csengőt!','Gyújts meg két izzót, egymás után!','Gyújtsd meg mindkét izzót a lehető legfényesebben!','Gyújtsd meg a piros LED-et! Vigyázz: a LED-nek van plusza és mínusza.','A közlekedési lámpa: minden LED a saját kapcsolójával!','A széf: az izzó csak akkor ég, ha mindkét kapcsoló be van kapcsolva!','A lépcső: az izzó bármelyik kapcsolóval felgyullad!','RoboPufi háza: izzó, ventilátor és csengő, mind egyetlen kapcsolóval!','A labor: építs, amit csak szeretnél!'],
+ cwhy:['Az áram a pluszból indul, átmegy az izzón, és visszatér a mínuszba. Egy teljes kör!','A kapcsoló nyitja és zárja az áram útját.','A motor az áramot mozgássá alakítja.','A csengő az áramot hanggá alakítja!','Az egymás utáni izzók megosztják az áramot, ezért halványabban égnek.','Ha minden izzónak saját útja van az elemhez, mindkettő fényesen ég!','A LED csak egy irányba engedi át az áramot.','Minden LED-nek saját kapcsolója van, mint egy közlekedési lámpának!','Az izzó csak mindkét kapcsolóval ég. Mint egy széf ajtaja!','Az izzó bármelyik kapcsolóval felgyullad. Mint a lépcsőházi lámpa!','Egyetlen kapcsoló indítja az egész házat!',''],
+ dim:'Az izzók halványak. Kösd mindegyik izzót közvetlenül az elemhez!',ledRev:'A LED-nek van plusza és mínusza. A LED plusz lábát kösd az elem plusza felé!',
+ bypass:c=>`A vezeték megkerüli ezt: ${c}! Az áram a legkönnyebb utat választja.`,cn:{bulb:'az izzó',motor:'a ventilátor',buzz:'a csengő',led:'a LED',res:'az ellenállás',pot:'a forgatógomb'},
+ andH:'Az izzónak ki kell aludnia, ha bármelyik kapcsolót kikapcsolod.',orH:'Az izzónak mindegyik kapcsolóval külön is fel kell gyulladnia.',indepH:'Minden kapcsoló csak a saját LED-jét kapcsolhatja fel.',masterH:'Ha kikapcsolod a kapcsolót, mindennek meg kell állnia.',
+ loose:'A szürke vezetékekben nem folyik áram. Megtarthatod vagy törölheted őket.',swOut:'Az izzó ég, de a kapcsoló nincs az áram útjában! Tedd az elem és az izzó közé.',swLoose:'A kapcsoló nincs semmihez kötve. Kösd be az áramkörbe!'}
+};
+const N={
+ro:{cx:{mat:['Testul detectivului: ce lucruri lasă electricitatea să treacă? Alege un obiect!','Metalele lasă electricitatea să treacă: sunt conductori. Lemnul, plasticul și pânza nu o lasă: sunt izolatori. De aceea firele sunt din metal, îmbrăcate în plastic!'],
+  btn:['Soneria cu buton: leag-o, apoi apasă butonul de trei ori!','Butonul soneriei este un întrerupător care se închide doar cât îl ții apăsat. Când îi dai drumul, un arc îl deschide la loc.'],
+  ser:['Super ventilator! Folosește ambele baterii ca ventilatorul lui RoboPufi să se învârtă foarte repede!','Două baterii una după alta împing electricitatea de două ori mai tare. De aceea jucăriile cu mai multe baterii sunt mai puternice!'],
+  pot:['Lampa lui Pufi: un buton rotativ schimbă lumina!','Butonul rotativ se numește potențiometru. El frânează electricitatea: cu cât frânează mai mult, cu atât lumina e mai slabă!'],
+  res:['Două baterii sunt prea mult pentru un LED mic! Aprinde-l fără să-l arzi.','Rezistorul frânează electricitatea și protejează LED-ul. Fiecare LED are un rezistor mic drept prieten!'],
+  sun:['Energie solară! Leagă panoul solar de ventilator.','Panoul solar transformă lumina soarelui în electricitate. Fără soare, nu e electricitate!']},
+ cm:{predQ:n=>`${n}. Crezi că becul se va aprinde? Atinge 💡 pentru da sau 🌑 pentru nu.`,predOk:'Ai ghicit!',predNo:'Surpriză!',
+  yes:n=>`${n} lasă electricitatea să treacă. Este un conductor!`,no:n=>`${n} nu lasă electricitatea să treacă. Este un izolator!`,
+  obj:{spoon:'Lingurița de metal',wood:'Bețișorul de lemn',coin:'Moneda',bear:'Ursulețul de pluș',clip:'Agrafa de birou',crayon:'Creionul cerat'},
+  matH:'Atinge un obiect de jos și ghicește dacă becul se aprinde.',
+  press:'Circuitul e gata! Acum apasă butonul roșu.',press2:'Cling-clang! Mai apasă!',
+  btnOut:'Soneria sună fără buton! Pune butonul pe drumul electricității.',
+  serH:'Ventilatorul merge încet. Pune bateriile una după alta: plusul uneia la minusul celeilalte!',
+  oppH:'Bateriile se împing una pe alta! Leagă plusul la minus.',
+  potHi:'Atinge butonul rotativ ca să-l învârți, până când becul luminează tare, ca soarele!',potLo:'Pufi vrea să doarmă. Învârte butonul până când lumina e slabă, ca luna!',
+  turn:'Atinge butonul rotativ ca să-l învârți!',potOut:'Butonul rotativ nu e pe drumul electricității. Pune-l între baterie și bec!',
+  burn:'Puf! LED-ul s-a ars: două baterii sunt prea mult pentru el. Pune rezistorul în fața lui, ca să frâneze electricitatea!',
+  resOut:'LED-ul luminează, dar rezistorul nu e în circuit. Folosește ambele baterii și rezistorul!',
+  sunOn:'Leagă panoul solar de ventilator. Soarele îi dă putere!',sunOff:'Merge! Acum atinge soarele, ca să-l acopere un nor. Ce se întâmplă?'}},
+de:{cx:{mat:['Detektiv-Test: Welche Dinge lassen Strom durch? Wähle einen Gegenstand!','Metalle lassen Strom durch: Sie sind Leiter. Holz, Plastik und Stoff nicht: Sie sind Isolatoren. Darum sind Kabel aus Metall und mit Plastik umhüllt!'],
+  btn:['Klingel mit Taster: Verbinde sie und drück dann dreimal auf den Knopf!','Der Klingelknopf ist ein Schalter, der nur geschlossen ist, solange du drückst. Lässt du los, öffnet ihn eine Feder wieder.'],
+  ser:['Super-Ventilator! Nimm beide Batterien, damit RoboPufis Ventilator ganz schnell dreht!','Zwei Batterien hintereinander schieben den Strom doppelt so stark. Darum sind Spielzeuge mit mehr Batterien stärker!'],
+  pot:['Pufis Lampe: Ein Drehknopf verändert das Licht!','Der Drehknopf heißt Potentiometer. Er bremst den Strom: Je mehr er bremst, desto schwächer das Licht!'],
+  res:['Zwei Batterien sind zu viel für eine kleine LED! Bring sie zum Leuchten, ohne dass sie durchbrennt.','Der Widerstand bremst den Strom und schützt die LED. Jede LED hat einen kleinen Widerstand als Freund!'],
+  sun:['Sonnenenergie! Verbinde das Solarpanel mit dem Ventilator.','Das Solarpanel verwandelt Sonnenlicht in Strom. Ohne Sonne kein Strom!']},
+ cm:{predQ:n=>`${n}. Glaubst du, die Lampe leuchtet? Tippe 💡 für ja oder 🌑 für nein.`,predOk:'Richtig geraten!',predNo:'Überraschung!',
+  yes:n=>`${n} lässt Strom durch. Das ist ein Leiter!`,no:n=>`${n} lässt keinen Strom durch. Das ist ein Isolator!`,
+  obj:{spoon:'Der Metalllöffel',wood:'Das Holzstäbchen',coin:'Die Münze',bear:'Der Teddybär',clip:'Die Büroklammer',crayon:'Der Wachsmalstift'},
+  matH:'Tippe unten auf einen Gegenstand und rate, ob die Lampe leuchtet.',
+  press:'Der Stromkreis ist fertig! Jetzt drück den roten Knopf.',press2:'Ding-dong! Nochmal drücken!',
+  btnOut:'Die Klingel läutet ohne Knopf! Setz den Knopf in den Weg des Stroms.',
+  serH:'Der Ventilator ist langsam. Schalte die Batterien hintereinander: Plus der einen an Minus der anderen!',
+  oppH:'Die Batterien drücken gegeneinander! Verbinde Plus mit Minus.',
+  potHi:'Tippe auf den Drehknopf, bis die Lampe hell leuchtet, wie die Sonne!',potLo:'Pufi will schlafen. Dreh den Knopf, bis das Licht schwach ist, wie der Mond!',
+  turn:'Tippe auf den Drehknopf, um ihn zu drehen!',potOut:'Der Drehknopf ist nicht im Weg des Stroms. Setz ihn zwischen Batterie und Lampe!',
+  burn:'Puff! Die LED ist durchgebrannt: Zwei Batterien sind zu viel für sie. Setz den Widerstand davor, damit er den Strom bremst!',
+  resOut:'Die LED leuchtet, aber der Widerstand ist nicht im Stromkreis. Nimm beide Batterien und den Widerstand!',
+  sunOn:'Verbinde das Solarpanel mit dem Ventilator. Die Sonne gibt ihm Kraft!',sunOff:'Es läuft! Tippe jetzt auf die Sonne, damit eine Wolke sie verdeckt. Was passiert?'}},
+en:{cx:{mat:['Detective test: which things let electricity through? Pick a thing!','Metals let electricity through: they are conductors. Wood, plastic and fabric do not: they are insulators. That is why wires are made of metal, covered in plastic!'],
+  btn:['Doorbell with a button: wire it up, then press the button three times!','The doorbell button is a switch that is closed only while you press it. When you let go, a spring opens it again.'],
+  ser:['Super fan! Use both batteries so RoboPufi’s fan spins really fast!','Two batteries one after the other push the electricity twice as hard. That is why toys with more batteries are stronger!'],
+  pot:['Pufi’s lamp: a turning knob changes the light!','The turning knob is called a potentiometer. It slows the electricity down: the more it slows it, the weaker the light!'],
+  res:['Two batteries are too much for a little LED! Light it without burning it.','The resistor slows the electricity down and protects the LED. Every LED has a little resistor as its friend!'],
+  sun:['Solar power! Connect the solar panel to the fan.','The solar panel turns sunlight into electricity. No sun, no electricity!']},
+ cm:{predQ:n=>`${n}. Do you think the bulb will light up? Tap 💡 for yes or 🌑 for no.`,predOk:'You guessed right!',predNo:'Surprise!',
+  yes:n=>`${n} lets electricity through. It is a conductor!`,no:n=>`${n} does not let electricity through. It is an insulator!`,
+  obj:{spoon:'The metal spoon',wood:'The wooden stick',coin:'The coin',bear:'The teddy bear',clip:'The paper clip',crayon:'The wax crayon'},
+  matH:'Tap a thing at the bottom and guess whether the bulb lights up.',
+  press:'The circuit is ready! Now press the red button.',press2:'Ding dong! Press it again!',
+  btnOut:'The bell rings without the button! Put the button on the electricity’s path.',
+  serH:'The fan is slow. Put the batteries one after the other: the plus of one to the minus of the other!',
+  oppH:'The batteries are pushing against each other! Connect plus to minus.',
+  potHi:'Tap the knob to turn it, until the bulb shines brightly, like the sun!',potLo:'Pufi wants to sleep. Turn the knob until the light is weak, like the moon!',
+  turn:'Tap the knob to turn it!',potOut:'The knob is not on the electricity’s path. Put it between the battery and the bulb!',
+  burn:'Poof! The LED burnt out: two batteries are too much for it. Put the resistor in front of it, to slow the electricity down!',
+  resOut:'The LED is on, but the resistor is not in the circuit. Use both batteries and the resistor!',
+  sunOn:'Connect the solar panel to the fan. The sun gives it power!',sunOff:'It works! Now tap the sun so a cloud covers it. What happens?'}},
+fr:{cx:{mat:['Test du détective : quels objets laissent passer l’électricité ? Choisis un objet !','Les métaux laissent passer l’électricité : ce sont des conducteurs. Le bois, le plastique et le tissu non : ce sont des isolants. C’est pour ça que les fils sont en métal, entourés de plastique !'],
+  btn:['La sonnette à bouton : branche-la, puis appuie trois fois sur le bouton !','Le bouton de la sonnette est un interrupteur fermé seulement pendant que tu appuies. Quand tu lâches, un ressort le rouvre.'],
+  ser:['Super ventilateur ! Utilise les deux piles pour que le ventilateur de RoboPufi tourne très vite !','Deux piles l’une après l’autre poussent l’électricité deux fois plus fort. C’est pour ça que les jouets avec plus de piles sont plus forts !'],
+  pot:['La lampe de Pufi : un bouton tournant change la lumière !','Le bouton tournant s’appelle un potentiomètre. Il freine l’électricité : plus il freine, plus la lumière est faible !'],
+  res:['Deux piles, c’est trop pour une petite LED ! Allume-la sans la brûler.','La résistance freine l’électricité et protège la LED. Chaque LED a une petite résistance comme amie !'],
+  sun:['L’énergie solaire ! Relie le panneau solaire au ventilateur.','Le panneau solaire transforme la lumière du soleil en électricité. Sans soleil, pas d’électricité !']},
+ cm:{predQ:n=>`${n}. Tu crois que l’ampoule va s’allumer ? Touche 💡 pour oui ou 🌑 pour non.`,predOk:'Bien deviné !',predNo:'Surprise !',
+  yes:n=>`${n} laisse passer l’électricité. C’est un conducteur !`,no:n=>`${n} ne laisse pas passer l’électricité. C’est un isolant !`,
+  obj:{spoon:'La cuillère en métal',wood:'Le bâtonnet en bois',coin:'La pièce',bear:'L’ours en peluche',clip:'Le trombone',crayon:'Le crayon de cire'},
+  matH:'Touche un objet en bas et devine si l’ampoule s’allume.',
+  press:'Le circuit est prêt ! Maintenant, appuie sur le bouton rouge.',press2:'Ding dong ! Appuie encore !',
+  btnOut:'La sonnette sonne sans le bouton ! Mets le bouton sur le chemin de l’électricité.',
+  serH:'Le ventilateur est lent. Mets les piles l’une après l’autre : le plus de l’une au moins de l’autre !',
+  oppH:'Les piles se poussent l’une contre l’autre ! Relie le plus au moins.',
+  potHi:'Touche le bouton tournant pour le tourner, jusqu’à ce que l’ampoule brille fort, comme le soleil !',potLo:'Pufi veut dormir. Tourne le bouton jusqu’à ce que la lumière soit faible, comme la lune !',
+  turn:'Touche le bouton tournant pour le tourner !',potOut:'Le bouton tournant n’est pas sur le chemin de l’électricité. Mets-le entre la pile et l’ampoule !',
+  burn:'Pouf ! La LED a grillé : deux piles, c’est trop pour elle. Mets la résistance devant elle pour freiner l’électricité !',
+  resOut:'La LED brille, mais la résistance n’est pas dans le circuit. Utilise les deux piles et la résistance !',
+  sunOn:'Relie le panneau solaire au ventilateur. Le soleil lui donne de la force !',sunOff:'Ça marche ! Maintenant, touche le soleil pour qu’un nuage le cache. Que se passe-t-il ?'}},
+es:{cx:{mat:['Prueba de detective: ¿qué cosas dejan pasar la electricidad? ¡Elige un objeto!','Los metales dejan pasar la electricidad: son conductores. La madera, el plástico y la tela no: son aislantes. ¡Por eso los cables son de metal, cubiertos de plástico!'],
+  btn:['Timbre con pulsador: conéctalo y luego aprieta el botón tres veces.','El botón del timbre es un interruptor que solo se cierra mientras lo aprietas. Cuando lo sueltas, un muelle lo vuelve a abrir.'],
+  ser:['¡Súper ventilador! Usa las dos pilas para que el ventilador de RoboPufi gire muy rápido.','Dos pilas una tras otra empujan la electricidad el doble de fuerte. ¡Por eso los juguetes con más pilas son más fuertes!'],
+  pot:['La lámpara de Pufi: ¡una rueda giratoria cambia la luz!','La rueda giratoria se llama potenciómetro. Frena la electricidad: ¡cuanto más frena, más débil es la luz!'],
+  res:['¡Dos pilas son demasiado para un LED pequeño! Enciéndelo sin quemarlo.','La resistencia frena la electricidad y protege el LED. ¡Cada LED tiene una pequeña resistencia como amiga!'],
+  sun:['¡Energía solar! Conecta el panel solar al ventilador.','El panel solar convierte la luz del sol en electricidad. ¡Sin sol, no hay electricidad!']},
+ cm:{predQ:n=>`${n}. ¿Crees que la bombilla se encenderá? Toca 💡 para sí o 🌑 para no.`,predOk:'¡Acertaste!',predNo:'¡Sorpresa!',
+  yes:n=>`${n} deja pasar la electricidad. ¡Es un conductor!`,no:n=>`${n} no deja pasar la electricidad. ¡Es un aislante!`,
+  obj:{spoon:'La cuchara de metal',wood:'El palito de madera',coin:'La moneda',bear:'El osito de peluche',clip:'El clip',crayon:'La cera de colores'},
+  matH:'Toca un objeto de abajo y adivina si la bombilla se enciende.',
+  press:'¡El circuito está listo! Ahora aprieta el botón rojo.',press2:'¡Din don! ¡Aprieta otra vez!',
+  btnOut:'¡El timbre suena sin el botón! Pon el botón en el camino de la electricidad.',
+  serH:'El ventilador va lento. Pon las pilas una tras otra: ¡el más de una con el menos de la otra!',
+  oppH:'¡Las pilas se empujan una contra otra! Une el más con el menos.',
+  potHi:'Toca la rueda para girarla, hasta que la bombilla brille fuerte, ¡como el sol!',potLo:'Pufi quiere dormir. Gira la rueda hasta que la luz sea débil, ¡como la luna!',
+  turn:'¡Toca la rueda para girarla!',potOut:'La rueda no está en el camino de la electricidad. ¡Ponla entre la pila y la bombilla!',
+  burn:'¡Puf! El LED se quemó: dos pilas son demasiado para él. ¡Pon la resistencia delante para frenar la electricidad!',
+  resOut:'El LED brilla, pero la resistencia no está en el circuito. ¡Usa las dos pilas y la resistencia!',
+  sunOn:'Conecta el panel solar al ventilador. ¡El sol le da fuerza!',sunOff:'¡Funciona! Ahora toca el sol para que lo tape una nube. ¿Qué pasa?'}},
+it:{cx:{mat:['Test del detective: quali cose fanno passare l’elettricità? Scegli un oggetto!','I metalli fanno passare l’elettricità: sono conduttori. Il legno, la plastica e la stoffa no: sono isolanti. Per questo i fili sono di metallo, coperti di plastica!'],
+  btn:['Campanello con pulsante: collegalo, poi premi il pulsante tre volte!','Il pulsante del campanello è un interruttore chiuso solo mentre lo premi. Quando lo lasci, una molla lo riapre.'],
+  ser:['Super ventilatore! Usa tutte e due le pile perché il ventilatore di RoboPufi giri velocissimo!','Due pile una dopo l’altra spingono l’elettricità il doppio. Per questo i giocattoli con più pile sono più forti!'],
+  pot:['La lampada di Pufi: una manopola cambia la luce!','La manopola si chiama potenziometro. Frena l’elettricità: più frena, più la luce è debole!'],
+  res:['Due pile sono troppe per un piccolo LED! Accendilo senza bruciarlo.','La resistenza frena l’elettricità e protegge il LED. Ogni LED ha una piccola resistenza come amica!'],
+  sun:['Energia solare! Collega il pannello solare al ventilatore.','Il pannello solare trasforma la luce del sole in elettricità. Senza sole, niente elettricità!']},
+ cm:{predQ:n=>`${n}. Secondo te la lampadina si accende? Tocca 💡 per sì o 🌑 per no.`,predOk:'Hai indovinato!',predNo:'Sorpresa!',
+  yes:n=>`${n} fa passare l’elettricità. È un conduttore!`,no:n=>`${n} non fa passare l’elettricità. È un isolante!`,
+  obj:{spoon:'Il cucchiaio di metallo',wood:'Il bastoncino di legno',coin:'La moneta',bear:'L’orsetto di peluche',clip:'La graffetta',crayon:'Il pastello a cera'},
+  matH:'Tocca un oggetto in basso e indovina se la lampadina si accende.',
+  press:'Il circuito è pronto! Ora premi il pulsante rosso.',press2:'Din don! Premi ancora!',
+  btnOut:'Il campanello suona senza pulsante! Metti il pulsante sulla strada dell’elettricità.',
+  serH:'Il ventilatore è lento. Metti le pile una dopo l’altra: il più di una al meno dell’altra!',
+  oppH:'Le pile si spingono una contro l’altra! Collega il più al meno.',
+  potHi:'Tocca la manopola per girarla, finché la lampadina brilla forte, come il sole!',potLo:'Pufi vuole dormire. Gira la manopola finché la luce è debole, come la luna!',
+  turn:'Tocca la manopola per girarla!',potOut:'La manopola non è sulla strada dell’elettricità. Mettila tra la pila e la lampadina!',
+  burn:'Puff! Il LED si è bruciato: due pile sono troppe per lui. Metti la resistenza davanti, per frenare l’elettricità!',
+  resOut:'Il LED è acceso, ma la resistenza non è nel circuito. Usa tutte e due le pile e la resistenza!',
+  sunOn:'Collega il pannello solare al ventilatore. Il sole gli dà forza!',sunOff:'Funziona! Ora tocca il sole perché una nuvola lo copra. Che cosa succede?'}},
+pt:{cx:{mat:['Teste do detetive: que coisas deixam passar a eletricidade? Escolhe um objeto!','Os metais deixam passar a eletricidade: são condutores. A madeira, o plástico e o tecido não: são isoladores. É por isso que os fios são de metal, cobertos de plástico!'],
+  btn:['Campainha com botão: liga-a e depois carrega no botão três vezes!','O botão da campainha é um interruptor que só fecha enquanto carregas. Quando largas, uma mola volta a abri-lo.'],
+  ser:['Super ventoinha! Usa as duas pilhas para a ventoinha do RoboPufi girar muito depressa!','Duas pilhas uma depois da outra empurram a eletricidade com o dobro da força. É por isso que os brinquedos com mais pilhas são mais fortes!'],
+  pot:['A lâmpada do Pufi: um botão rotativo muda a luz!','O botão rotativo chama-se potenciómetro. Ele trava a eletricidade: quanto mais trava, mais fraca é a luz!'],
+  res:['Duas pilhas são demais para um LED pequenino! Acende-o sem o queimar.','A resistência trava a eletricidade e protege o LED. Cada LED tem uma pequena resistência como amiga!'],
+  sun:['Energia solar! Liga o painel solar à ventoinha.','O painel solar transforma a luz do sol em eletricidade. Sem sol, não há eletricidade!']},
+ cm:{predQ:n=>`${n}. Achas que a lâmpada vai acender? Toca em 💡 para sim ou 🌑 para não.`,predOk:'Acertaste!',predNo:'Surpresa!',
+  yes:n=>`${n} deixa passar a eletricidade. É um condutor!`,no:n=>`${n} não deixa passar a eletricidade. É um isolador!`,
+  obj:{spoon:'A colher de metal',wood:'O pauzinho de madeira',coin:'A moeda',bear:'O ursinho de peluche',clip:'O clipe',crayon:'O lápis de cera'},
+  matH:'Toca num objeto em baixo e adivinha se a lâmpada acende.',
+  press:'O circuito está pronto! Agora carrega no botão vermelho.',press2:'Trim trim! Carrega outra vez!',
+  btnOut:'A campainha toca sem o botão! Põe o botão no caminho da eletricidade.',
+  serH:'A ventoinha está lenta. Põe as pilhas uma depois da outra: o mais de uma ao menos da outra!',
+  oppH:'As pilhas estão a empurrar-se uma contra a outra! Liga o mais ao menos.',
+  potHi:'Toca no botão rotativo para o rodar, até a lâmpada brilhar com força, como o sol!',potLo:'O Pufi quer dormir. Roda o botão até a luz ficar fraca, como a lua!',
+  turn:'Toca no botão rotativo para o rodar!',potOut:'O botão rotativo não está no caminho da eletricidade. Põe-no entre a pilha e a lâmpada!',
+  burn:'Puf! O LED queimou: duas pilhas são demais para ele. Põe a resistência à frente dele, para travar a eletricidade!',
+  resOut:'O LED está aceso, mas a resistência não está no circuito. Usa as duas pilhas e a resistência!',
+  sunOn:'Liga o painel solar à ventoinha. O sol dá-lhe força!',sunOff:'Funciona! Agora toca no sol para uma nuvem o tapar. O que acontece?'}},
+nl:{cx:{mat:['Detectivetest: welke dingen laten stroom door? Kies een voorwerp!','Metalen laten stroom door: het zijn geleiders. Hout, plastic en stof niet: het zijn isolatoren. Daarom zijn draden van metaal, met plastic eromheen!'],
+  btn:['Bel met drukknop: sluit hem aan en druk dan drie keer op de knop!','De belknop is een schakelaar die alleen dicht is zolang je drukt. Laat je los, dan duwt een veertje hem weer open.'],
+  ser:['Superventilator! Gebruik beide batterijen zodat de ventilator van RoboPufi heel snel draait!','Twee batterijen na elkaar duwen de stroom twee keer zo hard. Daarom is speelgoed met meer batterijen sterker!'],
+  pot:['Pufi’s lamp: een draaiknop verandert het licht!','De draaiknop heet een potentiometer. Hij remt de stroom af: hoe meer hij remt, hoe zwakker het licht!'],
+  res:['Twee batterijen zijn te veel voor een kleine led! Laat hem branden zonder dat hij doorbrandt.','De weerstand remt de stroom af en beschermt de led. Elke led heeft een kleine weerstand als vriendje!'],
+  sun:['Zonne-energie! Verbind het zonnepaneel met de ventilator.','Het zonnepaneel maakt van zonlicht stroom. Geen zon, geen stroom!']},
+ cm:{predQ:n=>`${n}. Denk je dat het lampje gaat branden? Tik op 💡 voor ja of 🌑 voor nee.`,predOk:'Goed geraden!',predNo:'Verrassing!',
+  yes:n=>`${n} laat stroom door. Het is een geleider!`,no:n=>`${n} laat geen stroom door. Het is een isolator!`,
+  obj:{spoon:'De metalen lepel',wood:'Het houten stokje',coin:'De munt',bear:'De knuffelbeer',clip:'De paperclip',crayon:'Het waskrijtje'},
+  matH:'Tik onderaan op een voorwerp en raad of het lampje gaat branden.',
+  press:'De stroomkring is klaar! Druk nu op de rode knop.',press2:'Tring tring! Druk nog eens!',
+  btnOut:'De bel gaat zonder knop! Zet de knop op de weg van de stroom.',
+  serH:'De ventilator is langzaam. Zet de batterijen na elkaar: de plus van de ene aan de min van de andere!',
+  oppH:'De batterijen duwen tegen elkaar in! Verbind plus met min.',
+  potHi:'Tik op de draaiknop om hem te draaien, tot het lampje fel brandt, net als de zon!',potLo:'Pufi wil slapen. Draai de knop tot het licht zwak is, net als de maan!',
+  turn:'Tik op de draaiknop om hem te draaien!',potOut:'De draaiknop zit niet op de weg van de stroom. Zet hem tussen de batterij en het lampje!',
+  burn:'Poef! De led is doorgebrand: twee batterijen zijn te veel voor hem. Zet de weerstand ervoor, om de stroom af te remmen!',
+  resOut:'De led brandt, maar de weerstand zit niet in de kring. Gebruik beide batterijen en de weerstand!',
+  sunOn:'Verbind het zonnepaneel met de ventilator. De zon geeft hem kracht!',sunOff:'Het werkt! Tik nu op de zon zodat er een wolk voor komt. Wat gebeurt er?'}},
+pl:{cx:{mat:['Test detektywa: które rzeczy przepuszczają prąd? Wybierz przedmiot!','Metale przepuszczają prąd: to przewodniki. Drewno, plastik i materiał nie: to izolatory. Dlatego kable są z metalu, owinięte plastikiem!'],
+  btn:['Dzwonek z przyciskiem: podłącz go, a potem naciśnij przycisk trzy razy!','Przycisk dzwonka to włącznik, który jest zamknięty tylko, gdy go naciskasz. Kiedy puścisz, sprężynka znów go otwiera.'],
+  ser:['Superwiatrak! Użyj obu baterii, żeby wiatrak RoboPufiego kręcił się bardzo szybko!','Dwie baterie jedna za drugą pchają prąd dwa razy mocniej. Dlatego zabawki z większą liczbą baterii są silniejsze!'],
+  pot:['Lampka Pufiego: pokrętło zmienia światło!','Pokrętło to potencjometr. Hamuje prąd: im mocniej hamuje, tym słabsze światło!'],
+  res:['Dwie baterie to za dużo dla małej diody! Zapal ją, ale jej nie spal.','Opornik hamuje prąd i chroni diodę. Każda dioda ma małego opornika za przyjaciela!'],
+  sun:['Energia słoneczna! Połącz panel słoneczny z wiatrakiem.','Panel słoneczny zamienia światło słońca w prąd. Bez słońca nie ma prądu!']},
+ cm:{predQ:n=>`${n}. Myślisz, że żarówka się zapali? Dotknij 💡 na tak albo 🌑 na nie.`,predOk:'Zgadłeś!',predNo:'Niespodzianka!',
+  yes:n=>`${n} przepuszcza prąd. To przewodnik!`,no:n=>`${n} nie przepuszcza prądu. To izolator!`,
+  obj:{spoon:'Metalowa łyżeczka',wood:'Drewniany patyczek',coin:'Moneta',bear:'Pluszowy miś',clip:'Spinacz',crayon:'Kredka świecowa'},
+  matH:'Dotknij przedmiotu na dole i zgadnij, czy żarówka się zapali.',
+  press:'Obwód gotowy! Teraz naciśnij czerwony przycisk.',press2:'Dzyń dzyń! Naciśnij jeszcze raz!',
+  btnOut:'Dzwonek dzwoni bez przycisku! Postaw przycisk na drodze prądu.',
+  serH:'Wiatrak kręci się wolno. Ustaw baterie jedna za drugą: plus jednej do minusa drugiej!',
+  oppH:'Baterie pchają się nawzajem! Połącz plus z minusem.',
+  potHi:'Dotykaj pokrętła, żeby je obrócić, aż żarówka zaświeci jasno jak słońce!',potLo:'Pufi chce spać. Obróć pokrętło, aż światło będzie słabe jak księżyc!',
+  turn:'Dotknij pokrętła, żeby je obrócić!',potOut:'Pokrętło nie jest na drodze prądu. Postaw je między baterią a żarówką!',
+  burn:'Puf! Dioda się spaliła: dwie baterie to dla niej za dużo. Postaw przed nią opornik, żeby hamował prąd!',
+  resOut:'Dioda świeci, ale opornika nie ma w obwodzie. Użyj obu baterii i opornika!',
+  sunOn:'Połącz panel słoneczny z wiatrakiem. Słońce daje mu siłę!',sunOff:'Działa! Teraz dotknij słońca, żeby zasłoniła je chmurka. Co się dzieje?'}},
+uk:{cx:{mat:['Тест детектива: які речі пропускають струм? Обери предмет!','Метали пропускають струм: це провідники. Дерево, пластик і тканина — ні: це ізолятори. Тому дроти зроблені з металу й обгорнуті пластиком!'],
+  btn:['Дзвоник із кнопкою: під’єднай його, а потім натисни кнопку три рази!','Кнопка дзвоника — це вимикач, який замкнений, лише поки ти тиснеш. Коли відпускаєш, пружинка знову його розмикає.'],
+  ser:['Супервентилятор! Візьми обидві батарейки, щоб вентилятор РобоПуфі крутився дуже швидко!','Дві батарейки одна за одною штовхають струм удвічі сильніше. Тому іграшки з більшою кількістю батарейок сильніші!'],
+  pot:['Лампа Пуфі: регулятор змінює світло!','Регулятор називається потенціометр. Він гальмує струм: що сильніше гальмує, то слабше світло!'],
+  res:['Дві батарейки — забагато для маленького світлодіода! Засвіти його, але не спали.','Резистор гальмує струм і захищає світлодіод. Кожен світлодіод має маленького друга-резистора!'],
+  sun:['Сонячна енергія! З’єднай сонячну панель із вентилятором.','Сонячна панель перетворює сонячне світло на струм. Немає сонця — немає струму!']},
+ cm:{predQ:n=>`${n}. Як думаєш, лампочка засвітиться? Торкнися 💡, якщо так, або 🌑, якщо ні.`,predOk:'Вгадав!',predNo:'Несподіванка!',
+  yes:n=>`${n} пропускає струм. Це провідник!`,no:n=>`${n} не пропускає струм. Це ізолятор!`,
+  obj:{spoon:'Металева ложечка',wood:'Дерев’яна паличка',coin:'Монетка',bear:'Плюшевий ведмедик',clip:'Скріпка',crayon:'Воскова крейдочка'},
+  matH:'Торкнися предмета внизу й вгадай, чи засвітиться лампочка.',
+  press:'Коло готове! Тепер натисни червону кнопку.',press2:'Дзінь-дзінь! Натисни ще!',
+  btnOut:'Дзвоник дзвонить без кнопки! Постав кнопку на шляху струму.',
+  serH:'Вентилятор крутиться повільно. Постав батарейки одну за одною: плюс однієї до мінуса іншої!',
+  oppH:'Батарейки штовхають одна одну! З’єднай плюс із мінусом.',
+  potHi:'Торкайся регулятора, щоб повернути його, поки лампочка не засвітить яскраво, як сонце!',potLo:'Пуфі хоче спати. Повертай регулятор, поки світло не стане слабким, як місяць!',
+  turn:'Торкнися регулятора, щоб повернути його!',potOut:'Регулятор не стоїть на шляху струму. Постав його між батарейкою і лампочкою!',
+  burn:'Пуф! Світлодіод перегорів: дві батарейки для нього забагато. Постав перед ним резистор, щоб гальмувати струм!',
+  resOut:'Світлодіод світить, але резистора немає в колі. Візьми обидві батарейки й резистор!',
+  sunOn:'З’єднай сонячну панель із вентилятором. Сонце дає їй силу!',sunOff:'Працює! Тепер торкнися сонця, щоб його закрила хмаринка. Що станеться?'}},
+ru:{cx:{mat:['Тест детектива: какие вещи пропускают ток? Выбери предмет!','Металлы пропускают ток: это проводники. Дерево, пластик и ткань — нет: это изоляторы. Поэтому провода сделаны из металла и покрыты пластиком!'],
+  btn:['Звонок с кнопкой: подключи его, а потом нажми на кнопку три раза!','Кнопка звонка — это выключатель, который замкнут, только пока ты нажимаешь. Когда отпускаешь, пружинка снова его размыкает.'],
+  ser:['Супервентилятор! Возьми обе батарейки, чтобы вентилятор РобоПуфи крутился очень быстро!','Две батарейки одна за другой толкают ток вдвое сильнее. Поэтому игрушки с большим количеством батареек сильнее!'],
+  pot:['Лампа Пуфи: регулятор меняет свет!','Регулятор называется потенциометр. Он тормозит ток: чем сильнее тормозит, тем слабее свет!'],
+  res:['Две батарейки — слишком много для маленького светодиода! Зажги его, но не сожги.','Резистор тормозит ток и защищает светодиод. У каждого светодиода есть маленький друг-резистор!'],
+  sun:['Солнечная энергия! Соедини солнечную панель с вентилятором.','Солнечная панель превращает солнечный свет в ток. Нет солнца — нет тока!']},
+ cm:{predQ:n=>`${n}. Как думаешь, лампочка загорится? Нажми 💡, если да, или 🌑, если нет.`,predOk:'Угадал!',predNo:'Сюрприз!',
+  yes:n=>`${n} пропускает ток. Это проводник!`,no:n=>`${n} не пропускает ток. Это изолятор!`,
+  obj:{spoon:'Металлическая ложечка',wood:'Деревянная палочка',coin:'Монетка',bear:'Плюшевый мишка',clip:'Скрепка',crayon:'Восковой мелок'},
+  matH:'Нажми на предмет внизу и угадай, загорится ли лампочка.',
+  press:'Цепь готова! Теперь нажми красную кнопку.',press2:'Дзинь-дзинь! Нажми ещё!',
+  btnOut:'Звонок звенит без кнопки! Поставь кнопку на пути тока.',
+  serH:'Вентилятор крутится медленно. Поставь батарейки одну за другой: плюс одной к минусу другой!',
+  oppH:'Батарейки толкают друг друга! Соедини плюс с минусом.',
+  potHi:'Нажимай на регулятор, чтобы повернуть его, пока лампочка не засветит ярко, как солнце!',potLo:'Пуфи хочет спать. Поворачивай регулятор, пока свет не станет слабым, как луна!',
+  turn:'Нажми на регулятор, чтобы повернуть его!',potOut:'Регулятор не стоит на пути тока. Поставь его между батарейкой и лампочкой!',
+  burn:'Пуф! Светодиод перегорел: две батарейки для него слишком много. Поставь перед ним резистор, чтобы тормозить ток!',
+  resOut:'Светодиод горит, но резистора нет в цепи. Возьми обе батарейки и резистор!',
+  sunOn:'Соедини солнечную панель с вентилятором. Солнце даёт ей силу!',sunOff:'Работает! Теперь нажми на солнце, чтобы его закрыло облачко. Что будет?'}},
+hu:{cx:{mat:['Detektívpróba: mely dolgok engedik át az áramot? Válassz egy tárgyat!','A fémek átengedik az áramot: ezek vezetők. A fa, a műanyag és a szövet nem: ezek szigetelők. Ezért vannak a vezetékek fémből, műanyaggal bevonva!'],
+  btn:['Csengő nyomógombbal: kösd be, aztán nyomd meg háromszor a gombot!','A csengő gombja olyan kapcsoló, amely csak addig zár, amíg nyomod. Ha elengeded, egy rugó újra kinyitja.'],
+  ser:['Szuperventilátor! Használd mindkét elemet, hogy RoboPufi ventilátora nagyon gyorsan forogjon!','Két elem egymás után kétszer olyan erősen tolja az áramot. Ezért erősebbek a több elemmel működő játékok!'],
+  pot:['Pufi lámpája: egy forgatógomb változtatja a fényt!','A forgatógomb neve potenciométer. Fékezi az áramot: minél jobban fékez, annál halványabb a fény!'],
+  res:['Két elem túl sok egy kis LED-nek! Gyújtsd meg úgy, hogy ne égjen ki.','Az ellenállás fékezi az áramot, és védi a LED-et. Minden LED-nek van egy kis ellenállás barátja!'],
+  sun:['Napenergia! Kösd össze a napelemet a ventilátorral.','A napelem a napfényt árammá alakítja. Nap nélkül nincs áram!']},
+ cm:{predQ:n=>`${n}. Szerinted felgyullad az izzó? Érintsd meg: 💡 igen, 🌑 nem.`,predOk:'Eltaláltad!',predNo:'Meglepetés!',
+  yes:n=>`${n} átengedi az áramot. Ez egy vezető!`,no:n=>`${n} nem engedi át az áramot. Ez egy szigetelő!`,
+  obj:{spoon:'A fémkanál',wood:'A fapálcika',coin:'A pénzérme',bear:'A plüssmaci',clip:'A gemkapocs',crayon:'A zsírkréta'},
+  matH:'Érints meg lent egy tárgyat, és találd ki, felgyullad-e az izzó.',
+  press:'Kész az áramkör! Most nyomd meg a piros gombot.',press2:'Csing-ling! Nyomd meg újra!',
+  btnOut:'A csengő gomb nélkül is szól! Tedd a gombot az áram útjába.',
+  serH:'Lassú a ventilátor. Tedd az elemeket egymás után: az egyik pluszát a másik mínuszához!',
+  oppH:'Az elemek egymás ellen tolnak! Kösd a pluszt a mínuszhoz.',
+  potHi:'Érintsd meg a forgatógombot, amíg az izzó fényesen nem ég, mint a nap!',potLo:'Pufi aludni szeretne. Forgasd a gombot, amíg a fény halvány nem lesz, mint a hold!',
+  turn:'Érintsd meg a forgatógombot, hogy elforgasd!',potOut:'A forgatógomb nincs az áram útjában. Tedd az elem és az izzó közé!',
+  burn:'Puff! Kiégett a LED: két elem túl sok neki. Tedd elé az ellenállást, hogy fékezze az áramot!',
+  resOut:'A LED világít, de az ellenállás nincs az áramkörben. Használd mindkét elemet és az ellenállást!',
+  sunOn:'Kösd össze a napelemet a ventilátorral. A nap ad neki erőt!',sunOff:'Működik! Most érintsd meg a napot, hogy eltakarja egy felhő. Mi történik?'}}
+};
+const CN={ro:{res:'rezistorul',pot:'butonul rotativ'},de:{res:'den Widerstand',pot:'den Drehknopf'},en:{res:'the resistor',pot:'the knob'}};
+function apply(){ const R=(window.L10N&&L10N.rb)||{}, T=window.__rbTX||{};
+  for(const l in A){ const o=T[l]||R[l]; if(o) for(const k in A[l]) if(!(k in o)) o[k]=A[l][k]; }
+  for(const l in N){ const o=T[l]||R[l]; if(o) Object.assign(o,N[l]); }
+  for(const l in CN){ const o=T[l]; if(o&&o.cn) Object.assign(o.cn,CN[l]); } }
+apply();
 })();
 </script>
 <script>
