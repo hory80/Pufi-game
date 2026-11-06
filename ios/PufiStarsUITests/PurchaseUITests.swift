@@ -56,21 +56,16 @@ final class PurchaseUITests: XCTestCase {
         XCTAssertTrue(unlock.waitForExistence(timeout: 20))
         XCTAssertTrue(unlock.label.contains("3.00"), unlock.label)
         XCTAssertTrue(app.buttons["Restore purchases"].exists)
-        for _ in 0..<12 {
-            if unlock.isHittable && app.buttons["Restore purchases"].isHittable { break }
-            let web = app.webViews.firstMatch
-            let start = web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
-            let end = web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
-            start.press(forDuration: 0.05, thenDragTo: end)
-        }
         XCTAssertTrue(unlock.isHittable)
-        let web = app.webViews.firstMatch
-        web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
-            .press(forDuration: 0.05, thenDragTo: web.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08)))
+        XCTAssertTrue(app.buttons["Restore purchases"].isHittable)
+        XCTAssertTrue(app.buttons["✖ Close"].isHittable)
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Record")).firstMatch.exists)
         let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         screenshot.name = "Pufi-IAP-Review-English"
         screenshot.lifetime = .keepAlways
         add(screenshot)
+        app.buttons["✖ Close"].tap()
+        XCTAssertFalse(unlock.exists)
         app.terminate()
         XCTAssertEqual(session.allTransactions().count, 0)
     }
