@@ -5,7 +5,7 @@ Aplicație SwiftUI care împachetează jocul web (`../index.html` + `foto/`, `im
 - **Voce nativă** (`AVSpeechSynthesizer`) — folosește vocile Premium/Enhanced instalate pe aparat; karaoke sincronizat pe cuvinte.
 - **🎤 Citesc cu voce** — recunoașterea vorbirii (`SFSpeechRecognizer`, pe aparat când limba o permite) colorează cuvintele citite de copil; la final „Ascultă-te”.
 - **🎙️ Vocea părintelui** — 5 laude înregistrate (rămân pe aparat), redate uneori după o reușită.
-- **IAP** prin RevenueCat — o singură cumpărare „Deblochează tot”.
+- **IAP** direct prin Apple StoreKit 2 — o singură cumpărare „Deblochează tot”.
 - **Poarta pentru părinți** înaintea panoului Părinți (deci și a cumpărării).
 - **Copie de siguranță a progresului** (localStorage → UserDefaults).
 
@@ -23,11 +23,32 @@ open PufiStars.xcodeproj
 
 La fiecare build, scriptul „Sync web game” recopiază automat `index.html` din rădăcina repo-ului — deci după `git pull` doar dai Run.
 
-## RevenueCat
-1. App Store Connect: produs **non-consumable** `unlock_all`.
-2. RevenueCat: entitlement `premium`, offering *current* cu un pachet ce conține `unlock_all`.
-3. Pune cheia publică iOS (`appl_…`) în `PufiStars/Services/PurchaseService.swift`.
-Fără cheie, în Debug totul e deblocat.
+## Achiziția permanentă (StoreKit 2)
+
+Produsul App Store Connect este **non-consumable** `unlock_all` (Apple ID
+`6831593303`), cu preț de bază **3,00 USD**. Prețul afișat în aplicație vine
+întotdeauna din `Product.displayPrice`, în moneda magazinului utilizatorului.
+Nu sunt necesare chei sau un serviciu terț. Aplicația verifică tranzacțiile Apple,
+ascultă aprobările/rambursările și restaurează prin `AppStore.sync()`.
+Contractul JS `iap.status/price/buy/restore` rămâne identic.
+
+Pentru teste locale și capturi: generează proiectul, alege schema
+**PufiStoreKit** și un simulator, apoi Run în Xcode. Schema folosește
+`StoreKit/Pufi.storekit` și argumente exclusiv Debug pentru un utilizator nou
+după 15 decembrie. Trece poarta pentru părinți înainte de cumpărare. Aceste
+tranzacții sunt de test, fără bani reali. Configurația nu este inclusă în app;
+numai bundle-urile de teste o includ ca resursă.
+
+Schema normală **PufiStars**, configurația Release/Archive și App Store folosesc
+produsele reale Apple. Debug normal rămâne deblocat. Argumentul
+`-PufiStoreKitTest` permite tranzacțiile StoreKit cu scenariul Debug izolat:
+nu se citește AppTransaction și nu se modifică Keychain. Fără fișier StoreKit
+selectat în schema Xcode, aceeași configurație Debug poate fi folosită pentru
+proba Sandbox a produsului real, pe dispozitiv, cu un cont Sandbox Apple.
+
+Înainte de lansare trebuie testată și cumpărarea/restaurarea în **Sandbox**, cu
+produsul real complet configurat, și trimis primul IAP împreună cu versiunea app.
+Testele locale nu confirmă încă funcționarea produsului pe serverele App Store.
 
 ## Limbi pentru voce/recunoaștere
 `SpeechService.locales`: ro, de, en, fr, it, es, pt, nl, pl, hu, uk, ru. Pentru voce mai bună: pe iPad, Setări → Accesibilitate → Conținut vorbit → Voci → descarcă varianta „Enhanced/Premium” pentru fiecare limbă.
@@ -71,7 +92,7 @@ păstrată în Git la `PufiStars/Assets.xcassets/AppIcon.appiconset/PufiIcon-102
 Până la **15 decembrie 2026, ora 00:00 Europe/Zurich**
 (`2026-12-14T23:00:00Z`) accesul este complet. După această dată, rămâne complet
 pentru utilizatorii cu o dată originală de achiziție anterioară limitei, verificată
-prin StoreKit `AppTransaction.shared`, sau cu entitlement RevenueCat `premium`.
+prin StoreKit `AppTransaction.shared`, sau cu o tranzacție Apple verificată și nerevocată pentru `unlock_all`.
 Eligibilitatea timpurie se păstrează în Keychain pe aparat. Pe un aparat nou,
 tranzacția verificată a aceluiași Apple ID permite restabilirea eligibilității.
 Dacă StoreKit nu răspunde, `iap.status` folosește rezultatul local după cel mult
@@ -89,7 +110,7 @@ Dacă StoreKit nu răspunde, `iap.status` folosește rezultatul local după cel 
 | Utilizator nou cu versiunea completă | `-PufiNow 2026-12-15T00:00:00Z -PufiOriginalPurchase none -PufiPremium true` |
 
 Oricare dintre aceste argumente activează un scenariu izolat: fără StoreKit,
-RevenueCat sau modificarea Keychain-ului real. `PufiPremium` simulează un
+cumpărături sau modificarea Keychain-ului real. `PufiPremium` simulează un
 entitlement activ; nu efectuează o cumpărătură. Toate argumentele sunt excluse din
 Release. Data-limită este strictă: o achiziție exact la limită nu califică pentru
 acces permanent gratuit.

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Regula de acces, independentă de StoreKit, RevenueCat și stocare.
+/// Regula de acces, independentă de magazin și stocare.
 struct EntitlementPolicy {
     // 15 decembrie 2026, 00:00 Europe/Zurich (CET).
     static let cutoff = ISO8601DateFormatter().date(from: "2026-12-14T23:00:00Z")!

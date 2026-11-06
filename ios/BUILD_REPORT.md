@@ -160,3 +160,83 @@ in App Store Connect. See `ios/store/README.md` for exact URLs and maintenance.
 Web follow-up for Claude: add readily accessible offline privacy/disclaimer text
 in `parents()` or `window.__parentsExtra`, keeping external navigation blocked.
 Wikimedia content-rights verification remains separate.
+
+## StoreKit 2 și capturi IAP — 6 noiembrie 2026
+
+Branch: `ios/storekit-unlock`. Baza web testată: `81e8b56`.
+
+### Ce s-a schimbat
+
+- `PurchaseService.swift`: achiziția unică `unlock_all` folosește direct StoreKit 2,
+  în locul integrării RevenueCat neactivate. Preț localizat din Apple, cumpărare,
+  restaurare, tranzacții verificate, anulare/pending fără acces și actualizări de
+  entitlement la aprobare/rambursare. `iap.status/price/buy/restore` rămân identice.
+- Regula de acces gratuit până la **15 decembrie 2026, 00:00 Europe/Zurich** și
+  eligibilitatea permanentă a primilor utilizatori rămân neschimbate. Nu se schimbă
+  bundle ID `com.horace.pufistars` sau product ID `unlock_all`.
+- `project.yml`: elimină SDK-ul RevenueCat; adaugă schema Debug `PufiStoreKit` și
+  resursa StoreKit numai în bundle-urile de teste. Niciun override de test sau
+  catalog local nu este inclus în aplicația Release.
+- `StoreKit/Pufi.storekit`: catalog Apple local, non-consumable, 3 USD.
+- `PurchaseServiceTests.swift`: preț/cumpărare/restaurare într-un serviciu nou,
+  anulare, Ask to Buy, rambursare. Așteptările țin cont de propagarea asincronă.
+- `PurchaseUITests.swift`: poarta nativă, prețul și butonul Restore în Părinți;
+  atașează o captură reală a simulatorului. Nu confirmă plăți din UI.
+- `README.md`, `store/README.md`: pași StoreKit/Sandbox și configurația de
+  confidențialitate fără serviciu terț. Politica publică existentă rămâne exactă.
+- `store/iap-review/`: două capturi originale pentru iPhone/iPad și o captură
+  suplimentară a ferestrei Apple de test; dimensiuni/proveniență în README local.
+
+### Verificare
+
+- Debug build iPhone 17 Pro și iPad Pro 13-inch (M5), OS 26.5: **PASS**.
+- Release build arm64 pentru simulator: **PASS**. Fișierul `.storekit` nu este în app.
+- iPhone 17 Pro, iOS 26.1: **13 teste PASS** (8 politică/Keychain, 4 StoreKit, 1 UI).
+- iPad Pro 13-inch (M5), iPadOS 26.1: **13 teste PASS**, aceeași suită.
+- Aplicația rulează pe ambele simulatoare; Părinți/poarta/preț/restaurare sunt
+  vizibile. Capturi vizual verificate: iPhone 1206×2622, iPad 2064×2752, portret.
+- Prețul testat este 3 USD; tranzacțiile locale verifică și restaurarea după
+  recrearea serviciului, anularea, aprobarea ulterioară și revocarea prin refund.
+- Prima încercare pe 26.5 a fost blocată de `SKInternalErrorDomain Code=3`,
+  „not installed for development”. 27.0 a blocat încărcarea configurației.
+  Nu sunt declarate reușite acele probe. Runtime-ul 26.1 a trecut suita finală.
+  [Incident StoreKit Test discutat cu Apple](https://developer.apple.com/forums/thread/826971).
+- Build/test în `/tmp/PufiIAPBuild`, copie a acelorași surse/configurații/joc.
+  iCloud a blocat și citirea `.git/HEAD` din Documents; pentru PR s-a folosit
+  o clonă curată `/tmp/PufiIAPPublish`, pe aceeași bază `main`, numai cu schimbări ios.
+- Nu sunt modificate `index.html`, `foto/`, `imn/`, `fotbal/`; niciun proiect Xcode,
+  WebContent generat, DerivedData, secret sau SDK de analiză nu este comis.
+
+Jurnale finale: `/tmp/pufi-iap-phone-complete.log`, `/tmp/pufi-iap-pad-complete.log`,
+`/tmp/pufi-iap-release-build.log`. Rezultate:
+`/tmp/PufiIAPPhoneComplete.xcresult`, `/tmp/PufiIAPPadComplete.xcresult`.
+
+### App Store Connect și limite rămase
+
+Produsul real **Pufi Full Access**, `unlock_all`, Apple ID `6831593303`, are preț
+3 USD și texte în 12 limbi. Captura iPad a fost încărcată în Review Information,
+instrucțiunile salvate; starea este **Prepare for Submission**. Niciun Add for
+Review/Submit și nicio plată reală. Primul IAP trebuie trimis cu versiunea app.
+
+**Sandbox cu produsul real și buildul distribuit nu a fost încă testat.** Probele
+StoreKit locale nu confirmă configurarea serverelor App Store. Lansarea gratuită
+și eligibilitatea timpurie ascund corect oferta celor deja eligibili; pentru
+proba Sandbox a unui utilizator nou se poate folosi Debug cu scenariul izolat,
+fără catalog local selectat în Xcode. Nu sunt necesare chei RevenueCat și nu a
+fost activat un serviciu terț care ar schimba declarația Data Not Collected.
+
+### Corecții necesare în joc (pentru Claude)
+
+1. În blocul de paywall, `NT()` citește `window.L10N.nt`, dar traducerile sunt
+   gestionate de `TR('nt', NT)` în blocul nativ. Rezultatul este gol: paywall-ul
+   unui joc blocat arată doar diamant + „Unlock” / „Restore”, fără titlu sau preț,
+   chiar dacă `iap.price` returnează corect. Expune un accessor comun pentru
+   traducerile native sau folosește aceeași sursă TR în `paywall()`; păstrează
+   prețul StoreKit în text. Secțiunea Părinți folosește deja `Y()` și afișează corect.
+2. Overlay-ul Părinți `.hm-par` este absolut în pagina derulată; pe iPhone, când
+   este deschis din cardul de jos, partea de sus ajunge în afara ecranului.
+   Recomand overlay fix în viewport, cu derulare internă. Captura păstrează UI-ul
+   real actual; nu a fost cosmetizată pentru a ascunde acest comportament.
+
+Aceste corecții web și rezolvarea problemelor de licențiere deja raportate rămân
+separate de acest PR nativ. Nu se cere merge automat.

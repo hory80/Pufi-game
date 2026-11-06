@@ -1,0 +1,39 @@
+{
+  "identifier": "A739CC44-4E61-4787-910F-9712092AA1CD",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "3.00",
+      "familyShareable": false,
+      "internalID": "6831593303",
+      "localizations": [
+        {
+          "description": "Unlock all activities permanently. One-time purchase.",
+          "displayName": "Pufi Full Access",
+          "locale": "en_US"
+        },
+        {
+          "description": "Deblochează permanent toate activitățile. Plată unică.",
+          "displayName": "Pufi – Acces complet",
+          "locale": "ro"
+        }
+      ],
+      "productID": "unlock_all",
+      "referenceName": "Pufi Full Access",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
