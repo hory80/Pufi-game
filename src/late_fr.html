@@ -1,0 +1,9 @@
+<script>
+/* Français — date din modulele încărcate după pachete (acvariu) */
+(()=>{ const lg='fr';
+const A=window.__aqData; if(A){ const i=A.SP.caras.N.length; (L10N.aq[lg]).li=i;
+  const NM={caras:['le carassin','Carassin','Le carassin est un poisson doré et calme. Il aime les plantes et les vers.'],crap:['la carpe','Carpe','La carpe a de petites moustaches pour chercher à manger dans la vase.'],pastrav:['la truite','Truite','La truite vit dans les ruisseaux froids des montagnes. Elle a des points noirs et une bande rose.'],biban:['la perche','Perche','La perche a des rayures sur le dos et des nageoires rouges. Elle chasse les petits poissons.'],somn:['le silure','Silure','Le silure a de longues moustaches et mange presque tout. Il chasse la nuit.'],stiuca:['le brochet','Brochet','Le brochet est le grand chasseur des rivières. Il se cache et attaque très vite !'],rac:['l’écrevisse','Écrevisse','L’écrevisse a des pinces et marche à reculons. Elle nettoie le fond.'],testoasa:['la tortue','Tortue','La tortue d’eau porte sa maison sur son dos.'],plev:['le vairon','Vairon','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'des algues',worm:'des vers',ins:'des insectes',plev:'des petits poissons'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k]; }
+})();
+</script>

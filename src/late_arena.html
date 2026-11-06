@@ -1,0 +1,358 @@
+<style>
+/* ===== Arena Anzan: concursuri de viteză la soroban ===== */
+#sp-root{position:fixed;inset:0;z-index:58;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px);font-family:var(--display);color:#fff;background:radial-gradient(ellipse at 50% 0%,#4B3AA8 0%,#25306B 55%,#141B45 100%);overflow:hidden}
+#sp-root[hidden]{display:none}
+#sp-root .sp-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#sp-root .sp-top h2{flex:1 1 160px;margin:0;text-align:center;font-size:clamp(1.3rem,3.6vw,2rem);text-shadow:0 0 18px rgba(255,212,59,.6)}
+#sp-root .ch-btn,#sp-root .ch-pill{color:#24325f}
+.sp-body{flex:1;min-height:0;overflow:auto;width:100%;max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-bottom:8px}
+.sp-hero{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.08);border-radius:26px;padding:12px 16px}
+.sp-hero .fox{font-size:clamp(3rem,10vh,4.6rem);line-height:1;animation:spBob 2s ease-in-out infinite;position:relative}
+.sp-hero .fox svg{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:76%}
+.sp-hero .who{flex:1;font-weight:800;font-size:clamp(1.05rem,2.8vw,1.5rem);line-height:1.2}
+.sp-hero .who small{display:block;font-size:.72em;opacity:.8;font-weight:700}
+@keyframes spBob{50%{transform:translateY(-5px)}}
+.sp-shelf{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.sp-shelf .bt{width:clamp(46px,8vw,70px);position:relative;opacity:.35;filter:grayscale(.6);cursor:pointer;background:none;border:none;padding:0}
+.sp-shelf .bt.got{opacity:1;filter:none}
+.sp-shelf .bt.nx{opacity:1;filter:none;animation:spPulse 1.2s ease-in-out infinite}
+.sp-shelf .bt svg{width:100%;display:block}
+@keyframes spPulse{50%{transform:scale(1.15)}}
+.sp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:12px}
+.sp-card{background:#fff;color:#24325f;border-radius:26px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 0 rgba(0,0,0,.25);position:relative}
+.sp-card h3{margin:0;font-size:clamp(1.25rem,3vw,1.6rem);display:flex;align-items:center;gap:8px}
+.sp-card p{margin:0;font-weight:700;opacity:.8;font-size:clamp(.95rem,2.2vw,1.1rem)}
+.sp-card .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.sp-b{font:inherit;font-weight:800;font-size:clamp(1rem,2.5vw,1.25rem);border:3px solid #24325f;background:#fff;color:#24325f;border-radius:999px;padding:6px 18px;cursor:pointer;min-height:50px}
+.sp-b.go{background:#3ECF8E;border-color:#2bb57a;color:#fff}
+.sp-b.gold{background:#FFD43B;border-color:#E0A800}
+.sp-b:active{transform:translateY(3px)}
+.sp-set{display:flex;flex-direction:column;gap:10px;background:#fff;color:#24325f;border-radius:26px;padding:14px 16px}
+.sp-set .ln{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;border-bottom:2px dashed #E6ECF7;padding-bottom:8px}
+.sp-set .ln:last-child{border-bottom:none}
+.sp-set .lb{font-weight:800;font-size:clamp(1rem,2.4vw,1.2rem)}
+.sp-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sp-chips button{font:inherit;font-weight:800;font-size:clamp(.95rem,2.2vw,1.1rem);border:3px solid #DCE3F2;background:#F5F7FD;color:#24325f;border-radius:999px;padding:5px 12px;cursor:pointer;min-height:44px}
+.sp-chips button.on{background:#5B4BD6;border-color:#4436B5;color:#fff}
+.sp-step{display:flex;align-items:center;gap:6px}
+.sp-step button{font:inherit;font-weight:800;font-size:1.5rem;width:48px;height:48px;border-radius:50%;border:3px solid #24325f;background:#fff;color:#24325f;cursor:pointer;line-height:1}
+.sp-step b{min-width:4.2em;text-align:center;font-size:clamp(1.2rem,3vw,1.5rem)}
+.sp-note{font-weight:800;color:#5B4BD6;text-align:center}
+/* ecranul de joc */
+.sp-run{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto}
+.sp-hud{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.sp-hud .p{background:rgba(255,255,255,.14);border-radius:999px;padding:4px 14px;font-weight:800;font-size:clamp(1rem,2.6vw,1.35rem);font-variant-numeric:tabular-nums}
+.sp-hud .p.warn{background:#E8505B;animation:spPulse .8s infinite}
+.sp-hud .p.fire{background:#FF9F43}
+.sp-main{flex:1;min-height:0;display:grid;grid-template-columns:1fr minmax(260px,36%);gap:12px}
+@media (max-aspect-ratio:1/1){.sp-main{grid-template-columns:1fr;grid-template-rows:1fr auto}}
+.sp-stage{position:relative;min-height:0;border-radius:28px;background:rgba(0,0,0,.25);box-shadow:inset 0 0 0 3px rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .2s}
+.sp-stage.ok{background:rgba(62,207,142,.45)}.sp-stage.no{background:rgba(232,80,91,.45)}
+.sp-num{font-size:clamp(4rem,22vmin,12rem);font-weight:800;font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 0 30px rgba(255,212,59,.75);color:#FFF3B0}
+.sp-num.neg{color:#FFB3C0;text-shadow:0 0 30px rgba(255,107,181,.7)}
+.sp-dot{width:26px;height:26px;border-radius:50%;background:#FFD43B;box-shadow:0 0 24px #FFD43B;animation:spPulse .5s infinite}
+.sp-col{display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums;font-weight:800;line-height:1.1;color:#FFF3B0;padding:10px 24px}
+.sp-col span{display:block}
+.sp-col .ln2{border-top:4px solid #FFF3B0;width:100%;margin-top:6px;text-align:right;color:#fff}
+.sp-ear{font-size:clamp(5rem,20vmin,10rem);animation:spPulse 1s infinite}
+.sp-cnt{font-size:clamp(5rem,26vmin,13rem);font-weight:800;color:#FFD43B;animation:spIn .9s ease-out}
+@keyframes spIn{0%{transform:scale(2.2);opacity:0}30%{opacity:1}100%{transform:scale(1)}}
+.sp-fb{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#fff;color:#24325f;border-radius:999px;padding:6px 18px;font-weight:800;font-size:clamp(1.1rem,3vw,1.6rem);white-space:nowrap}
+.sp-side{display:flex;flex-direction:column;gap:8px;min-height:0}
+.sp-out{background:#fff;color:#24325f;border-radius:20px;min-height:clamp(54px,9vh,78px);display:flex;align-items:center;justify-content:center;font-size:clamp(2rem,6vh,3.2rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.sp-out.ph{color:#9AA5C8;font-size:clamp(1.2rem,3.4vh,1.7rem)}
+.sp-keys{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:8px}
+.sp-keys button{font:inherit;font-weight:800;font-size:clamp(1.6rem,5vh,2.6rem);border:none;border-radius:18px;background:#fff;color:#24325f;box-shadow:0 5px 0 rgba(0,0,0,.3);cursor:pointer;min-height:48px;touch-action:manipulation}
+.sp-keys button:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.sp-keys .ok{background:#3ECF8E;color:#fff}.sp-keys .del{background:#FFE0C7}
+.sp-keys.off button{opacity:.35;pointer-events:none}
+@media (max-aspect-ratio:1/1){.sp-keys{grid-template-columns:repeat(6,1fr);grid-auto-rows:auto}.sp-keys button{order:var(--o,20)}.sp-keys button{min-height:clamp(50px,7.5vh,70px)}}
+.sp-track{position:absolute;left:12px;right:12px;top:10px;height:44px;border-radius:999px;background:rgba(255,255,255,.12)}
+.sp-track span{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:30px;transition:left .5s ease-out;line-height:1}
+.sp-track .fin{right:6px;left:auto;transform:translateY(-50%)}
+.sp-res{display:flex;flex-direction:column;align-items:center;gap:10px;background:#fff;color:#24325f;border-radius:28px;padding:16px;text-align:center}
+.sp-res .big{font-size:clamp(2.6rem,9vh,4.2rem);font-weight:800;line-height:1}
+.sp-res h3{margin:0;font-size:clamp(1.3rem,3.4vw,1.8rem)}
+.sp-res table{border-collapse:collapse;font-weight:800;font-variant-numeric:tabular-nums}
+.sp-res td{padding:3px 10px;border-bottom:1px solid #E6ECF7}
+.sp-res td.q{font-size:.85em;opacity:.75;max-width:52vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-res .no{color:#E8505B}.sp-res .yes{color:#2bb57a}
+.sp-belt-win svg{width:min(260px,60vw);animation:spIn 1.2s ease-out}
+.sp-fire{animation:spFire .6s ease-out}
+@keyframes spFire{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+/* card în meniul sorobanului */
+.sa-arena{font:inherit;width:100%;flex:none;border:none;border-radius:24px;padding:12px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;color:#fff;text-align:left;background:linear-gradient(120deg,#5B4BD6,#25306B);box-shadow:0 7px 0 #1a2150;position:relative;overflow:hidden}
+.sa-arena:active{transform:translateY(5px);box-shadow:0 2px 0 #1a2150}
+.sa-arena .ic{font-size:clamp(2.4rem,7vh,3.4rem);line-height:1}
+.sa-arena b{display:block;font-size:clamp(1.25rem,3.2vw,1.7rem)}
+.sa-arena span.s{font-weight:700;opacity:.85;font-size:clamp(.9rem,2.2vw,1.1rem)}
+.sa-arena .bl{margin-left:auto;width:clamp(60px,10vw,90px);flex:none}
+.sa-arena::after{content:'';position:absolute;top:-40%;left:-30%;width:30%;height:180%;background:rgba(255,255,255,.18);transform:rotate(20deg);animation:spShine 3.5s ease-in-out infinite}
+@keyframes spShine{0%,60%{left:-30%}100%{left:130%}}
+</style>
+<script>
+(()=>{
+const TX={
+ ro:{title:'Arena Anzan',sub:'Concursuri de viteză la socoteli',belts:['Centura albă','Centura galbenă','Centura portocalie','Centura verde','Centura albastră','Centura mov','Centura maro','Centura roșie','Centura neagră','Maestru','Mare Maestru'],
+  yours:'Centura ta',none:'Încă nicio centură',exam:'🥋 Examen de centură',examInfo:(c,k)=>`${c} exerciții · minimum ${k} corecte`,all:'Ai toate centurile! 🏆',
+  sprint:'🏁 Cursa de 1 minut',sprintInfo:'Câte socoteli rezolvi într-un minut? Întrece-ți recordul!',custom:'⚙️ Concurs la alegere',customInfo:'Setezi totul exact ca la concurs.',practice:'🔁 Exersează',record:'Record',
+  type:'Proba',types:['⚡ Flash Anzan','📜 Coloane','👂 Ascultare','✖️ Înmulțire','➗ Împărțire'],digits:'Cifre',count:'Numere în exercițiu',speed:'Secunde pentru fiecare număr',pause:'Pauză între numere (s)',ops:'Operații',opAdd:'Doar +',opMix:'+ și −',digits2:'Cifre la al doilea număr',tasks:'Exerciții',limit:'Timp total',noLimit:'Fără limită',min:'min',total:s=>`Total: ${s} s`,
+  start:'▶ Start',ready:'Atenție!',ask:'Cât face?',skip:'⏭ Sari',ok:'Corect!',was:n=>`Corect: ${n}`,res:'Rezultat',score:(c,t)=>`Corecte: ${c} / ${t}`,time:'Timp',
+  passed:b=>`Felicitări! ${b}!`,failed:k=>`Pentru centură: minimum ${k} corecte. Mai încearcă!`,newRec:'Record nou! 🏆',mistakes:'Greșeli',perfect:'Nicio greșeală! 🎉',you:'Tu',
+  again:'↺ Încă o dată',hub:'⬅ Arena',back:'⬅ Înapoi',locked:'Câștigă întâi centura de dinainte.',plus:'plus',minus:'minus',times:'ori',divby:'împărțit la',listen:'Ascultă cu atenție!',timeUp:'Timpul a expirat!',solved:n=>`Ai rezolvat: ${n}!`},
+ de:{title:'Anzan-Arena',sub:'Kopfrechen-Wettbewerbe auf Zeit',belts:['Weißer Gürtel','Gelber Gürtel','Orangener Gürtel','Grüner Gürtel','Blauer Gürtel','Lila Gürtel','Brauner Gürtel','Roter Gürtel','Schwarzer Gürtel','Meister','Großmeister'],
+  yours:'Dein Gürtel',none:'Noch kein Gürtel',exam:'🥋 Gürtelprüfung',examInfo:(c,k)=>`${c} Aufgaben · mindestens ${k} richtig`,all:'Du hast alle Gürtel! 🏆',
+  sprint:'🏁 1-Minuten-Rennen',sprintInfo:'Wie viele Aufgaben schaffst du in einer Minute? Schlag deinen Rekord!',custom:'⚙️ Eigener Wettbewerb',customInfo:'Stell alles genau wie beim Wettbewerb ein.',practice:'🔁 Üben',record:'Rekord',
+  type:'Disziplin',types:['⚡ Flash-Anzan','📜 Kolonnen','👂 Hören','✖️ Malnehmen','➗ Teilen'],digits:'Stellen',count:'Zahlen pro Aufgabe',speed:'Sekunden pro Zahl',pause:'Pause zwischen Zahlen (s)',ops:'Rechenarten',opAdd:'Nur +',opMix:'+ und −',digits2:'Stellen der zweiten Zahl',tasks:'Aufgaben',limit:'Gesamtzeit',noLimit:'Ohne Limit',min:'Min.',total:s=>`Gesamt: ${s} s`,
+  start:'▶ Start',ready:'Achtung!',ask:'Wie viel ist das?',skip:'⏭ Weiter',ok:'Richtig!',was:n=>`Richtig: ${n}`,res:'Ergebnis',score:(c,t)=>`Richtig: ${c} / ${t}`,time:'Zeit',
+  passed:b=>`Glückwunsch! ${b}!`,failed:k=>`Für den Gürtel: mindestens ${k} richtig. Versuch es nochmal!`,newRec:'Neuer Rekord! 🏆',mistakes:'Fehler',perfect:'Kein Fehler! 🎉',you:'Du',
+  again:'↺ Nochmal',hub:'⬅ Arena',back:'⬅ Zurück',locked:'Hol dir zuerst den Gürtel davor.',plus:'plus',minus:'minus',times:'mal',divby:'geteilt durch',listen:'Hör gut zu!',timeUp:'Die Zeit ist um!',solved:n=>`Gelöst: ${n}!`},
+ en:{title:'Anzan Arena',sub:'Speed maths competitions',belts:['White belt','Yellow belt','Orange belt','Green belt','Blue belt','Purple belt','Brown belt','Red belt','Black belt','Master','Grandmaster'],
+  yours:'Your belt',none:'No belt yet',exam:'🥋 Belt exam',examInfo:(c,k)=>`${c} sums · at least ${k} correct`,all:'You have every belt! 🏆',
+  sprint:'🏁 1-minute race',sprintInfo:'How many sums can you solve in one minute? Beat your record!',custom:'⚙️ Custom contest',customInfo:'Set everything exactly like a real contest.',practice:'🔁 Practise',record:'Record',
+  type:'Event',types:['⚡ Flash Anzan','📜 Columns','👂 Listening','✖️ Multiply','➗ Divide'],digits:'Digits',count:'Numbers per sum',speed:'Seconds per number',pause:'Pause between numbers (s)',ops:'Operations',opAdd:'Only +',opMix:'+ and −',digits2:'Digits of the second number',tasks:'Sums',limit:'Total time',noLimit:'No limit',min:'min',total:s=>`Total: ${s} s`,
+  start:'▶ Start',ready:'Get ready!',ask:'What is the answer?',skip:'⏭ Skip',ok:'Correct!',was:n=>`Correct: ${n}`,res:'Result',score:(c,t)=>`Correct: ${c} / ${t}`,time:'Time',
+  passed:b=>`Well done! ${b}!`,failed:k=>`For the belt: at least ${k} correct. Try again!`,newRec:'New record! 🏆',mistakes:'Mistakes',perfect:'No mistakes! 🎉',you:'You',
+  again:'↺ Again',hub:'⬅ Arena',back:'⬅ Back',locked:'Win the belt before this one first.',plus:'plus',minus:'minus',times:'times',divby:'divided by',listen:'Listen carefully!',timeUp:'Time is up!',solved:n=>`Solved: ${n}!`},
+ fr:{title:'Arène Anzan',sub:'Concours de calcul rapide',belts:['Ceinture blanche','Ceinture jaune','Ceinture orange','Ceinture verte','Ceinture bleue','Ceinture violette','Ceinture marron','Ceinture rouge','Ceinture noire','Maître','Grand maître'],
+  yours:'Ta ceinture',none:'Pas encore de ceinture',exam:'🥋 Examen de ceinture',examInfo:(c,k)=>`${c} calculs · au moins ${k} justes`,all:'Tu as toutes les ceintures ! 🏆',
+  sprint:'🏁 Course d’une minute',sprintInfo:'Combien de calculs en une minute ? Bats ton record !',custom:'⚙️ Concours sur mesure',customInfo:'Règle tout exactement comme en concours.',practice:'🔁 S’entraîner',record:'Record',
+  type:'Épreuve',types:['⚡ Flash Anzan','📜 Colonnes','👂 Écoute','✖️ Multiplication','➗ Division'],digits:'Chiffres',count:'Nombres par calcul',speed:'Secondes par nombre',pause:'Pause entre les nombres (s)',ops:'Opérations',opAdd:'Seulement +',opMix:'+ et −',digits2:'Chiffres du deuxième nombre',tasks:'Calculs',limit:'Temps total',noLimit:'Sans limite',min:'min',total:s=>`Total : ${s} s`,
+  start:'▶ Départ',ready:'Attention !',ask:'Combien ça fait ?',skip:'⏭ Passer',ok:'Juste !',was:n=>`Juste : ${n}`,res:'Résultat',score:(c,t)=>`Justes : ${c} / ${t}`,time:'Temps',
+  passed:b=>`Bravo ! ${b} !`,failed:k=>`Pour la ceinture : au moins ${k} justes. Réessaie !`,newRec:'Nouveau record ! 🏆',mistakes:'Erreurs',perfect:'Aucune erreur ! 🎉',you:'Toi',
+  again:'↺ Encore',hub:'⬅ Arène',back:'⬅ Retour',locked:'Gagne d’abord la ceinture précédente.',plus:'plus',minus:'moins',times:'fois',divby:'divisé par',listen:'Écoute bien !',timeUp:'Le temps est écoulé !',solved:n=>`Résolus : ${n} !`},
+ it:{title:'Arena Anzan',sub:'Gare di calcolo veloce',belts:['Cintura bianca','Cintura gialla','Cintura arancione','Cintura verde','Cintura blu','Cintura viola','Cintura marrone','Cintura rossa','Cintura nera','Maestro','Gran maestro'],
+  yours:'La tua cintura',none:'Ancora nessuna cintura',exam:'🥋 Esame di cintura',examInfo:(c,k)=>`${c} calcoli · almeno ${k} giusti`,all:'Hai tutte le cinture! 🏆',
+  sprint:'🏁 Gara di un minuto',sprintInfo:'Quanti calcoli risolvi in un minuto? Batti il tuo record!',custom:'⚙️ Gara personalizzata',customInfo:'Imposta tutto proprio come in gara.',practice:'🔁 Allenati',record:'Record',
+  type:'Prova',types:['⚡ Flash Anzan','📜 Colonne','👂 Ascolto','✖️ Moltiplicazione','➗ Divisione'],digits:'Cifre',count:'Numeri per calcolo',speed:'Secondi per numero',pause:'Pausa tra i numeri (s)',ops:'Operazioni',opAdd:'Solo +',opMix:'+ e −',digits2:'Cifre del secondo numero',tasks:'Calcoli',limit:'Tempo totale',noLimit:'Senza limite',min:'min',total:s=>`Totale: ${s} s`,
+  start:'▶ Via',ready:'Attenzione!',ask:'Quanto fa?',skip:'⏭ Salta',ok:'Giusto!',was:n=>`Giusto: ${n}`,res:'Risultato',score:(c,t)=>`Giusti: ${c} / ${t}`,time:'Tempo',
+  passed:b=>`Complimenti! ${b}!`,failed:k=>`Per la cintura: almeno ${k} giusti. Riprova!`,newRec:'Nuovo record! 🏆',mistakes:'Errori',perfect:'Nessun errore! 🎉',you:'Tu',
+  again:'↺ Ancora',hub:'⬅ Arena',back:'⬅ Indietro',locked:'Prima vinci la cintura precedente.',plus:'più',minus:'meno',times:'per',divby:'diviso',listen:'Ascolta bene!',timeUp:'Tempo scaduto!',solved:n=>`Risolti: ${n}!`},
+ es:{title:'Arena Anzan',sub:'Concursos de cálculo rápido',belts:['Cinturón blanco','Cinturón amarillo','Cinturón naranja','Cinturón verde','Cinturón azul','Cinturón morado','Cinturón marrón','Cinturón rojo','Cinturón negro','Maestro','Gran maestro'],
+  yours:'Tu cinturón',none:'Aún sin cinturón',exam:'🥋 Examen de cinturón',examInfo:(c,k)=>`${c} cuentas · mínimo ${k} correctas`,all:'¡Tienes todos los cinturones! 🏆',
+  sprint:'🏁 Carrera de 1 minuto',sprintInfo:'¿Cuántas cuentas resuelves en un minuto? ¡Supera tu récord!',custom:'⚙️ Concurso a medida',customInfo:'Configura todo igual que en un concurso.',practice:'🔁 Practicar',record:'Récord',
+  type:'Prueba',types:['⚡ Flash Anzan','📜 Columnas','👂 Escucha','✖️ Multiplicación','➗ División'],digits:'Cifras',count:'Números por cuenta',speed:'Segundos por número',pause:'Pausa entre números (s)',ops:'Operaciones',opAdd:'Solo +',opMix:'+ y −',digits2:'Cifras del segundo número',tasks:'Cuentas',limit:'Tiempo total',noLimit:'Sin límite',min:'min',total:s=>`Total: ${s} s`,
+  start:'▶ Empezar',ready:'¡Atención!',ask:'¿Cuánto es?',skip:'⏭ Saltar',ok:'¡Correcto!',was:n=>`Correcto: ${n}`,res:'Resultado',score:(c,t)=>`Correctas: ${c} / ${t}`,time:'Tiempo',
+  passed:b=>`¡Enhorabuena! ¡${b}!`,failed:k=>`Para el cinturón: mínimo ${k} correctas. ¡Inténtalo otra vez!`,newRec:'¡Nuevo récord! 🏆',mistakes:'Errores',perfect:'¡Ningún error! 🎉',you:'Tú',
+  again:'↺ Otra vez',hub:'⬅ Arena',back:'⬅ Volver',locked:'Primero gana el cinturón anterior.',plus:'más',minus:'menos',times:'por',divby:'entre',listen:'¡Escucha con atención!',timeUp:'¡Se acabó el tiempo!',solved:n=>`Resueltas: ${n}!`},
+ pt:{title:'Arena Anzan',sub:'Competições de cálculo rápido',belts:['Faixa branca','Faixa amarela','Faixa laranja','Faixa verde','Faixa azul','Faixa roxa','Faixa marrom','Faixa vermelha','Faixa preta','Mestre','Grão-mestre'],
+  yours:'Sua faixa',none:'Ainda sem faixa',exam:'🥋 Exame de faixa',examInfo:(c,k)=>`${c} contas · no mínimo ${k} certas`,all:'Você tem todas as faixas! 🏆',
+  sprint:'🏁 Corrida de 1 minuto',sprintInfo:'Quantas contas você resolve em um minuto? Bata seu recorde!',custom:'⚙️ Competição personalizada',customInfo:'Ajuste tudo exatamente como numa competição.',practice:'🔁 Praticar',record:'Recorde',
+  type:'Prova',types:['⚡ Flash Anzan','📜 Colunas','👂 Escuta','✖️ Multiplicação','➗ Divisão'],digits:'Algarismos',count:'Números por conta',speed:'Segundos por número',pause:'Pausa entre números (s)',ops:'Operações',opAdd:'Só +',opMix:'+ e −',digits2:'Algarismos do segundo número',tasks:'Contas',limit:'Tempo total',noLimit:'Sem limite',min:'min',total:s=>`Total: ${s} s`,
+  start:'▶ Começar',ready:'Atenção!',ask:'Quanto dá?',skip:'⏭ Pular',ok:'Certo!',was:n=>`Certo: ${n}`,res:'Resultado',score:(c,t)=>`Certas: ${c} / ${t}`,time:'Tempo',
+  passed:b=>`Parabéns! ${b}!`,failed:k=>`Para a faixa: no mínimo ${k} certas. Tente de novo!`,newRec:'Novo recorde! 🏆',mistakes:'Erros',perfect:'Nenhum erro! 🎉',you:'Você',
+  again:'↺ De novo',hub:'⬅ Arena',back:'⬅ Voltar',locked:'Primeiro ganhe a faixa anterior.',plus:'mais',minus:'menos',times:'vezes',divby:'dividido por',listen:'Ouça com atenção!',timeUp:'O tempo acabou!',solved:n=>`Resolvidas: ${n}!`},
+ nl:{title:'Anzan-arena',sub:'Wedstrijden snel rekenen',belts:['Witte band','Gele band','Oranje band','Groene band','Blauwe band','Paarse band','Bruine band','Rode band','Zwarte band','Meester','Grootmeester'],
+  yours:'Jouw band',none:'Nog geen band',exam:'🥋 Bandexamen',examInfo:(c,k)=>`${c} sommen · minstens ${k} goed`,all:'Je hebt alle banden! 🏆',
+  sprint:'🏁 Race van 1 minuut',sprintInfo:'Hoeveel sommen los je op in één minuut? Verbeter je record!',custom:'⚙️ Eigen wedstrijd',customInfo:'Stel alles in zoals op een echte wedstrijd.',practice:'🔁 Oefenen',record:'Record',
+  type:'Onderdeel',types:['⚡ Flash Anzan','📜 Kolommen','👂 Luisteren','✖️ Vermenigvuldigen','➗ Delen'],digits:'Cijfers',count:'Getallen per som',speed:'Seconden per getal',pause:'Pauze tussen getallen (s)',ops:'Bewerkingen',opAdd:'Alleen +',opMix:'+ en −',digits2:'Cijfers van het tweede getal',tasks:'Sommen',limit:'Totale tijd',noLimit:'Geen limiet',min:'min',total:s=>`Totaal: ${s} s`,
+  start:'▶ Start',ready:'Let op!',ask:'Hoeveel is het?',skip:'⏭ Overslaan',ok:'Goed!',was:n=>`Goed: ${n}`,res:'Resultaat',score:(c,t)=>`Goed: ${c} / ${t}`,time:'Tijd',
+  passed:b=>`Gefeliciteerd! ${b}!`,failed:k=>`Voor de band: minstens ${k} goed. Probeer het nog eens!`,newRec:'Nieuw record! 🏆',mistakes:'Fouten',perfect:'Geen fouten! 🎉',you:'Jij',
+  again:'↺ Nog eens',hub:'⬅ Arena',back:'⬅ Terug',locked:'Haal eerst de band hiervoor.',plus:'plus',minus:'min',times:'keer',divby:'gedeeld door',listen:'Luister goed!',timeUp:'De tijd is om!',solved:n=>`Opgelost: ${n}!`},
+ pl:{title:'Arena Anzan',sub:'Zawody w szybkim liczeniu',belts:['Biały pas','Żółty pas','Pomarańczowy pas','Zielony pas','Niebieski pas','Fioletowy pas','Brązowy pas','Czerwony pas','Czarny pas','Mistrz','Arcymistrz'],
+  yours:'Twój pas',none:'Jeszcze bez pasa',exam:'🥋 Egzamin na pas',examInfo:(c,k)=>`Zadania: ${c} · minimum poprawnych: ${k}`,all:'Masz wszystkie pasy! 🏆',
+  sprint:'🏁 Wyścig 1-minutowy',sprintInfo:'Ile działań rozwiążesz w minutę? Pobij swój rekord!',custom:'⚙️ Własne zawody',customInfo:'Ustaw wszystko dokładnie jak na zawodach.',practice:'🔁 Ćwicz',record:'Rekord',
+  type:'Konkurencja',types:['⚡ Flash Anzan','📜 Kolumny','👂 Słuchanie','✖️ Mnożenie','➗ Dzielenie'],digits:'Cyfry',count:'Liczby w działaniu',speed:'Sekundy na liczbę',pause:'Przerwa między liczbami (s)',ops:'Działania',opAdd:'Tylko +',opMix:'+ i −',digits2:'Cyfry drugiej liczby',tasks:'Zadania',limit:'Czas całkowity',noLimit:'Bez limitu',min:'min',total:s=>`Razem: ${s} s`,
+  start:'▶ Start',ready:'Uwaga!',ask:'Ile to jest?',skip:'⏭ Pomiń',ok:'Dobrze!',was:n=>`Poprawnie: ${n}`,res:'Wynik',score:(c,t)=>`Poprawne: ${c} / ${t}`,time:'Czas',
+  passed:b=>`Gratulacje! ${b}!`,failed:k=>`Na pas: minimum poprawnych: ${k}. Spróbuj jeszcze raz!`,newRec:'Nowy rekord! 🏆',mistakes:'Błędy',perfect:'Bez błędów! 🎉',you:'Ty',
+  again:'↺ Jeszcze raz',hub:'⬅ Arena',back:'⬅ Wstecz',locked:'Najpierw zdobądź poprzedni pas.',plus:'plus',minus:'minus',times:'razy',divby:'podzielić przez',listen:'Słuchaj uważnie!',timeUp:'Czas minął!',solved:n=>`Rozwiązane: ${n}!`},
+ hu:{title:'Anzan Aréna',sub:'Gyorsszámolási versenyek',belts:['Fehér öv','Sárga öv','Narancs öv','Zöld öv','Kék öv','Lila öv','Barna öv','Piros öv','Fekete öv','Mester','Nagymester'],
+  yours:'Az öved',none:'Még nincs öved',exam:'🥋 Övvizsga',examInfo:(c,k)=>`Feladatok: ${c} · legalább ennyi jó: ${k}`,all:'Megvan az összes öv! 🏆',
+  sprint:'🏁 Egyperces verseny',sprintInfo:'Hány feladatot oldasz meg egy perc alatt? Döntsd meg a rekordodat!',custom:'⚙️ Saját verseny',customInfo:'Állíts be mindent pont úgy, mint a versenyen.',practice:'🔁 Gyakorlás',record:'Rekord',
+  type:'Versenyszám',types:['⚡ Flash Anzan','📜 Oszlopok','👂 Hallás','✖️ Szorzás','➗ Osztás'],digits:'Számjegyek',count:'Számok feladatonként',speed:'Másodperc számonként',pause:'Szünet a számok között (mp)',ops:'Műveletek',opAdd:'Csak +',opMix:'+ és −',digits2:'A második szám számjegyei',tasks:'Feladatok',limit:'Teljes idő',noLimit:'Nincs korlát',min:'perc',total:s=>`Összesen: ${s} mp`,
+  start:'▶ Start',ready:'Figyelem!',ask:'Mennyi az eredmény?',skip:'⏭ Tovább',ok:'Jó!',was:n=>`Helyesen: ${n}`,res:'Eredmény',score:(c,t)=>`Jó válaszok: ${c} / ${t}`,time:'Idő',
+  passed:b=>`Gratulálok! ${b}!`,failed:k=>`Az övhöz legalább ennyi jó kell: ${k}. Próbáld újra!`,newRec:'Új rekord! 🏆',mistakes:'Hibák',perfect:'Nincs hiba! 🎉',you:'Te',
+  again:'↺ Újra',hub:'⬅ Aréna',back:'⬅ Vissza',locked:'Előbb szerezd meg az előző övet.',plus:'meg',minus:'mínusz',times:'szorozva',divby:'osztva',listen:'Figyelj jól!',timeUp:'Lejárt az idő!',solved:n=>`Megoldva: ${n}!`},
+ uk:{title:'Арена Анзан',sub:'Змагання з швидкого рахунку',belts:['Білий пояс','Жовтий пояс','Помаранчевий пояс','Зелений пояс','Синій пояс','Фіолетовий пояс','Коричневий пояс','Червоний пояс','Чорний пояс','Майстер','Гросмейстер'],
+  yours:'Твій пояс',none:'Ще немає пояса',exam:'🥋 Іспит на пояс',examInfo:(c,k)=>`Завдань: ${c} · правильних щонайменше: ${k}`,all:'У тебе всі пояси! 🏆',
+  sprint:'🏁 Перегони на 1 хвилину',sprintInfo:'Скільки прикладів розв’яжеш за хвилину? Побий свій рекорд!',custom:'⚙️ Своє змагання',customInfo:'Налаштуй усе точно як на змаганні.',practice:'🔁 Тренуватися',record:'Рекорд',
+  type:'Дисципліна',types:['⚡ Флеш-анзан','📜 Стовпчики','👂 На слух','✖️ Множення','➗ Ділення'],digits:'Цифри',count:'Чисел у прикладі',speed:'Секунд на число',pause:'Пауза між числами (с)',ops:'Дії',opAdd:'Тільки +',opMix:'+ і −',digits2:'Цифри другого числа',tasks:'Приклади',limit:'Загальний час',noLimit:'Без ліміту',min:'хв',total:s=>`Разом: ${s} с`,
+  start:'▶ Старт',ready:'Увага!',ask:'Скільки буде?',skip:'⏭ Далі',ok:'Правильно!',was:n=>`Правильно: ${n}`,res:'Результат',score:(c,t)=>`Правильно: ${c} / ${t}`,time:'Час',
+  passed:b=>`Вітаю! ${b}!`,failed:k=>`Для пояса правильних щонайменше: ${k}. Спробуй ще раз!`,newRec:'Новий рекорд! 🏆',mistakes:'Помилки',perfect:'Жодної помилки! 🎉',you:'Ти',
+  again:'↺ Ще раз',hub:'⬅ Арена',back:'⬅ Назад',locked:'Спершу здобудь попередній пояс.',plus:'плюс',minus:'мінус',times:'помножити на',divby:'поділити на',listen:'Слухай уважно!',timeUp:'Час вийшов!',solved:n=>`Розв’язано: ${n}!`},
+ ru:{title:'Арена Анзан',sub:'Соревнования по быстрому счёту',belts:['Белый пояс','Жёлтый пояс','Оранжевый пояс','Зелёный пояс','Синий пояс','Фиолетовый пояс','Коричневый пояс','Красный пояс','Чёрный пояс','Мастер','Гроссмейстер'],
+  yours:'Твой пояс',none:'Пока нет пояса',exam:'🥋 Экзамен на пояс',examInfo:(c,k)=>`Заданий: ${c} · правильных минимум: ${k}`,all:'У тебя все пояса! 🏆',
+  sprint:'🏁 Гонка на 1 минуту',sprintInfo:'Сколько примеров решишь за минуту? Побей свой рекорд!',custom:'⚙️ Своё соревнование',customInfo:'Настрой всё точно как на соревновании.',practice:'🔁 Тренироваться',record:'Рекорд',
+  type:'Дисциплина',types:['⚡ Флеш-анзан','📜 Столбики','👂 На слух','✖️ Умножение','➗ Деление'],digits:'Цифры',count:'Чисел в примере',speed:'Секунд на число',pause:'Пауза между числами (с)',ops:'Действия',opAdd:'Только +',opMix:'+ и −',digits2:'Цифры второго числа',tasks:'Примеры',limit:'Общее время',noLimit:'Без лимита',min:'мин',total:s=>`Всего: ${s} с`,
+  start:'▶ Старт',ready:'Внимание!',ask:'Сколько получилось?',skip:'⏭ Дальше',ok:'Правильно!',was:n=>`Правильно: ${n}`,res:'Результат',score:(c,t)=>`Правильно: ${c} / ${t}`,time:'Время',
+  passed:b=>`Поздравляю! ${b}!`,failed:k=>`Для пояса правильных минимум: ${k}. Попробуй ещё раз!`,newRec:'Новый рекорд! 🏆',mistakes:'Ошибки',perfect:'Ни одной ошибки! 🎉',you:'Ты',
+  again:'↺ Ещё раз',hub:'⬅ Арена',back:'⬅ Назад',locked:'Сначала получи предыдущий пояс.',plus:'плюс',minus:'минус',times:'умножить на',divby:'разделить на',listen:'Слушай внимательно!',timeUp:'Время вышло!',solved:n=>`Решено: ${n}!`}};
+const X=()=>TX[lang]||TX.en;
+const sp=t=>{ try{ return typeof say==='function'?say(t):Promise.resolve(false); }catch(e){ return Promise.resolve(false); } };
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const giveStars=k=>{ if(k<=0) return; try{ stars+=k; renderBar(); }catch(e){} };
+/* ---- centurile (examene ca la concurs) ---- */
+const BC=['#F7F7F7','#FFD43B','#FF9F43','#3ECF8E','#4AA8FF','#B07CFF','#A0663A','#E8505B','#26262E','gold','rainbow'];
+const BELT=[
+ {type:'flash',d:1,n:3,s:2,mix:0,tasks:10,need:8},
+ {type:'flash',d:1,n:5,s:1.5,mix:0,tasks:10,need:8},
+ {type:'cols',d:1,n:6,mix:1,tasks:10,lim:3,need:8},
+ {type:'flash',d:1,n:5,s:1.2,mix:1,tasks:10,need:8},
+ {type:'cols',d:2,n:5,mix:1,tasks:10,lim:4,need:8},
+ {type:'flash',d:2,n:5,s:1.2,mix:1,tasks:10,need:8},
+ {type:'mul',d:2,d2:1,tasks:10,lim:3,need:9},
+ {type:'flash',d:2,n:8,s:0.9,mix:1,tasks:10,need:8},
+ {type:'cols',d:3,n:8,mix:1,tasks:10,lim:6,need:9},
+ {type:'flash',d:2,n:12,s:0.6,mix:1,tasks:10,need:9},
+ {type:'flash',d:3,n:15,s:0.5,mix:1,tasks:10,need:9}];
+const SPR=[[1,2,0],[1,3,0],[1,4,1],[1,5,1],[2,3,1],[2,4,1],[2,4,1],[2,5,1],[3,4,1],[3,5,1],[3,6,1],[3,7,1]];
+let got=LS.get('sp_belt',0);
+function beltSVG(i){ const c=BC[i], ink='#24325f';
+  const fill=c==='gold'?'url(#spGold)':c==='rainbow'?'url(#spRb)':c;
+  return `<svg viewBox="0 0 120 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="spGold" x1="0" x2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset=".5" stop-color="#F2B90C"/><stop offset="1" stop-color="#FFE27A"/></linearGradient><linearGradient id="spRb" x1="0" x2="1"><stop offset="0" stop-color="#FF6B6B"/><stop offset=".25" stop-color="#FFD43B"/><stop offset=".5" stop-color="#3ECF8E"/><stop offset=".75" stop-color="#4AA8FF"/><stop offset="1" stop-color="#B07CFF"/></linearGradient></defs>
+  <rect x="3" y="14" width="114" height="18" rx="7" fill="${fill}" stroke="${ink}" stroke-width="3"/><path d="M54 30 L40 60 L52 60 L60 36z M66 30 L80 60 L68 60 L60 36z" fill="${fill}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/><rect x="49" y="9" width="22" height="28" rx="7" fill="${fill}" stroke="${ink}" stroke-width="3"/>${i>=9?'<text x="60" y="29" text-anchor="middle" font-size="14">⭐</text>':''}</svg>`; }
+/* ---- generatoare ---- */
+const rnd=d=>d<=1?RR(1,9):RR(10**(d-1),10**d-1);
+function genSeq(d,n,mix){ const a=[], lo=d<=1?1:10**(d-1), hi=10**d-1; let tot=0, prev=0;
+  for(let i=0;i<n;i++){ let x, neg=false;
+    if(i>0&&mix&&tot>lo&&Math.random()<.42){ const top=Math.min(hi,tot-1); if(top>=lo){ neg=true; let k=0; do{ x=RR(lo,top); }while(x===prev&&top>lo&&k++<8); } }
+    if(!neg){ let k=0; do{ x=rnd(d); }while(x===prev&&k++<8); }
+    a.push(neg?-x:x); tot+=neg?-x:x; prev=x; }
+  return {seq:a,ans:tot}; }
+function genItem(c){
+  if(c.type==='mul'){ const a=rnd(c.d), b=Math.max(2,rnd(c.d2||1)); return {kind:'mul',a,b,ans:a*b}; }
+  if(c.type==='div'){ const q=Math.max(2,rnd(c.d)), b=Math.max(2,rnd(c.d2||1)); return {kind:'div',a:q*b,b,ans:q}; }
+  const g=genSeq(c.d,c.n,c.mix); return {kind:c.type,seq:g.seq,ans:g.ans}; }
+const qText=it=>it.kind==='mul'?`${it.a} × ${it.b}`:it.kind==='div'?`${it.a} ÷ ${it.b}`:it.seq.map((v,i)=>(i?(v<0?' − ':' + '):'')+Math.abs(v)).join('');
+/* ---- interfață ---- */
+const root=document.createElement('div'); root.id='sp-root'; root.hidden=true;
+root.innerHTML=`<div class="sp-top"><button class="ch-btn" id="sp-back"></button><h2 id="sp-title"></h2><div class="ch-pill" id="sp-stars">⭐ 0</div></div><div class="sp-body" id="sp-body"></div>`;
+document.body.appendChild(root);
+const $=id=>document.getElementById('sp-'+id), body=$('body');
+let view='hub', run=null;
+const pill=()=>{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); };
+function top(t){ $('title').textContent=t; $('back').textContent=view==='hub'?X().back:X().hub; pill(); }
+const el=(tag,cls,html)=>{ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; };
+function cfgDesc(c){ const t=X().types[['flash','cols','listen','mul','div'].indexOf(c.type)];
+  if(c.type==='mul'||c.type==='div') return `${t} · ${'9'.repeat(c.d)} ${c.type==='mul'?'×':'÷'} ${'9'.repeat(c.d2||1)}`+(c.lim?` · ${c.lim} ${X().min}`:'');
+  return `${t} · ${X().digits}: ${c.d} · ${X().count}: ${c.n}`+(c.type==='flash'?` · ${c.s} s`:'')+(c.mix?' · ±':' · +')+(c.lim?` · ${c.lim} ${X().min}`:''); }
+function hub(){ view='hub'; stopRun(); top('🏁 '+X().title); body.innerHTML='';
+  const hero=el('div','sp-hero'); const cur=got>0?X().belts[got-1]:X().none;
+  hero.innerHTML=`<div class="fox">🦊${got>0?beltSVG(got-1):''}</div><div class="who"><small>${X().yours}</small>${cur}<small>${X().sub}</small></div><button class="sp-b" data-a="s">🔊</button>`;
+  hero.querySelector('[data-a=s]').onclick=()=>sp(X().yours+': '+cur+'. '+X().sub); body.appendChild(hero);
+  const sh=el('div','sp-shelf'); BELT.forEach((b,i)=>{ const x=el('button','bt'+(i<got?' got':i===got?' nx':''),beltSVG(i)); x.title=X().belts[i]; x.onclick=()=>{ sp(X().belts[i]+'. '+cfgDesc(b)); }; sh.appendChild(x); }); body.appendChild(sh);
+  const cards=el('div','sp-cards');
+  /* examen */
+  const ex=el('div','sp-card'); if(got<BELT.length){ const b=BELT[got];
+    ex.innerHTML=`<h3>${X().exam}</h3><div style="display:flex;align-items:center;gap:10px"><div style="width:90px">${beltSVG(got)}</div><b style="font-size:1.25rem">${X().belts[got]}</b></div><p>${cfgDesc(b)}</p><p>${X().examInfo(b.tasks,b.need)}</p><div class="row"><button class="sp-b go" data-a="e">${X().start}</button><button class="sp-b" data-a="p">${X().practice}</button><button class="sp-b" data-a="s">🔊</button></div>`;
+    ex.querySelector('[data-a=e]').onclick=()=>gate('arena')||start({mode:'exam',belt:got,cfg:BELT[got]});
+    ex.querySelector('[data-a=p]').onclick=()=>gate('arena')||start({mode:'practice',belt:got,cfg:BELT[got]});
+    ex.querySelector('[data-a=s]').onclick=()=>sp(X().exam.replace(/^\S+\s/,'')+': '+X().belts[got]+'. '+X().examInfo(b.tasks,b.need));
+  } else ex.innerHTML=`<h3>${X().exam}</h3><p style="font-size:1.4rem">${X().all}</p>`;
+  cards.appendChild(ex);
+  /* cursa */
+  const lvl=Math.min(got,SPR.length-1), rec=(LS.get('sp_rec',{})['s'+lvl])||0;
+  const sc=el('div','sp-card',`<h3>${X().sprint}</h3><p>${X().sprintInfo}</p><p>🏆 ${X().record}: <b>${rec}</b></p><div class="row"><button class="sp-b gold" data-a="g">${X().start}</button><button class="sp-b" data-a="s">🔊</button></div>`);
+  sc.querySelector('[data-a=g]').onclick=()=>gate('sprint')||start({mode:'sprint',lvl,cfg:{type:'cols',d:SPR[lvl][0],n:SPR[lvl][1],mix:SPR[lvl][2],lim:1,tasks:999}});
+  sc.querySelector('[data-a=s]').onclick=()=>sp(X().sprintInfo); cards.appendChild(sc);
+  /* concurs la alegere */
+  const cc=el('div','sp-card',`<h3>${X().custom}</h3><p>${X().customInfo}</p><p>${cfgDesc(cfg())}</p><div class="row"><button class="sp-b go" data-a="o">⚙️ ${X().start.replace('▶ ','')}</button><button class="sp-b" data-a="s">🔊</button></div>`);
+  cc.querySelector('[data-a=o]').onclick=()=>gate('arena')||settings(); cc.querySelector('[data-a=s]').onclick=()=>sp(X().customInfo); cards.appendChild(cc);
+  body.appendChild(cards); }
+const gate=k=>!!(window.__gate&&window.__gate('sa',k));
+/* ---- setări concurs ---- */
+const DEF={type:'flash',d:1,n:5,s:1.5,mix:0,tasks:10,lim:0,d2:1,p:1};
+const cfg=()=>Object.assign({},DEF,LS.get('sp_cfg',{}));
+const V={d:[1,2,3,4,5],n:[2,3,4,5,6,7,8,10,12,15,20,25,30],s:[3,2.5,2,1.5,1.2,1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.2,0.15,0.1],tasks:[5,10,15,20,25,30,50,100,200],lim:[0,1,2,3,4,5,6,8,10,12,15],d2:[1,2,3],p:[3,2,1.5,1,0.5,0.2]};
+function settings(){ view='set'; top('⚙️ '+X().custom.replace(/^\S+\s/,'')); const c=cfg(); body.innerHTML=''; const box=el('div','sp-set'); body.appendChild(box);
+  const save=()=>{ LS.set('sp_cfg',c); draw(); };
+  const chips=(lab,opts,cur,set)=>{ const ln=el('div','ln'); ln.appendChild(el('div','lb',lab)); const ch=el('div','sp-chips'); opts.forEach(([v,t])=>{ const b=el('button',v===cur?'on':'',t); b.onclick=()=>{ set(v); save(); }; ch.appendChild(b); }); ln.appendChild(ch); box.appendChild(ln); };
+  const step=(lab,key,fmt)=>{ const ln=el('div','ln'); ln.appendChild(el('div','lb',lab)); const st=el('div','sp-step'); const L=V[key]; let i=Math.max(0,L.indexOf(c[key])); if(L.indexOf(c[key])<0) c[key]=L[0];
+    const mk=(t,dv)=>{ const b=el('button','',t); b.onclick=()=>{ i=Math.max(0,Math.min(L.length-1,L.indexOf(c[key])+dv)); c[key]=L[i]; save(); }; return b; };
+    st.append(mk('−',-1),el('b','',fmt?fmt(c[key]):c[key]),mk('+',1)); ln.appendChild(st); box.appendChild(ln); };
+  function draw(){ box.innerHTML='';
+    chips(X().type,['flash','cols','listen','mul','div'].map((v,i)=>[v,X().types[i]]),c.type,v=>c.type=v);
+    step(X().digits,'d');
+    if(c.type==='mul'||c.type==='div') step(X().digits2,'d2');
+    else { step(X().count,'n'); chips(X().ops,[[0,X().opAdd],[1,X().opMix]],c.mix,v=>c.mix=v); }
+    if(c.type==='flash') step(X().speed,'s',v=>v+' s');
+    if(c.type==='listen') step(X().pause,'p',v=>v+' s');
+    step(X().tasks,'tasks');
+    if(c.type==='cols'||c.type==='mul'||c.type==='div') step(X().limit,'lim',v=>v?v+' '+X().min:X().noLimit);
+    if(c.type==='flash') box.appendChild(el('div','sp-note',X().total(+(c.s*c.n).toFixed(2))));
+    const row=el('div','ln'); const go=el('button','sp-b go',X().start); go.style.cssText='flex:1;font-size:1.5rem'; go.onclick=()=>start({mode:'custom',cfg:Object.assign({},c)}); row.appendChild(go);
+    const sb=el('button','sp-b','🔊'); sb.onclick=()=>sp(X().customInfo+' '+cfgDesc(c)); row.appendChild(sb); box.appendChild(row); }
+  draw(); }
+/* ---- rularea unei probe ---- */
+let actx=null; function tick(f,d){ try{ actx=actx||(typeof ctx!=='undefined'&&ctx)||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime; o.type='sine'; o.frequency.value=f||880; g.gain.setValueAtTime(.09,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.06)); o.connect(g).connect(actx.destination); o.start(t); o.stop(t+(d||.06)+.02); }catch(e){} }
+function stopRun(){ if(run){ run.dead=true; clearInterval(run.timer); } run=null; document.removeEventListener('keydown',onKey); try{ speechSynthesis.cancel(); }catch(e){} }
+const fmtT=s=>{ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+function start(o){ stopRun(); view='run'; const c=o.cfg; run={...o,c,i:0,ok:0,items:[],ans:'',busy:true,combo:0,t0:0,deadline:0,dead:false};
+  top('🏁 '+(o.mode==='exam'||o.mode==='practice'?X().belts[o.belt]:o.mode==='sprint'?X().sprint.replace(/^\S+\s/,''):X().custom.replace(/^\S+\s/,'')));
+  body.innerHTML=`<div class="sp-run"><div class="sp-hud"><div class="p" id="sp-prog"></div><div class="p" id="sp-clock" hidden></div><div class="p fire" id="sp-combo" hidden></div><button class="sp-b" id="sp-say" style="min-height:40px;padding:2px 12px">🔊</button></div>
+   <div class="sp-main"><div class="sp-stage" id="sp-stage"></div><div class="sp-side"><div class="sp-out ph" id="sp-out"></div><div class="sp-keys off" id="sp-keys"></div></div></div></div>`;
+  const keys=$('keys'); ['7','8','9','4','5','6','1','2','3','⌫','0','✔'].forEach(k=>{ const b=el('button',k==='✔'?'ok':k==='⌫'?'del':'',k); b.style.setProperty('--o',{'0':10,'⌫':11,'✔':12}[k]||k); b.onpointerdown=e=>{ e.preventDefault(); press(k); }; keys.appendChild(b); });
+  if(o.mode!=='sprint'&&o.mode!=='exam'){ const s=el('button','del',X().skip); s.style.gridColumn='span 3'; s.style.fontSize='1.2rem'; s.onpointerdown=e=>{ e.preventDefault(); if(!run||run.busy) return; submit(true); }; keys.appendChild(s); }
+  $('say').onclick=()=>{ if(!run) return; const it=run.items[run.i]; if(run.c.type==='flash'||run.c.type==='listen'){ sp(X().ask); return; } if(it) sp(speakQ(it)); };
+  document.addEventListener('keydown',onKey); prog(); countdown(); }
+function onKey(e){ if(!run||root.hidden) return; if(/^[0-9]$/.test(e.key)) press(e.key); else if(e.key==='Backspace') press('⌫'); else if(e.key==='Enter') press('✔'); }
+function prog(){ if(!run) return; $('prog').textContent=run.mode==='sprint'?'✅ '+run.ok:`${Math.min(run.i+1,run.c.tasks)} / ${run.c.tasks}`; }
+async function countdown(){ const my=run, st=$('stage'); sp(X().ready);
+  for(const n of ['3','2','1']){ if(run!==my) return; st.innerHTML=`<div class="sp-cnt">${n}</div>`; tick(660,.12); await wait(800); }
+  if(run!==my) return; tick(990,.25); run.t0=performance.now();
+  if(run.c.lim){ run.deadline=run.t0+run.c.lim*60000; $('clock').hidden=false; run.timer=setInterval(()=>{ if(!run||run!==my) return; const left=(run.deadline-performance.now())/1000; $('clock').textContent='⏱ '+fmtT(left); $('clock').classList.toggle('warn',left<=10); if(left<=0){ clearInterval(run.timer); timeUp(); } },250); }
+  else { $('clock').hidden=false; run.timer=setInterval(()=>{ if(run===my) $('clock').textContent='⏱ '+fmtT((performance.now()-run.t0)/1000); },500); }
+  next(); }
+function speakQ(it){ if(it.kind==='mul') return `${it.a} ${X().times} ${it.b}`; if(it.kind==='div') return `${it.a} ${X().divby} ${it.b}`; return it.seq.map((v,i)=>(i?(v<0?X().minus:X().plus)+' ':'')+Math.abs(v)).join(', '); }
+function setOut(){ const o=$('out'); if(!o) return; o.classList.toggle('ph',!run.ans); o.textContent=run.ans||(run.busy?'…':X().ask); }
+async function next(){ const my=run; if(!run||run.dead) return; if(run.i>=run.c.tasks) return finish();
+  const it=genItem(run.c); run.items[run.i]=it; it.given=null; run.ans=''; run.busy=true; setOut(); prog(); $('keys').classList.add('off');
+  const st=$('stage'); st.className='sp-stage';
+  const trackHTML=run.mode==='sprint'?`<div class="sp-track"><span id="sp-ghost" style="left:4%">👻</span><span id="sp-me" style="left:4%">🦊</span><span class="fin">🏁</span></div>`:'';
+  if(it.kind==='flash'){ st.innerHTML='<div class="sp-dot"></div>'; await wait(700); const ms=run.c.s*1000, show=Math.max(60,ms*.78), gap=Math.max(40,ms-show);
+    for(const v of it.seq){ if(run!==my||run.dead) return; st.innerHTML=`<div class="sp-num${v<0?' neg':''}">${v<0?'−':''}${Math.abs(v)}</div>`; if(ms>=300) tick(1046,.04); await hold(show); if(run!==my) return; st.innerHTML=''; await hold(gap); }
+    if(run!==my) return; st.innerHTML='<div class="sp-num" style="opacity:.5">?</div>'; }
+  else if(it.kind==='listen'){ st.innerHTML='<div class="sp-ear">👂</div>'; await sp(X().listen); await wait(400);
+    for(let i=0;i<it.seq.length;i++){ if(run!==my||run.dead) return; const v=it.seq[i]; const t=(i?(v<0?X().minus:X().plus)+' ':'')+Math.abs(v); const ok=await sp(t);
+      if(ok===false){ st.innerHTML=`<div class="sp-num${v<0?' neg':''}">${v<0?'−':''}${Math.abs(v)}</div>`; await wait(1200); st.innerHTML='<div class="sp-ear">👂</div>'; } await wait(run.c.p*1000); }
+    if(run!==my) return; st.innerHTML='<div class="sp-num" style="opacity:.5">?</div>'; }
+  else if(it.kind==='cols'){ const n=it.seq.length, H=st.clientHeight-(run.mode==='sprint'?64:20), mx=Math.max(...it.seq.map(v=>String(Math.abs(v)).length))+1, fs=Math.max(16,Math.min(74,H/((n+1)*1.18+.6),(st.clientWidth-50)/(mx*.62)))+'px';
+    st.innerHTML=trackHTML+`<div class="sp-col" style="font-size:${fs};${run.mode==='sprint'?'margin-top:50px':''}">${it.seq.map(v=>`<span>${v<0?'−':''}${Math.abs(v)}</span>`).join('')}<span class="ln2">?</span></div>`; }
+  else { st.innerHTML=trackHTML+`<div class="sp-num" style="font-size:clamp(3rem,13vmin,8rem)">${it.a} ${it.kind==='mul'?'×':'÷'} ${it.b}</div>`; }
+  if(run.mode==='sprint') moveTrack();
+  run.busy=false; setOut(); $('keys').classList.remove('off'); }
+function hold(ms){ return new Promise(r=>{ const t0=performance.now(); const f=()=>{ if(performance.now()-t0>=ms-8) r(); else requestAnimationFrame(f); }; requestAnimationFrame(f); }); }
+function press(k){ if(!run||run.busy) return;
+  if(k==='⌫'){ run.ans=run.ans.slice(0,-1); setOut(); return; }
+  if(k==='✔'){ if(run.ans) submit(false); return; }
+  if(run.ans.length>=9) return; run.ans=(run.ans==='0'?'':run.ans)+k; setOut();
+  if(run.mode==='sprint'&&+run.ans===run.items[run.i].ans) submit(false); }
+async function submit(skip){ const my=run, it=run.items[run.i]; run.busy=true; $('keys').classList.add('off');
+  it.given=skip?null:+run.ans; const ok=!skip&&it.given===it.ans; const st=$('stage');
+  if(ok){ run.ok++; run.combo++; st.classList.add('ok'); tick(1320,.08); setTimeout(()=>tick(1760,.1),70);
+    if(run.combo>=3){ const c=$('combo'); c.hidden=false; c.textContent='🔥 x'+run.combo; c.classList.remove('sp-fire'); void c.offsetWidth; c.classList.add('sp-fire'); if(run.combo%5===0) try{ confetti(14); }catch(e){} } }
+  else { run.combo=0; $('combo').hidden=true; st.classList.add('no'); try{ beep(false); }catch(e){} }
+  if(!ok||run.mode!=='sprint') st.insertAdjacentHTML('beforeend',`<div class="sp-fb">${ok?'✅ '+X().ok:'❌ '+X().was(it.ans)}</div>`);
+  await wait(run.mode==='sprint'?(ok?250:1100):(ok?650:1500)); if(run!==my||run.dead) return;
+  run.i++; if(run.mode==='sprint') run.c.tasks=run.i+1; next(); }
+function moveTrack(){ const rec=(LS.get('sp_rec',{})['s'+run.lvl])||0, goal=Math.max(rec,8)+2, me=$('me'), gh=$('ghost'); if(!me) return;
+  me.style.left=(4+Math.min(1,run.ok/goal)*84)+'%'; const el2=(performance.now()-run.t0)/60000; gh.style.left=(4+Math.min(1,rec*el2/goal)*84)+'%'; gh.style.opacity=rec?1:0; }
+setInterval(()=>{ if(run&&run.mode==='sprint'&&!run.busy) moveTrack(); },500);
+function timeUp(){ if(!run||run.dead) return; const my=run; run.busy=true; try{ beep(false); }catch(e){}
+  if(run.mode==='sprint'){ run.items.length=run.i; run.c.tasks=run.i; } else { for(let k=run.i;k<run.c.tasks;k++){ if(!run.items[k]) run.items[k]=genItem(run.c); run.items[k].given=null; } }
+  $('stage').innerHTML=`<div class="sp-cnt" style="font-size:clamp(2.4rem,9vmin,5rem)">⏰ ${X().timeUp}</div>`; sp(X().timeUp); setTimeout(()=>{ if(run===my) finish(true); },1400); }
+function finish(){ if(!run) return; const r=run; clearInterval(r.timer); r.dead=true; document.removeEventListener('keydown',onKey); view='res'; top('🏁 '+X().res);
+  const total=r.mode==='sprint'?r.ok:r.c.tasks, secs=(performance.now()-r.t0)/1000; let head='', extra='', stars2=0, speak='';
+  if(r.mode==='sprint'){ const recs=LS.get('sp_rec',{}), k='s'+r.lvl, old=recs[k]||0; const isRec=r.ok>old; if(isRec){ recs[k]=r.ok; LS.set('sp_rec',recs); }
+    head=`<div class="big">🏁 ${r.ok}</div><h3>${X().solved(r.ok)}</h3>${isRec?`<h3 style="color:#E0A800">${X().newRec}</h3>`:`<p>🏆 ${X().record}: ${old}</p>`}`; stars2=Math.floor(r.ok/5)+(isRec?2:0); speak=X().solved(r.ok)+(isRec?' '+X().newRec:''); if(isRec) try{ confetti(60); }catch(e){} }
+  else { const pass=r.mode==='exam'&&r.ok>=r.c.need, pct=Math.round(r.ok/total*100);
+    head=`<div class="big">${r.ok} / ${total}</div><h3>${X().score(r.ok,total)} · ${pct}%</h3><p>⏱ ${X().time}: ${fmtT(secs)}</p>`;
+    stars2=Math.max(r.ok?1:0,Math.floor(r.ok/3)); speak=X().score(r.ok,total);
+    if(r.mode==='exam'){ if(pass){ const nb=r.belt; if(got<=nb){ got=nb+1; LS.set('sp_belt',got); } head=`<div class="sp-belt-win">${beltSVG(nb)}</div><h3>${X().passed(X().belts[nb])}</h3>`+head; stars2+=5; speak=X().passed(X().belts[nb]); try{ confetti(80); }catch(e){} }
+      else { extra=`<p style="font-weight:800">${X().failed(r.c.need)}</p>`; speak+='. '+X().failed(r.c.need); } } }
+  const bad=r.items.slice(0,total).filter(it=>it&&it.given!==it.ans);
+  let tbl=''; if(r.mode!=='sprint'){ tbl=bad.length?`<h3>${X().mistakes}</h3><table>${bad.slice(0,30).map(it=>`<tr><td class="q">${qText(it)}</td><td class="no">${X().you}: ${it.given==null?'—':it.given}</td><td class="yes">✔ ${it.ans}</td></tr>`).join('')}</table>`:`<h3>${X().perfect}</h3>`; }
+  body.innerHTML=''; const box=el('div','sp-res',head+extra+(stars2?`<p style="font-size:1.4rem">+${stars2} ⭐</p>`:'')+tbl+`<div class="row" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="sp-b go" data-a="a">${X().again}</button><button class="sp-b" data-a="h">${X().hub}</button><button class="sp-b" data-a="s">🔊</button></div>`);
+  body.appendChild(box); giveStars(stars2); pill(); run=null;
+  box.querySelector('[data-a=a]').onclick=()=>start({mode:r.mode,belt:r.belt,lvl:r.lvl,cfg:r.mode==='exam'||r.mode==='practice'?BELT[r.belt]:r.mode==='sprint'?Object.assign({},r.c,{tasks:999}):r.c});
+  box.querySelector('[data-a=h]').onclick=hub; box.querySelector('[data-a=s]').onclick=()=>sp(speak); sp(speak); }
+$('back').onclick=()=>{ if(view==='hub'){ stopRun(); root.hidden=true; } else hub(); };
+window.openArena=()=>{ root.hidden=false; hub(); };
+/* card în meniul Academiei Soroban */
+window.__saArena=m=>{ const b=el('button','sa-arena',`<span class="ic">🏁</span><span><b>${X().title}</b><span class="s">${X().sub}</span></span><span class="bl">${beltSVG(Math.max(0,got-1))}</span>`); if(!got) b.querySelector('.bl').style.opacity='.35'; b.onclick=()=>window.openArena(); m.appendChild(b); };
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='hub') hub(); else if(view==='set') settings(); });
+window.__sp={genSeq,genItem,BELT};
+})();
+</script>

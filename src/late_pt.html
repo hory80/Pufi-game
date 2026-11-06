@@ -1,0 +1,8 @@
+<script>
+/* Português — nomes dos peixes */
+(()=>{ const lg='pt', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['o carássio','Carássio','O carássio é um peixe dourado e calmo. Ele gosta de plantas e minhocas.'],crap:['a carpa','Carpa','A carpa tem bigodinhos para procurar comida na lama.'],pastrav:['a truta','Truta','A truta vive nos riachos frios das montanhas. Tem pintas pretas e uma listra rosa.'],biban:['a perca','Perca','A perca tem listras nas costas e nadadeiras vermelhas. Ela caça peixinhos.'],somn:['o bagre','Bagre','O bagre tem bigodes compridos e come quase tudo. Ele caça de noite.'],stiuca:['o lúcio','Lúcio','O lúcio é o grande caçador dos rios. Ele se esconde e ataca rapidinho!'],rac:['o lagostim','Lagostim','O lagostim tem pinças e anda para trás. Ele limpa o fundo.'],testoasa:['a tartaruga','Tartaruga','A tartaruga-d’água leva a casa nas costas.'],plev:['o peixinho','Peixinho','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'as algas',worm:'as minhocas',ins:'os insetos',plev:'os peixinhos'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>

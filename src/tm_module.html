@@ -1,0 +1,752 @@
+
+<style>
+#tm-root{position:fixed;inset:0;z-index:50;background:#EAF7F0;background-image:radial-gradient(rgba(59,196,138,.14) 2px,transparent 2px);background-size:30px 30px;color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 10px);overflow:hidden}
+#tm-root[hidden]{display:none}
+#tm-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto;position:relative}
+.tm-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(44%,200px),1fr));gap:14px;align-content:start;padding:4px}
+.tm-worlds{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;flex:1;min-height:0;overflow:auto;padding:4px;align-content:start}
+.tm-world{font:inherit;color:var(--ink);border:none;border-radius:28px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 8px 0 rgba(36,50,95,.16);min-height:clamp(120px,24vh,220px)}
+.tm-world:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(36,50,95,.16)}
+.tm-world .ic{font-size:clamp(3rem,10vh,5rem);line-height:1}
+.tm-world .t{font-weight:800;font-size:clamp(1.2rem,3vw,1.7rem);text-align:center}
+.tm-world .p{font-weight:800;color:#C98A00}
+.tm-ladder{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;font-weight:800;font-size:clamp(.85rem,2.2vw,1.1rem);background:#fff;border-radius:999px;padding:4px 14px;align-self:center}
+.tm-ladder span{white-space:nowrap}
+.tm-stage{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:center;position:relative}
+.tm-stage>svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
+.tm-ans{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tm-ans button{font:inherit;font-weight:800;font-size:clamp(1.15rem,3.6vh,1.9rem);min-width:2.6em;min-height:58px;border-radius:20px;border:3px solid var(--ink);background:#fff;cursor:pointer;padding:4px 14px;color:var(--ink)}
+.tm-ans button.ok{background:var(--leaf);color:#fff}.tm-ans button.no{background:#FFB3C0;opacity:.6}
+.tm-opt{position:relative;display:flex}
+.tm-say{position:absolute;top:-10px;right:-10px;width:34px!important;min-width:0!important;height:34px;min-height:0!important;padding:0!important;border-radius:50%!important;font-size:1rem!important;border:2px solid var(--ink)!important;background:var(--sun)!important;line-height:1}
+.tm-ans button.hl{outline:5px solid var(--sun);transform:scale(1.06)}
+.tm-ans button .dg{display:block;font-size:1.5em;line-height:1.1}
+.tm-ans button small{display:block;font-size:.62em;opacity:.8}
+.tm-ans.tm-wide button{min-width:5.5em}
+.tm-ans.big button{font-size:clamp(2rem,6vh,3rem)}
+.tm-read{font-weight:800;font-size:clamp(1.1rem,3vw,1.6rem);text-align:center;min-height:1.3em}
+.tm-read b{color:var(--berry)}
+.tm-cards{display:grid;gap:10px;width:100%;max-width:900px;margin:auto}
+.tm-mc{font:inherit;border:none;border-radius:18px;background:#5B8DEF;color:#fff;font-weight:800;font-size:clamp(1.1rem,3vw,1.8rem);cursor:pointer;aspect-ratio:1.1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 #3A63B8;padding:4px;transition:transform .25s}
+.tm-mc.up{background:#fff;color:var(--ink);box-shadow:0 6px 0 #B9D9F2}
+.tm-mc.done{background:#D7F5E6;box-shadow:0 6px 0 #3BC48A;cursor:default}
+.tm-mc svg{width:92%;height:92%}
+.tm-slots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
+.tm-slot{min-width:clamp(84px,13vw,150px);min-height:clamp(96px,17vh,170px);border-radius:18px;border:4px dashed rgba(36,50,95,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:clamp(.9rem,2.2vw,1.2rem);text-align:center;padding:4px}
+.tm-slot .e{font-size:clamp(2.4rem,6.5vh,3.8rem);line-height:1.1}
+.tm-slot.full{border:none;background:#fff;box-shadow:0 5px 0 #B9D9F2;animation:rdPop .3s}
+.tm-tiles{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tm-tile{font:inherit;border:none;border-radius:18px;background:#fff;box-shadow:0 6px 0 #B9D9F2;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:8px 12px;min-width:clamp(84px,13vw,150px);font-weight:800;font-size:clamp(1rem,2.4vw,1.3rem);color:var(--ink)}
+.tm-tile .e{font-size:clamp(2.6rem,7.5vh,4.2rem);line-height:1.1}
+.tm-tile.used{visibility:hidden}
+.tm-tile.hl{outline:5px solid var(--sun);transform:scale(1.06)}
+.tm-tile.tm-hint{animation:tmHint .6s ease-in-out infinite alternate;outline:5px solid var(--plum)}
+@keyframes tmHint{to{transform:scale(1.1)}}
+.tm-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%;max-width:760px;margin:0 auto}
+.tm-cal .hd{font-weight:800;text-align:center;font-size:clamp(.8rem,2vw,1.05rem);padding:2px;border-radius:10px;background:#fff}
+.tm-cal .hd.we{background:#FFE1E7}
+.tm-cal button{font:inherit;font-weight:800;font-size:clamp(1rem,2.8vw,1.5rem);border:none;border-radius:12px;background:#fff;box-shadow:0 4px 0 #CFE3D8;min-height:clamp(40px,7.2vh,64px);cursor:pointer;position:relative;color:var(--ink)}
+.tm-cal button.we{background:#FFF4F6}
+.tm-cal button.today{outline:4px solid var(--sun);background:#FFF6C9}
+.tm-cal button.today::after{content:"⭐";position:absolute;top:-8px;right:-4px;font-size:1rem}
+.tm-cal button.bd::before{content:"🎂";position:absolute;top:-8px;left:-4px;font-size:1rem}
+.tm-cal button.mark{background:#D7F5E6;box-shadow:0 4px 0 #3BC48A}
+.tm-cal button.no{background:#FFE1E7}
+.tm-cal button .c{position:absolute;bottom:1px;right:4px;font-size:.6em;color:#24935F}
+.tm-calTop{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:clamp(1.2rem,3.2vw,1.8rem)}
+.tm-bday{background:#FFF1C2;border-radius:999px;padding:4px 14px;font-weight:800;text-align:center;align-self:center;font-size:clamp(.95rem,2.4vw,1.2rem)}
+.tm-sky{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:900px}
+.tm-sky button{font:inherit;border:none;border-radius:20px;min-height:clamp(110px,24vh,200px);color:#fff;font-weight:800;font-size:clamp(.9rem,2.3vw,1.2rem);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tm-sky button .e{font-size:clamp(2.2rem,6vh,3.4rem);text-shadow:none}
+.tm-sky button.no{opacity:.4}.tm-sky button.hl{outline:5px solid var(--sun);transform:scale(1.05)}.tm-sky button.tm-hint{animation:tmHint .6s ease-in-out infinite alternate;outline:6px solid var(--sun)}.tm-sky button.ok{outline:5px solid var(--sun)}
+.tm-panels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:900px}
+.tm-panel{padding:16px 8px!important}
+.tm-panel{background:#fff;border-radius:22px;box-shadow:0 6px 0 #B9D9F2;display:flex;flex-direction:column;align-items:center;padding:8px;gap:4px}
+.tm-panel .l{font-weight:800;font-size:clamp(1rem,2.8vw,1.5rem);color:var(--plum)}
+.tm-panel .e{font-size:clamp(3.4rem,13vh,6.5rem);line-height:1.1}
+.tm-panel .s{font-weight:800;font-size:clamp(1rem,2.6vw,1.4rem);text-align:center}
+.tm-panel.now{outline:4px solid var(--sun)}
+.tm-seas{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tm-seas button{font:inherit;font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);border:3px solid var(--ink);background:#fff;border-radius:999px;padding:4px 14px;cursor:pointer;color:var(--ink)}
+.tm-seas button[aria-pressed="true"]{background:var(--sun)}
+.tm-fly{transition:transform .7s cubic-bezier(.3,1.4,.6,1),opacity .7s}
+@keyframes tmFall{to{transform:translateY(var(--fy,300px)) rotate(var(--fr,200deg));}}
+@keyframes tmSnow{to{transform:translateY(460px)}}
+@keyframes tmBee{0%{transform:translate(0,0)}25%{transform:translate(40px,-20px)}50%{transform:translate(80px,10px)}75%{transform:translate(30px,25px)}100%{transform:translate(0,0)}}
+@keyframes tmPend{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@keyframes tmBob{50%{transform:translateY(-10px)}}
+@keyframes tmCu{0%{transform:translateX(0)}40%,60%{transform:translateX(-58px)}100%{transform:translateX(0)}}
+@keyframes tmTrain{to{transform:translateX(-900px)}}
+@keyframes tmSteam{0%{opacity:.8;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-60px) scale(1.4)}}
+@keyframes tmCloud{from{transform:translateX(-220px)}to{transform:translateX(1150px)}}
+@keyframes tmBird{0%{transform:translate(-120px,0)}50%{transform:translate(500px,-30px)}100%{transform:translate(1120px,10px)}}
+@keyframes tmTwinkle{50%{opacity:.25}}
+@keyframes tmZ{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(26px,-60px) scale(1.3)}}
+@keyframes tmNote{0%{opacity:0;transform:translate(0,0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--nx,40px),-120px) rotate(20deg)}}
+@keyframes tmStarUp{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1;transform:translate(0,-20px) scale(1.2)}100%{opacity:0;transform:translate(var(--sx,0),-180px) scale(.8)}}
+@keyframes tmSway{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
+@keyframes tmShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-9deg)}80%{transform:rotate(9deg)}}
+@keyframes tmSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes tmFloatUp{0%{transform:translateY(0)}100%{transform:translateY(-640px)}}
+@keyframes tmPop{0%{transform:scale(1);opacity:1}60%{transform:scale(1.6);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+@keyframes tmJump{0%,100%{transform:translateY(0)}40%{transform:translateY(-60px)}}
+@keyframes tmRain{to{transform:translateY(480px)}}
+.tm-burst{position:absolute;pointer-events:none;font-size:clamp(28px,5vh,46px);animation:tmStarUp 1.3s ease-out forwards;z-index:5}
+@media (prefers-reduced-motion:reduce){#tm-root *{animation-duration:.01s!important}}
+</style>
+<div id="tm-root" hidden>
+  <div class="rb-top"><button class="ch-btn" id="tm-back"></button><h2 id="tm-title"></h2><button class="ch-btn" id="tm-all" hidden></button><div class="ch-pill" id="tm-stars">⭐ 0</div></div>
+  <div id="tm-main"></div>
+  <div class="rb-ov" id="tm-ov" hidden><div><div class="big" id="tm-ovS"></div><h3 id="tm-ovT"></h3>
+    <div class="rb-ctrl"><button class="rb-b go" id="tm-ovNext"></button><button class="rb-b" id="tm-ovAgain"></button><button class="rb-b" id="tm-ovBack"></button></div></div></div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById('tm-'+id), root=$('root'), main=$('main');
+const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+/* în română ora e de genul feminin: „ora două”, „ora douăsprezece”; „12:00” se citește „ora douăsprezece” */
+const roTime=t=>{ if(typeof t!=='string') return t;
+  t=t.replace(/\b(\d{1,2}):(\d{2})\b/g,(x,h,m)=>{ h=+h; m=+m; const H=h===0?'douăsprezece':roF(h); return 'ora '+H+(m?' și '+roMin(m):''); }).replace(/\bla ora ora\b/g,'la ora').replace(/\bora ora\b/g,'ora');
+  const b=t.match(/^\s*(\d{1,2})\s*$/); if(b) return roF(+b[1])||'zero'; return t; };
+const sp=t=>(typeof say==='function')?say(lang==='ro'?roTime(t):t):Promise.resolve(false);
+const spW=(t,ms)=>Promise.all([sp(t),wait(ms)]);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const pick=a=>a[R(a.length)];
+function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function btn(txt,cls,fn){ const b=el('button','rb-b'+(cls?' '+cls:''),txt); b.onclick=fn; return b; }
+function snd(f,d,type,vol){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime; o.type=type||'triangle'; o.frequency.value=f; g.gain.setValueAtTime(vol||.12,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.12)); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+(d||.12)+.03);}catch(e){} }
+const blip=()=>snd(880,.07), boing=()=>{ snd(320,.15,'sine',.2); setTimeout(()=>snd(170,.25,'sine',.2),100); }, chime=()=>[784,988,1319].forEach((f,i)=>setTimeout(()=>snd(f,.2,'sine',.12),i*90)), tickS=()=>snd(1400,.03,'square',.04);
+const cucu=()=>{ snd(784,.22,'sine',.18); setTimeout(()=>snd(622,.32,'sine',.18),260); };
+const ding=()=>{ snd(1568,.6,'sine',.15); setTimeout(()=>snd(2093,.5,'sine',.1),120); };
+const toot=()=>{ snd(392,.35,'sawtooth',.06); setTimeout(()=>snd(523,.45,'sawtooth',.06),380); };
+const NS='http://www.w3.org/2000/svg';
+const ptIn=(svg,e)=>{ const m=svg.getScreenCTM().inverse(), p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY; const r=p.matrixTransform(m); return [r.x,r.y]; };
+
+/* ================= texte ================= */
+const RO_H=['douăsprezece','unu','două','trei','patru','cinci','șase','șapte','opt','nouă','zece','unsprezece'];
+const RO_U=['','unu','două','trei','patru','cinci','șase','șapte','opt','nouă'], RO_T=['zece','unsprezece','douăsprezece','treisprezece','paisprezece','cincisprezece','șaisprezece','șaptesprezece','optsprezece','nouăsprezece'];
+function roF(n){ if(n<10) return RO_U[n]; if(n<20) return RO_T[n-10]; const t=['','','douăzeci','treizeci','patruzeci','cincizeci'][Math.floor(n/10)], u=n%10; return u?`${t} și ${RO_U[u]}`:t; }
+const roMin=n=>n===1?'un minut':n<20?roF(n)+' minute':roF(n)+' de minute';
+const DE_H=['zwölf','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf'];
+const h12=h=>(h%12)||12;
+const TX={
+ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff:'🔓 Toate: NU',lvl:n=>`Nivelul ${n}`,ok:'✔ Gata',listen:'🔊 Ascultă',help:'💡 Ajutor',first:a=>`Prima dată: ${a}.`,nextIs:(a,b)=>`După ${a} urmează: ${b}.`,
+ done:s=>`Gata! Ai câștigat ${['','o stea','două stele','trei stele'][s]}!`,next:'▶ Nivelul următor',again:'↺ Din nou',toMenu:'⬅ Înapoi',locked:'Termină întâi nivelul de dinainte.',
+ ladder:['🕰️ ore','🌅 o zi','🚃 7 zile = o săptămână','🎡 12 luni = un an'],
+ worlds:{clock:['🕰️','Ceasul'],day:['🌅','Ziua'],cal:['📅','Săptămâna și calendarul'],seas:['🌳','Anotimpurile']},
+ games:{wake:['⏰','Trezește-l pe Pufi'],balloon:['🎈','Baloanele cu ore'],explore:['🕰️','Ceasul magic'],cuckoo:['🐦','Ceasul cu cuc'],pizza:['🍕','Ceasul-pizza'],station:['🚂','Gara'],memo:['🧩','Perechi'],oven:['⏳','Cât durează?'],
+  order:['🧸','Ordonează ziua'],dayclk:['🌞','O zi cu Pufi'],moments:['🌗','Momentele zilei'],ytm:['📆','Ieri, azi, mâine'],
+  week:['🚃','Trenul săptămânii'],calm:['📅','Calendarul meu'],months:['🎡','Roata lunilor'],
+  tree:['🌳','Copacul anotimpurilor'],dress:['🦊','Îmbracă-l pe Pufi'],sort:['🧺','Sortează pe anotimpuri']},
+ lv:{wake:['Ore fixe','Și jumătate','Sferturi','Din 5 în 5 minute'],balloon:['Ore fixe','Și jumătate','Sferturi'],cuckoo:['Numără cucu','Citește ceasul','Potrivește ceasul'],pizza:['Și jumătate','Arată jumătatea','Și un sfert','Fără un sfert','Arată sferturile'],
+  station:['Ore fixe','Și jumătate','Sferturi','Din 5 în 5 minute','Orice minut','Ceasul de 24 de ore'],memo:['Ore și jumătăți','Sferturi','Din 5 în 5 minute'],
+  oven:['O oră','Două ore','O jumătate de oră','Un sfert de oră','Amestec'],order:['Dimineața','Toată ziua'],dayclk:['Ore fixe','Și jumătate'],ytm:['Povestea lui Pufi','Zilele săptămânii'],
+  week:['Pune zilele în ordine','Ce zi vine după?','Ce zi a fost înainte?'],calm:['Azi, ieri, mâine','Zilele săptămânii','Numără zilele'],months:['Lunile în ordine','Ce lună vine după?','Lunile și anotimpurile']},
+ days:['luni','marți','miercuri','joi','vineri','sâmbătă','duminică'],
+ months:['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'],
+ seas:['primăvară','vară','toamnă','iarnă'], seasT:['Primăvara','Vara','Toamna','Iarna'],
+ parts:['dimineața','la prânz','după-amiaza','seara','noaptea'],
+ today:(wd,d,mo,s)=>`Azi este ${wd}, ${d===1?'întâi':d} ${mo}. E ${s}!`,
+ time:(h,m)=>{ const H=RO_H[h%12], H1=RO_H[(h+1)%12]; if(m===0) return `ora ${H}`; if(m===15) return `ora ${H} și un sfert`; if(m===30) return `ora ${H} și jumătate`; if(m===45) return `ora ${H1} fără un sfert`; return m<30?`ora ${H} și ${roMin(m)}`:`ora ${H1} fără ${roMin(60-m)}`; },
+ short:(h,m)=>{ const H=RO_H[h%12], H1=RO_H[(h+1)%12]; if(m===0) return `ora ${H}`; if(m===15) return `${H} și un sfert`; if(m===30) return `${H} și jumătate`; if(m===45) return `${H1} fără un sfert`; return m<30?`${H} și ${m}`:`${H1} fără ${60-m}`; },
+ itIs:t=>`Este ${t}.`, hourOnly:h=>`ora ${RO_H[h%12]}`,
+ hands:'Minutarul cel lung arată minutele. Orarul cel scurt arată ora.',
+ exHi:'Trage acele ceasului cu degetul și vezi cum trece ziua!', now:'⏰ Acum', gears:'⚙️ Rotițe', pz:'🍕 Pizza',
+ cuCount:'Ascultă cucul! De câte ori cântă?', cuRead:'Ce oră arată ceasul?', cuSet:h=>`Pune ceasul la ora ${RO_H[h%12]}! Mută orarul cel scurt.`,
+ pzRead:'Ce oră arată ceasul? Uită-te cât din pizza e colorat.', pzSet:t=>`Arată ${t}! Mută minutarul.`, pzHalf:'Jumătate de pizza înseamnă jumătate de oră: 30 de minute.', pzQuar:'O felie de pizza este un sfert de oră: 15 minute.',
+ dest:[['🏔️','munte'],['🏖️','mare'],['👵','bunica'],['🏰','castel'],['🦁','grădina zoologică'],['🌲','pădure']],
+ stTask:(t,d)=>`Trenul spre ${d} pleacă la ${t}. Pune ceasul la ora plecării!`, go:'🚂 Pleacă!', stWrong:'Hopa! Ceasul arată altă oră. Mai încearcă!', st24:(d,t,p)=>`${d} înseamnă ${t} ${p}.`,
+ memoTask:'Întoarce cărțile și găsește perechile: ceasul și ora lui!', wakeTask:t=>`Pufi doarme. Trebuie să se trezească la ${t}. Pune ceasul deșteptător!`, ring:'⏰ Sună!', wakeWrong:t=>`Ceasul arată ${t}. Pufi s-ar trezi la altă oră. Mai încearcă!`, wakeDone:'Bună dimineața, Pufi!', balTask:t=>`Prinde balonul care arată ${t}!`,
+ ovItems:[['🎂','tortul'],['🍕','pizza'],['🍪','fursecurile'],['🍞','pâinea']], dur:m=>({60:'o oră',120:'două ore',30:'o jumătate de oră',15:'un sfert de oră',45:'trei sferturi de oră',90:'o oră și jumătate'})[m],
+ ovTask:(it,t,d)=>`Pufi pune ${it} în cuptor la ${t}. Trebuie să stea ${d}. Învârte minutarul înainte și apasă Gata!`, ovEarly:'Încă nu e gata! Mai învârte.', ovBurn:'Ups, prea mult! S-a ars puțin. Mai încearcă!', ovDone:t=>`Ding! E gata! Acum este ${t}.`,
+ acts:[['⏰','Pufi se trezește',420],['🪥','se spală pe dinți',430],['🥣','micul dejun',450],['🎒','merge la grădiniță',480],['🍽️','prânzul',720],['😴','somnul de prânz',780],['🛝','joacă în parc',960],['🍝','cina',1080],['🛁','baia',1140],['📖','povestea de seară',1170],['🌙','culcarea',1200]],
+ ordTask:'Pune ziua lui Pufi în ordine: de dimineața până seara!',
+ dcTask:(a,t)=>`${a}! Pune ceasul la ${t}.`,
+ mom:[[0,'🥣','luăm micul dejun'],[0,'🐓','cântă cocoșul și răsare soarele'],[1,'🍝','mâncăm prânzul'],[1,'☀️','soarele e sus de tot pe cer'],[2,'🍪','luăm gustarea după somnul de prânz'],[2,'🛝','ne jucăm în parc după-amiaza'],[3,'🌇','apune soarele'],[3,'🛁','facem baie înainte de culcare'],[4,'😴','dormim'],[4,'🦉','bufnița vânează și stelele strălucesc']],
+ moTask:a=>`Când ${a}?`,
+ ytmL:['IERI','AZI','MÂINE'], places:[['👵','la bunica'],['🛝','în parc'],['🏊','la piscină'],['🦁','la zoo'],['🏫','la grădiniță'],['🎂','la o petrecere'],['🏖️','la mare'],['🚒','la pompieri']],
+ ytmStory:(a,b,c)=>`Ieri Pufi a fost ${a}. Azi este ${b}. Mâine merge ${c}.`, ytmQ:['Unde a fost Pufi ieri?','Unde este Pufi azi?','Unde merge Pufi mâine?'],
+ ytmD:(k,d)=>[`Azi este ${d}. Ce zi a fost ieri?`,`Azi este ${d}. Ce zi va fi mâine?`][k],
+ weekTask:'Pune vagoanele în ordine: începe cu luni!', weekAfter:d=>`Ce zi vine după ${d}?`, weekBefore:d=>`Ce zi este înainte de ${d}?`, weekend:'Sâmbăta și duminica sunt weekend: nu mergem la grădiniță!',
+ calToday:'Atinge ziua de azi!', calTom:'Atinge ziua de mâine!', calYes:'Atinge ziua de ieri!', calWd:n=>`În ce zi a săptămânii este ${n}?`, calCount:n=>`Câte zile mai sunt până pe ${n}? Atinge zilele, una câte una, începând de mâine!`, calHow:'Câte zile ai numărat?',
+ bday:n=>n===0?'🎂 Azi este ziua ta! La mulți ani!':`🎂 Până la ziua ta: ${n===1?'o zi':n<20?n+' zile':n+' de zile'}`,
+ moOrder:'Atinge lunile în ordine, de la ianuarie!', moAfter:m=>`Ce lună vine după ${m}?`, moSeas:m=>`În ce anotimp este ${m}?`,
+ treeHi:['Primăvara copacul înflorește. Atinge mugurii!','Vara copacul e plin de fructe. Culege cireșele!','Toamna frunzele se îngălbenesc și cad. Scutură copacul!','Iarna copacul doarme sub zăpadă. Fă un om de zăpadă!'],
+ dressTask:s=>`E ${s}! Ce îmbracă Pufi? Alege trei lucruri potrivite.`, dressNo:['Hmm, asta nu se potrivește acum.','Uff, vara e prea cald pentru asta!','Hmm, asta nu se potrivește acum.','Brrr! Iarna e prea frig pentru asta!'],
+ sortTask:'În ce anotimp folosim asta? Pune-l în coșul potrivit!'},
+de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',lvl:n=>`Level ${n}`,ok:'✔ Fertig',listen:'🔊 Anhören',help:'💡 Hilfe',first:a=>`Zuerst: ${a}.`,nextIs:(a,b)=>`Nach ${a} kommt: ${b}.`,
+ done:s=>`Geschafft! Du hast ${['','einen Stern','zwei Sterne','drei Sterne'][s]} gewonnen!`,next:'▶ Nächstes Level',again:'↺ Nochmal',toMenu:'⬅ Zurück',locked:'Schaffe zuerst das Level davor.',
+ ladder:['🕰️ Stunden','🌅 ein Tag','🚃 7 Tage = eine Woche','🎡 12 Monate = ein Jahr'],
+ worlds:{clock:['🕰️','Die Uhr'],day:['🌅','Der Tag'],cal:['📅','Woche und Kalender'],seas:['🌳','Die Jahreszeiten']},
+ games:{wake:['⏰','Weck Pufi auf'],balloon:['🎈','Uhren-Ballons'],explore:['🕰️','Die Zauberuhr'],cuckoo:['🐦','Die Kuckucksuhr'],pizza:['🍕','Die Pizza-Uhr'],station:['🚂','Der Bahnhof'],memo:['🧩','Paare finden'],oven:['⏳','Wie lange dauert es?'],
+  order:['🧸','Der Tag in Ordnung'],dayclk:['🌞','Ein Tag mit Pufi'],moments:['🌗','Tageszeiten'],ytm:['📆','Gestern, heute, morgen'],
+  week:['🚃','Der Wochenzug'],calm:['📅','Mein Kalender'],months:['🎡','Das Monatsrad'],
+  tree:['🌳','Der Jahreszeiten-Baum'],dress:['🦊','Zieh Pufi an'],sort:['🧺','Jahreszeiten sortieren']},
+ lv:{wake:['Volle Stunden','Halbe Stunden','Viertelstunden','5-Minuten-Schritte'],balloon:['Volle Stunden','Halbe Stunden','Viertelstunden'],cuckoo:['Kuckuck zählen','Uhr lesen','Uhr stellen'],pizza:['Halb','Halb einstellen','Viertel nach','Viertel vor','Viertel einstellen'],
+  station:['Volle Stunden','Halbe Stunden','Viertelstunden','5-Minuten-Schritte','Jede Minute','24-Stunden-Uhr'],memo:['Volle und halbe','Viertel','5 Minuten'],
+  oven:['Eine Stunde','Zwei Stunden','Eine halbe Stunde','Eine Viertelstunde','Gemischt'],order:['Der Morgen','Der ganze Tag'],dayclk:['Volle Stunden','Halbe Stunden'],ytm:['Pufis Geschichte','Wochentage'],
+  week:['Tage ordnen','Welcher Tag kommt danach?','Welcher Tag war davor?'],calm:['Heute, gestern, morgen','Wochentage','Tage zählen'],months:['Monate in Reihenfolge','Welcher Monat kommt danach?','Monate und Jahreszeiten']},
+ days:['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'],
+ months:['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+ seas:['Frühling','Sommer','Herbst','Winter'], seasT:['Frühling','Sommer','Herbst','Winter'],
+ parts:['am Morgen','am Mittag','am Nachmittag','am Abend','in der Nacht'],
+ today:(wd,d,mo,s)=>`Heute ist ${wd}, der ${d}. ${mo}. Es ist ${s}!`,
+ time:(h,m)=>{ const H=DE_H[h%12], H1=DE_H[(h+1)%12]; if(m===0) return `${h%12===1?'ein':H} Uhr`; if(m===15) return `Viertel nach ${H}`; if(m===30) return `halb ${H1}`; if(m===45) return `Viertel vor ${H1}`;
+   if(m<=20) return `${m} nach ${H}`; if(m<30) return `${30-m} vor halb ${H1}`; if(m<40) return `${m-30} nach halb ${H1}`; return `${60-m} vor ${H1}`; },
+ short:null, itIs:t=>`Es ist ${t}.`, hourOnly:h=>`${h%12===1?'ein':DE_H[h%12]} Uhr`,
+ hands:'Der lange Minutenzeiger zeigt die Minuten. Der kurze Stundenzeiger zeigt die Stunde.',
+ exHi:'Zieh die Zeiger mit dem Finger und schau, wie der Tag vergeht!', now:'⏰ Jetzt', gears:'⚙️ Zahnräder', pz:'🍕 Pizza',
+ cuCount:'Hör dem Kuckuck zu! Wie oft ruft er?', cuRead:'Wie spät ist es?', cuSet:h=>`Stell die Uhr auf ${h%12===1?'ein':DE_H[h%12]} Uhr! Bewege den kurzen Stundenzeiger.`,
+ pzRead:'Wie spät ist es? Schau, wie viel von der Pizza bunt ist.', pzSet:t=>`Zeig ${t}! Bewege den Minutenzeiger.`, pzHalf:'Halb vier heißt: die halbe Stunde bis vier ist schon um. Eine halbe Pizza ist eine halbe Stunde, 30 Minuten.', pzQuar:'Ein Stück Pizza ist eine Viertelstunde: 15 Minuten.',
+ dest:[['🏔️','die Berge'],['🏖️','das Meer'],['👵','Oma'],['🏰','das Schloss'],['🦁','den Zoo'],['🌲','den Wald']],
+ stTask:(t,d)=>`Der Zug fährt um ${t} los. Stell die Uhr auf die Abfahrtszeit!`, go:'🚂 Abfahrt!', stWrong:'Hoppla! Die Uhr zeigt eine andere Zeit. Versuch es nochmal!', st24:(d,t,p)=>`${d} heißt ${t} ${p}.`,
+ memoTask:'Dreh die Karten um und finde die Paare: die Uhr und ihre Zeit!', wakeTask:t=>`Pufi schläft. Er muss um ${t} aufwachen. Stell den Wecker!`, ring:'⏰ Klingeln!', wakeWrong:t=>`Der Wecker zeigt ${t}. Dann wacht Pufi zu einer anderen Zeit auf. Versuch es nochmal!`, wakeDone:'Guten Morgen, Pufi!', balTask:t=>`Fang den Ballon, der ${t} zeigt!`,
+ ovItems:[['🎂','den Kuchen'],['🍕','die Pizza'],['🍪','die Kekse'],['🍞','das Brot']], dur:m=>({60:'eine Stunde',120:'zwei Stunden',30:'eine halbe Stunde',15:'eine Viertelstunde',45:'eine Dreiviertelstunde',90:'eineinhalb Stunden'})[m],
+ ovTask:(it,t,d)=>`Pufi schiebt ${it} um ${t} in den Ofen. Er muss ${d} backen. Dreh den Minutenzeiger vorwärts und drück Fertig!`, ovEarly:'Noch nicht fertig! Dreh weiter.', ovBurn:'Oje, zu lange! Es ist ein bisschen verbrannt. Versuch es nochmal!', ovDone:t=>`Ding! Fertig! Jetzt ist es ${t}.`,
+ acts:[['⏰','Pufi wacht auf',420],['🪥','Zähne putzen',430],['🥣','Frühstück',450],['🎒','in den Kindergarten',480],['🍽️','Mittagessen',720],['😴','Mittagsschlaf',780],['🛝','im Park spielen',960],['🍝','Abendessen',1080],['🛁','baden',1140],['📖','Gutenachtgeschichte',1170],['🌙','schlafen gehen',1200]],
+ ordTask:'Bring Pufis Tag in die richtige Reihenfolge: vom Morgen bis zum Abend!',
+ dcTask:(a,t)=>`${a}! Stell die Uhr auf ${t}.`,
+ mom:[[0,'🥣','frühstücken wir'],[0,'🐓','kräht der Hahn und die Sonne geht auf'],[1,'🍝','essen wir zu Mittag'],[1,'☀️','steht die Sonne ganz oben am Himmel'],[2,'🍪','essen wir einen Snack nach dem Mittagsschlaf'],[2,'🛝','spielen wir am Nachmittag im Park'],[3,'🌇','geht die Sonne unter'],[3,'🛁','baden wir vor dem Schlafengehen'],[4,'😴','schlafen wir'],[4,'🦉','jagt die Eule und die Sterne leuchten']],
+ moTask:a=>`Wann ${a}?`,
+ ytmL:['GESTERN','HEUTE','MORGEN'], places:[['👵','bei Oma'],['🛝','im Park'],['🏊','im Schwimmbad'],['🦁','im Zoo'],['🏫','im Kindergarten'],['🎂','auf einer Party'],['🏖️','am Meer'],['🚒','bei der Feuerwehr']],
+ ytmStory:(a,b,c)=>`Gestern war Pufi ${a}. Heute ist er ${b}. Morgen ist er ${c}.`, ytmQ:['Wo war Pufi gestern?','Wo ist Pufi heute?','Wo ist Pufi morgen?'],
+ ytmD:(k,d)=>[`Heute ist ${d}. Welcher Tag war gestern?`,`Heute ist ${d}. Welcher Tag ist morgen?`][k],
+ weekTask:'Bring die Wagen in die richtige Reihenfolge: fang mit Montag an!', weekAfter:d=>`Welcher Tag kommt nach ${d}?`, weekBefore:d=>`Welcher Tag kommt vor ${d}?`, weekend:'Samstag und Sonntag sind Wochenende: kein Kindergarten!',
+ calToday:'Tippe auf heute!', calTom:'Tippe auf morgen!', calYes:'Tippe auf gestern!', calWd:n=>`Welcher Wochentag ist der ${n}.?`, calCount:n=>`Wie viele Tage sind es noch bis zum ${n}.? Tippe die Tage einzeln an, fang bei morgen an!`, calHow:'Wie viele Tage hast du gezählt?',
+ bday:n=>n===0?'🎂 Heute ist dein Geburtstag! Alles Gute!':`🎂 Bis zu deinem Geburtstag: ${n===1?'ein Tag':n+' Tage'}`,
+ moOrder:'Tippe die Monate der Reihe nach an, fang mit Januar an!', moAfter:m=>`Welcher Monat kommt nach ${m}?`, moSeas:m=>`In welcher Jahreszeit ist der ${m}?`,
+ treeHi:['Im Frühling blüht der Baum. Tippe auf die Knospen!','Im Sommer hängen viele Früchte am Baum. Pflück die Kirschen!','Im Herbst werden die Blätter bunt und fallen. Schüttel den Baum!','Im Winter schläft der Baum unter dem Schnee. Bau einen Schneemann!'],
+ dressTask:s=>`Es ist ${s}! Was zieht Pufi an? Such drei passende Sachen aus.`, dressNo:['Hmm, das passt gerade nicht.','Puh, im Sommer ist es dafür zu warm!','Hmm, das passt gerade nicht.','Brrr! Im Winter ist es dafür zu kalt!'],
+ sortTask:'In welcher Jahreszeit brauchen wir das? Leg es in den richtigen Korb!'},
+en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',lvl:n=>`Level ${n}`,ok:'✔ Done',listen:'🔊 Listen',help:'💡 Help',first:a=>`First: ${a}.`,nextIs:(a,b)=>`After ${a} comes: ${b}.`,
+ done:s=>`Done! You won ${['','one star','two stars','three stars'][s]}!`,next:'▶ Next level',again:'↺ Again',toMenu:'⬅ Back',locked:'Finish the level before first.',
+ ladder:['🕰️ hours','🌅 a day','🚃 7 days = a week','🎡 12 months = a year'],
+ worlds:{clock:['🕰️','The clock'],day:['🌅','The day'],cal:['📅','Week and calendar'],seas:['🌳','The seasons']},
+ games:{wake:['⏰','Wake Pufi up'],balloon:['🎈','Clock balloons'],explore:['🕰️','Magic clock'],cuckoo:['🐦','Cuckoo clock'],pizza:['🍕','Pizza clock'],station:['🚂','The station'],memo:['🧩','Pairs'],oven:['⏳','How long?'],
+  order:['🧸','Order the day'],dayclk:['🌞','A day with Pufi'],moments:['🌗','Times of day'],ytm:['📆','Yesterday, today, tomorrow'],
+  week:['🚃','The week train'],calm:['📅','My calendar'],months:['🎡','The month wheel'],
+  tree:['🌳','The seasons tree'],dress:['🦊','Dress Pufi'],sort:['🧺','Sort the seasons']},
+ lv:{wake:['O’clock','Half past','Quarters','5-minute steps'],balloon:['O’clock','Half past','Quarters'],cuckoo:['Count the cuckoo','Read the clock','Set the clock'],pizza:['Half past','Show half past','Quarter past','Quarter to','Show the quarters'],
+  station:['O’clock','Half past','Quarters','5-minute steps','Any minute','24-hour clock'],memo:['O’clock and half past','Quarters','5 minutes'],
+  oven:['One hour','Two hours','Half an hour','A quarter of an hour','Mixed'],order:['The morning','The whole day'],dayclk:['O’clock','Half past'],ytm:['Pufi’s story','Days of the week'],
+  week:['Put the days in order','Which day comes after?','Which day comes before?'],calm:['Today, yesterday, tomorrow','Days of the week','Count the days'],months:['Months in order','Which month comes next?','Months and seasons']},
+ days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+ months:['January','February','March','April','May','June','July','August','September','October','November','December'],
+ seas:['spring','summer','autumn','winter'], seasT:['Spring','Summer','Autumn','Winter'],
+ parts:['in the morning','at noon','in the afternoon','in the evening','at night'],
+ today:(wd,d,mo,s)=>`Today is ${wd}, ${mo} ${d}. It is ${s}!`,
+ time:(h,m)=>{ const H=h12(h), H1=h12(h+1); if(m===0) return `${H} o’clock`; if(m===15) return `quarter past ${H}`; if(m===30) return `half past ${H}`; if(m===45) return `quarter to ${H1}`; return m<30?`${m} past ${H}`:`${60-m} to ${H1}`; },
+ short:null, itIs:t=>`It is ${t}.`, hourOnly:h=>`${h12(h)} o’clock`,
+ hands:'The long minute hand shows the minutes. The short hour hand shows the hour.',
+ exHi:'Drag the clock hands with your finger and watch the day go by!', now:'⏰ Now', gears:'⚙️ Gears', pz:'🍕 Pizza',
+ cuCount:'Listen to the cuckoo! How many times does it call?', cuRead:'What time is it?', cuSet:h=>`Set the clock to ${h12(h)} o’clock! Move the short hour hand.`,
+ pzRead:'What time is it? Look how much of the pizza is coloured.', pzSet:t=>`Show ${t}! Move the minute hand.`, pzHalf:'Half a pizza means half an hour: 30 minutes.', pzQuar:'One slice of pizza is a quarter of an hour: 15 minutes.',
+ dest:[['🏔️','the mountains'],['🏖️','the seaside'],['👵','Grandma'],['🏰','the castle'],['🦁','the zoo'],['🌲','the forest']],
+ stTask:(t,d)=>`The train to ${d} leaves at ${t}. Set the clock to the departure time!`, go:'🚂 Go!', stWrong:'Oops! The clock shows a different time. Try again!', st24:(d,t,p)=>`${d} means ${t} ${p}.`,
+ memoTask:'Turn the cards and find the pairs: the clock and its time!', wakeTask:t=>`Pufi is asleep. He has to wake up at ${t}. Set the alarm clock!`, ring:'⏰ Ring!', wakeWrong:t=>`The alarm shows ${t}. Pufi would wake up at a different time. Try again!`, wakeDone:'Good morning, Pufi!', balTask:t=>`Catch the balloon that shows ${t}!`,
+ ovItems:[['🎂','the cake'],['🍕','the pizza'],['🍪','the cookies'],['🍞','the bread']], dur:m=>({60:'one hour',120:'two hours',30:'half an hour',15:'a quarter of an hour',45:'three quarters of an hour',90:'an hour and a half'})[m],
+ ovTask:(it,t,d)=>`Pufi puts ${it} in the oven at ${t}. It needs ${d}. Turn the minute hand forwards and press Done!`, ovEarly:'Not ready yet! Keep turning.', ovBurn:'Oops, too long! It got a bit burnt. Try again!', ovDone:t=>`Ding! Ready! Now it is ${t}.`,
+ acts:[['⏰','Pufi wakes up',420],['🪥','brush teeth',430],['🥣','breakfast',450],['🎒','off to nursery',480],['🍽️','lunch',720],['😴','afternoon nap',780],['🛝','play in the park',960],['🍝','dinner',1080],['🛁','bath time',1140],['📖','bedtime story',1170],['🌙','go to sleep',1200]],
+ ordTask:'Put Pufi’s day in order: from morning to night!',
+ dcTask:(a,t)=>`${a}! Set the clock to ${t}.`,
+ mom:[[0,'🥣','do we have breakfast'],[0,'🐓','does the rooster crow and the sun rise'],[1,'🍝','do we eat lunch'],[1,'☀️','is the sun highest in the sky'],[2,'🍪','do we have a snack after the nap'],[2,'🛝','do we play in the park in the afternoon'],[3,'🌇','does the sun set'],[3,'🛁','do we have a bath before bed'],[4,'😴','do we sleep'],[4,'🦉','does the owl hunt while the stars shine']],
+ moTask:a=>`When ${a}?`,
+ ytmL:['YESTERDAY','TODAY','TOMORROW'], places:[['👵','at Grandma’s'],['🛝','at the park'],['🏊','at the pool'],['🦁','at the zoo'],['🏫','at nursery'],['🎂','at a party'],['🏖️','at the seaside'],['🚒','at the fire station']],
+ ytmStory:(a,b,c)=>`Yesterday Pufi was ${a}. Today he is ${b}. Tomorrow he will be ${c}.`, ytmQ:['Where was Pufi yesterday?','Where is Pufi today?','Where will Pufi be tomorrow?'],
+ ytmD:(k,d)=>[`Today is ${d}. What day was yesterday?`,`Today is ${d}. What day will it be tomorrow?`][k],
+ weekTask:'Put the wagons in order: start with Monday!', weekAfter:d=>`Which day comes after ${d}?`, weekBefore:d=>`Which day comes before ${d}?`, weekend:'Saturday and Sunday are the weekend: no nursery!',
+ calToday:'Tap today!', calTom:'Tap tomorrow!', calYes:'Tap yesterday!', calWd:n=>`Which day of the week is the ${n}${ord(n)}?`, calCount:n=>`How many days until the ${n}${ord(n)}? Tap the days one by one, starting with tomorrow!`, calHow:'How many days did you count?',
+ bday:n=>n===0?'🎂 It’s your birthday today! Happy birthday!':`🎂 Days until your birthday: ${n}`,
+ moOrder:'Tap the months in order, starting with January!', moAfter:m=>`Which month comes after ${m}?`, moSeas:m=>`Which season is ${m} in?`,
+ treeHi:['In spring the tree blossoms. Tap the buds!','In summer the tree is full of fruit. Pick the cherries!','In autumn the leaves turn yellow and fall. Shake the tree!','In winter the tree sleeps under the snow. Build a snowman!'],
+ dressTask:s=>`It is ${s}! What does Pufi wear? Choose three things that fit.`, dressNo:['Hmm, that doesn’t fit right now.','Phew, it’s too hot in summer for that!','Hmm, that doesn’t fit right now.','Brrr! It’s too cold in winter for that!'],
+ sortTask:'Which season do we use this in? Put it in the right basket!'}
+};
+function ord(n){ return (n%100>=11&&n%100<=13)?'th':['th','st','nd','rd'][n%10]||'th'; }
+const X=()=>TR('tm',TX);
+const tSay=(h,m)=>X().time(h,m);
+const tShort=(h,m)=>(X().short||X().time)(h,m);
+const digi=(t,h24)=>{ const h=Math.floor(t/60)%24, m=t%60; return `${h24?h:h12(h)}:${String(m).padStart(2,'0')}`; };
+const partOf=t=>{ const h=Math.floor(t/60)%24; return h>=5&&h<11?0:h>=11&&h<14?1:h>=14&&h<18?2:h>=18&&h<22?3:4; };
+const seasonOf=mo=>mo>=2&&mo<=4?0:mo>=5&&mo<=7?1:mo>=8&&mo<=10?2:3;
+
+/* ================= date + cadru ================= */
+let data={prog:{},all:false,seen:{}}; try{ const d=JSON.parse(localStorage.getItem('tm_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
+const save=()=>{ try{ localStorage.setItem('tm_data',JSON.stringify(data)); }catch(e){} };
+const pill=()=>{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); };
+function award(n){ try{ stars+=(n||1); renderBar(); }catch(e){} pill(); burst(); }
+function burst(){ try{ const r=main.getBoundingClientRect(), E=['⭐','🌟','✨','🦊','⭐'];
+  for(let i=0;i<7;i++){ const b=el('div','tm-burst',E[i%E.length]); b.style.left=(r.width*.25+Math.random()*r.width*.5)+'px'; b.style.top=(r.height*.55+Math.random()*r.height*.2)+'px'; b.style.setProperty('--sx',(Math.random()*160-80)+'px'); b.style.animationDelay=(i*60)+'ms'; main.appendChild(b); setTimeout(()=>b.remove(),1700); } }catch(e){} }
+let back=null, curRestart=null, curNext=null, gen=0, curLevels=null, raf=0;
+function stopAll(){ try{ speechSynthesis.cancel(); }catch(e){} $('ov').hidden=true; gen++; cancelAnimationFrame(raf); }
+const rate=e=>e===0?3:e<=2?2:1;
+const PER=6;
+const RECENT={}; function fresh(k,f,n){ n=n||8; const H=RECENT[k]=RECENT[k]||[]; let v,s,i=0; do{ v=f(); s=JSON.stringify(v); i++; }while(H.includes(s)&&i<80); H.push(s); while(H.length>n) H.shift(); return v; }
+const m12=t=>((t%720)+720)%720;
+function frame(task,n,face){ main.innerHTML=''; const head=el('div','rb-head'); const fc=el('div','rb-face',`<div style="font-size:clamp(40px,7vh,58px);line-height:1">${face||'🦊'}</div>`); const bub=el('div','rb-bubble'); bub.textContent=task||'';
+  const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(fc,bub,dots);
+  const stage=el('div','tm-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=fc.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
+  return {bub,stage,ctrl,set:t=>bub.textContent=t,say:t=>{ bub.textContent=t; return sp(t); },dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
+function finish(key,s,onNext){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+  $('ovNext').textContent=X().next; $('ovNext').hidden=!onNext; curNext=onNext; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
+$('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
+$('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
+$('ovBack').onclick=()=>{ $('ov').hidden=true; back&&back(); };
+$('back').onclick=()=>{ stopAll(); if(back) back(); else root.hidden=true; };
+$('all').onclick=()=>{ data.all=!data.all; save(); curLevels&&curLevels(); };
+
+/* ================= ceasul (componentă) ================= */
+function gearPath(r,n){ let d=''; const ro=r, ri=r*.82; for(let i=0;i<n;i++){ const a0=i/n*2*Math.PI, a1=(i+.25)/n*2*Math.PI, a2=(i+.5)/n*2*Math.PI, a3=(i+.75)/n*2*Math.PI;
+  const P=(rr,a)=>`${(rr*Math.sin(a)).toFixed(1)} ${(-rr*Math.cos(a)).toFixed(1)}`; d+=(i?'L':'M')+P(ri,a0)+'L'+P(ro,a1)+'L'+P(ro,a2)+'L'+P(ri,a3); } return d+'Z'; }
+function clockSVG(id,cx,cy,r,o={}){
+  let s=`<g id="${id}"><circle cx="${cx}" cy="${cy}" r="${r+r*.07}" fill="${o.rim||'#3BC48A'}"/><circle id="${id}-face" cx="${cx}" cy="${cy}" r="${r}" fill="#FFFDF5" stroke="#24325F" stroke-width="${r*.03}"/>`;
+  s+=`<g id="${id}-gr" opacity="0" style="transition:opacity .5s">`;
+  [[0,0,.42,24,'#FFC83D','m'],[-.36,.3,.2,12,'#FF8A65','i'],[.3,.36,.24,14,'#8C6CF2','h']].forEach(([dx,dy,rr,n,c,k])=>{ s+=`<g transform="translate(${cx+dx*r} ${cy+dy*r})"><path class="gr-${k}" d="${gearPath(rr*r,n)}" fill="${c}" stroke="#24325F" stroke-width="2"/><circle r="${rr*r*.25}" fill="#fff" stroke="#24325F" stroke-width="2"/></g>`; });
+  s+=`</g><path id="${id}-pz" fill="#FFC83D" opacity=".85" stroke="#E0A000" stroke-width="2"/><g id="${id}-pzl"></g>`;
+  for(let i=0;i<60;i++){ const a=i*6*Math.PI/180, l=i%5?r*.05:r*.1; s+=`<line x1="${cx+Math.sin(a)*(r*.95)}" y1="${cy-Math.cos(a)*(r*.95)}" x2="${cx+Math.sin(a)*(r*.95-l)}" y2="${cy-Math.cos(a)*(r*.95-l)}" stroke="#24325F" stroke-width="${i%5?r*.012:r*.025}"/>`; }
+  for(let i=1;i<=12;i++){ const a=i*30*Math.PI/180; s+=`<text x="${cx+Math.sin(a)*r*.72}" y="${cy-Math.cos(a)*r*.72+r*.075}" font-size="${r*.2}" font-weight="800" text-anchor="middle" fill="#24325F">${i}</text>`; }
+  if(o.mnums) for(let i=0;i<12;i++){ const a=i*30*Math.PI/180; s+=`<text x="${cx+Math.sin(a)*r*1.19}" y="${cy-Math.cos(a)*r*1.19+r*.04}" font-size="${r*.1}" font-weight="800" text-anchor="middle" fill="#E0507A">${String(i*5).padStart(2,'0')}</text>`; }
+  s+=`<g id="${id}-h"><line x1="${cx}" y1="${cy+r*.08}" x2="${cx}" y2="${cy-r*.5}" stroke="#2E6BD6" stroke-width="${r*.085}" stroke-linecap="round"/></g>`;
+  s+=`<g id="${id}-m"><line x1="${cx}" y1="${cy+r*.1}" x2="${cx}" y2="${cy-r*.84}" stroke="#FF5D7A" stroke-width="${r*.05}" stroke-linecap="round"/><circle cx="${cx}" cy="${cy-r*.84}" r="${r*.035}" fill="#FF5D7A"/></g>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r*.06}" fill="#24325F"/><circle id="${id}-hit" cx="${cx}" cy="${cy}" r="${r*1.05}" fill="transparent"/></g>`; return s; }
+function makeClock(svg,id,cx,cy,r,o={}){
+  const c={total:o.total||0,step:o.step||1,only:o.only||null,locked:false,onChange:o.onChange||null,onEnd:o.onEnd||null,pizza:!!o.pizza,min:o.min!=null?o.min:null,max:o.max!=null?o.max:null};
+  const H=svg.querySelector('#'+id+'-h'), M=svg.querySelector('#'+id+'-m'), PZ=svg.querySelector('#'+id+'-pz'), PZL=svg.querySelector('#'+id+'-pzl'), GR=svg.querySelector('#'+id+'-gr');
+  function draw(){ const t=((c.total%1440)+1440)%1440, m=t%60, ha=(t%720)/2, ma=m*6;
+    H.setAttribute('transform',`rotate(${ha} ${cx} ${cy})`); M.setAttribute('transform',`rotate(${ma} ${cx} ${cy})`);
+    if(c.pizza&&m>0){ const a=ma*Math.PI/180, R2=r*.9; PZ.setAttribute('d',`M${cx} ${cy}L${cx} ${cy-R2}A${R2} ${R2} 0 ${ma>180?1:0} 1 ${cx+Math.sin(a)*R2} ${cy-Math.cos(a)*R2}Z`); } else PZ.setAttribute('d','');
+    if(c.pizza&&!PZL.childNodes.length) PZL.innerHTML=[0,90,180,270].map(d=>{ const a=d*Math.PI/180; return `<line x1="${cx}" y1="${cy}" x2="${cx+Math.sin(a)*r*.9}" y2="${cy-Math.cos(a)*r*.9}" stroke="#E0A000" stroke-width="2" stroke-dasharray="6 6"/>`; }).join('');
+    if(!c.pizza) PZL.innerHTML='';
+    const T=c.total; svg.querySelectorAll('#'+id+' .gr-m').forEach(g=>g.setAttribute('transform',`rotate(${T*6})`)); svg.querySelectorAll('#'+id+' .gr-i').forEach(g=>g.setAttribute('transform',`rotate(${-T*6*24/12})`)); svg.querySelectorAll('#'+id+' .gr-h').forEach(g=>g.setAttribute('transform',`rotate(${T/2})`)); }
+  c.draw=draw; c.gears=on=>{ GR.setAttribute('opacity',on?'1':'0'); svg.querySelector('#'+id+'-face').setAttribute('fill',on?'rgba(255,253,245,.55)':'#FFFDF5'); };
+  c.set=(t,anim)=>new Promise(res=>{ if(!anim){ c.total=t; draw(); return res(); } const a=c.total, t0=performance.now(), D=Math.min(1600,300+Math.abs(t-a)*2);
+    const f=now=>{ const k=Math.min(1,(now-t0)/D), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; c.total=Math.round(a+(t-a)*e); draw(); if(k<1) raf=requestAnimationFrame(f); else { c.total=t; draw(); res(); } }; raf=requestAnimationFrame(f); });
+  const ang=(x,y)=>{ let a=Math.atan2(x-cx,-(y-cy))*180/Math.PI; return (a+360)%360; };
+  let drag=null;
+  const clampT=t=>{ if(c.min!=null&&t<c.min) t=c.min; if(c.max!=null&&t>c.max) t=c.max; return t; };
+  svg.addEventListener('pointerdown',e=>{ if(c.locked) return; const [x,y]=ptIn(svg,e), d=Math.hypot(x-cx,y-cy); if(d>r*1.1) return; e.preventDefault(); try{ svg.setPointerCapture(e.pointerId); }catch(_){}
+    const a=ang(x,y), ha=(((c.total%720)+720)%720)/2, dif=Math.min(Math.abs(a-ha),360-Math.abs(a-ha));
+    drag=c.only||(c.step>=60?'h':(d<r*.62&&dif<28)?'h':'m'); move(e); });
+  function move(e){ if(!drag) return; const [x,y]=ptIn(svg,e), a=ang(x,y), t=c.total, m=((t%60)+60)%60;
+    if(drag==='m'){ let nm=Math.round(a/6/c.step)*c.step%60, dl=nm-m; if(dl<-30) dl+=60; if(dl>30) dl-=60; if(dl){ c.total=clampT(t+dl); if(c.total!==t) tickS(); } }
+    else { const hh=Math.round((a*2-m)/60), base=((hh%12)+12)%12*60+m; let best=t, bd=1e9; for(const k of [-1440,-720,0,720,1440]){ const cand=base+k+Math.floor(t/1440)*1440; if(Math.abs(cand-t)<bd){ bd=Math.abs(cand-t); best=cand; } } if(best!==t){ c.total=clampT(best); tickS(); } }
+    if(c.min==null&&c.max==null) c.total=((c.total%1440)+1440)%1440;
+    draw(); c.onChange&&c.onChange(c.total); }
+  svg.addEventListener('pointermove',e=>{ if(drag){ e.preventDefault(); move(e); } });
+  const up=()=>{ if(!drag) return; drag=null; c.onEnd&&c.onEnd(c.total); };
+  svg.addEventListener('pointerup',up); svg.addEventListener('pointercancel',up);
+  draw(); return c; }
+/* cerul care se schimbă după oră */
+const SKY=[[0,'#0B1640','#24325F'],[300,'#1A2558','#3B3F7A'],[390,'#FF9E7A','#FFE3B8'],[480,'#5DB8F5','#D6F0FF'],[1020,'#5DB8F5','#D6F0FF'],[1140,'#FF7E5F','#7B5FD0'],[1230,'#1A2558','#3B3F7A'],[1440,'#0B1640','#24325F']];
+const hx=(a,b,k)=>{ const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16)); const A=p(a),B=p(b); return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join(''); };
+function skyCols(t){ t=((t%1440)+1440)%1440; for(let i=0;i<SKY.length-1;i++){ const [a,c1,c2]=SKY[i],[b,d1,d2]=SKY[i+1]; if(t>=a&&t<=b){ const k=(t-a)/(b-a); return [hx(c1,d1,k),hx(c2,d2,k)]; } } return ['#5DB8F5','#D6F0FF']; }
+function sceneSVG(W,H,gy){ let s=`<defs><linearGradient id="tm-skg" x1="0" y1="0" x2="0" y2="1"><stop id="tm-s1" offset="0"/><stop id="tm-s2" offset="1"/></linearGradient></defs><rect width="${W}" height="${H}" rx="24" fill="url(#tm-skg)"/><g id="tm-stars">`;
+  for(let i=0;i<26;i++) s+=`<circle cx="${W*.5+R(W*.5)}" cy="${R(gy-40)}" r="${1+R(3)}" fill="#fff"/>`;
+  s+=`</g><g id="tm-sun"><g style="transform-box:fill-box;transform-origin:center;animation:tmSpin 18s linear infinite">${[...Array(10)].map((_,i)=>`<line x1="0" y1="-46" x2="0" y2="-60" stroke="#FFC400" stroke-width="7" stroke-linecap="round" transform="rotate(${i*36})"/>`).join('')}</g><circle r="34" fill="#FFD54A" stroke="#FFB300" stroke-width="6"/><circle cx="-11" cy="-6" r="4" fill="#7A4A00"/><circle cx="11" cy="-6" r="4" fill="#7A4A00"/><path d="M-12 8 Q0 18 12 8" stroke="#7A4A00" stroke-width="4" fill="none" stroke-linecap="round"/></g><text id="tm-moon" font-size="56" text-anchor="middle">🌙</text>
+  <g id="tm-clouds">${[[60,40,8],[150,70,-14],[95,52,-27]].map(([y,fz,d])=>`<text x="0" y="${y}" font-size="${fz}" style="animation:tmCloud ${46+fz/2}s linear ${d}s infinite">☁️</text>`).join('')}</g>
+  <g id="tm-birds"><text x="0" y="110" font-size="26" style="animation:tmBird 14s linear infinite">🐦</text><text x="0" y="140" font-size="22" style="animation:tmBird 17s linear -6s infinite">🕊️</text></g>`;
+  s+=`<path d="M0 ${gy} Q${W*.2} ${gy-40} ${W*.42} ${gy-6} T${W} ${gy-20} V${H} H0Z" fill="#7BC96F"/><path d="M0 ${gy+30} Q${W*.3} ${gy+5} ${W*.6} ${gy+28} T${W} ${gy+20} V${H} H0Z" fill="#5DB35A"/>`;
+  s+=`<rect id="tm-win" x="${W*.88-14}" y="${gy-22}" width="16" height="14" rx="3" fill="#FFE27A" opacity="0"/><text x="${W*.88}" y="${gy+10}" font-size="64" text-anchor="middle">🏡</text>
+  <g id="tm-pufiG" style="transition:transform 1.2s ease"><text id="tm-pufi" x="0" y="${gy+30}" font-size="58" text-anchor="middle" style="animation:tmBob 1.6s ease-in-out infinite">🦊</text><text id="tm-pact" x="34" y="${gy-28}" font-size="34" text-anchor="middle"></text>
+  <g id="tm-zz" opacity="0"><text x="24" y="${gy-14}" font-size="26" style="animation:tmZ 2s linear infinite">💤</text><text x="30" y="${gy-14}" font-size="20" style="animation:tmZ 2s linear 1s infinite">💤</text></g></g>`;
+  return s; }
+function updScene(svg,t,W,gy,x0,x1){ x0=x0==null?60:x0; x1=x1==null?W-60:x1; const [a,b]=skyCols(t); svg.querySelector('#tm-s1').setAttribute('stop-color',a); svg.querySelector('#tm-s2').setAttribute('stop-color',b);
+  t=((t%1440)+1440)%1440; const sun=svg.querySelector('#tm-sun'), moon=svg.querySelector('#tm-moon'), st=svg.querySelector('#tm-stars');
+  const day=t>=360&&t<=1200; const k=day?(t-360)/840:((t-1200+1440)%1440)/600; const x=x0+Math.min(1,k)*(x1-x0), y=gy-Math.sin(Math.PI*Math.min(1,k))*(gy-60)+10;
+  sun.setAttribute('transform',`translate(${x} ${y})`); sun.setAttribute('opacity',day?1:0); moon.setAttribute('x',x); moon.setAttribute('y',y+18); moon.setAttribute('opacity',day?0:1);
+  st.setAttribute('opacity',t<330||t>1230?1:t<420?(420-t)/90:t>1140?(t-1140)/90:0);
+  /* scena vie: nori ziua, păsări ziua, lumina în casă seara, Pufi face ce face la ora aceea */
+  const q=s=>svg.querySelector(s); const night=t<400||t>1215;
+  if(q('#tm-clouds')) q('#tm-clouds').setAttribute('opacity',night?.25:1); if(q('#tm-birds')) q('#tm-birds').setAttribute('opacity',night?0:1);
+  if(q('#tm-win')) q('#tm-win').setAttribute('opacity',t>1110||t<420?1:0);
+  const pg=q('#tm-pufiG'); if(pg){ const A=X().acts; let a=null; for(const x of A) if(x[2]<=t) a=x; const sleep=night||!a;
+    const px=sleep?W*.8:x0+((t-400)/820)*(x1-x0-80); pg.setAttribute('transform',`translate(${Math.max(40,Math.min(W*.8,px))} 0)`);
+    q('#tm-pact').textContent=sleep?'':a[0]; q('#tm-zz').setAttribute('opacity',sleep?1:0); q('#tm-pufi').textContent=sleep?'😴':'🦊'; } }
+
+function staticClock(t,id,r,o){ const s=clockSVG(id,r*1.2,r*1.2,r,o||{}); const ha=(t%720)/2, ma=(t%60)*6;
+  return s.replace(`<g id="${id}-h">`,`<g id="${id}-h" transform="rotate(${ha} ${r*1.2} ${r*1.2})">`).replace(`<g id="${id}-m">`,`<g id="${id}-m" transform="rotate(${ma} ${r*1.2} ${r*1.2})">`); }
+/* butoane de răspuns: cele cu text au 🔊 ca să le poată auzi și un copil care încă nu citește */
+function opts(ctrl,list,fn,cls,after){ const box=el('div','tm-ans'+(cls?' '+cls:'')); const items=[];
+  list.forEach(o=>{ const b=el('button',null,o.html||o.t); b.onclick=()=>{ box.dataset.stop=1; fn(o,b); };
+    const say_=o.say||(o.t&&!/^\d+$/.test(o.t)?o.t:null);
+    if(say_){ const w=el('div','tm-opt'); const s=el('button','tm-say','🔊'); s.onclick=e=>{ e.stopPropagation(); box.dataset.stop=1; sp(say_); }; w.append(b,s); box.appendChild(w); items.push([b,say_]); }
+    else box.appendChild(b); });
+  ctrl.appendChild(box); if(after&&items.length) readAll(items,box,after); return box; }
+/* carduri cu 🔊 (pentru copiii care încă nu citesc) */
+function sayTile(tl,b,text,items){ const w=el('div','tm-opt'); const s=el('button','tm-say','🔊'); s.onclick=e=>{ e.stopPropagation(); tl.dataset.stop=1; sp(text); }; w.append(b,s); tl.appendChild(w); items.push([b,text]); b._w=w; }
+function hideTile(b){ b.classList.add('used'); if(b._w) b._w.style.visibility='hidden'; }
+function helpBtn(F,fn){ const h=btn(X().help,'',fn); F.ctrl.appendChild(h); return h; }
+function blinkHint(b){ document.querySelectorAll('.tm-hint').forEach(x=>x.classList.remove('tm-hint')); b.classList.add('tm-hint'); }
+async function readAll(items,box,after){ const my=gen; await after; await wait(250); for(const [b,t] of items){ if(my!==gen||box.dataset.stop||!document.body.contains(b)) return; b.classList.add('hl'); await sp(t); b.classList.remove('hl'); await wait(150); } }
+const hmOf=t=>[Math.floor(t/60)%24,t%60];
+
+/* ---------- 1. ceasul magic ---------- */
+function gExplore(){ const F=frame(X().exHi,0,'🦉'); const W=1000,Hh=470,gy=400;
+  F.stage.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}">${sceneSVG(W,Hh,gy)}${clockSVG('tc',300,232,182,{mnums:true})}</svg>`; const svg=F.stage.firstChild;
+  const lab=el('div','tm-read'); F.ctrl.appendChild(lab);
+  const now=new Date(); let t0=now.getHours()*60+now.getMinutes();
+  const show=t=>{ const [h,m]=hmOf(t); updScene(svg,t,W,gy,540,960); lab.innerHTML=`<b>${digi(t,true)}</b> · ${X().parts[partOf(t)]} · ${tSay(h,m)}`; };
+  const c=makeClock(svg,'tc',300,232,182,{total:t0,onChange:show,onEnd:t=>{ const [h,m]=hmOf(t); sp(X().itIs(tSay(h,m))+' '+X().parts[partOf(t)]); }}); show(t0);
+  let gOn=false, pOn=false; const row=el('div','rb-ctrl');
+  row.append(btn(X().now,'',async()=>{ const n=new Date(); await c.set(n.getHours()*60+n.getMinutes(),true); show(c.total); const [h,m]=hmOf(c.total); sp(X().itIs(tSay(h,m))); }),
+    btn(X().gears,'',()=>{ gOn=!gOn; c.gears(gOn); }), btn(X().pz,'',()=>{ pOn=!pOn; c.pizza=pOn; c.draw(); }), btn(X().listen,'',()=>{ const [h,m]=hmOf(c.total); sp(X().itIs(tSay(h,m))); }));
+  F.ctrl.appendChild(row); const tick2=setInterval(()=>{ if(root.hidden||!document.body.contains(svg)) return clearInterval(tick2); show(c.total); },400);
+  sp(X().exHi+' '+X().hands); }
+
+/* ---------- 2. ceasul cu cuc ---------- */
+function cuckooHouse(){ return `<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#E8F4FF"/>
+  <g id="tm-pend" style="transform-origin:450px 400px;animation:tmPend 1.2s ease-in-out infinite alternate"><line x1="450" y1="400" x2="450" y2="455" stroke="#8A5A2B" stroke-width="5"/><circle cx="450" cy="458" r="14" fill="#F2A900" stroke="#8A5A2B" stroke-width="3"/></g>
+  <rect x="300" y="130" width="300" height="290" rx="16" fill="#B5733A" stroke="#6B3E18" stroke-width="6"/>
+  <polygon points="262,150 450,26 638,150" fill="#7A4A22" stroke="#4E2C10" stroke-width="6" stroke-linejoin="round"/>
+  ${[0,1,2,3,4].map(i=>`<path d="M${300+i*75} 150 q18 26 37 0 q18 26 38 0" fill="#3BC48A" stroke="#24935F" stroke-width="3"/>`).join('')}
+  <rect x="418" y="70" width="64" height="62" rx="8" fill="#3A220E"/><rect id="tm-door" x="418" y="70" width="64" height="62" rx="8" fill="#D9A066" stroke="#6B3E18" stroke-width="3" style="transform-origin:418px 100px;transition:transform .2s"/>
+  <text id="tm-bird" x="450" y="120" font-size="50" text-anchor="middle" opacity="0" style="transition:transform .18s;transform-origin:450px 100px">🐦</text>
+  ${clockSVG('tc',450,282,118,{rim:'#E0A000'})}
+  <text id="tm-cnt" x="760" y="160" font-size="70" font-weight="800" fill="#FF5D7A" text-anchor="middle"></text></svg>`; }
+async function sing(svg,n,show,myGen){ const door=svg.querySelector('#tm-door'), bird=svg.querySelector('#tm-bird'), cnt=svg.querySelector('#tm-cnt');
+  for(let i=1;i<=n;i++){ if(myGen!==gen) return; door.style.transform='scaleX(-.15)'; bird.setAttribute('opacity','1'); bird.style.transform='translateY(14px) scale(1.35)'; cucu(); if(show) cnt.textContent=i;
+    { const nt=document.createElementNS(NS,'text'); nt.setAttribute('x',470+R(30)); nt.setAttribute('y',90); nt.setAttribute('font-size','34'); nt.textContent=pick(['🎵','🎶']); nt.style.setProperty('--nx',(R(120)-20)+'px'); nt.style.animation='tmNote 1.4s ease-out forwards'; nt.style.transformBox='fill-box'; svg.appendChild(nt); setTimeout(()=>nt.remove(),1500); }
+    await wait(420); bird.style.transform=''; await wait(160); bird.setAttribute('opacity','0'); door.style.transform=''; await wait(260); } }
+function gCuckoo(li){ let ti=0, errs=0, busy=false, h=0; const F=frame('',PER,'🐦'); const myGen=gen;
+  F.stage.innerHTML=cuckooHouse(); const svg=F.stage.firstChild; const c=makeClock(svg,'tc',450,282,118,{total:0,step:60,only:'h'}); c.locked=li<2;
+  async function show(){ F.ctrl.innerHTML=''; svg.querySelector('#tm-cnt').textContent=''; h=fresh('cu'+li,()=>RR(1,12),7);
+    if(li<2){ await c.set(h*60,true); if(myGen!==gen) return;
+      if(li===0){ await F.say(X().cuCount); await sing(svg,h,false,myGen); } else F.say(X().cuRead);
+      if(myGen!==gen) return; const set=new Set([h]); while(set.size<4){ const v=h+RR(-3,3); if(v>=1&&v<=12) set.add(v); }
+      opts(F.ctrl,shuf([...set]).map(v=>({t:String(v),v})),answer,'big'); if(li===0) F.ctrl.appendChild(btn('🔁 🐦','',()=>{ if(!busy) sing(svg,h,false,myGen); })); }
+    else { c.locked=false; await c.set(((h+RR(2,9))%12)*60); F.say(X().cuSet(h)); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:(Math.round(m12(c.total)/60)%12)||12},null))); } }
+  async function answer(o,b){ if(busy) return; if(o.v!==h){ errs++; if(b) b.classList.add('no'); boing(); if(li===2) F.say(X().cuSet(h)); return; }
+    busy=true; if(b) b.classList.add('ok'); c.locked=true; if(li>0) await sing(svg,h,true,myGen); else svg.querySelector('#tm-cnt').textContent=h; if(myGen!==gen) return;
+    chime(); award(); F.dot(ti+1); await spW(X().itIs(X().hourOnly(h)),900); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('cuckoo',li,errs); show(); }
+  show(); }
+
+/* ---------- 3. ceasul-pizza ---------- */
+function pzParty(svg){ for(let i=0;i<8;i++){ const t=document.createElementNS(NS,'text'); const a=i/8*Math.PI*2; t.setAttribute('x',450); t.setAttribute('y',250); t.setAttribute('font-size','44'); t.setAttribute('text-anchor','middle'); t.textContent=pick(['🍕','🧀','🍅','🫒']);
+  t.style.transition='transform .9s cubic-bezier(.2,.8,.3,1),opacity .9s'; svg.appendChild(t); requestAnimationFrame(()=>requestAnimationFrame(()=>{ t.style.transform=`translate(${Math.cos(a)*300}px,${Math.sin(a)*190}px) rotate(${R(360)}deg)`; t.style.opacity='0'; })); setTimeout(()=>t.remove(),1000); } }
+function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'🍕'); const myGen=gen;
+  F.stage.innerHTML=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#FFF4E0"/>${clockSVG('tc',450,235,205,{rim:'#E0A000'})}</svg>`; const svg=F.stage.firstChild;
+  const read=li!==1&&li!==4, ms=li<=1?[30]:li===2?[15]:li===3?[45]:[15,30,45];
+  const c=makeClock(svg,'tc',450,235,205,{pizza:true,step:15,only:'m'}); c.locked=read;
+  const tip=()=>X()[tg%60===30?'pzHalf':'pzQuar'];
+  async function show(){ F.ctrl.innerHTML=''; const [h,m]=fresh('pz'+li,()=>[RR(1,12),pick(ms)],9); tg=h*60+m; const [H,M]=[h,m];
+    if(read){ await c.set(tg,true); if(myGen!==gen) return; const qq=F.say(X().pzRead);
+      const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>{ const v=((a%12)*60+b)%720; return {t:tShort(a,b),say:tShort(a,b),v,html:`<span class="dg">${digi(v||720)}</span><small>${tShort(a,b)}</small>`}; });
+      const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer,'tm-wide',qq); }
+    else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:m12(c.total)},null))); } }
+  async function answer(o,b){ if(busy) return; if(o.v!==tg%720){ errs++; if(b) b.classList.add('no'); boing(); F.say(tip()); return; }
+    busy=true; c.locked=true; if(b) b.classList.add('ok'); chime(); award(); F.dot(ti+1); pzParty(svg); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('pizza',li,errs); show(); }
+  show(); }
+
+/* ---------- 4. gara ---------- */
+function puffs(svg,x,y,n){ for(let i=0;i<n;i++){ setTimeout(()=>{ const t=document.createElementNS(NS,'text'); t.setAttribute('x',x+i*55); t.setAttribute('y',y); t.setAttribute('font-size','46'); t.textContent='☁️'; t.style.transformBox='fill-box'; t.style.transformOrigin='center'; t.style.animation='tmSteam 1.4s ease-out forwards'; svg.appendChild(t); setTimeout(()=>t.remove(),1500); },i*220); } }
+function gStation(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'🚂'); const myGen=gen; const step=[60,30,15,5,1,15][li], h24=li===5;
+  F.stage.innerHTML=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#DFF1FF"/><rect x="0" y="380" width="900" height="90" fill="#C9B8A0"/>
+    ${[...Array(19)].map((_,i)=>`<rect x="${i*50}" y="408" width="30" height="10" fill="#7A5A3A"/>`).join('')}<line x1="0" y1="405" x2="900" y2="405" stroke="#555" stroke-width="5"/><line x1="0" y1="422" x2="900" y2="422" stroke="#555" stroke-width="5"/>
+    <rect x="30" y="40" width="370" height="170" rx="16" fill="#1E2433" stroke="#556" stroke-width="6"/><line x1="160" y1="20" x2="160" y2="40" stroke="#556" stroke-width="5"/><line x1="270" y1="20" x2="270" y2="40" stroke="#556" stroke-width="5"/>
+    <text id="tm-dest" x="95" y="150" font-size="76" text-anchor="middle"></text><text id="tm-dep" x="285" y="152" font-size="78" font-weight="800" font-family="monospace" fill="#FFD54A" text-anchor="middle"></text>
+    <g id="tm-train" style="transition:transform 2.2s ease-in"><text x="60" y="400" font-size="84">🚂🚃🚃</text></g>
+    ${clockSVG('tc',660,200,150,{mnums:li>=3})}</svg>`;
+  const svg=F.stage.firstChild, tr=svg.querySelector('#tm-train');
+  const c=makeClock(svg,'tc',660,200,150,{step,only:step>=60?'h':null});
+  async function show(){ F.ctrl.innerHTML=''; tr.style.transition='none'; tr.style.transform='translateX(0)'; void tr.getBoundingClientRect(); tr.style.transition='transform 2.2s ease-in';
+    const d=pick(X().dest); const [h,m]=fresh('st'+li,()=>[h24?RR(13,22):RR(1,12),step>=60?0:R(60/step)*step],9); tg=h*60+m;
+    svg.querySelector('#tm-dest').textContent=d[0]; svg.querySelector('#tm-dep').textContent=digi(tg,h24);
+    let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
+    F.say(X().stTask(digi(tg,h24),d[1])); F.ctrl.appendChild(btn(X().go,'go',answer)); }
+  async function answer(){ if(busy) return; if(m12(c.total)!==m12(tg)){ errs++; boing(); F.say(X().stWrong); return; }
+    busy=true; c.locked=true; toot(); tr.style.transform='translateX(1000px)'; puffs(svg,90,330,6); chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg);
+    const msg=h24?X().st24(digi(tg,true),tSay(h,m),X().parts[partOf(tg)]):X().itIs(tSay(h,m)); await spW(msg,2300); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('station',li,errs); show(); }
+  show(); }
+
+/* ---------- 5. perechi ---------- */
+function gMemo(li){ const F=frame(X().memoTask,0,'🧩'); const myGen=gen; const n=[4,5,6][li], ms=li===0?[0,30]:li===1?[0,15,30,45]:[...Array(12).keys()].map(i=>i*5);
+  const times=[]; while(times.length<n){ const t=RR(1,12)*60+pick(ms); if(!times.some(x=>x%720===t%720)) times.push(t); }
+  const cards=shuf(times.flatMap((t,i)=>[{i,t,k:'a'},{i,t,k:'d'}])); const g=el('div','tm-cards'); g.style.gridTemplateColumns=`repeat(${n===5?5:4},1fr)`; g.style.maxWidth=n===6?'640px':'820px'; F.stage.appendChild(g);
+  let open=[], lockB=false, found=0, wrong=0;
+  cards.forEach((cd,j)=>{ const b=el('button','tm-mc','❓'); b.id='tm-mc'+j;
+    const face=()=>{ const [h,m]=hmOf(cd.t); return cd.k==='a'?`<svg viewBox="0 0 120 120">${staticClock(cd.t,'mc'+j,50)}</svg>`:(li===1?tShort(h,m):digi(cd.t)); };
+    b.onclick=()=>{ if(lockB||b.classList.contains('up')||b.classList.contains('done')) return; b.classList.add('up'); b.innerHTML=face(); blip(); if(cd.k==='d'){ const [h,m]=hmOf(cd.t); sp(tSay(h,m)); }
+      open.push([b,cd]); if(open.length<2) return; const [[b1,c1],[b2,c2]]=open; open=[];
+      if(c1.i===c2.i){ setTimeout(()=>{ b1.classList.add('done'); b2.classList.add('done'); chime(); },300); found++; if(found===n){ setTimeout(()=>{ if(myGen!==gen) return; award(); finish('memo'+li,wrong<=n?3:wrong<=2*n?2:1,li<2?()=>play('memo',li+1):null); },900); } }
+      else { wrong++; lockB=true; setTimeout(()=>{ [b1,b2].forEach(x=>{ x.classList.remove('up'); x.textContent='❓'; }); lockB=false; },1100); } };
+    g.appendChild(b); });
+  sp(X().memoTask); }
+
+/* ---------- 6. cât durează (cuptorul) ---------- */
+function gOven(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'👩‍🍳'); const myGen=gen; const DL=[[60],[120],[30],[15],[60,30,15,45,90,120]][li];
+  F.stage.innerHTML=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="#FFF0F3"/>
+    ${clockSVG('tc',260,235,200,{rim:'#FF8FA8'})}
+    <rect x="540" y="120" width="300" height="290" rx="22" fill="#B0BEC5" stroke="#546E7A" stroke-width="6"/><rect x="560" y="140" width="260" height="40" rx="8" fill="#78909C"/>
+    ${[0,1,2,3].map(i=>`<circle cx="${590+i*45}" cy="160" r="12" fill="#ECEFF1" stroke="#455A64" stroke-width="3"/>`).join('')}
+    <rect x="575" y="200" width="230" height="180" rx="16" fill="#263238"/><rect id="tm-glow" x="585" y="210" width="210" height="160" rx="12" fill="#FF8F00" opacity=".25"/>
+    <text id="tm-food" x="690" y="330" font-size="90" text-anchor="middle" style="transform-origin:690px 330px;transition:transform .2s,filter .3s">🎂</text><text id="tm-smoke" x="690" y="110" font-size="56" text-anchor="middle" opacity="0">💨</text>
+    <g id="tm-ghost" opacity=".25"></g></svg>`;
+  const svg=F.stage.firstChild, food=svg.querySelector('#tm-food'), smoke=svg.querySelector('#tm-smoke');
+  let st=0, dur=60, it=null; const c=makeClock(svg,'tc',260,235,200,{step:5,only:'m',onChange:t=>grow(t)});
+  function grow(t){ const k=(t-st)/dur; food.style.transform=`scale(${.55+Math.min(1,k)*.6})`; food.style.filter=k>1.05?`brightness(${Math.max(.35,1-(k-1)*1.6)})`:'none'; smoke.setAttribute('opacity',k>1.05?1:0); svg.querySelector('#tm-glow').setAttribute('opacity',.25+Math.min(1,k)*.4); }
+  async function show(){ F.ctrl.innerHTML=''; food.style.animation=''; const fv=fresh('ov'+li,()=>[pick(DL),R(X().ovItems.length),RR(1,10)*60+(li>=2?pick([0,15,30]):0)],6); dur=fv[0]; it=X().ovItems[fv[1]]; food.textContent=it[0]; st=fv[2]; c.min=st; c.max=st+180; c.locked=false; await c.set(st); grow(st);
+    const ha=(st%720)/2, ma=(st%60)*6; svg.querySelector('#tm-ghost').innerHTML=`<line x1="260" y1="235" x2="260" y2="135" stroke="#2E6BD6" stroke-width="16" stroke-linecap="round" transform="rotate(${ha} 260 235)"/><line x1="260" y1="235" x2="260" y2="67" stroke="#FF5D7A" stroke-width="10" stroke-linecap="round" transform="rotate(${ma} 260 235)"/>`;
+    const [h,m]=hmOf(st); F.say(X().ovTask(it[1],tSay(h,m),X().dur(dur))); F.ctrl.appendChild(btn(X().ok,'go',answer)); }
+  async function answer(){ if(busy) return; const el_=c.total-st;
+    if(el_<dur){ errs++; boing(); F.say(X().ovEarly); return; }
+    if(el_>dur){ errs++; boing(); F.say(X().ovBurn); await wait(1200); if(myGen!==gen) return; await c.set(st,true); grow(st); return; }
+    busy=true; c.locked=true; ding(); chime(); award(); F.dot(ti+1); try{ confetti(14); }catch(e){} puffs(svg,640,190,3); food.style.animation='tmJump .7s ease 2'; const [h,m]=hmOf(c.total); await spW(X().ovDone(tSay(h,m)),1500); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('oven',li,errs); show(); }
+  show(); }
+
+/* ---------- 7. ordonează ziua ---------- */
+function gOrder(li){ let round=0, errs=0; const ROUNDS=3; const F=frame(X().ordTask,ROUNDS,'🧸'); const myGen=gen;
+  function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const A=X().acts; let idx;
+    if(li===0) idx=shuf([0,1,2,3,4]).slice(0,4).sort((a,b)=>a-b); else idx=shuf([...A.keys()]).slice(0,5).sort((a,b)=>a-b);
+    const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:18px;align-items:center;width:100%';
+    const sl=el('div','tm-slots'); const slots=idx.map(i=>{ const s=el('div','tm-slot'); const [c1,c2]=skyCols(A[i][2]); s.style.background=`linear-gradient(${c1},${c2})`; s.style.borderColor='rgba(255,255,255,.7)'; sl.appendChild(s); return s; });
+    const tl=el('div','tm-tiles'); let k=0;
+    const items=[], tiles={};
+    shuf(idx).forEach(i=>{ const b=el('button','tm-tile',`<span class="e">${A[i][0]}</span>${A[i][1]}`); tiles[i]=b; b.onclick=()=>{ if(b.classList.contains('used')) return; tl.dataset.stop=1;
+      if(i===idx[k]){ hideTile(b); b.classList.remove('tm-hint'); const s=slots[k]; s.classList.add('full'); s.innerHTML=`<span class="e">${A[i][0]}</span>${A[i][1]}<small>${digi(A[i][2])}</small>`; s.style.background=''; blip(); sp(A[i][1]); k++;
+        if(k===idx.length){ chime(); award(); round++; F.dot(round); setTimeout(()=>{ if(myGen!==gen) return; if(round>=ROUNDS) levelDone('order',li,errs); else show(); },1600); } }
+      else { errs++; boing(); sp(A[i][1]); b.classList.remove('rd-shake'); void b.offsetWidth; b.classList.add('rd-shake'); } }; sayTile(tl,b,A[i][1],items); });
+    wrap.append(sl,tl); F.stage.appendChild(wrap);
+    helpBtn(F,()=>{ if(k>=idx.length) return; errs++; tl.dataset.stop=1; const i=idx[k]; blinkHint(tiles[i]); sp(k===0?X().first(A[i][1]):X().nextIs(A[idx[k-1]][1],A[i][1])); });
+    readAll(items,tl,round===0?sp(X().ordTask):Promise.resolve()); }
+  show(); }
+
+/* ---------- 8. o zi cu Pufi (ceas + cer) ---------- */
+function daySeq(li){ const A=X().acts, st=li===0?60:30, offs=li===0?[-60,0,60]:[-30,0,30,60];
+  for(let tr=0;tr<80;tr++){ const idx=shuf([...A.keys()]).slice(0,6).sort((a,b)=>a-b); let prev=300, out=[];
+    for(const i of idx){ let t=Math.round(A[i][2]/st)*st+pick(offs); if(t<=prev) t=prev+st; if(Math.abs(t-A[i][2])>90||t>1290) break; out.push([i,t]); prev=t; }
+    if(out.length===6&&(li===0||out.some(([,t])=>t%60))&&new Set(out.map(([,t])=>m12(t))).size===6) return out; }
+  return li===0?[[0,420],[3,480],[4,720],[6,960],[7,1080],[10,1200]]:[[0,420],[2,450],[4,750],[6,990],[8,1170],[10,1230]]; }
+function gDayClk(li){ const A=X().acts; const SEQ=fresh('dc'+li,()=>daySeq(li),3);
+  let ti=0, errs=0, busy=false; const F=frame('',SEQ.length,'🌞'); const myGen=gen; const W=1000,Hh=470,gy=400;
+  F.stage.innerHTML=`<svg viewBox="0 0 ${W} ${Hh}">${sceneSVG(W,Hh,gy)}${clockSVG('tc',300,232,182,{})}<text id="tm-act" x="760" y="300" font-size="120" text-anchor="middle" style="animation:tmBob 1.4s ease-in-out infinite"></text></svg>`;
+  const svg=F.stage.firstChild; const c=makeClock(svg,'tc',300,232,182,{step:li===0?60:30,onChange:t=>updScene(svg,t,W,gy,540,960)});
+  let cur=SEQ[0][1]-60; c.set(cur); updScene(svg,cur,W,gy,540,960);
+  function show(){ F.ctrl.innerHTML=''; const [ai,t]=SEQ[ti]; svg.querySelector('#tm-act').textContent='❔'; c.locked=false; const [h,m]=hmOf(t);
+    F.say(X().dcTask(A[ai][0]+' '+A[ai][1],tSay(h,m))); F.ctrl.appendChild(btn(X().ok,'go',answer)); }
+  async function answer(){ if(busy) return; const [ai,t]=SEQ[ti]; if(m12(c.total)!==m12(t)){ errs++; boing(); const [h,m]=hmOf(t); F.say(X().dcTask(A[ai][1],tSay(h,m))); return; }
+    busy=true; c.locked=true; c.total=t+Math.floor(c.total/1440)*1440; c.draw(); updScene(svg,c.total,W,gy,540,960); svg.querySelector('#tm-act').textContent=A[ai][0]; chime(); award(); F.dot(ti+1);
+    const [h,m]=hmOf(t); await spW(`${X().itIs(tSay(h,m))} ${A[ai][1]}!`,1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=SEQ.length) return levelDone('dayclk',li,errs); show(); }
+  show(); }
+
+/* ---------- 9. momentele zilei ---------- */
+function gMoments(){ let ti=0, errs=0, busy=false, last=-1; const F=frame('',PER,'🌗'); const myGen=gen; const REP=[480,750,960,1170,90], EM=['🌅','☀️','🌤️','🌇','🌙'];
+  const box=el('div','tm-sky'); const bs=X().parts.map((p,i)=>{ const [a,b]=skyCols(REP[i]); const x=el('button',null,`<span class="e">${EM[i]}</span>${p}`); x.style.background=`linear-gradient(${a},${b})`; if(i<3){ x.style.color='#24325F'; x.style.textShadow='0 1px 2px rgba(255,255,255,.7)'; } x.onclick=()=>{ box.dataset.stop=1; answer(i,x); }; box.appendChild(x); return x; });
+  F.stage.appendChild(box); let cur=null, help=0; const items=bs.map((x,i)=>[x,X().parts[i]]);
+  helpBtn(F,()=>{ if(busy) return; errs++; help++; box.dataset.stop='';
+    if(help===1){ const wrong=shuf([0,1,2,3,4].filter(i=>i!==cur[0]&&!bs[i].classList.contains('no'))).slice(0,2); wrong.forEach(i=>bs[i].classList.add('no')); readAll(items.filter(([x])=>!x.classList.contains('no')),box,sp(cur[1]+' '+X().moTask(cur[2]))); }
+    else { blinkHint(bs[cur[0]]); sp(X().parts[cur[0]]); } });
+  function show(){ help=0; bs.forEach(b=>b.classList.remove('no','ok','tm-hint')); let k; do{ k=R(X().mom.length); }while(k===last); last=k; cur=X().mom[k]; box.dataset.stop=''; const qq=F.say(cur[1]+' '+X().moTask(cur[2])); if(ti===0) readAll(items,box,qq); }
+  async function answer(i,b){ if(busy) return; if(i!==cur[0]){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1);
+    await spW(cur[1]+' '+X().parts[i]+'!',1100); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('moments',0,errs); show(); }
+  show(); }
+
+/* ---------- 10. ieri, azi, mâine ---------- */
+function gYtm(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📆'); const myGen=gen;
+  async function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML='';
+    if(li===0){ const pl=shuf(X().places).slice(0,3); const pn=el('div','tm-panels'); const ps=pl.map((p,i)=>{ const d=el('div','tm-panel'+(i===1?' now':''),`<span class="l">${X().ytmL[i]}</span><span class="e">${p[0]}</span><span class="s">${p[1]}</span>`); pn.appendChild(d); return d; }); F.stage.appendChild(pn);
+      await F.say(X().ytmStory(pl[0][1],pl[1][1],pl[2][1])); await wait(700); if(myGen!==gen) return; ps.forEach(d=>{ d.querySelector('.e').textContent='❔'; d.querySelector('.s').textContent=''; });
+      const q=R(3); F.say(X().ytmQ[q]);
+      opts(F.ctrl,shuf(pl.map((p,i)=>({html:`<span style="font-size:1.6em">${p[0]}</span>`,i}))),async(o,b)=>{ if(busy) return; if(o.i!==q){ errs++; b.classList.add('no'); boing(); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; }); return; }
+        busy=true; b.classList.add('ok'); ps.forEach((d,i)=>{ d.querySelector('.e').textContent=pl[i][0]; d.querySelector('.s').textContent=pl[i][1]; }); chime(); award(); F.dot(ti+1); await spW(pl[q][1],900); next(); }); }
+    else { const D=X().days, [d,k]=fresh('yt'+li,()=>[R(7),R(2)],6), ans=(d+(k?1:6))%7; const strip=el('div','tm-tiles'); D.forEach((n,i)=>strip.appendChild(el('div','tm-tile',`<span class="e" style="font-size:1.6rem">${i===d?'⭐':i>=5?'🎈':'📘'}</span>${n}`))); F.stage.appendChild(strip);
+      const qq=F.say(X().ytmD(k,D[d])); const set=new Set([ans,d,(d+(k?6:1))%7]); while(set.size<3) set.add(R(7));
+      opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],800); next(); },null,qq); } }
+  async function next(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('ytm',li,errs); show(); }
+  show(); }
+
+/* ---------- 11. trenul săptămânii ---------- */
+function gWeek(li){ let ti=0, errs=0, busy=false; const N=li===0?2:PER; const F=frame('',N,'🚃'); const myGen=gen; const D=X().days;
+  function train(filled,hi){ const w=el('div','tm-slots'); w.style.alignItems='flex-end'; w.style.flexWrap='nowrap'; w.appendChild(el('div',null,'<span style="font-size:clamp(3rem,9vh,5rem);display:inline-block;transform:scaleX(-1)">🚂</span>'));
+    return [w,D.map((n,i)=>{ const s=el('div','tm-slot'+(filled?' full':''),filled?`<span class="e">${i>=5?'🎈':'📘'}</span>${n}`:''); s.style.minWidth='clamp(46px,10.5vw,124px)'; s.style.flex='1 1 0'; if(i>=5) s.style.background=filled?'#FFE1E7':'rgba(255,93,122,.08)'; if(hi===i) s.style.outline='4px solid var(--sun)'; w.appendChild(s); return s; })]; }
+  function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:18px;align-items:center;width:100%';
+    if(li===0){ const [w,slots]=train(false); const tl=el('div','tm-tiles'); let k=0; const qq=F.say(X().weekTask); const items=[], tiles={};
+      shuf([...D.keys()]).forEach(i=>{ const b=el('button','tm-tile',`<span class="e" style="font-size:2rem">${D[i][0].toUpperCase()}</span>${D[i]}`); tiles[i]=b; b.onclick=async()=>{ if(busy||b.classList.contains('used')) return; tl.dataset.stop=1;
+        if(i!==k){ errs++; boing(); sp(D[i]); return; } hideTile(b); b.classList.remove('tm-hint'); slots[k].classList.add('full'); slots[k].innerHTML=`<span class="e">${k>=5?'🎈':'📘'}</span>${D[k]}`; if(k>=5) slots[k].style.background='#FFE1E7'; blip(); sp(D[k]); k++;
+        if(k===7){ busy=true; toot(); chime(); award(); F.dot(ti+1); w.style.transition='transform 2.4s ease-in'; await spW(X().weekend,1200); w.style.transform='translateX(-120vw)'; await wait(1400); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); } }; sayTile(tl,b,D[i],items); });
+      wrap.append(w,tl); helpBtn(F,()=>{ if(k>=7||busy) return; errs++; tl.dataset.stop=1; blinkHint(tiles[k]); sp(k===0?X().first(D[0]):X().nextIs(D[k-1],D[k])); }); readAll(items,tl,qq); }
+    else { const d=fresh('wd'+li,()=>R(7),4), ans=li===1?(d+1)%7:(d+6)%7; const [w]=train(true,d); wrap.appendChild(w); const qq=F.say(li===1?X().weekAfter(D[d]):X().weekBefore(D[d]));
+      const set=new Set([ans]); while(set.size<3){ const v=R(7); if(v!==d) set.add(v); }
+      opts(F.ctrl,shuf([...set]).map(i=>({t:D[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==ans){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(D[ans],900); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('week',li,errs); show(); },null,qq);
+      }
+    F.stage.appendChild(wrap); }
+  show(); }
+
+/* ---------- 12. calendarul meu ---------- */
+function bdayDays(){ let s=null; try{ s=localStorage.getItem('tm_bday'); }catch(e){} if(!s) return null; const p=s.split('-').map(Number); const mo=p.length===3?p[1]-1:p[0]-1, d=p.length===3?p[2]:p[1]; if(isNaN(mo)||isNaN(d)) return null;
+  const now=new Date(); now.setHours(0,0,0,0); let b=new Date(now.getFullYear(),mo,d); if(b<now) b=new Date(now.getFullYear()+1,mo,d); return {n:Math.round((b-now)/864e5),mo,d}; }
+function calGrid(y,mo,today,onTap){ const D=X().days, first=(new Date(y,mo,1).getDay()+6)%7, last=new Date(y,mo+1,0).getDate(), g=el('div','tm-cal'), bd=bdayDays();
+  D.forEach((n,i)=>g.appendChild(el('div','hd'+(i>=5?' we':''),n.slice(0,lang==='de'?2:3).toUpperCase()))); for(let i=0;i<first;i++) g.appendChild(el('div'));
+  const bt={}; for(let d=1;d<=last;d++){ const wd=(first+d-1)%7, b=el('button',(wd>=5?'we':'')+(d===today?' today':'')+(bd&&bd.mo===mo&&bd.d===d?' bd':''),String(d)); b.onclick=()=>onTap(d,b); g.appendChild(b); bt[d]=b; } return {g,bt,last,first}; }
+function gCal(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📅'); const myGen=gen; const now=new Date(), y=now.getFullYear(), mo=now.getMonth();
+  function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:8px;width:100%;max-width:760px;margin:auto';
+    const bd=bdayDays(); if(bd) wrap.appendChild(el('div','tm-bday',X().bday(bd.n)));
+    wrap.appendChild(el('div','tm-calTop',`${['⛄','❄️','🌷','🐣','🌸','🍓','☀️','🏖️','🎒','🎃','🍂','🎄'][mo]} ${X().months[mo]} ${y}`));
+    let today=now.getDate(); const last=new Date(y,mo+1,0).getDate();
+    if(li===2){ today=RR(1,Math.max(1,last-10)); }
+    let target=null, kind=0, cnt=0, nextD=today+1, tgCount=0;
+    const cg=calGrid(y,mo,today,async(d,b)=>{ if(busy) return;
+      if(li===0){ if(d!==target){ errs++; b.classList.add('no'); boing(); setTimeout(()=>b.classList.remove('no'),700); return; } busy=true; b.classList.add('mark'); chime(); award(); F.dot(ti+1); await spW(`${d} ${X().months[mo]}`,900); return nx(); }
+      if(li===2){ if(d!==nextD){ if(d>today) { errs++; boing(); } return; } cnt++; b.classList.add('mark'); b.insertAdjacentHTML('beforeend',`<span class="c">${cnt}</span>`); blip(); sp(String(cnt)); nextD++;
+        if(d===target){ busy=true; await wait(500); F.say(X().calHow); const set=new Set([tgCount]); while(set.size<3){ const v=tgCount+RR(-2,2); if(v>0) set.add(v); }
+          opts(F.ctrl,shuf([...set]).map(v=>({t:String(v),v})),async(o,bb)=>{ if(o.v!==tgCount){ errs++; bb.classList.add('no'); boing(); return; } bb.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(String(tgCount),800); nx(); },'big'); } } });
+    wrap.appendChild(cg.g); F.stage.appendChild(wrap);
+    if(li===0){ const ks=[0,1,2].filter(k=>k===0||(k===1&&today<last)||(k===2&&today>1)); kind=pick(ks); target=today+[0,1,-1][kind]; F.say([X().calToday,X().calTom,X().calYes][kind]); }
+    else if(li===1){ const d=fresh('cw',()=>RR(1,last),8), wd=(cg.first+d-1)%7; const qq=F.say(X().calWd(d)); cg.bt[d].classList.add('mark'); const set=new Set([wd]); while(set.size<3) set.add(R(7));
+      opts(F.ctrl,shuf([...set]).map(i=>({t:X().days[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==wd){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(X().days[wd],800); nx(); },null,qq); }
+    else { target=Math.min(last,today+RR(3,9)); tgCount=target-today; cg.bt[target].style.outline='4px dashed var(--berry)'; F.say(X().calCount(target)); } }
+  async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('calm',li,errs); show(); }
+  show(); }
+
+/* ---------- 13. roata lunilor ---------- */
+const MEM=['⛄','❄️','🌷','🐣','🌸','🍓','☀️','🏖️','🎒','🎃','🍂','🎄'], SCOL=['#A8E6A1','#FFE07A','#FFB27A','#9AD0FF'], SEM=['🌷','☀️','🍂','❄️'];
+function wheelSVG(){ let s=`<svg viewBox="0 0 620 620"><circle cx="310" cy="310" r="300" fill="#fff" stroke="#24325F" stroke-width="6"/>`; const bd=bdayDays(), cm=new Date().getMonth();
+  for(let i=0;i<12;i++){ const a0=(i*30-15)*Math.PI/180, a1=(i*30+15)*Math.PI/180, P=(r,a)=>`${310+Math.sin(a)*r} ${310-Math.cos(a)*r}`;
+    s+=`<path id="tm-wm${i}" d="M310 310L${P(292,a0)}A292 292 0 0 1 ${P(292,a1)}Z" fill="${SCOL[seasonOf(i)]}" stroke="#fff" stroke-width="4" style="cursor:pointer"/>`;
+    const am=i*30*Math.PI/180; s+=`<text x="${310+Math.sin(am)*248}" y="${310-Math.cos(am)*248+16}" font-size="42" text-anchor="middle" pointer-events="none">${MEM[i]}</text><text x="${310+Math.sin(am)*178}" y="${310-Math.cos(am)*178+7}" font-size="19" font-weight="800" text-anchor="middle" fill="#24325F" pointer-events="none">${X().months[i]}</text>`;
+    if(i===cm) s+=`<text x="${310+Math.sin(am)*210}" y="${310-Math.cos(am)*210-18}" font-size="26" text-anchor="middle" pointer-events="none">⭐</text>`;
+    if(bd&&bd.mo===i) s+=`<text x="${310+Math.sin(am)*120}" y="${310-Math.cos(am)*120+10}" font-size="30" text-anchor="middle" pointer-events="none">🎂</text>`; }
+  return s+`<circle cx="310" cy="310" r="78" fill="#fff" stroke="#24325F" stroke-width="5"/><text id="tm-wc" x="310" y="335" font-size="70" text-anchor="middle">🎡</text></svg>`; }
+function gMonths(li){ let ti=0, errs=0, busy=false, k=0; const N=li===0?1:PER; const F=frame('',N,'🎡'); const myGen=gen; const M=X().months;
+  F.stage.innerHTML=wheelSVG(); const svg=F.stage.firstChild, wc=svg.querySelector('#tm-wc'); let tg=0;
+  for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).addEventListener('click',()=>tap(i));
+  async function tap(i){ if(busy) return; const p=svg.querySelector('#tm-wm'+i); wc.textContent=SEM[seasonOf(i)];
+    if(li===0){ if(i!==k){ errs++; boing(); return; } p.setAttribute('opacity','.55'); blip(); sp(M[i]); k++; if(k===12){ busy=true; chime(); award(); F.dot(1); await spW(X().ladder[3].replace(/^\S+\s/,''),1200); if(myGen!==gen) return; levelDone('months',0,errs); } return; }
+    if(li===1){ if(i!==tg){ errs++; boing(); return; } busy=true; p.setAttribute('opacity','.55'); svg.style.transition='transform 1.2s cubic-bezier(.3,1.3,.6,1)'; svg.style.transform=`rotate(${(svg._r=(svg._r||0)+360)}deg)`; chime(); award(); F.dot(ti+1); await spW(M[i],800); nx(); } else sp(M[i]); }
+  function show(){ F.ctrl.innerHTML=''; for(let i=0;i<12;i++) svg.querySelector('#tm-wm'+i).setAttribute('opacity','1');
+    if(li===0){ F.say(X().moOrder); return; }
+    const m=fresh('mo'+li,()=>R(12),6); if(li===1){ tg=(m+1)%12; F.say(X().moAfter(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.7'); }
+    else { const s=seasonOf(m); const qq=F.say(X().moSeas(M[m])); svg.querySelector('#tm-wm'+m).setAttribute('opacity','.6');
+      opts(F.ctrl,[0,1,2,3].map(i=>({html:`${SEM[i]} ${X().seasT[i]}`,say:X().seasT[i],i})),async(o,b)=>{ if(busy) return; if(o.i!==s){ errs++; b.classList.add('no'); boing(); return; } busy=true; b.classList.add('ok'); chime(); award(); F.dot(ti+1); await spW(`${M[m]}: ${X().seas[s]}`,900); nx(); },null,qq); } }
+  async function nx(){ if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('months',li,errs); show(); }
+  show(); }
+
+/* ---------- 14. copacul anotimpurilor ---------- */
+function gTree(){ const F=frame('',0,'🌳'); const myGen=gen; let s=seasonOf(new Date().getMonth());
+  const row=el('div','tm-seas'); const bs=[0,1,2,3].map(i=>{ const b=el('button',null,`${SEM[i]} ${X().seasT[i]}`); b.onclick=()=>{ s=i; draw(); }; row.appendChild(b); return b; }); F.ctrl.appendChild(row);
+  function draw(){ bs.forEach((b,i)=>b.setAttribute('aria-pressed',i===s)); const sky=['#CFEFFF','#9ED8FF','#D9E6F2','#E3ECF5'][s], gr=['#8FD47F','#6CC25C','#C9A66B','#FFFFFF'][s];
+    let h=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="24" fill="${sky}"/><path d="M0 380 Q450 340 900 380 V470 H0Z" fill="${gr}" ${s===3?'stroke="#D0DCE8" stroke-width="3"':''}/>`;
+    h+=`<g style="transform-origin:450px 392px;animation:tmSway 2.8s ease-in-out infinite alternate">`; h+=`<path d="M430 390 L440 250 L380 190 M440 250 L445 200 L500 160 M445 230 L520 205 M440 290 L360 250" stroke="#7A4A22" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M420 392 Q450 300 438 240 L462 240 Q455 300 480 392Z" fill="#7A4A22"/>`;
+    const crown=[[450,170,120],[360,200,80],[540,200,85],[400,120,75],[500,115,80],[450,90,70]];
+    const endTree='</g>'; if(s<3) crown.forEach(([x,y,r],i)=>{ const col=s===0?['#B9E8A8','#A8E09A'][i%2]:s===1?['#3FAE4F','#4CBB5C'][i%2]:['#F2A33A','#E4572E','#F6C445'][i%3]; h+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${s===0?.85:1}"/>`; });
+    else h+=`<path d="M380 190 q-30 -10 -40 -40 M500 160 q20 -30 50 -35 M520 205 q30 0 50 -20 M445 200 q-5 -40 10 -70" stroke="#7A4A22" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M372 186 l-10 -8 M495 156 l14 -6" stroke="#fff" stroke-width="9" stroke-linecap="round"/>`;
+    h+=endTree+(s===1?`<text x="110" y="90" font-size="80" style="animation:tmSpin 16s linear infinite;transform-box:fill-box;transform-origin:center">☀️</text>`:'')+(s===2?[...Array(14)].map((_,i)=>`<text x="${R(900)}" y="${-30-R(300)}" font-size="22" style="animation:tmRain ${1.4+Math.random()}s linear ${-Math.random()*2}s infinite" pointer-events="none">💧</text>`).join(''):'')+(s===0?`<text x="120" y="90" font-size="60" style="animation:tmBob 2s ease-in-out infinite">🌈</text>`:'');
+    h+=`<g id="tm-fx"></g><text x="760" y="420" font-size="64" text-anchor="middle">${s===1?'🧺':''}</text><text id="tm-bk" x="760" y="370" font-size="34" font-weight="800" text-anchor="middle" fill="#24325F"></text><g id="tm-items"></g></svg>`;
+    F.stage.innerHTML=h; const svg=F.stage.firstChild, it=svg.querySelector('#tm-items'), fx=svg.querySelector('#tm-fx'); F.say(X().treeHi[s]);
+    const spots=[[380,170],[420,120],[470,100],[520,140],[560,200],[330,210],[450,190],[500,210],[400,220],[350,160],[480,60],[540,100],[420,60],[590,180]];
+    const done=msg=>{ if(myGen!==gen) return; chime(); try{ confetti(20); }catch(e){} const key='tree'+s; if(!data.seen[key]){ data.seen[key]=1; save(); award(); } sp((typeof T==='function'&&T().praise?T().praise[R(6)]:'⭐')+' '+(msg||'')); };
+    if(s===0){ let n=0; spots.forEach(([x,y],i)=>{ const b=document.createElementNS(NS,'circle'); b.setAttribute('cx',x); b.setAttribute('cy',y); b.setAttribute('r',13); b.setAttribute('fill','#FF9EC4'); b.setAttribute('stroke','#fff'); b.setAttribute('stroke-width','3'); b.style.cursor='pointer';
+        b.addEventListener('click',()=>{ const t=document.createElementNS(NS,'text'); t.setAttribute('x',x); t.setAttribute('y',y+14); t.setAttribute('font-size','40'); t.setAttribute('text-anchor','middle'); t.textContent='🌸'; t.style.animation='rdPop .4s'; b.replaceWith(t); snd(700+n*40,.1); n++;
+          if(n===spots.length){ fx.innerHTML=`<text x="300" y="120" font-size="44" style="animation:tmBee 3s linear infinite">🐝</text><text x="560" y="90" font-size="40" style="animation:tmBee 2.6s linear infinite reverse">🐝</text><text x="520" y="215" font-size="44">🐣</text>`; done(); } }); it.appendChild(b); }); }
+    if(s===1){ let n=0; spots.slice(0,10).forEach(([x,y])=>{ const t=document.createElementNS(NS,'text'); t.setAttribute('x',x); t.setAttribute('y',y+14); t.setAttribute('font-size','42'); t.setAttribute('text-anchor','middle'); t.textContent='🍒'; t.style.cursor='pointer'; t.classList.add('tm-fly');
+        t.addEventListener('click',()=>{ if(t.dataset.f) return; t.dataset.f=1; t.style.transform=`translate(${760-x}px,${400-y}px) scale(.6)`; t.style.opacity='.0'; n++; snd(500+n*50,.1); svg.querySelector('#tm-bk').textContent=n; sp(String(n)); if(n===10) done(); }); it.appendChild(t); }); }
+    if(s===2){ const L=[]; for(let i=0;i<24;i++){ const [x,y]=pick(spots); const t=document.createElementNS(NS,'text'); t.setAttribute('x',x+RR(-30,30)); t.setAttribute('y',y+RR(-20,30)); t.setAttribute('font-size','34'); t.setAttribute('text-anchor','middle'); t.textContent=pick(['🍂','🍁','🍂']); it.appendChild(t); L.push(t); }
+      let fallen=0; svg.addEventListener('pointerdown',()=>{ if(myGen!==gen) return; for(let k=0;k<4&&L.length;k++){ const t=L.splice(R(L.length),1)[0]; const y0=+t.getAttribute('y'); t.style.setProperty('--fy',(400-y0+RR(-10,20))+'px'); t.style.setProperty('--fr',RR(-260,260)+'deg'); t.style.transformBox='fill-box'; t.style.transformOrigin='center'; t.style.animation=`tmFall ${1.2+Math.random()}s ease-in forwards`; fallen++; }
+        snd(300+R(200),.08,'sine',.08); if(!L.length&&!fx.childNodes.length){ fx.innerHTML='<text x="600" y="400" font-size="56">🦔</text><text x="260" y="410" font-size="56">🎃</text>'; setTimeout(()=>done(),900); } }); }
+    if(s===3){ for(let i=0;i<22;i++){ const t=document.createElementNS(NS,'text'); t.setAttribute('x',R(900)); t.setAttribute('y',-20-R(200)); t.setAttribute('font-size',16+R(18)); t.textContent='❄️'; t.style.animation=`tmSnow ${4+Math.random()*4}s linear ${-Math.random()*6}s infinite`; t.setAttribute('pointer-events','none'); fx.appendChild(t); }
+      let n=0; const parts=[['⚪',220,410,110],['⚪',220,330,80],['⚪',220,268,56],['🎩',220,222,48],['🥕',238,268,26]];
+      svg.addEventListener('pointerdown',()=>{ if(myGen!==gen||n>=parts.length) return; const [e,x,y,fz]=parts[n]; const t=document.createElementNS(NS,'text'); t.setAttribute('x',x); t.setAttribute('y',y); t.setAttribute('font-size',fz); t.setAttribute('text-anchor','middle'); t.textContent=e; t.style.animation='rdPop .4s'; it.appendChild(t); n++; snd(400+n*80,.12);
+        if(n===parts.length) done('⛄'); }); } }
+  draw(); }
+
+/* ---------- 15. îmbracă-l pe Pufi ---------- */
+const WEAR=[['🧥','☂️','👢','🧢'],['🩳','🕶️','👒','🩴'],['🧥','☂️','👢','🧣'],['🧣','🧤','🥾','🧥']], NOWEAR=[['🩱','🎿','🩴'],['🧣','🧤','🥾','🎿'],['🩴','🩱','🕶️','🩳'],['🩳','🩴','👒','🩱']], SBG=[['#DFF7D8','🌷 🌤️ 🌷'],['#FFF3C4','☀️ 🏖️ 🌻'],['#FFE3C9','🍂 🌧️ 🍁'],['#E8F2FF','❄️ ⛄ ❄️']];
+function gDress(){ let ti=0, errs=0, busy=false; const order=shuf([0,1,2,3]); const F=frame('',4,'🦊'); const myGen=gen;
+  function show(){ const s=order[ti]; F.stage.innerHTML=''; F.ctrl.innerHTML=''; const sc=el('div',null); sc.style.cssText=`width:100%;max-width:820px;height:100%;border-radius:26px;background:${SBG[s][0]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px`;
+    sc.innerHTML=`<div style="font-size:clamp(1.6rem,5vh,2.6rem);letter-spacing:.4em">${SBG[s][1]}</div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:clamp(5rem,18vh,9rem);line-height:1">🦊</span><div id="tm-wear" style="display:flex;flex-direction:column;font-size:clamp(2.2rem,7vh,3.6rem);line-height:1.1;min-width:1.2em"></div></div>`; F.stage.appendChild(sc);
+    const good=shuf(WEAR[s]).slice(0,3), bad=shuf(NOWEAR[s]).slice(0,3); let got=0; F.say(X().dressTask(X().seas[s]));
+    const box=el('div','tm-ans big'); shuf(good.concat(bad)).forEach(e=>{ const b=el('button',null,e); b.onclick=async()=>{ if(busy||b.classList.contains('ok')) return;
+      if(!good.includes(e)){ errs++; b.classList.add('no'); boing(); sp(X().dressNo[s]); return; } b.classList.add('ok'); b.style.visibility='hidden'; sc.querySelector('#tm-wear').insertAdjacentHTML('beforeend',`<span style="animation:rdPop .4s">${e}</span>`); blip(); got++;
+      if(got===3){ busy=true; chime(); award(); F.dot(ti+1); try{ confetti(14); }catch(_){} await spW(X().seasT[s]+'!',1200); if(myGen!==gen) return; ti++; busy=false; if(ti>=4) return levelDone('dress',0,errs); show(); } }; box.appendChild(b); });
+    F.ctrl.appendChild(box); }
+  show(); }
+
+/* ---------- 16. sortează pe anotimpuri ---------- */
+const SITEMS=[['🌷','🐣','🌱','🪁','🦋'],['🍦','🏖️','🍉','🌻','🩴'],['🎃','🍂','🍄','🌰','🍇'],['⛄','🛷','🎄','🧤','❄️']];
+function gSort(){ let ti=0, errs=0, busy=false; const N=8; const F=frame(X().sortTask,N,'🧺'); const myGen=gen; const pool=shuf(SITEMS.flatMap((a,s)=>a.map(e=>[e,s]))).slice(0,N); const cnt=[0,0,0,0];
+  const big=el('div',null); big.style.cssText='font-size:clamp(5rem,20vh,10rem);line-height:1;animation:tmBob 1.6s ease-in-out infinite'; F.stage.appendChild(big);
+  const box=el('div','tm-sky'); box.style.gridTemplateColumns='repeat(4,1fr)'; const bs=[0,1,2,3].map(i=>{ const b=el('button',null,`<span class="e">${SEM[i]}</span>${X().seasT[i]}<span class="c">🧺 0</span>`); b.style.background=SCOL[i]; b.style.color='#24325F'; b.style.textShadow='none'; b.style.minHeight='clamp(90px,18vh,150px)'; b.onclick=()=>answer(i,b); box.appendChild(b); return b; });
+  F.ctrl.appendChild(box);
+  function show(){ bs.forEach(b=>b.classList.remove('no')); big.textContent=pool[ti][0]; sp(X().sortTask); }
+  async function answer(i,b){ if(busy) return; if(i!==pool[ti][1]){ errs++; b.classList.add('no'); boing(); return; } busy=true; cnt[i]++; b.querySelector('.c').textContent='🧺 '+cnt[i]; chime(); award(); F.dot(ti+1); await spW(X().seasT[i],700); if(myGen!==gen) return; ti++; busy=false; if(ti>=N) return levelDone('sort',0,errs); show(); }
+  show(); }
+
+
+/* ---------- 17. trezește-l pe Pufi (ceasul deșteptător) ---------- */
+function gWake(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'⏰'); const myGen=gen; const step=[60,30,15,5][li];
+  F.stage.innerHTML=`<svg viewBox="0 0 900 470"><defs><linearGradient id="tm-wk" x1="0" y1="0" x2="0" y2="1"><stop id="tm-wk1" offset="0" stop-color="#14204F"/><stop id="tm-wk2" offset="1" stop-color="#2E3A78"/></linearGradient></defs>
+    <rect width="900" height="470" rx="24" fill="#F6E7D2"/><rect x="0" y="360" width="900" height="110" fill="#D9B48A"/>
+    <rect x="540" y="40" width="300" height="210" rx="14" fill="url(#tm-wk)" stroke="#8A5A2B" stroke-width="10"/><line x1="690" y1="40" x2="690" y2="250" stroke="#8A5A2B" stroke-width="8"/>
+    <text id="tm-wkSky" x="760" y="130" font-size="58" text-anchor="middle">🌙</text><g id="tm-wkSt">${[[580,80],[640,150],[800,190],[720,75],[610,210]].map(([x,y],i)=>`<text x="${x}" y="${y}" font-size="20" style="animation:tmTwinkle ${1.4+i*.3}s ease-in-out infinite">⭐</text>`).join('')}</g>
+    <rect id="tm-curL" x="530" y="30" width="80" height="235" rx="10" fill="#E86B8A" style="transition:transform 1s ease;transform-origin:530px 30px"/><rect id="tm-curR" x="770" y="30" width="80" height="235" rx="10" fill="#E86B8A" style="transition:transform 1s ease;transform-origin:850px 30px"/>
+    <rect x="470" y="300" width="390" height="70" rx="20" fill="#7FB3FF"/><rect x="470" y="270" width="80" height="60" rx="18" fill="#FFFFFF"/><rect x="540" y="292" width="320" height="56" rx="18" fill="#FFC8D8"/>
+    <g id="tm-wkP" style="transform-origin:600px 300px"><text id="tm-wkF" x="600" y="300" font-size="86" text-anchor="middle">😴</text>
+    <g id="tm-wkZ"><text x="640" y="230" font-size="34" style="animation:tmZ 2.2s linear infinite">💤</text><text x="655" y="230" font-size="26" style="animation:tmZ 2.2s linear 1.1s infinite">💤</text></g></g>
+    <rect x="70" y="380" width="250" height="30" rx="8" fill="#8A5A2B"/>
+    <g id="tm-alarm" style="transform-origin:195px 230px"><circle cx="135" cy="80" r="26" fill="#FF5D7A"/><circle cx="255" cy="80" r="26" fill="#FF5D7A"/>${clockSVG('tc',195,230,150,{rim:'#FF5D7A',mnums:li>=3})}<line x1="120" y1="372" x2="140" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/><line x1="270" y1="372" x2="250" y2="390" stroke="#24325F" stroke-width="10" stroke-linecap="round"/></g></svg>`;
+  const svg=F.stage.firstChild, q=x=>svg.querySelector(x); const c=makeClock(svg,'tc',195,230,150,{step,only:step>=60?'h':null});
+  function night(){ q('#tm-wk1').setAttribute('stop-color','#14204F'); q('#tm-wk2').setAttribute('stop-color','#2E3A78'); q('#tm-wkSky').textContent='🌙'; q('#tm-wkSt').setAttribute('opacity',1); q('#tm-curL').style.transform=''; q('#tm-curR').style.transform=''; q('#tm-wkF').textContent='😴'; q('#tm-wkZ').setAttribute('opacity',1); q('#tm-wkP').style.animation=''; q('#tm-alarm').style.animation=''; }
+  async function show(){ F.ctrl.innerHTML=''; night(); const [h,m]=fresh('wk'+li,()=>[RR(5,10),step>=60?0:R(60/step)*step],step>=60?4:9); tg=h*60+m;
+    let st; do{ st=RR(1,12)*60+(step>=60?0:R(60/step)*step); }while(st%720===tg%720); c.locked=false; await c.set(st);
+    F.say(X().wakeTask(tSay(h,m))); F.ctrl.appendChild(btn(X().ring,'go',answer)); F.ctrl.appendChild(btn(X().listen,'',()=>F.say(X().wakeTask(tSay(h,m))))); }
+  async function answer(){ if(busy) return; if(m12(c.total)!==m12(tg)){ errs++; boing(); const [a,b]=hmOf(m12(c.total)||720); F.say(X().wakeWrong(tSay(a,b))); return; }
+    busy=true; c.locked=true; q('#tm-alarm').style.animation='tmShake .35s linear 5'; for(let i=0;i<6;i++) setTimeout(()=>snd(i%2?1760:1320,.12,'square',.07),i*170);
+    await wait(1100); if(myGen!==gen) return; q('#tm-wk1').setAttribute('stop-color','#FFB27A'); q('#tm-wk2').setAttribute('stop-color','#BFE6FF'); q('#tm-wkSky').textContent='🌞'; q('#tm-wkSt').setAttribute('opacity',0);
+    q('#tm-curL').style.transform='scaleX(.35)'; q('#tm-curR').style.transform='scaleX(.35)'; q('#tm-wkZ').setAttribute('opacity',0); q('#tm-wkF').textContent='🦊'; q('#tm-wkP').style.animation='tmJump .6s ease 3';
+    chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().wakeDone+' '+X().itIs(tSay(h,m)),1800); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('wake',li,errs); show(); }
+  show(); }
+
+/* ---------- 18. baloanele cu ore ---------- */
+function gBalloon(li){ let ti=0, errs=0, busy=false, tg=0; const N=6; const F=frame('',N,'🎈'); const myGen=gen; const ms=[[0],[0,30],[0,15,30,45]][li];
+  const sky=el('div'); sky.style.cssText='position:relative;width:100%;height:100%;overflow:hidden;border-radius:24px;background:linear-gradient(#8FD3FF,#E6F7FF)';
+  sky.innerHTML=`<div style="position:absolute;left:0;top:12%;font-size:60px;animation:tmCloud 40s linear infinite">☁️</div><div style="position:absolute;left:0;top:40%;font-size:44px;animation:tmCloud 55s linear -20s infinite">☁️</div>`;
+  F.stage.appendChild(sky); const lab=el('div','tm-read'); F.ctrl.appendChild(lab); const COLS=['#FF6B8A','#FFC83D','#7BD389','#6FA8FF','#B58CFF','#FF9F5A'];
+  let alive=[];
+  function spawn(t,slot,delay){ const b=el('div'); const col=pick(COLS); const sz='clamp(92px,15vh,140px)';
+    b.style.cssText=`position:absolute;left:${6+slot*18.5}%;bottom:-200px;width:${sz};cursor:pointer;animation:tmFloatUp ${8+Math.random()*3}s linear ${delay}s forwards;display:flex;flex-direction:column;align-items:center`;
+    b.innerHTML=`<div style="width:${sz};height:calc(${sz} * 1.15);border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 35% 30%,#fff9 0 12%,${col} 13%);display:flex;align-items:center;justify-content:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.08)"><svg viewBox="0 0 120 120" style="width:78%;height:auto">${staticClock(t,'bl'+Math.random().toString(36).slice(2,7),50)}</svg></div><div style="width:2px;height:70px;background:#555"></div>`;
+    b.dataset.t=t; b.onclick=()=>pop(b); b.addEventListener('animationend',e=>{ if(e.animationName==='tmFloatUp'){ b.remove(); if(!busy&&myGen===gen&&!sky.querySelector(`[data-t="${tg}"]`)) round(true); } }); sky.appendChild(b); alive.push(b); }
+  function round(again){ if(myGen!==gen) return; sky.querySelectorAll('[data-t]').forEach(x=>x.remove()); const set=new Set(); if(!again){ const [h,m]=fresh('bl'+li,()=>[RR(1,12),pick(ms)],8); tg=h*60+m; }
+    set.add(tg); while(set.size<5){ const v=RR(1,12)*60+pick(ms); if(v%720!==tg%720) set.add(v); } shuf([...set]).forEach((t,i)=>spawn(t,i,i*.35+Math.random()*.4));
+    const [h,m]=hmOf(tg); lab.innerHTML=`🎯 <b>${tShort(h,m)}</b>`; if(!again) F.say(X().balTask(tSay(h,m))); }
+  async function pop(b){ if(busy) return; const t=+b.dataset.t; if(t%720!==tg%720){ errs++; boing(); b.firstChild.style.animation='tmShake .4s'; setTimeout(()=>{ if(b.firstChild) b.firstChild.style.animation=''; },450); const [h,m]=hmOf(t); sp(tSay(h,m)); return; }
+    busy=true; snd(220,.08,'square',.12); b.style.animationPlayState='paused'; b.firstChild.style.animation='tmPop .35s forwards'; chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=N) return levelDone('balloon',li,errs); round(false); }
+  F.ctrl.appendChild(btn(X().listen,'',()=>{ const [h,m]=hmOf(tg); sp(X().balTask(tSay(h,m))); }));
+  round(false); }
+
+/* ================= meniuri ================= */
+const WORLDS={clock:['explore','balloon','cuckoo','pizza','station','memo','oven'],day:['wake','order','dayclk','moments','ytm'],cal:['week','calm','months'],seas:['tree','dress','sort']};
+const WBG={clock:'#FFE9A8',day:'#FFD9C2',cal:'#D9E4FF',seas:'#CDEFD2'};
+const RUN={wake:gWake,balloon:gBalloon,explore:gExplore,cuckoo:gCuckoo,pizza:gPizza,station:gStation,memo:gMemo,oven:gOven,order:gOrder,dayclk:gDayClk,moments:gMoments,ytm:gYtm,week:gWeek,calm:gCal,months:gMonths,tree:gTree,dress:gDress,sort:gSort};
+const FREE=['explore','tree'];
+const nLv=k=>FREE.includes(k)?0:(X().lv[k]||[0]).length;
+const gotStars=k=>[...Array(nLv(k))].reduce((s,_,i)=>s+(data.prog[k+i]||0),0);
+function head(ic,txt){ const h=el('div','rb-head'); h.append(el('div','rb-face',`<div style="font-size:clamp(40px,7vh,58px);line-height:1">${ic}</div>`)); const b=el('div','rb-bubble'); b.textContent=txt; b.onclick=()=>sp(txt); h.append(b); return h; }
+function todayText(){ const n=new Date(); const wd=X().days[(n.getDay()+6)%7], mo=X().months[n.getMonth()], s=X().seas[seasonOf(n.getMonth())]; return X().today(wd,n.getDate(),mo,s); }
+function home(){ stopAll(); back=null; curLevels=null; $('title').textContent=X().title; $('back').textContent=X().back; $('all').hidden=true; pill(); main.innerHTML='';
+  const tt=todayText(); main.append(head('🦊',tt)); const bd=bdayDays(); if(bd) main.appendChild(el('div','tm-bday',X().bday(bd.n)));
+  const lad=el('div','tm-ladder'); X().ladder.forEach((t,i)=>{ lad.appendChild(el('span',null,t)); if(i<3) lad.appendChild(el('span',null,'→')); }); main.appendChild(lad);
+  const g=el('div','tm-worlds'); Object.keys(WORLDS).forEach(w=>{ const tot=WORLDS[w].reduce((s,k)=>s+nLv(k)*3,0), got=WORLDS[w].reduce((s,k)=>s+gotStars(k),0);
+    const c=el('button','tm-world',`<span class="ic">${X().worlds[w][0]}</span><span class="t">${X().worlds[w][1]}</span><span class="p">⭐ ${got}/${tot}</span>`); c.style.background=WBG[w]; c.onclick=()=>{ blip(); world(w); }; g.appendChild(c); });
+  main.appendChild(g); sp(tt); }
+function world(w){ stopAll(); back=home; curLevels=null; $('all').hidden=true; $('title').textContent=X().worlds[w][0]+' '+X().worlds[w][1]; main.innerHTML='';
+  main.append(head(X().worlds[w][0],X().worlds[w][1])); const g=el('div','tm-grid');
+  WORLDS[w].forEach(k=>{ const L=nLv(k); const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span>${L?`<span class="p">⭐ ${gotStars(k)}/${L*3}</span>`:''}`);
+    c.dataset.lk='tm:'+k; c.onclick=()=>{ blip(); if(L>1) levels(k,w); else play(k,0,w); }; g.appendChild(c); });
+  main.appendChild(g); sp(X().worlds[w][1]); }
+const isOpen=(k,i)=>data.all||i===0||(data.prog[k+(i-1)]||0)>0;
+const worldOf=k=>Object.keys(WORLDS).find(w=>WORLDS[w].includes(k));
+function levels(k){ stopAll(); const w=worldOf(k); back=()=>world(w); curLevels=()=>levels(k); $('all').hidden=false; $('all').textContent=data.all?X().allOn:X().allOff; main.innerHTML='';
+  main.append(head(X().games[k][0],X().games[k][1])); const g=el('div','tm-grid'); const names=X().lv[k]; const cur=names.findIndex((_,i)=>isOpen(k,i)&&!(data.prog[k+i]>0));
+  names.forEach((nm,i)=>{ const open=isOpen(k,i), s=data.prog[k+i]||0; const c=el('button','rb-card'+(open?'':' lock')+(i===cur?' cur':''),`<span class="n">${X().lvl(i+1)}</span><span class="t">${nm}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`);
+    c.onclick=()=>{ if(!open){ sp(X().locked); return; } blip(); play(k,i); }; g.appendChild(c); });
+  main.appendChild(g); sp(X().games[k][1]); }
+function play(k,i){ stopAll(); const w=worldOf(k); back=nLv(k)>1?()=>levels(k):()=>world(w); curRestart=()=>play(k,i); $('all').hidden=true; $('title').textContent=X().games[k][0]+' '+X().games[k][1]; RUN[k](i); }
+function levelDone(k,i,errs){ award(); finish(k+i,rate(errs),i<nLv(k)-1?()=>play(k,i+1):null); }
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; levels=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('tm',k)) return; return f(k,...a); })(levels); play=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('tm',k)) return home(); return f(k,...a); })(play); home=__rm(home); world=__rm(world); levels=__rm(levels); play=__rm(play);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
+window.openTime=()=>{ root.hidden=false; home(); };
+window.__tm={tSay,digi,skyCols,data,play};
+})();
+</script>

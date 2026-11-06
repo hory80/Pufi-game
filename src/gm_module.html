@@ -1,0 +1,320 @@
+
+<style>
+#gm-root{position:fixed;inset:0;z-index:50;background:#FFF8EC;background-image:radial-gradient(rgba(240,160,60,.13) 2px,transparent 2px);background-size:28px 28px;color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 10px);overflow:hidden}
+#gm-root[hidden]{display:none}
+#gm-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto;position:relative}
+.gm-cards{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,210px),1fr));gap:16px;align-content:center;max-width:760px;width:100%;margin:0 auto;overflow:auto}
+.gm-stage{flex:1;min-height:0;width:100%;display:flex;justify-content:center;position:relative}
+.gm-stage>svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
+.gm-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.gm-num{font:inherit;font-weight:800;font-size:clamp(1.2rem,3vw,1.7rem);min-width:54px;min-height:54px;border-radius:16px;border:3px solid var(--ink);background:#fff;cursor:pointer}
+.gm-num.ok{background:var(--leaf);color:#fff}.gm-num.no{background:#FFB3C0}
+.gm-pc{cursor:grab;transition:transform .18s}
+.gm-pc.lock{cursor:default}
+.gm-blink{animation:rbAnt .5s infinite}
+</style>
+<div id="gm-root" hidden>
+  <div class="rb-top">
+    <button class="ch-btn" id="gm-back"></button>
+    <h2 id="gm-title">📐</h2>
+    <div class="ch-pill" id="gm-stars">⭐ 0</div>
+  </div>
+  <div id="gm-main"></div>
+  <div class="rb-ov" id="gm-ov" hidden><div>
+    <div class="big" id="gm-ovS"></div><h3 id="gm-ovT"></h3>
+    <div class="rb-ctrl"><button class="rb-b go" id="gm-ovNext"></button><button class="rb-b" id="gm-ovAgain"></button><button class="rb-b" id="gm-ovBack"></button></div>
+  </div></div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById('gm-'+id), root=$('root'), main=$('main');
+const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
+const spW=(t,ms)=>Promise.all([sp(t),wait(ms)]);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function btn(txt,cls,fn){ const b=el('button','rb-b'+(cls?' '+cls:''),txt); b.onclick=fn; return b; }
+function pt(svg,e){ const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+function snd(f,d,type,vol){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime; o.type=type||'triangle'; o.frequency.value=f; g.gain.setValueAtTime(vol||.12,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.12)); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+(d||.12)+.03);}catch(e){} }
+const blip=()=>snd(880,.07), boing=()=>{ snd(320,.15,'sine',.2); setTimeout(()=>snd(170,.25,'sine',.2),100); }, chime=()=>[784,988,1319].forEach((f,i)=>setTimeout(()=>snd(f,.2,'sine',.12),i*90));
+const pop=n=>snd(400+n*40,.09,'triangle',.1);
+
+/* ================= texte ================= */
+const TX={
+ro:{title:'📐 Lumea formelor',back:'⬅ Înapoi',hello:'Bun venit în lumea formelor! Alege un joc.',hint:'💡 Ajutor',undo:'↩ Înapoi',clear:'🗑️ Șterge',
+ games:{geo:['📌','Tabla cu elastice'],tan:['🧩','Puzzle cu forme'],cube:['🧊','Cuburi 3D'],meas:['📏','Ghicește și măsoară']},
+ done:s=>`Gata! Ai câștigat ${['','o stea','două stele','trei stele'][s]}!`,next:'▶ Mai departe',again:'↺ Din nou',toMenu:'⬅ Jocuri',
+ shapes:{3:'un triunghi',4:'un patrulater',5:'un pentagon',6:'un hexagon',sq:'un pătrat',rect:'un dreptunghi'},
+ geoIntro:'Atinge cuiele unul după altul ca să întinzi elasticul. Ca să închizi forma, atinge din nou primul cui!',
+ geoT:['Fă un triunghi!','Fă un pătrat!','Fă un dreptunghi care nu e pătrat!','Fă un pătrat cu latura de trei pătrățele!','Câte pătrățele sunt în interiorul formei?','Fă o formă care are înăuntru exact patru pătrățele!','Câte bucăți de gard trebuie în jurul grădinii?','Fă un triunghi mare, cu șase pătrățele înăuntru!'],
+ made:s=>`Ai făcut ${s}!`,corners:n=>`Are ${n} colțuri.`,notTri:'Un triunghi are trei colțuri. Mai încearcă!',notSq:'Un pătrat are patru laturi egale și colțuri drepte.',isSq:'Asta e un pătrat! Fă-l mai lung pe o parte.',notRect:'Un dreptunghi are patru colțuri drepte.',
+ notSq3:'Fiecare latură trebuie să aibă trei pătrățele.',areaIs:n=>`Forma ta are ${n} pătrățele înăuntru.`,cross:'Elasticul se încrucișează! Încearcă din nou.',
+ geoHint:['Un triunghi are trei colțuri. Atinge cuiele galbene în ordine: unu, doi, trei, apoi din nou primul!','Un pătrat are patru laturi la fel de lungi. Atinge cuiele galbene în ordine!','Un dreptunghi e mai lung decât e de înalt. Atinge cuiele galbene în ordine!','Fiecare latură are trei pătrățele. Atinge cuiele galbene în ordine!','Numără pătrățelele rând cu rând. Pe primul rând sunt patru. Câte rânduri sunt?','Două pătrățele pe un rând și încă două dedesubt fac patru! Atinge cuiele galbene!','Numără fiecare bucată de gard, de la o bulină la alta, de jur împrejur.','O latură de patru pătrățele și una de trei fac un triunghi mare. Atinge cuiele galbene!'],areaQ:'Câte pătrățele sunt înăuntru? Numără!',perimQ:'Câte bucăți de gard trebuie de jur împrejur?',areaA:n=>`Sunt ${n} pătrățele. Asta e suprafața!`,perimA:n=>`Trebuie ${n} bucăți de gard. Asta e perimetrul!`,
+ tanIntro:'Trage piesele pe umbră. Atinge o piesă ca s-o rotești!',tanT:['Fă un pătrat din două triunghiuri!','Construiește o casă!','Fă un pește!','Fă o barcă cu pânze!','Construiește o rachetă!','Fă o pisică!'],
+ rotate:'Aproape! Atinge piesa ca s-o rotești.',tanOk:['Două triunghiuri fac un pătrat!','Ce casă frumoasă!','Un pește!','O barcă gata de plecare!','Racheta pornește!','Miau! O pisică!'],
+ cubeIntro:'Uită-te bine la cuburi! Unele sunt ascunse în spate sau dedesubt.',cubeCount:'Câte cuburi sunt?',cubeTop:'Cum se vede construcția de sus? Alege!',cubeBuild:'Construiește la fel! Atinge un loc ca să pui un cub.',
+ cubeA:n=>`Sunt ${n} cuburi!`,cubeTopA:'Exact! Așa se vede de sus.',cubeBuildA:'Identic! Ești un arhitect!',cubeNo:'Mai uită-te o dată. Nu uita de cuburile ascunse!',model:'Model',yours:'Al tău',
+ measIntro:'Hai să ghicim distanțe și să le măsurăm!',estQ:'Câți pași face vulpița până la morcov? Ghicește!',estRef:'Sus vezi cât de mare e un pas. Îl poți trage cu degetul!',u1:'1 pas',penRef:'Sus e un creion. Îl poți trage cu degetul ca să măsori!',u2:'1 creion',steps:n=>`${n} pași!`,exact:'Perfect! Ai ghicit exact!',close:'Foarte aproape!',far:(g,n)=>`Ai zis ${g}, dar sunt ${n} pași.`,
+ cmpQ:'Care drum e mai lung?',blue:'🟦 Albastru',orange:'🟧 Portocaliu',same:'🟰 La fel',cmpA:(a,b)=>`Drumul albastru are ${a} pași, cel portocaliu are ${b}.`,
+ penQ:'Câte creioane lungă e bucata de lemn?',penA:n=>`Are ${n} creioane!`,rugQ:'Care covor e mai mare?',rugA:(a,b)=>`Covorul albastru are ${a} pătrățele, cel portocaliu are ${b}.`},
+de:{title:'📐 Welt der Formen',back:'⬅ Zurück',hello:'Willkommen in der Welt der Formen! Such dir ein Spiel aus.',hint:'💡 Hilfe',undo:'↩ Zurück',clear:'🗑️ Löschen',
+ games:{geo:['📌','Das Nagelbrett'],tan:['🧩','Formen-Puzzle'],cube:['🧊','3D-Würfel'],meas:['📏','Schätzen und Messen']},
+ done:s=>`Geschafft! Du hast ${['','einen Stern','zwei Sterne','drei Sterne'][s]} bekommen!`,next:'▶ Weiter',again:'↺ Nochmal',toMenu:'⬅ Spiele',
+ shapes:{3:'ein Dreieck',4:'ein Viereck',5:'ein Fünfeck',6:'ein Sechseck',sq:'ein Quadrat',rect:'ein Rechteck'},
+ geoIntro:'Tippe die Nägel nacheinander an, um das Gummiband zu spannen. Um die Form zu schließen, tippe nochmal auf den ersten Nagel!',
+ geoT:['Mach ein Dreieck!','Mach ein Quadrat!','Mach ein Rechteck, das kein Quadrat ist!','Mach ein Quadrat mit drei Kästchen pro Seite!','Wie viele Kästchen sind in der Form?','Mach eine Form mit genau vier Kästchen darin!','Wie viele Zaunstücke braucht man um den Garten?','Mach ein großes Dreieck mit sechs Kästchen darin!'],
+ made:s=>`Du hast ${s} gemacht!`,corners:n=>`Es hat ${n} Ecken.`,notTri:'Ein Dreieck hat drei Ecken. Versuch es nochmal!',notSq:'Ein Quadrat hat vier gleich lange Seiten und rechte Winkel.',isSq:'Das ist ein Quadrat! Mach es auf einer Seite länger.',notRect:'Ein Rechteck hat vier rechte Winkel.',
+ notSq3:'Jede Seite muss drei Kästchen lang sein.',areaIs:n=>`Deine Form hat ${n} Kästchen darin.`,cross:'Das Gummiband kreuzt sich! Versuch es nochmal.',
+ geoHint:['Ein Dreieck hat drei Ecken. Tippe die gelben Nägel der Reihe nach an: eins, zwei, drei und dann wieder den ersten!','Ein Quadrat hat vier gleich lange Seiten. Tippe die gelben Nägel der Reihe nach an!','Ein Rechteck ist länger als hoch. Tippe die gelben Nägel der Reihe nach an!','Jede Seite hat drei Kästchen. Tippe die gelben Nägel der Reihe nach an!','Zähl die Kästchen Reihe für Reihe. In der ersten Reihe sind vier. Wie viele Reihen gibt es?','Zwei Kästchen in einer Reihe und noch zwei darunter sind vier! Tippe die gelben Nägel an!','Zähl jedes Zaunstück, von einem Punkt zum nächsten, rundherum.','Eine Seite mit vier Kästchen und eine mit drei ergeben ein großes Dreieck. Tippe die gelben Nägel an!'],areaQ:'Wie viele Kästchen sind darin? Zähl!',perimQ:'Wie viele Zaunstücke braucht man rundherum?',areaA:n=>`Es sind ${n} Kästchen. Das ist die Fläche!`,perimA:n=>`Man braucht ${n} Zaunstücke. Das ist der Umfang!`,
+ tanIntro:'Zieh die Teile auf den Schatten. Tippe auf ein Teil, um es zu drehen!',tanT:['Mach ein Quadrat aus zwei Dreiecken!','Bau ein Haus!','Mach einen Fisch!','Mach ein Segelboot!','Bau eine Rakete!','Mach eine Katze!'],
+ rotate:'Fast! Tippe auf das Teil, um es zu drehen.',tanOk:['Zwei Dreiecke ergeben ein Quadrat!','Was für ein schönes Haus!','Ein Fisch!','Ein Boot, bereit zum Lossegeln!','Die Rakete startet!','Miau! Eine Katze!'],
+ cubeIntro:'Schau dir die Würfel genau an! Manche sind hinten oder unten versteckt.',cubeCount:'Wie viele Würfel sind es?',cubeTop:'Wie sieht der Bau von oben aus? Wähl aus!',cubeBuild:'Bau es nach! Tippe auf einen Platz, um einen Würfel hinzustellen.',
+ cubeA:n=>`Es sind ${n} Würfel!`,cubeTopA:'Genau! So sieht es von oben aus.',cubeBuildA:'Gleich! Du bist ein Architekt!',cubeNo:'Schau nochmal hin. Denk an die versteckten Würfel!',model:'Vorlage',yours:'Deins',
+ measIntro:'Lass uns Entfernungen schätzen und messen!',estQ:'Wie viele Schritte macht der kleine Fuchs bis zur Karotte? Schätz mal!',estRef:'Oben siehst du, wie groß ein Schritt ist. Du kannst ihn mit dem Finger ziehen!',u1:'1 Schritt',penRef:'Oben liegt ein Stift. Du kannst ihn mit dem Finger ziehen, um zu messen!',u2:'1 Stift',steps:n=>`${n} Schritte!`,exact:'Perfekt! Genau richtig geschätzt!',close:'Ganz nah dran!',far:(g,n)=>`Du hast ${g} gesagt, aber es sind ${n} Schritte.`,
+ cmpQ:'Welcher Weg ist länger?',blue:'🟦 Blau',orange:'🟧 Orange',same:'🟰 Gleich',cmpA:(a,b)=>`Der blaue Weg hat ${a} Schritte, der orange hat ${b}.`,
+ penQ:'Wie viele Stifte lang ist das Holzstück?',penA:n=>`Es ist ${n} Stifte lang!`,rugQ:'Welcher Teppich ist größer?',rugA:(a,b)=>`Der blaue Teppich hat ${a} Kästchen, der orange hat ${b}.`},
+en:{title:'📐 World of shapes',back:'⬅ Back',hello:'Welcome to the world of shapes! Pick a game.',hint:'💡 Help',undo:'↩ Undo',clear:'🗑️ Clear',
+ games:{geo:['📌','The pegboard'],tan:['🧩','Shape puzzle'],cube:['🧊','3D cubes'],meas:['📏','Guess and measure']},
+ done:s=>`Done! You earned ${['','1 star','2 stars','3 stars'][s]}!`,next:'▶ Next',again:'↺ Again',toMenu:'⬅ Games',
+ shapes:{3:'a triangle',4:'a quadrilateral',5:'a pentagon',6:'a hexagon',sq:'a square',rect:'a rectangle'},
+ geoIntro:'Tap the pegs one after another to stretch the rubber band. To close the shape, tap the first peg again!',
+ geoT:['Make a triangle!','Make a square!','Make a rectangle that is not a square!','Make a square with sides three squares long!','How many little squares are inside the shape?','Make a shape with exactly four little squares inside!','How many fence pieces go around the garden?','Make a big triangle with six little squares inside!'],
+ made:s=>`You made ${s}!`,corners:n=>`It has ${n} corners.`,notTri:'A triangle has three corners. Try again!',notSq:'A square has four equal sides and square corners.',isSq:'That’s a square! Make one side longer.',notRect:'A rectangle has four square corners.',
+ notSq3:'Each side must be three squares long.',areaIs:n=>`Your shape has ${n} little squares inside.`,cross:'The rubber band crosses itself! Try again.',
+ geoHint:['A triangle has three corners. Tap the yellow pegs in order: one, two, three, then the first one again!','A square has four sides of the same length. Tap the yellow pegs in order!','A rectangle is longer than it is tall. Tap the yellow pegs in order!','Each side is three squares long. Tap the yellow pegs in order!','Count the squares row by row. There are four in the first row. How many rows are there?','Two squares in a row and two more underneath make four! Tap the yellow pegs!','Count each fence piece, from one dot to the next, all the way around.','One side four squares long and one side three squares long make a big triangle. Tap the yellow pegs!'],areaQ:'How many little squares are inside? Count!',perimQ:'How many fence pieces go all the way around?',areaA:n=>`There are ${n} squares. That’s the area!`,perimA:n=>`You need ${n} fence pieces. That’s the perimeter!`,
+ tanIntro:'Drag the pieces onto the shadow. Tap a piece to turn it!',tanT:['Make a square from two triangles!','Build a house!','Make a fish!','Make a sailing boat!','Build a rocket!','Make a cat!'],
+ rotate:'Almost! Tap the piece to turn it.',tanOk:['Two triangles make a square!','What a lovely house!','A fish!','A boat ready to sail!','The rocket is taking off!','Meow! A cat!'],
+ cubeIntro:'Look carefully at the cubes! Some are hidden at the back or underneath.',cubeCount:'How many cubes are there?',cubeTop:'What does it look like from above? Choose!',cubeBuild:'Build the same! Tap a spot to add a cube.',
+ cubeA:n=>`There are ${n} cubes!`,cubeTopA:'Exactly! That’s the view from above.',cubeBuildA:'Identical! You are an architect!',cubeNo:'Look again. Don’t forget the hidden cubes!',model:'Model',yours:'Yours',
+ measIntro:'Let’s guess distances and measure them!',estQ:'How many steps does the little fox take to the carrot? Guess!',estRef:'At the top you can see how big one step is. You can drag it with your finger!',u1:'1 step',penRef:'At the top there is one pencil. You can drag it with your finger to measure!',u2:'1 pencil',steps:n=>`${n} steps!`,exact:'Perfect! You guessed exactly!',close:'Very close!',far:(g,n)=>`You said ${g}, but it is ${n} steps.`,
+ cmpQ:'Which path is longer?',blue:'🟦 Blue',orange:'🟧 Orange',same:'🟰 The same',cmpA:(a,b)=>`The blue path has ${a} steps, the orange one has ${b}.`,
+ penQ:'How many pencils long is the log?',penA:n=>`It is ${n} pencils long!`,rugQ:'Which rug is bigger?',rugA:(a,b)=>`The blue rug has ${a} squares, the orange one has ${b}.`}
+};
+const X=()=>TR('gm',TX);
+
+/* ================= cadru ================= */
+let data={prog:{}}; try{ const d=JSON.parse(localStorage.getItem('gm_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
+const save=()=>{ try{ localStorage.setItem('gm_data',JSON.stringify(data)); }catch(e){} };
+const pill=()=>{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); };
+function award(){ try{ stars++; renderBar(); }catch(e){} pill(); }
+let back=null, curRestart=null, timers=[], raf=0, gen=0;
+function stopAll(){ timers.forEach(clearTimeout); timers=[]; cancelAnimationFrame(raf); try{ speechSynthesis.cancel(); }catch(e){} $('ov').hidden=true; gen++; }
+const rate=e=>e===0?3:e<=2?2:1;
+function frame(task,n){ main.innerHTML=''; const head=el('div','rb-head'); const face=el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦊</div>'); const bub=el('div','rb-bubble'); bub.textContent=task||'';
+  const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(face,bub,dots);
+  const stage=el('div','gm-stage'); const ctrl=el('div','rb-ctrl'); main.append(head,stage,ctrl); bub.onclick=face.onclick=()=>sp(bub.textContent.replace(/^\W+\s/,''));
+  return {bub,stage,ctrl,set:t=>bub.textContent=t,dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
+function finish(key,s){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+  $('ovNext').textContent=X().toMenu; $('ovAgain').textContent=X().again; $('ovBack').hidden=true; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
+$('ovNext').onclick=()=>{ $('ov').hidden=true; menu(); };
+$('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
+$('back').onclick=()=>{ stopAll(); if(back) back(); else { root.hidden=true; } };
+function menu(){ stopAll(); back=null; $('title').textContent=X().title; $('back').textContent=X().back; pill(); main.innerHTML='';
+  const head=el('div','rb-head'); head.append(el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦊</div>')); const b=el('div','rb-bubble'); b.textContent=X().hello; head.append(b); main.append(head);
+  const g=el('div','gm-cards'); Object.entries({geo:geoGame,tan:tanGame,cube:cubeGame,meas:measGame}).forEach(([k,fn])=>{ const s=data.prog[k]||0;
+    const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.dataset.lk='gm:'+k; c.onclick=()=>{ blip(); back=menu; fn(); }; g.appendChild(c); });
+  main.appendChild(g); sp(X().hello); }
+
+/* ================= 1. TABLA CU ELASTICE ================= */
+const area2=P=>{ let s=0; for(let i=0;i<P.length;i++){ const [x1,y1]=P[i],[x2,y2]=P[(i+1)%P.length]; s+=x1*y2-x2*y1; } return s; };
+const segX=(a,b,c,d)=>{ const o=(p,q,r)=>Math.sign((q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0])); return o(a,b,c)*o(a,b,d)<0&&o(c,d,a)*o(c,d,b)<0; };
+function simple(P){ const n=P.length; for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){ if(Math.abs(i-j)===1||(i===0&&j===n-1)) continue; if(segX(P[i],P[(i+1)%n],P[j],P[(j+1)%n])) return false; } return true; }
+const d2=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2;
+function clean(P){ /* scoate vârfurile coliniare */ const out=[]; const n=P.length; for(let i=0;i<n;i++){ const a=P[(i-1+n)%n], b=P[i], c=P[(i+1)%n]; if((b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0])!==0) out.push(b); } return out; }
+function classify(P){ const Q=clean(P), n=Q.length; if(n===4){ const s=[0,1,2,3].map(i=>d2(Q[i],Q[(i+1)%4])), dg=[d2(Q[0],Q[2]),d2(Q[1],Q[3])];
+    const right=[0,1,2,3].every(i=>{ const a=Q[(i+3)%4],b=Q[i],c=Q[(i+1)%4]; return (a[0]-b[0])*(c[0]-b[0])+(a[1]-b[1])*(c[1]-b[1])===0; });
+    if(right&&s.every(v=>v===s[0])) return {n,kind:'sq',side2:s[0]}; if(right) return {n,kind:'rect'}; }
+  return {n,kind:n}; }
+const GEO=[{t:'tri'},{t:'sq'},{t:'rect'},{t:'sq3'},{t:'area',poly:[[1,1],[5,1],[5,4],[1,4]]},{t:'a4'},{t:'perim',poly:[[1,2],[5,2],[5,3],[1,3]]},{t:'tri6'}];
+function geoGame(){
+  stopAll(); curRestart=geoGame; const myGen=gen; let ti=0, errs=0, P=[], closed=false, busy=false, svg, ghost='';
+  const F=frame(X().geoIntro,GEO.length), N=7, S=70, O=50, pp=([x,y])=>[O+x*S,O+y*S];
+  function draw(extra){ const T=GEO[ti]; let s=`<svg viewBox="0 0 520 520"><rect x="6" y="6" width="508" height="508" rx="24" fill="#D9A066" stroke="#A86B32" stroke-width="6"/>`;
+    for(let i=0;i<N-1;i++) for(let j=0;j<N-1;j++) s+=`<rect x="${O+i*S+2}" y="${O+j*S+2}" width="${S-4}" height="${S-4}" rx="6" fill="rgba(255,255,255,.12)"/>`;
+    const fixed=T.poly; if(fixed){ const pts=fixed.map(pp).map(p=>p.join(',')).join(' '); s+=`<polygon points="${pts}" fill="rgba(59,196,138,.35)" stroke="#2FA772" stroke-width="9" stroke-linejoin="round"/>`; }
+    if(P.length){ const pts=P.map(pp).map(p=>p.join(',')).join(' '); s+=closed?`<polygon points="${pts}" fill="rgba(255,93,122,.3)" stroke="#FF5D7A" stroke-width="9" stroke-linejoin="round"/>`:`<polyline points="${pts}" fill="none" stroke="#FF5D7A" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>`; }
+    s+=extra||'';
+    for(let i=0;i<N;i++) for(let j=0;j<N;j++){ const [x,y]=pp([i,j]); const first=P.length&&!closed&&P[0][0]===i&&P[0][1]===j; s+=`<circle cx="${x}" cy="${y}" r="${first?13:9}" fill="${first?'#FFC83D':'#F4F4F4'}" stroke="#5A3A1A" stroke-width="3" ${first?'class="gm-blink"':''}/>`; }
+    if(P.length){ s+=`<text x="260" y="505" font-size="20" font-weight="800" text-anchor="middle" fill="#5A3A1A">🔺 ${clean(P).length>=3&&closed?clean(P).length:P.length} </text>`; }
+    F.stage.innerHTML=s+ghost.replace(/<circle /g,'<circle pointer-events="none" ')+'</svg>'; svg=F.stage.firstChild; bind(); }
+  function near(p){ const i=Math.round((p.x-O)/S), j=Math.round((p.y-O)/S); if(i<0||j<0||i>=N||j>=N) return null; const [x,y]=pp([i,j]); return Math.hypot(p.x-x,p.y-y)<30?[i,j]:null; }
+  let down=false, lastPeg=null;
+  function bind(){ if(GEO[ti].poly) return;
+    svg.onpointerdown=e=>{ if(busy) return; e.preventDefault(); down=true; try{ svg.setPointerCapture(e.pointerId);}catch(_){} const q=near(pt(svg,e)); if(q){ lastPeg=q.join(); peg(q); } };
+    svg.onpointermove=e=>{ if(!down||busy||!e.buttons) return; const q=near(pt(svg,e)); if(q&&q.join()!==lastPeg){ lastPeg=q.join(); peg(q); } };
+    svg.onpointerup=()=>{ down=false; lastPeg=null; }; }
+  function peg(q){ if(closed){ P=[]; closed=false; }
+    if(P.length>=3&&P[0][0]===q[0]&&P[0][1]===q[1]){ closed=true; snd(1000,.12,'sine',.1); draw(); evaluate(); return; }
+    if(P.some(v=>v[0]===q[0]&&v[1]===q[1])) return; P.push(q); pop(P.length); draw(); }
+  async function ok(msg){ busy=true; chime(); award(); F.dot(ti+1); try{ confetti(12); }catch(e){} F.set('🎉 '+msg); await spW(msg,1700); if(myGen!==gen) return; ti++; busy=false; P=[]; closed=false; if(ti>=GEO.length) return finish('geo',rate(errs)); task(); }
+  function no(msg){ errs++; boing(); F.set('🤔 '+msg); sp(msg); }
+  function evaluate(){ if(!simple(P)) return no(X().cross); const c=classify(P), A=Math.abs(area2(clean(P)))/2, T=GEO[ti].t; const name=c.kind==='sq'?X().shapes.sq:c.kind==='rect'?X().shapes.rect:(X().shapes[c.n]||'');
+    if(T==='tri') return c.n===3?ok(X().made(name)):no(X().notTri);
+    if(T==='sq') return c.kind==='sq'?ok(X().made(name)):no(X().notSq);
+    if(T==='rect') return c.kind==='rect'?ok(X().made(name)):c.kind==='sq'?no(X().isSq):no(X().notRect);
+    if(T==='sq3') return c.kind==='sq'&&c.side2===9?ok(X().made(name)):no(c.kind==='sq'?X().notSq3:X().notSq);
+    if(T==='a4') return A===4?ok(X().areaIs(4)):no(X().areaIs(A));
+    if(T==='tri6') return c.n===3&&A===6?ok(X().made(name)+' '+X().areaIs(6)):no(c.n!==3?X().notTri:X().areaIs(A)); }
+  function task(){ const T=GEO[ti]; ghost=''; F.set(X().geoT[ti]); sp(X().geoT[ti]); F.ctrl.innerHTML='';
+    if(T.poly){ draw(); const ans=T.t==='area'?Math.abs(area2(T.poly))/2:T.poly.reduce((s,p,i)=>s+Math.sqrt(d2(p,T.poly[(i+1)%T.poly.length])),0); const box=el('div','gm-row');
+      const opts=shuf([...new Set([ans,ans+1,ans-1,ans+2].filter(v=>v>0))].slice(0,4)); opts.forEach(v=>{ const b=el('button','gm-num',String(v)); b.onclick=()=>answer(v,ans,b); box.appendChild(b); }); F.ctrl.append(box,btn(X().hint,'',hint)); }
+    else { draw(); F.ctrl.append(btn(X().undo,'',()=>{ if(busy) return; if(closed) closed=false; else P.pop(); draw(); }),btn(X().clear,'',()=>{ if(busy) return; P=[]; closed=false; draw(); }),btn(X().hint,'',hint)); } }
+  const SOL={tri:[[1,1],[4,1],[1,4]],sq:[[1,1],[3,1],[3,3],[1,3]],rect:[[1,1],[5,1],[5,3],[1,3]],sq3:[[1,1],[4,1],[4,4],[1,4]],a4:[[1,1],[3,1],[3,3],[1,3]],tri6:[[1,1],[5,1],[1,4]]};
+  function hint(){ if(busy) return; errs++; const T=GEO[ti]; blip(); sp(X().geoHint[ti]); F.set('💡 '+X().geoHint[ti]);
+    if(T.poly){ let s=''; if(T.t==='area'){ const [x0,y0]=T.poly[0],[x1]=T.poly[2]; for(let i=x0;i<x1;i++){ const [x,y]=pp([i,y0]); s+=`<text x="${x+S/2}" y="${y+S/2+10}" font-size="28" font-weight="800" text-anchor="middle" fill="#5A3A1A" class="gm-blink">${i-x0+1}</text>`; } }
+      else { const Pp=T.poly; for(let i=0;i<Pp.length;i++){ const a=Pp[i], c=Pp[(i+1)%Pp.length], L=Math.round(Math.sqrt(d2(a,c))); for(let u=0;u<=L;u++){ const [x,y]=pp([a[0]+(c[0]-a[0])*u/L,a[1]+(c[1]-a[1])*u/L]); s+=`<circle cx="${x}" cy="${y}" r="8" fill="#FFE45C" stroke="#5A3A1A" stroke-width="2" class="gm-blink"/>`; } } }
+      ghost=s; draw(); return; }
+    const Q=SOL[T.t]; P=[]; closed=false; const pts=Q.map(pp);
+    ghost=`<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="rgba(255,228,92,.25)" stroke="#FFE45C" stroke-width="7" stroke-dasharray="12 9" stroke-linejoin="round"/>`+pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="17" fill="#FFE45C" stroke="#5A3A1A" stroke-width="3" class="gm-blink"/><text x="${p[0]}" y="${p[1]+7}" font-size="18" font-weight="800" text-anchor="middle" fill="#5A3A1A" pointer-events="none">${i+1}</text>`).join('');
+    draw(); }
+  async function answer(v,ans,b){ if(busy) return; const T=GEO[ti]; busy=true; if(v!==ans){ errs++; b.classList.add('no'); boing(); } else b.classList.add('ok');
+    let k=0; if(T.t==='area'){ const [x0,y0]=T.poly[0], [x1,y1]=T.poly[2]; for(let j=y0;j<y1;j++) for(let i=x0;i<x1;i++){ k++; const [x,y]=pp([i,j]); svg.insertAdjacentHTML('beforeend',`<g><rect x="${x+4}" y="${y+4}" width="${S-8}" height="${S-8}" rx="8" fill="#FFC83D" opacity=".85"/><text x="${x+S/2}" y="${y+S/2+10}" font-size="28" font-weight="800" text-anchor="middle" fill="#5A3A1A">${k}</text></g>`); pop(k); await wait(330); } }
+    else { const Pp=T.poly; for(let i=0;i<Pp.length;i++){ const a=Pp[i], c=Pp[(i+1)%Pp.length], L=Math.round(Math.sqrt(d2(a,c))); for(let u=0;u<L;u++){ k++; const x1=a[0]+(c[0]-a[0])*u/L, y1=a[1]+(c[1]-a[1])*u/L, x2=a[0]+(c[0]-a[0])*(u+1)/L, y2=a[1]+(c[1]-a[1])*(u+1)/L; const [X1,Y1]=pp([x1,y1]), [X2,Y2]=pp([x2,y2]);
+        svg.insertAdjacentHTML('beforeend',`<line x1="${X1}" y1="${Y1}" x2="${X2}" y2="${Y2}" stroke="#8F5427" stroke-width="12" stroke-dasharray="4 6"/><text x="${(X1+X2)/2+(a[1]===c[1]?0:(a[0]<3?-22:22))}" y="${(Y1+Y2)/2+(a[1]===c[1]?(a[1]<2.5?-14:30):8)}" font-size="22" font-weight="800" text-anchor="middle" fill="#24325F">${k}</text>`); pop(k); await wait(300); } } }
+    const msg=T.t==='area'?X().areaA(ans):X().perimA(ans); if(v===ans){ busy=false; return ok(msg); } F.set(msg); await spW(msg,1500); if(myGen!==gen) return; ti++; busy=false; if(ti>=GEO.length) return finish('geo',rate(errs)); task(); }
+  sp(X().geoIntro); task();
+}
+
+/* ================= 2. PUZZLE CU FORME (tangram simplificat, rotiri de 90°) ================= */
+const BASE={tri:[[0,0],[1,0],[0,1]],tri2:[[0,0],[2,0],[0,2]],sq:[[0,0],[1,0],[1,1],[0,1]],sq2:[[0,0],[2,0],[2,2],[0,2]],rect:[[0,0],[1,0],[1,2],[0,2]],par:[[0,0],[1,0],[2,1],[1,1]]};
+const PCOL={tri:'#FF5D7A',tri2:'#4AA8FF',sq:'#FFC83D',sq2:'#FFB21E',rect:'#3BC48A',par:'#9B7BFF'};
+function rotN(pts,r){ let q=pts.map(p=>p.slice()); for(let k=0;k<r;k++) q=q.map(([x,y])=>[-y,x]); const mx=Math.min(...q.map(p=>p[0])), my=Math.min(...q.map(p=>p[1])); return q.map(([x,y])=>[x-mx,y-my]); }
+const cen=P=>[P.reduce((s,p)=>s+p[0],0)/P.length,P.reduce((s,p)=>s+p[1],0)/P.length];
+const TAN=[
+ {slots:[['tri2',0,0,0],['tri2',2,0,0]],deco:''},
+ {slots:[['sq2',0,0,1],['tri',2,0,0],['tri',3,1,0]],deco:'door'},
+ {slots:[['sq2',0,1,0],['tri',3,0,0],['tri',0,0,1]],deco:'eye'},
+ {slots:[['tri',1,0,2],['rect',1,1,2],['tri',0,3,2],['tri2',3,2,0]],deco:'mast'},
+ {slots:[['tri',2,1,0],['tri',3,2,0],['sq2',0,1,1],['tri',2,0,2],['tri',3,3,2]],deco:'fire'},
+ {slots:[['tri',3,0,0],['tri',2,1,0],['sq2',0,0,1],['tri2',3,0,3],['par',0,2,4]],deco:'cat'}];
+function tanGame(){
+  stopAll(); curRestart=tanGame; const myGen=gen; let li=0, errs=0, busy=false, pcs=[], svg, U=70, OX=70, OY=60;
+  const F=frame(X().tanIntro,TAN.length);
+  function setup(){ const L=TAN[li]; const W=Math.max(...L.slots.map(([t,r,x,y])=>Math.max(...rotN(BASE[t],r).map(p=>p[0]+x)))), H=Math.max(...L.slots.map(([t,r,x,y])=>Math.max(...rotN(BASE[t],r).map(p=>p[1]+y))));
+    U=Math.min(80,360/Math.max(W,H)); OX=60+(380-W*U)/2; OY=40+(420-H*U)/2;
+    pcs=L.slots.map(([t,r],i)=>{ let rr; do{ rr=R(4); }while(L.slots.length>1&&rotN(BASE[t],rr).map(String).join()===rotN(BASE[t],r).map(String).join()&&t!=='sq'&&t!=='sq2'&&R(3)>0); return {t,rot:rr,x:600+(i%2)*150+R(30),y:110+Math.floor(i/2)*130+R(20),done:false,slot:null}; });
+    F.set(X().tanT[li]); sp((li===0?X().tanIntro+' ':'')+X().tanT[li]); draw(); }
+  function slotPoly(s){ const [t,r,x,y]=s; return rotN(BASE[t],r).map(([a,b])=>[OX+(a+x)*U,OY+(b+y)*U]); }
+  function piecePoly(p){ const q=rotN(BASE[p.t],p.rot), c=cen(q); return q.map(([a,b])=>[p.x+(a-c[0])*U,p.y+(b-c[1])*U]); }
+  function draw(){ const L=TAN[li]; let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#FFF1DC"/><rect x="40" y="20" width="440" height="480" rx="20" fill="#FFE6C2"/>`;
+    L.slots.forEach(sl=>{ s+=`<polygon points="${slotPoly(sl).map(p=>p.join(',')).join(' ')}" fill="#5A4A6A" stroke="#5A4A6A" stroke-width="2" stroke-linejoin="round"/>`; });
+    pcs.forEach((p,i)=>{ const P=piecePoly(p); s+=`<polygon class="gm-pc${p.done?' lock':''}" data-i="${i}" points="${P.map(q=>q.join(',')).join(' ')}" fill="${PCOL[p.t]}" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>`; });
+    if(pcs.every(p=>p.done)) s+=decor(L.deco);
+    F.stage.innerHTML=s+'</svg>'; svg=F.stage.firstChild; bind(); }
+  function decor(d){ const P=(x,y)=>[OX+x*U,OY+y*U]; if(d==='door'){ const [x,y]=P(.7,2.1); return `<rect x="${x}" y="${y}" width="${.6*U}" height="${.9*U}" rx="6" fill="#8F5427"/><text x="${P(1.5,1.6)[0]}" y="${P(1.5,1.6)[1]}" font-size="${U*.5}">🪟</text>`; }
+    if(d==='eye'){ const [x,y]=P(2.3,.7); return `<circle cx="${x}" cy="${y}" r="${U*.16}" fill="#fff"/><circle cx="${x}" cy="${y}" r="${U*.08}" fill="#24325F"/>`; }
+    if(d==='mast'){ const [x,y]=P(3,0); const [x2,y2]=P(3,2); return `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="#8F5427" stroke-width="6"/><text x="${P(4.2,3.3)[0]}" y="${P(4.2,3.3)[1]}" font-size="${U*.6}">🌊</text>`; }
+    if(d==='fire'){ const [x,y]=P(1.6,3.8); return `<text x="${x}" y="${y}" font-size="${U*.8}">🔥</text>`; }
+    if(d==='cat'){ const [x,y]=P(.6,1.9), [x2]=P(1.4,1.9); return `<circle cx="${x}" cy="${y}" r="${U*.13}" fill="#FFE45C"/><circle cx="${x2}" cy="${y}" r="${U*.13}" fill="#FFE45C"/><text x="${P(1,2.6)[0]}" y="${P(1,2.6)[1]}" font-size="${U*.4}" text-anchor="middle">👃</text>`; } return ''; }
+  let drag=null;
+  function bind(){ svg.querySelectorAll('.gm-pc').forEach(g=>{ g.onpointerdown=e=>{ const p=pcs[+g.dataset.i]; if(p.done||busy) return; e.preventDefault(); const q=pt(svg,e); drag={p,dx:p.x-q.x,dy:p.y-q.y,sx:e.clientX,sy:e.clientY,moved:false}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} }; });
+    svg.onpointermove=e=>{ if(!drag) return; if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>8) drag.moved=true; if(!drag.moved) return; const q=pt(svg,e); drag.p.x=clamp(q.x+drag.dx,30,870); drag.p.y=clamp(q.y+drag.dy,30,490);
+      const g=svg.querySelector(`.gm-pc[data-i="${pcs.indexOf(drag.p)}"]`); if(g) g.setAttribute('points',piecePoly(drag.p).map(v=>v.join(',')).join(' ')); };
+    svg.onpointerup=()=>{ if(!drag) return; const p=drag.p; if(!drag.moved){ p.rot=(p.rot+1)%4; snd(700,.06,'square',.06); drag=null; draw(); tryFit(p,true); return; } drag=null; tryFit(p,false); }; }
+  function tryFit(p,quiet){ const L=TAN[li]; const mine=piecePoly(p), mc=cen(mine); let near=false;
+    for(let k=0;k<L.slots.length;k++){ if(pcs.some(o=>o.slot===k)) continue; const sl=L.slots[k]; if(sl[0]!==p.t) continue; const SP=slotPoly(sl), sc=cen(SP); if(Math.hypot(mc[0]-sc[0],mc[1]-sc[1])>U*.6) continue; near=true;
+      const key=P=>P.map(([x,y])=>[Math.round((x-cen(P)[0])/U*6),Math.round((y-cen(P)[1])/U*6)].join()).sort().join('|');
+      if(key(mine)===key(SP)){ p.done=true; p.slot=k; p.x=sc[0]; p.y=sc[1]; chime(); draw(); if(pcs.every(o=>o.done)) win(); return; } }
+    if(near&&!quiet){ errs++; sp(X().rotate); F.set('🔄 '+X().rotate); } else if(!quiet) blip(); draw(); }
+  async function win(){ busy=true; award(); F.dot(li+1); try{ confetti(18); }catch(e){} const m=X().tanOk[li]; F.set('🎉 '+m); await spW(m,1800); if(myGen!==gen) return; li++; busy=false; if(li>=TAN.length) return finish('tan',rate(errs)); setup(); }
+  function hint(){ if(busy) return; errs++; const k=TAN[li].slots.findIndex((_,k)=>!pcs.some(o=>o.slot===k)); if(k<0) return; const sl=TAN[li].slots[k]; const p=pcs.find(o=>!o.done&&o.t===sl[0]); if(!p) return;
+    p.rot=sl[1]; draw(); const SP=slotPoly(sl); svg.insertAdjacentHTML('beforeend',`<polygon class="gm-blink" points="${SP.map(q=>q.join(',')).join(' ')}" fill="none" stroke="#FFE45C" stroke-width="6"/>`); const g=svg.querySelector(`.gm-pc[data-i="${pcs.indexOf(p)}"]`); if(g) g.classList.add('gm-blink'); blip(); }
+  setup(); F.ctrl.append(btn(X().hint,'',hint));
+}
+
+/* ================= 3. CUBURI 3D ================= */
+function isoSVG(H,a,ox,oy,opt){ opt=opt||{}; const n=H.length; let s=''; const cubes=[];
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++){ const x=ox+(i-j)*a, y=oy+(i+j)*a/2; s+=`<path d="M${x} ${y} L${x+a} ${y+a/2} L${x} ${y+a} L${x-a} ${y+a/2} Z" fill="${opt.floor||'#E6E9F2'}" stroke="#C3CAD9" stroke-width="2"/>`; for(let k=0;k<H[i][j];k++) cubes.push([i,j,k]); }
+  cubes.sort((p,q)=>(p[0]+p[1])-(q[0]+q[1])||p[2]-q[2]);
+  const C=opt.col||['#7FC4FF','#4AA8FF','#2B7FD0'];
+  cubes.forEach(([i,j,k],idx)=>{ const x=ox+(i-j)*a, y=oy+(i+j)*a/2-(k+1)*a;
+    s+=`<g class="gm-cube" data-n="${idx}"><path d="M${x} ${y} L${x+a} ${y+a/2} L${x} ${y+a} L${x-a} ${y+a/2} Z" fill="${C[0]}" stroke="#24325F" stroke-width="2"/><path d="M${x-a} ${y+a/2} L${x} ${y+a} L${x} ${y+2*a} L${x-a} ${y+1.5*a} Z" fill="${C[1]}" stroke="#24325F" stroke-width="2"/><path d="M${x} ${y+a} L${x+a} ${y+a/2} L${x+a} ${y+1.5*a} L${x} ${y+2*a} Z" fill="${C[2]}" stroke="#24325F" stroke-width="2"/></g>`; });
+  if(opt.taps) for(let i=0;i<n;i++) for(let j=0;j<n;j++){ const x=ox+(i-j)*a, y=oy+(i+j)*a/2-H[i][j]*a; s+=`<path class="gm-tap" data-i="${i}" data-j="${j}" d="M${x} ${y} L${x+a} ${y+a/2} L${x} ${y+a} L${x-a} ${y+a/2} Z" fill="rgba(255,255,255,.01)" style="cursor:pointer"/>`; }
+  return s; }
+function topSVG(H,a,ox,oy,col){ let s=''; const n=H.length; for(let i=0;i<n;i++) for(let j=0;j<n;j++){ const x=ox+(i-j)*a, y=oy+(i+j)*a/2; s+=`<path d="M${x} ${y} L${x+a} ${y+a/2} L${x} ${y+a} L${x-a} ${y+a/2} Z" fill="${H[i][j]?col:'#F2F4F8'}" stroke="#9AA5B8" stroke-width="2"/>`; } return s; }
+const sumH=H=>H.flat().reduce((a,b)=>a+b,0);
+function randH(n,maxh,fill){ let H; do{ H=[...Array(n)].map(()=>Array(n).fill(0));
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++){ const cap=Math.min(i?H[i-1][j]:maxh, j?H[i][j-1]:maxh); H[i][j]=cap&&Math.random()<fill?RR(Math.max(1,cap-1),cap):0; } /* spatele e mai înalt: toate cuburile se pot deduce */
+  }while(sumH(H)<3||sumH(H)===n*n*maxh); return H; }
+function cubeGame(){
+  stopAll(); curRestart=cubeGame; const myGen=gen; const plan=['count','count','top','build','count','top','build','build']; let ti=0, errs=0, busy=false, H, mine;
+  const F=frame(X().cubeIntro,plan.length);
+  function task(){ const t=plan[ti]; F.ctrl.innerHTML=''; busy=false;
+    if(t==='count'){ H=ti===0?[[1,1],[2,0]]:randH(ti<2?2:3,ti<2?2:3,.75); const a=ti===0?70:55, mh=Math.max(...H.flat()); F.stage.innerHTML=`<svg viewBox="0 0 900 460">${isoSVG(H,a,450,30+mh*a)}</svg>`;
+      const n=sumH(H); const opts=shuf([...new Set([n,n+1,n-1,n+2,n-2].filter(v=>v>0))].slice(0,4)); const box=el('div','gm-row'); opts.forEach(v=>{ const b=el('button','gm-num',String(v)); b.onclick=()=>count(v,n,b); box.appendChild(b); }); F.ctrl.appendChild(box);
+      F.set('🧊 '+X().cubeCount); sp(X().cubeCount); }
+    if(t==='top'){ H=randH(3,3,.6); const vars=[H.map(r=>r.slice()),H[0].map((_,j)=>H.map(r=>r[j])),H.map(r=>r.slice().reverse())].map(V=>V.map(r=>r.map(v=>v?1:0)));
+      const uniq=[]; vars.forEach(v=>{ if(!uniq.some(u=>u.flat().join()===v.flat().join())) uniq.push(v); }); while(uniq.length<3){ const v=uniq[0].map(r=>r.slice()); const i=R(3),j=R(3); v[i][j]=1-v[i][j]; if(!uniq.some(u=>u.flat().join()===v.flat().join())&&v.flat().some(x=>x)) uniq.push(v); }
+      const right=uniq[0]; const opts=shuf(uniq.slice(0,3));
+      let s=`<svg viewBox="0 0 900 460">${isoSVG(H,48,250,40+Math.max(...H.flat())*48)}<text x="80" y="60" font-size="40" text-anchor="middle">👀⬇</text>`;
+      opts.forEach((o,k)=>{ s+=`<g class="gm-opt" data-k="${k}" style="cursor:pointer"><rect x="${520+(k%2)*190}" y="${30+Math.floor(k/2)*215}" width="170" height="190" rx="18" fill="#fff" stroke="#24325F" stroke-width="3"/>${topSVG(o,28,605+(k%2)*190,60+Math.floor(k/2)*215,'#4AA8FF')}</g>`; });
+      F.stage.innerHTML=s+'</svg>'; F.stage.firstChild.querySelectorAll('.gm-opt').forEach(g=>g.onclick=()=>pickTop(opts[+g.dataset.k]===right,g));
+      F.set('👀 '+X().cubeTop); sp(X().cubeTop); }
+    if(t==='build'){ H=ti===3?[[1,0],[2,1]]:randH(ti<7?2:3,ti<7?2:3,.7); const n=H.length; mine=H.map(r=>r.map(()=>0)); drawBuild();
+      F.set('🏗️ '+X().cubeBuild); sp(X().cubeBuild); F.ctrl.append(btn(X().clear,'',()=>{ if(busy) return; mine=H.map(r=>r.map(()=>0)); drawBuild(); })); }
+  }
+  function drawBuild(){ const n=H.length, a=n===2?60:46; let s=`<svg viewBox="0 0 900 460"><text x="230" y="40" font-size="26" font-weight="800" text-anchor="middle" fill="#24325F">${X().model}</text><text x="670" y="40" font-size="26" font-weight="800" text-anchor="middle" fill="#24325F">${X().yours}</text><line x1="450" y1="30" x2="450" y2="440" stroke="#E0C9A6" stroke-width="4" stroke-dasharray="8 8"/>`;
+    s+=isoSVG(H,a,230,190,{col:['#B9F0D2','#3BC48A','#23935F']})+isoSVG(mine,a,670,190,{taps:true,floor:'#FFF3C4'});
+    F.stage.innerHTML=s+'</svg>'; F.stage.firstChild.querySelectorAll('.gm-tap').forEach(t=>t.onclick=()=>{ if(busy) return; const i=+t.dataset.i,j=+t.dataset.j; mine[i][j]=(mine[i][j]+1)%4; pop(mine[i][j]); drawBuild();
+      if(mine.flat().join()===H.flat().join()) good(X().cubeBuildA); }); }
+  async function good(m){ busy=true; chime(); award(); F.dot(ti+1); try{ confetti(12); }catch(e){} F.set('🎉 '+m); await spW(m,1700); if(myGen!==gen) return; ti++; if(ti>=plan.length) return finish('cube',rate(errs)); task(); }
+  async function count(v,n,b){ if(busy) return; busy=true; const svg=F.stage.firstChild; if(v!==n){ errs++; b.classList.add('no'); boing(); } else b.classList.add('ok');
+    const cs=[...svg.querySelectorAll('.gm-cube')]; for(let k=0;k<cs.length;k++){ const c=cs[k]; const bb=c.getBBox(); c.querySelector('path').setAttribute('fill','#FFE45C'); svg.insertAdjacentHTML('beforeend',`<text x="${bb.x+bb.width/2}" y="${bb.y+bb.height/2+8}" font-size="24" font-weight="800" text-anchor="middle" fill="#24325F" stroke="#fff" stroke-width="4" paint-order="stroke">${k+1}</text>`); pop(k+1); await wait(330); }
+    if(v===n){ busy=false; return good(X().cubeA(n)); } const m=X().cubeNo+' '+X().cubeA(n); F.set(m); await spW(m,1600); if(myGen!==gen) return; ti++; busy=false; if(ti>=plan.length) return finish('cube',rate(errs)); task(); }
+  function pickTop(ok,g){ if(busy) return; if(ok) return good(X().cubeTopA); errs++; boing(); g.style.opacity=.35; sp(X().cubeNo); }
+  sp(X().cubeIntro); task();
+}
+
+/* ================= 4. GHICEȘTE ȘI MĂSOARĂ ================= */
+function measGame(){
+  stopAll(); curRestart=measGame; const myGen=gen; const plan=['est','est','cmp','pen','est','rug','cmp','est']; let ti=0, errs=0, busy=false;
+  const F=frame(X().measIntro,plan.length), ST=72, X0=80;
+  function next(){ ti++; busy=false; if(ti>=plan.length) return finish('meas',rate(errs)); task(); }
+  async function good(m){ chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} F.set('🎉 '+m); await spW(m,1600); if(myGen!==gen) return; next(); }
+  function dragRef(svg){ const g=svg.querySelector('#gm-ref'); if(!g) return; let d=null, ox=0, oy=0;
+    g.onpointerdown=e=>{ e.preventDefault(); const p=pt(svg,e); d={x:p.x-ox,y:p.y-oy}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
+    svg.addEventListener('pointermove',e=>{ if(!d) return; const p=pt(svg,e); ox=p.x-d.x; oy=p.y-d.y; g.setAttribute('transform',`translate(${ox} ${oy})`); });
+    svg.addEventListener('pointerup',()=>{ if(d){ d=null; blip(); } }); }
+  function nums(lo,hi,fn){ const box=el('div','gm-row'); for(let v=lo;v<=hi;v++){ const b=el('button','gm-num',String(v)); b.onclick=()=>fn(v,b); box.appendChild(b); } F.ctrl.innerHTML=''; F.ctrl.appendChild(box); }
+  function task(){ const t=plan[ti];
+    if(t==='est'){ const d=RR(3,10); let s=`<svg viewBox="0 0 900 360"><rect width="900" height="360" rx="22" fill="#E6F6FF"/><rect y="250" width="900" height="110" fill="#9FDB86"/><text x="${X0}" y="250" font-size="64" text-anchor="middle" id="gm-fox">🦊</text><text x="${X0+d*ST}" y="250" font-size="60" text-anchor="middle">🥕</text><g id="gm-steps"></g><g id="gm-ref" style="cursor:grab"><rect x="40" y="30" width="${ST+40}" height="96" rx="14" fill="#fff" stroke="#FF9F43" stroke-width="3"/><text x="60" y="80" font-size="26" text-anchor="middle">🐾</text><text x="${60+ST}" y="80" font-size="26" text-anchor="middle">🐾</text><path d="M60 96 L60 106 L${60+ST} 106 L${60+ST} 96" stroke="#24325F" stroke-width="3" fill="none"/><text x="${60+ST/2}" y="52" font-size="18" font-weight="800" text-anchor="middle" fill="#24325F">${X().u1}</text></g></svg>`;
+      F.stage.innerHTML=s; dragRef(F.stage.firstChild); F.set('🦶 '+X().estQ); sp(X().estQ+' '+X().estRef); nums(1,10,async(v,b)=>{ if(busy) return; busy=true; b.classList.add('ok'); const svg=F.stage.firstChild, fox=svg.querySelector('#gm-fox'), g=svg.querySelector('#gm-steps');
+        for(let k=1;k<=d;k++){ fox.setAttribute('x',X0+k*ST); fox.setAttribute('y',236); setTimeout(()=>fox&&fox.setAttribute('y',250),140); g.insertAdjacentHTML('beforeend',`<text x="${X0+(k-.5)*ST}" y="300" font-size="26" text-anchor="middle">🐾</text><text x="${X0+(k-.5)*ST}" y="340" font-size="24" font-weight="800" text-anchor="middle" fill="#24325F">${k}</text>`); pop(k); await wait(420); if(myGen!==gen) return; }
+        const diff=Math.abs(v-d); if(diff===0) return good(X().exact+' '+X().steps(d)); if(diff===1) return good(X().close+' '+X().steps(d));
+        errs++; const m=X().far(v,d); F.set(m); await spW(m,1600); if(myGen!==gen) return; next(); }); }
+    if(t==='cmp'){ const G=50; const A=[[1,4],[11,4]]; const lenB=RR(0,2)===0?10:RR(11,14); /* drum în zigzag */
+      const B=[[1,6]]; let x=1,y=6,left=lenB; const goal=11; const zig=lenB-10; let up=zig>0?Math.ceil(zig/2):0; if(up){ B.push([3,6]); B.push([3,6+up]); B.push([7,6+up]); B.push([7,6]); B.push([11,6]); } else B.push([11,6]);
+      const L=P=>P.reduce((s,p,i)=>i?s+Math.abs(p[0]-P[i-1][0])+Math.abs(p[1]-P[i-1][1]):0,0); const la=L(A), lb=L(B);
+      const P=p=>[60+p[0]*G*1.3,p[1]*G-120]; let s=`<svg viewBox="0 0 900 380"><rect width="900" height="380" rx="22" fill="#F4FFF0"/>`;
+      s+=`<polyline points="${A.map(P).map(q=>q.join(',')).join(' ')}" fill="none" stroke="#4AA8FF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${B.map(P).map(q=>q.join(',')).join(' ')}" fill="none" stroke="#FF9F43" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>`;
+      s+=`<text x="${P([1,5])[0]-40}" y="${P([1,5])[1]+20}" font-size="56" text-anchor="middle">🏠</text><text x="${P([11,5])[0]+40}" y="${P([11,5])[1]+20}" font-size="56" text-anchor="middle">🌳</text><g id="gm-ms"></g></svg>`;
+      F.stage.innerHTML=s; F.set('🛤️ '+X().cmpQ); sp(X().cmpQ); F.ctrl.innerHTML=''; const right=la>lb?'a':lb>la?'b':'s';
+      [['a',X().blue],['b',X().orange],['s',X().same]].forEach(([k,t])=>F.ctrl.appendChild(btn(t,'',async()=>{ if(busy) return; busy=true; const svg=F.stage.firstChild, g=svg.querySelector('#gm-ms');
+        for(const [Pth,col] of [[A,'#1F6FD1'],[B,'#C96A00']]){ let k2=0; for(let i=1;i<Pth.length;i++){ const [a1,b1]=Pth[i-1],[a2,b2]=Pth[i], n=Math.abs(a2-a1)+Math.abs(b2-b1); for(let u=0;u<n;u++){ k2++; const px=a1+(a2-a1)*(u+.5)/n, py=b1+(b2-b1)*(u+.5)/n; const [X_,Y_]=P([px,py]); g.insertAdjacentHTML('beforeend',`<circle cx="${X_}" cy="${Y_}" r="13" fill="#fff" stroke="${col}" stroke-width="3"/><text x="${X_}" y="${Y_+6}" font-size="15" font-weight="800" text-anchor="middle" fill="${col}">${k2}</text>`); pop(k2); await wait(150); if(myGen!==gen) return; } } }
+        const m=X().cmpA(la,lb); if(k===right) return good(m); errs++; boing(); F.set(m); await spW(m,1800); if(myGen!==gen) return; next(); }))); }
+    if(t==='pen'){ const n=RR(3,6), PW=110; let s=`<svg viewBox="0 0 900 340"><rect width="900" height="340" rx="22" fill="#FFF7E6"/><rect x="${450-n*PW/2}" y="70" width="${n*PW}" height="60" rx="30" fill="#C98A4E" stroke="#8F5427" stroke-width="5"/><g id="gm-pens"></g><g id="gm-ref" style="cursor:grab"><rect x="30" y="200" width="${PW+30}" height="80" rx="14" fill="#fff" stroke="#FFB21E" stroke-width="3"/><rect x="45" y="240" width="${PW-26}" height="22" fill="#FFC83D" stroke="#B57A00" stroke-width="2"/><path d="M${45+PW-26} 240 L${45+PW-8} 251 L${45+PW-26} 262 Z" fill="#F2D3A0" stroke="#B57A00" stroke-width="2"/><rect x="41" y="240" width="10" height="22" fill="#FF8FA6"/><text x="${30+(PW+30)/2}" y="228" font-size="18" font-weight="800" text-anchor="middle" fill="#24325F">${X().u2}</text></g></svg>`;
+      F.stage.innerHTML=s; dragRef(F.stage.firstChild); F.set('✏️ '+X().penQ); sp(X().penQ+' '+X().penRef); nums(1,8,async(v,b)=>{ if(busy) return; busy=true; const g=F.stage.firstChild.querySelector('#gm-pens');
+        for(let k=0;k<n;k++){ const x=450-n*PW/2+k*PW; g.insertAdjacentHTML('beforeend',`<g><rect x="${x+4}" y="160" width="${PW-26}" height="22" fill="#FFC83D" stroke="#B57A00" stroke-width="2"/><path d="M${x+PW-22} 160 L${x+PW-4} 171 L${x+PW-22} 182 Z" fill="#F2D3A0" stroke="#B57A00" stroke-width="2"/><rect x="${x}" y="160" width="10" height="22" fill="#FF8FA6"/><text x="${x+PW/2}" y="225" font-size="24" font-weight="800" text-anchor="middle" fill="#24325F">${k+1}</text></g>`); pop(k+1); await wait(400); if(myGen!==gen) return; }
+        if(v===n) return good(X().penA(n)); errs++; boing(); b.classList.add('no'); const m=X().penA(n); F.set(m); await spW(m,1400); if(myGen!==gen) return; next(); }); }
+    if(t==='rug'){ let a1,b1,a2,b2; do{ a1=RR(2,5); b1=RR(2,4); a2=RR(1,6); b2=RR(2,4); }while(a1*b1===a2*b2||Math.abs(a1*b1-a2*b2)>4); const C=46;
+      let s=`<svg viewBox="0 0 900 360"><rect width="900" height="360" rx="22" fill="#F6F1FF"/><rect id="gm-r1" x="${230-a1*C/2}" y="${180-b1*C/2}" width="${a1*C}" height="${b1*C}" rx="8" fill="#4AA8FF"/><rect id="gm-r2" x="${670-a2*C/2}" y="${180-b2*C/2}" width="${a2*C}" height="${b2*C}" rx="8" fill="#FF9F43"/><g id="gm-grid"></g></svg>`;
+      F.stage.innerHTML=s; F.set('🧶 '+X().rugQ); sp(X().rugQ); F.ctrl.innerHTML='';
+      [['a',X().blue],['b',X().orange]].forEach(([k,t])=>F.ctrl.appendChild(btn(t,'',async()=>{ if(busy) return; busy=true; const g=F.stage.firstChild.querySelector('#gm-grid');
+        for(const [cx,a,b] of [[230,a1,b1],[670,a2,b2]]){ let c=0; for(let j=0;j<b;j++) for(let i=0;i<a;i++){ c++; const x=cx-a*C/2+i*C, y=180-b*C/2+j*C; g.insertAdjacentHTML('beforeend',`<rect x="${x+2}" y="${y+2}" width="${C-4}" height="${C-4}" rx="5" fill="rgba(255,255,255,.35)" stroke="#fff"/><text x="${x+C/2}" y="${y+C/2+7}" font-size="18" font-weight="800" text-anchor="middle" fill="#fff">${c}</text>`); pop(c); await wait(140); if(myGen!==gen) return; } }
+        const m=X().rugA(a1*b1,a2*b2), right=a1*b1>a2*b2?'a':'b'; if(k===right) return good(m); errs++; boing(); F.set(m); await spW(m,1800); if(myGen!==gen) return; next(); }))); }
+  }
+  sp(X().measIntro); task();
+}
+
+/* ================= intrare ================= */
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; { const gw=(k,f)=>(...a)=>{ if(window.__gate&&window.__gate('gm',k)) return menu(); return f(...a); }; geoGame=gw('geo',geoGame); tanGame=gw('tan',tanGame); cubeGame=gw('cube',cubeGame); measGame=gw('meas',measGame); } menu=__rm(menu); geoGame=__rm(geoGame); tanGame=__rm(tanGame); cubeGame=__rm(cubeGame); measGame=__rm(measGame);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
+window.openShapes=()=>{ root.hidden=false; menu(); };
+try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gShapes')){ const b=document.createElement('button'); b.id='gShapes'; b.className='pufiTab'; b.textContent='📐 Forme';
+  b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} window.openShapes(); }; const ref=document.getElementById('gRobo'); if(ref&&ref.nextSibling) tabs.insertBefore(b,ref.nextSibling); else tabs.appendChild(b); }
+  const upd=()=>{ const b=document.getElementById('gShapes'); if(b) b.textContent={de:'📐 Formen',en:'📐 Shapes'}[lang]||'📐 Forme'; }; upd(); document.querySelectorAll('.langs button').forEach(x=>x.addEventListener('click',upd)); }catch(e){}
+window.__gm={GEO,TAN,BASE,rotN,classify,area2,simple,clean};
+})();
+</script>

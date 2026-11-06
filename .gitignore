@@ -1,1 +1,4 @@
 licenses/.cache/
+dist/
+src/late_credits_data.html
+src/tests/index.html

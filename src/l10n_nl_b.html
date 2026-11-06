@@ -1,0 +1,53 @@
+
+<script>
+/* ===== Nederlands — lezen ===== */
+(()=>{ const lg='nl', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Lezen',title:'Lezen en schrijven',back:'⬅ Terug',menu:'⬅ Menu',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','Het alfabet'],fish:['🎣','Vang de letter'],train:['🚂','De klankentrein'],build:['🧩','Het toverwoord'],read:['👀','Lees en kies'],story:['📚','Verhaaltjes'],write:['✍️','Schrijf met je vinger']},
+  alphaTask:'Tik op een letter om hem te horen!',album:(n,t)=>`🏅 Stickers: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, van ${w}.`,
+  fishSay:(l,w)=>`Vang de letter ${l}, van ${w}!`,fishWrong:l=>`Dit is de letter ${l}. Probeer het nog eens!`,fishRight:l=>`Goed zo! Je hebt de ${l} gevangen.`,
+  trainSay:w=>`Maak het woord ${w}! Zet de wagons op volgorde.`,trainDone:w=>`Goed zo! ${w}!`,
+  buildSay:w=>`Schrijf het woord ${w}!`,buildDone:w=>`Super! Je hebt ${w} geschreven.`,
+  readTask:'Lees het woord en kies het plaatje!',readWrong:'Probeer het nog eens!',readRight:w=>`Ja! ${w}!`,
+  storyTask:'Kies een verhaaltje!',readMe:'▶ Lees voor',readSelf:'Tik op een woord om het te horen.',storyDone:'Goed zo! Je hebt het verhaaltje uit.',
+  writeTask:l=>`Schrijf ${l}. Begin bij de groene stip.`,writeDone:l=>`Goed zo! Je hebt ${l} geschreven!`,offTrack:'Volg de grijze lijn 🙂',
+  letters:'🔤 Letters',digits:'🔢 Cijfers',next:'▶ Volgende',again:'↺ Nog een keer',listen:'🔊 Luisteren',
+  sylQ:w=>`Hoeveel klankgroepen heeft het woord ${w}?`,sylN:n=>n===1?'één klankgroep':n+' klankgroepen',sylSay:(w,n,x)=>`Ja! ${w} heeft ${n}: ${x}.`,sylWrong:'Probeer het nog eens! Klap bij elke klankgroep. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'klankgroep':'klankgroepen'} 👏`,
+  mPick:'🔤 Kies letters',mFree:'✏️ Schrijf over de lijn',mGuide:'✍️ Schrijf met hulp',clear:'🧽 Wissen',freeHint:'Schrijf de letter over de grijze lijn.',freeBad:'Probeer over de lijn te schrijven 🙂',writeLetter:l=>`Schrijf de letter ${l}.`};
+D.AQTX[lg]={btn:'🐠 Mijn aquarium',title:'🐠 Mijn aquarium',empty:'Vang vissen om je aquarium te vullen!',slow:'🐢 Langzaam',fast:'🐇 Snel',close:'✖ Sluiten'};
+D.STX[lg]={syl:'🎨 Gekleurde klankgroepen',listen:'🔊 Lees voor',self:'👆 Ik lees zelf',next:'Volgend woord ▶',selfHint:'Lees het gele woord hardop en druk dan op ▶. Ken je een woord niet? Tik erop.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, van ${w}!`,(l,w)=>`Waar is de ${l}? ${l}, van ${w}.`,(l,w)=>`Zoek de ${l}, van ${w}!`,(l,w)=>`De vis met de ${l}, van ${w}!`,(l,w)=>`Kom op, de ${l}, van ${w}!`],
+  pic:w=>`Met welke letter begint ${w}?`, ok:['Gevangen!','Super!','Goede vangst!','Wauw!','Ja!','Wat een vis!'], no:['Die niet!','Oei, een andere vis!','Zoek verder!',x=>`Dit is de ${x}.`],
+  gold:'De gouden vis! Drie sterren!', lvl:n=>`Niveau ${n}! Er komen nieuwe zeedieren!`, bucket:'Emmer'};
+D.ALPHA[lg]=[['A','🐒','AAP'],['B','🐻','BEER'],['C','🍋','CITROEN'],['D','🐬','DOLFIJN'],['E','🦆','EEND'],['F','🚲','FIETS'],['G','🦒','GIRAF'],['H','🐶','HOND'],['I','🐛','INSECT'],['J','🧥','JAS'],['K','🐱','KAT'],['L','🦁','LEEUW'],['M','🐭','MUIS'],
+  ['N','👃','NEUS'],['O','🐘','OLIFANT'],['P','🐧','PINGUÏN'],['Q','🦜','QUETZAL'],['R','🚀','RAKET'],['S','⭐','STER'],['T','🍅','TOMAAT'],['U','🦉','UIL'],['V','🐟','VIS'],['W','☁️','WOLK'],['X','🎹','XYLOFOON'],['Y','🧘','YOGA'],['Z','☀️','ZON']];
+D.WORDS[lg]=[['👩','MA-MA'],['👨','PA-PA'],['🐱','POES'],['🐶','HOND'],['🏠','HUIS'],['🍎','AP-PEL'],['🚗','AU-TO'],['☀️','ZON'],['🌙','MAAN'],['🐟','VIS'],['🦆','EEND'],['🎈','BAL-LON'],['🌸','BLOEM'],['🦁','LEEUW'],
+  ['🍌','BA-NAAN'],['🐸','KIK-KER'],['🦋','VLIN-DER'],['🍓','AARD-BEI'],['🥕','WOR-TEL'],['🐭','MUIS'],['🐄','KOE'],['🌳','BOOM'],['🍉','WA-TER-ME-LOEN'],['🐢','SCHIL-PAD'],['🚂','TREIN'],['🐻','BEER'],['☁️','WOLK'],['🎂','TAART'],['🐰','KO-NIJN'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi en de bal','Pu·fi heeft een ro·de bal. De bal stuit om·hoog, om·hoog, om·hoog. Pu·fi rent er·ach·ter·aan. Wat een pret!'],
+ ['🐱','Poes Mimi','Mi·mi is een klei·ne poes. Ze drinkt melk. Dan slaapt ze in de zon. Mi·auw, zegt Mi·mi.'],
+ ['🏖️','Een dag aan zee','Van·daag gaan we naar zee. Het wa·ter is blauw. Ik bouw een zand·kas·teel. Wat een mooie dag!'],
+ ['🚂','De trein','De trein rijdt snel. Tsjoe tsjoe, zegt de trein. Ma·ma en pa·pa kij·ken uit het raam. We gaan naar o·ma.'],
+ ['⛄','De sneeuwpop','Bui·ten sneeuwt het. Pu·fi maakt een sneeuw·pop. Hij krijgt een wor·tel als neus. De sneeuw·pop lacht.'],
+ ['🍯','De beer en de honing','Een gro·te beer zoekt ho·ning. De bij·en vlie·gen: bzz, bzz! De beer vindt een pot ho·ning. Mmm, lek·ker!'],
+ ['🎂','Pufi is jarig','Van·daag is Pu·fi ja·rig. Op de taart staan zes kaar·sjes. De vrien·den zin·gen een liedje. Pu·fi blaast en lacht.'],
+ ['🚀','De raket','Pu·fi vliegt met een ra·ket. Om·hoog, steeds ho·ger! Hij ziet de maan en de ster·ren. Dan gaat hij naar huis om te e·ten.'],
+ ['🌈','De regen','Het re·gent en Pu·fi heeft een ge·le pa·ra·plu. Hij springt in de plas·sen: plons, plons! Dan komt de zon. Aan de lucht staat een re·gen·boog.'],
+ ['🥕','De moestuin','O·ma heeft een moes·tuin. Daar groei·en to·ma·ten en wor·tels. Pu·fi geeft de bloe·men wa·ter. Een slak·je kruipt heel lang·zaam.']];
+D.X2[lg]={ groups:['🔤 Letters en klanken','✍️ Schrijven','📚 Lezen'],
+  games:{hunt:['👂','Klankenjacht'],pos:['📍','Waar hoor je de klank?'],bubble:['🫧','Letterbellen'],twins:['🔍','Woordtweelingen']},
+  huntSay:(u,ex)=>`Tik op alle plaatjes die beginnen met ${u}, zoals ${ex}!`, huntTask:u=>`Wat begint met ${u}?`,
+  huntNo:w=>`${w}? Nee, die past niet.`, huntDone:'Goed zo! Je hebt ze allemaal gevonden! De andere passen niet.',
+  posSay:(l,w)=>`Waar hoor je de ${l} in ${w}? Aan het begin, in het midden of aan het eind?`, posTask:l=>`Waar hoor je de ${l}?`,
+  posLbl:['Aan het begin','In het midden','Aan het eind'], posRight:(l,w,p)=>`Ja! In ${w} hoor je de ${l} ${p.toLowerCase()}.`, posWrong:'Luister nog een keer!',
+  bubbleSay:w=>`Prik de bellen op volgorde en schrijf ${w}!`, bubbleTask:f=>`Woorden met ${f}`, bubbleDone:w=>`Super! Je hebt ${w} geschreven.`,
+  twinsSay:'Welk woord hoort bij het plaatje?', twinsWrong:w=>`Hier staat ${w}. Probeer het nog eens!`, twinsRight:w=>`Ja! ${w}!`, listen:'🔊 Luisteren' };
+const RAW='ZON☀️ MAAN🌙 HUIS🏠 POES🐱 HOND🐶 VIS🐟 KIKKER🐸 BEER🐻 LEEUW🦁 KOE🐄 SCHAAP🐑 SLAK🐌 SCHILDPAD🐢 SCHIP🚢 PARAPLU☂️ BOOM🌳 BOEK📖 BAL⚽ BROOD🍞 MELK🥛 BOTER🧈 APPEL🍎 BANAAN🍌 BLOEM🌸 EEND🦆 EGEL🦔 NEUS👃 ROOS🌹 TIJGER🐯 TREIN🚂 BOOT⛵ RAKET🚀 PADDENSTOEL🍄 HART❤️ KAAS🧀 WALVIS🐳 MUIS🐭 KIP🐔 PAARD🐴 ZWAAN🦢 LEPEL🥄 TOMAAT🍅 KERS🍒 WORTEL🥕 PEER🍐 CITROEN🍋 MOND👄 KROON👑 BEL🔔 KAARS🕯️ PENSEEL🖌️ BEZEM🧹 KOPJE☕ BRIL👓 KAMEEL🐪 MIER🐜 SPIN🕷️ OLIFANT🐘 KROKODIL🐊 AUTO🚗 OOG👁️ BIJ🐝 SLANG🐍 SCHAAR✂️ SCHOEN👟 SLEUTEL🔑 VLINDER🦋 STER⭐ STOEL🪑 POTLOOD✏️ SOK🧦 STEEN🪨 IJSJE🍦 EMMER🪣 UIL🦉 GEIT🐐 AAP🐒 VARKEN🐷 GITAAR🎸 KLOK⏰ HAMER🔨 KUIKEN🐤 MAMA👩 WOLK☁️ AARDBEI🍓 DOLFIJN🐬 GIRAF🦒 ZEBRA🦓 WOLF🐺 VOS🦊 PINGUÏN🐧 KONIJN🐰 VLIEGTUIG✈️ FIETS🚲 VUUR🔥 KERSTBOOM🎄 CADEAU🎁 TAART🎂 DOBBELSTEEN🎲 HAND✋ VOET🦶 TAND🦷 OOR👂 MES🔪 HAAN🐓 CHOCOLA🍫 VIOOL🎻 TROMMEL🥁 SLOT🔒 BRIEF✉️ VLAG🚩 ZOUT🧂 HONING🍯 TELEFOON📱 UI🧅 HERT🦌 TAS👜 RAAM🪟 SPIEGEL🪞 JAS🧥 ROBOT🤖 OCTOPUS🐙 KONINGIN👸 VRACHTWAGEN🚚 HOED🎩 PIZZA🍕 SINAASAPPEL🍊 DRUIF🍇 VOGEL🐦 KOALA🐨 BED🛏️ EIKEL🌰 SJAAL🧣 BLAD🍃 KNOFLOOK🧄 VUIST👊 EZEL🫏 MUTS🧢 TOREN🗼 SPEEN🍼 NACHT🌃 EI🥚 WORM🪱 ANANAS🍍 POP🪆 REGEN🌧️ CLOWN🤡 NEST🪺 MOLEN🌬️ TUIN🏡 TENT⛺ BUIK🫃 DUIF🕊️ KOEKJE🍪 SCHOOL🏫 SCHOMMEL🛝 BLAUW🔵';
+const seen={}; D.VOC[lg]=RAW.trim().split(/\s+/).map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; }).filter(x=>!seen[x[1]]&&!seen[x[0]]&&(seen[x[1]]=seen[x[0]]=1));
+D.GRA[lg]=['SCH','IJ','EI','UI','OU','AU','OE','EU','IE','AA','EE','OO','UU','CH','NG'];
+D.HUNTLONG[lg]=['SCH','CH','EI','UI','OU','AU','OE','EU','IJ','IE','AA','EE','OO','UU'];
+D.HUNTL[lg]='BDFGHKLMNPRSTVWZ';
+D.FAM[lg]=[['EI','IJ'],['UI'],['OU','AU'],['OE'],['EU'],['IE'],['SCH'],['NG']];
+D.POSL[lg]='MLNPKRT';
+})();
+</script>

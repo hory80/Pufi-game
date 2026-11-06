@@ -1,0 +1,17 @@
+<style>
+/* fără zoom la dublu-tap (ex. 1 apoi 1 = 11) și fără ciupit pentru mărire */
+html,body,*{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,[role=button],.sp-keys button,.mw-ans button,.sa-ans button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+</style>
+<script>
+(()=>{
+/* viewport fix: fără mărire, nici în artefact, nici în aplicație */
+try{ let m=document.querySelector('meta[name=viewport]'); if(!m){ m=document.createElement('meta'); m.name='viewport'; document.head.appendChild(m); }
+  m.content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover'; }catch(e){}
+const stop=e=>{ try{ e.preventDefault(); }catch(_){} };
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stop,{passive:false}));
+document.addEventListener('dblclick',stop,{passive:false});
+document.addEventListener('touchmove',e=>{ if(e.touches&&e.touches.length>1) stop(e); },{passive:false});
+})();
+</script>

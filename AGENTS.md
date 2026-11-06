@@ -9,3 +9,10 @@
 - Kids app: no analytics, no ads, no third-party tracking; external links stay blocked.
 - Keep the JS bridge contract (`window.native.call`, `native.on`) unchanged unless the task says otherwise. Details: `ios/README.md` and `ios/CODEX_PROMPT.md`.
 - Hory writes tasks in Romanian; reply to him in Romanian.
+
+## Sursele jocului web (src/)
+- Jocul web se editează DOAR în `src/` (joc-base.html, l10n_*.html, *_module.html, late_*.html). `index.html` este generat.
+- Build: `python3 src/build.py` (din rădăcina repo-ului) → actualizează `index.html` și scrie `dist/joc.html`.
+- Teste Playwright: `cp dist/joc.html src/tests/index.html && node src/tests/<test>.cjs` (Chromium + Playwright sunt necesare).
+- Limbi: ro, de, en, fr, es, it, pt, nl, pl, uk, ru, hu. Orice text nou trebuie să aibă audio (copiii nu știu să citească) și traducere în toate cele 12 limbi.
+- Nu copia niciodată un fișier generat peste `index.html`; rulează build-ul.

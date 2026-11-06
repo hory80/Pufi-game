@@ -1,0 +1,346 @@
+<style>
+/* ===== Insula lui Pufi ===== */
+.isl-ban{position:relative;width:100%;max-width:1000px;height:clamp(150px,30vh,270px);border-radius:28px;overflow:hidden;cursor:pointer;box-shadow:0 8px 0 rgba(36,50,95,.18);flex:none;border:none;padding:0;font:inherit;background:#6EC6FF}
+.isl-ban:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(36,50,95,.18)}
+.isl-ban svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.isl-ban .cap{position:absolute;left:12px;bottom:10px;background:rgba(255,255,255,.92);border-radius:18px;padding:6px 14px;font-weight:800;color:#24325f;text-align:left;line-height:1.15;max-width:75%}
+.isl-ban .cap b{display:block;font-size:clamp(1.2rem,3.2vw,1.7rem)}
+.isl-ban .cap span{font-size:clamp(.85rem,2vw,1.05rem);opacity:.85}
+.isl-ban .bdg{position:absolute;right:12px;top:10px;background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;font-size:clamp(1rem,2.6vw,1.35rem);color:#24325f}
+.isl-ban .bdg.hot{background:#FFD43B;animation:islPulse 1s ease-in-out infinite}
+@keyframes islPulse{50%{transform:scale(1.12)}}
+#isl-root{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;gap:6px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);font-family:var(--display);color:var(--ink);background:#3BA7E5}
+#isl-root[hidden]{display:none}
+#isl-root .rb-top h2{margin:0;flex:1;text-align:center;font-size:clamp(1.3rem,3.6vw,2rem);color:#fff;text-shadow:0 2px 0 #24325f,0 -2px 0 #24325f,2px 0 0 #24325f,-2px 0 0 #24325f}
+#isl-stage{flex:1;min-height:0;position:relative;overflow:hidden}
+#isl-stage.por{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+#isl-stage.por svg{max-width:none}
+#isl-stage svg{width:100%;height:100%;display:block;-webkit-user-select:none;user-select:none}
+.isl-b{cursor:pointer}
+#isl-pop{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:#fff;border-radius:24px;padding:12px 16px;width:min(560px,94%);box-sizing:border-box;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;font-weight:800;box-shadow:0 8px 0 rgba(36,50,95,.18);z-index:2}
+#isl-pop[hidden]{display:none}
+#isl-pop h3{margin:0;font-size:clamp(1.2rem,3vw,1.6rem)}
+#isl-pop p{margin:0;font-size:clamp(1rem,2.4vw,1.2rem);line-height:1.3}
+#isl-pop .bar{width:100%;height:16px;border-radius:999px;background:#E6ECF7;overflow:hidden}
+#isl-pop .bar i{display:block;height:100%;background:linear-gradient(90deg,#FFD43B,#FFB020);border-radius:999px}
+#isl-pop .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.isl-toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:100000;background:#fff;border:3px solid #FFB020;border-radius:999px;padding:8px 18px;font-family:var(--display);font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);color:#24325f;pointer-events:none;animation:islToast 3s ease forwards;white-space:nowrap;box-shadow:0 6px 0 rgba(36,50,95,.15)}
+@keyframes islToast{0%{opacity:0;transform:translate(-50%,-20px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+/* animații în scenă */
+.isl-svg .cl{animation:islCloud 60s linear infinite}
+.isl-svg .cl2{animation:islCloud 85s linear infinite;animation-delay:-40s}
+@keyframes islCloud{from{transform:translateX(-300px)}to{transform:translateX(1850px)}}
+.isl-svg .boat{animation:islBoat 70s linear infinite}
+@keyframes islBoat{from{transform:translateX(-120px)}to{transform:translateX(1680px)}}
+.isl-svg .bob{animation:islBob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islBob{50%{transform:translateY(-4px) rotate(-3deg)}}
+.isl-svg .wave{animation:islWave 6s linear infinite}
+.isl-svg .wave2{animation:islWave 9s linear infinite reverse}
+@keyframes islWave{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+.isl-svg .palm{animation:islSway 4s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islSway{50%{transform:rotate(4deg)}}
+.isl-svg .tw{animation:islTw 2s ease-in-out infinite}
+@keyframes islTw{50%{opacity:.2}}
+.isl-svg .spin{animation:islSpin 6s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islSpin{to{transform:rotate(360deg)}}
+.isl-svg .smoke{animation:islSmoke 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes islSmoke{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.85}100%{opacity:0;transform:translate(14px,-46px) scale(1.5)}}
+.isl-svg .flag{animation:islFlag 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:left center}
+@keyframes islFlag{50%{transform:scaleX(.8) skewY(4deg)}}
+.isl-svg .hop{animation:islHop 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islHop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.isl-svg .beam{animation:islBeam 5s ease-in-out infinite;transform-box:fill-box;transform-origin:right center}
+@keyframes islBeam{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.15)}}
+.isl-svg .an{transition:transform 2.6s linear}
+.isl-svg .egg{animation:islEgg 2s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+.isl-svg .egg.rdy{animation:islEggR .6s ease-in-out infinite}
+@keyframes islEgg{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-8deg)}92%{transform:rotate(8deg)}}
+@keyframes islEggR{25%{transform:rotate(-10deg) translateY(-3px)}75%{transform:rotate(10deg) translateY(-3px)}}
+.isl-svg .grow{animation:islGrow 1.3s cubic-bezier(.3,1.5,.5,1) both;transform-box:fill-box;transform-origin:bottom center}
+@keyframes islGrow{0%{transform:scale(.15,.05);opacity:0}60%{transform:scale(1.08,1.12);opacity:1}100%{transform:scale(1)}}
+.isl-svg .pf{animation:islPf 1.4s ease-out forwards;transform-box:fill-box;transform-origin:center}
+@keyframes islPf{0%{opacity:1;transform:translate(0,0) scale(.4)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}}
+.isl-svg .tap{animation:islTapH 1.2s ease-in-out infinite}
+@keyframes islTapH{50%{transform:translateY(-6px)}}
+#isl-stage svg image{-webkit-user-drag:none}
+.isl-svg .sn{animation:islSnow 10s linear infinite}
+@keyframes islSnow{from{transform:translate(0,-40px)}to{transform:translate(60px,1080px)}}
+#isl-root .isl-tb{white-space:nowrap}
+#isl-root .isl-tb.hot{background:#FFD43B;animation:islPulse 1s ease-in-out infinite}
+#isl-shop{position:absolute;inset:0;z-index:4;background:rgba(20,30,70,.45);display:flex;align-items:center;justify-content:center;padding:12px}
+#isl-shop[hidden]{display:none}
+.isl-shopbox{background:#fff;border-radius:26px;width:min(860px,96vw);max-height:88%;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;color:#24325f}
+.isl-shopbox .hd{display:flex;align-items:center;gap:10px;font-weight:800;font-size:clamp(1.2rem,3vw,1.6rem)}.isl-shopbox .hd b{flex:1}
+.isl-shopbox .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(30%,150px),1fr));gap:10px}
+.isl-shopbox .it{font:inherit;font-weight:800;border:3px solid #E6ECF7;background:#F7FAFF;border-radius:20px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#24325f;min-height:132px;justify-content:flex-end}
+.isl-shopbox .it .nm{font-size:clamp(.85rem,2vw,1rem);line-height:1.1;text-align:center}
+.isl-shopbox .it .pr{font-size:1.1rem;background:#FFF3B0;border-radius:999px;padding:1px 10px}
+.isl-shopbox .it.can{border-color:#3ECF8E}.isl-shopbox .it.own{opacity:.6}.isl-shopbox .it.own .pr{background:#D8F3E3}
+#isl-pop h3 img{display:block;margin:0 auto}
+.isl-svg .bb{transform-box:fill-box;transform-origin:bottom center}
+.isl-svg .squash{animation:islSq .55s ease-out}
+@keyframes islSq{0%{transform:scale(1)}25%{transform:scale(1.1,.86)}55%{transform:scale(.94,1.08)}100%{transform:scale(1)}}
+.isl-svg .ai{transform-box:fill-box;transform-origin:bottom center;transition:transform .3s}
+.isl-svg .hopn{animation:islHopN .6s ease-out}
+@keyframes islHopN{0%{translate:0 0}35%{translate:0 -60px}70%{translate:0 0}85%{translate:0 -12px}100%{translate:0 0}}
+.isl-svg .glow{animation:islGlow 3s ease-in-out infinite}
+@keyframes islGlow{50%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){.isl-svg *{animation-duration:0s!important;transition:none!important}}
+</style>
+<script>
+(()=>{
+/* Insula lui Pufi: stelele câștigate în fiecare card construiesc o clădire; în fiecare zi un ou surpriză aduce un prieten nou. */
+const TX={
+ ro:{hi:'Bună! Hai să ne jucăm!',sleep:'Pufi doarme. Șșș!',title:'Insula lui Pufi',sub:'Câștigă stele și insula ta crește!',b:{time:'Turnul cu ceas',read:'Biblioteca',math:'Turnul cifrelor',world:'Farul',shapes:'Piramida formelor',robo:'Atelierul roboților',chess:'Castelul de șah',pufi:'Casa lui Pufi'},
+   grow:c=>`Ca să crească, joacă: ${c}!`,max:'Clădirea e gata! ✨',up:(n,k)=>`${n}: nivelul ${k}!`,lv:k=>`Nivelul ${k}`,
+   eggNeed:k=>`Câștigă 3 stele azi și oul se deschide! (${k}/3)`,eggReady:'Oul e gata! Atinge-l de trei ori!',hatched:'Un prieten nou a venit pe insulă!',eggDone:'Mâine vine un ou nou!',friends:'Prieteni'},
+ de:{hi:'Hallo! Komm, wir spielen!',sleep:'Pufi schläft. Pssst!',title:'Pufis Insel',sub:'Sammle Sterne und deine Insel wächst!',b:{time:'Der Uhrturm',read:'Die Bibliothek',math:'Der Zahlenturm',world:'Der Leuchtturm',shapes:'Die Formenpyramide',robo:'Die Roboterwerkstatt',chess:'Die Schachburg',pufi:'Pufis Haus'},
+   grow:c=>`Damit es wächst, spiel: ${c}!`,max:'Fertig gebaut! ✨',up:(n,k)=>`${n}: Stufe ${k}!`,lv:k=>`Stufe ${k}`,
+   eggNeed:k=>`Sammle heute 3 Sterne, dann schlüpft das Ei! (${k}/3)`,eggReady:'Das Ei ist bereit! Tippe dreimal darauf!',hatched:'Ein neuer Freund ist auf die Insel gekommen!',eggDone:'Morgen kommt ein neues Ei!',friends:'Freunde'},
+ en:{hi:'Hi! Let’s play!',sleep:'Pufi is sleeping. Shhh!',title:'Pufi’s Island',sub:'Win stars and your island grows!',b:{time:'Clock Tower',read:'Library',math:'Number Tower',world:'Lighthouse',shapes:'Shape Pyramid',robo:'Robot Workshop',chess:'Chess Castle',pufi:'Pufi’s House'},
+   grow:c=>`To make it grow, play: ${c}!`,max:'Fully built! ✨',up:(n,k)=>`${n}: level ${k}!`,lv:k=>`Level ${k}`,
+   eggNeed:k=>`Win 3 stars today and the egg will hatch! (${k}/3)`,eggReady:'The egg is ready! Tap it three times!',hatched:'A new friend has come to the island!',eggDone:'A new egg comes tomorrow!',friends:'Friends'},
+ fr:{hi:'Coucou ! On joue ?',sleep:'Pufi dort. Chut !',title:'L’île de Pufi',sub:'Gagne des étoiles et ton île grandit !',b:{time:'La tour de l’horloge',read:'La bibliothèque',math:'La tour des nombres',world:'Le phare',shapes:'La pyramide des formes',robo:'L’atelier des robots',chess:'Le château d’échecs',pufi:'La maison de Pufi'},
+   grow:c=>`Pour le faire grandir, joue : ${c} !`,max:'Construction terminée ! ✨',up:(n,k)=>`${n} : niveau ${k} !`,lv:k=>`Niveau ${k}`,
+   eggNeed:k=>`Gagne 3 étoiles aujourd’hui et l’œuf va éclore ! (${k}/3)`,eggReady:'L’œuf est prêt ! Touche-le trois fois !',hatched:'Un nouvel ami est arrivé sur l’île !',eggDone:'Demain, un nouvel œuf arrive !',friends:'Amis'},
+ it:{hi:'Ciao! Giochiamo?',sleep:'Pufi dorme. Sst!',title:'L’isola di Pufi',sub:'Vinci stelle e la tua isola cresce!',b:{time:'La torre dell’orologio',read:'La biblioteca',math:'La torre dei numeri',world:'Il faro',shapes:'La piramide delle forme',robo:'L’officina dei robot',chess:'Il castello degli scacchi',pufi:'La casa di Pufi'},
+   grow:c=>`Per farlo crescere, gioca: ${c}!`,max:'Costruzione finita! ✨',up:(n,k)=>`${n}: livello ${k}!`,lv:k=>`Livello ${k}`,
+   eggNeed:k=>`Vinci 3 stelle oggi e l’uovo si schiude! (${k}/3)`,eggReady:'L’uovo è pronto! Toccalo tre volte!',hatched:'Un nuovo amico è arrivato sull’isola!',eggDone:'Domani arriva un nuovo uovo!',friends:'Amici'},
+ es:{hi:'¡Hola! ¿Jugamos?',sleep:'Pufi está durmiendo. ¡Shhh!',title:'La isla de Pufi',sub:'¡Gana estrellas y tu isla crece!',b:{time:'La torre del reloj',read:'La biblioteca',math:'La torre de los números',world:'El faro',shapes:'La pirámide de formas',robo:'El taller de robots',chess:'El castillo de ajedrez',pufi:'La casa de Pufi'},
+   grow:c=>`Para que crezca, juega: ${c}!`,max:'¡Construcción terminada! ✨',up:(n,k)=>`${n}: ¡nivel ${k}!`,lv:k=>`Nivel ${k}`,
+   eggNeed:k=>`¡Gana 3 estrellas hoy y el huevo se abrirá! (${k}/3)`,eggReady:'¡El huevo está listo! ¡Tócalo tres veces!',hatched:'¡Un nuevo amigo ha llegado a la isla!',eggDone:'¡Mañana llega un huevo nuevo!',friends:'Amigos'},
+ pt:{hi:'Oi! Vamos brincar?',sleep:'O Pufi está dormindo. Shhh!',title:'A ilha do Pufi',sub:'Ganhe estrelas e sua ilha cresce!',b:{time:'A torre do relógio',read:'A biblioteca',math:'A torre dos números',world:'O farol',shapes:'A pirâmide das formas',robo:'A oficina dos robôs',chess:'O castelo de xadrez',pufi:'A casa do Pufi'},
+   grow:c=>`Para crescer, jogue: ${c}!`,max:'Construção concluída! ✨',up:(n,k)=>`${n}: nível ${k}!`,lv:k=>`Nível ${k}`,
+   eggNeed:k=>`Ganhe 3 estrelas hoje e o ovo vai chocar! (${k}/3)`,eggReady:'O ovo está pronto! Toque nele três vezes!',hatched:'Um novo amigo chegou à ilha!',eggDone:'Amanhã chega um ovo novo!',friends:'Amigos'},
+ nl:{hi:'Hoi! Zullen we spelen?',sleep:'Pufi slaapt. Ssst!',title:'Het eiland van Pufi',sub:'Verdien sterren en je eiland groeit!',b:{time:'De klokkentoren',read:'De bibliotheek',math:'De cijfertoren',world:'De vuurtoren',shapes:'De vormenpiramide',robo:'De robotwerkplaats',chess:'Het schaakkasteel',pufi:'Het huis van Pufi'},
+   grow:c=>`Speel ${c} om het te laten groeien!`,max:'Helemaal klaar! ✨',up:(n,k)=>`${n}: niveau ${k}!`,lv:k=>`Niveau ${k}`,
+   eggNeed:k=>`Verdien vandaag 3 sterren, dan komt het ei uit! (${k}/3)`,eggReady:'Het ei is klaar! Tik er drie keer op!',hatched:'Er is een nieuwe vriend op het eiland!',eggDone:'Morgen komt er een nieuw ei!',friends:'Vrienden'},
+ pl:{hi:'Cześć! Pobawimy się?',sleep:'Pufi śpi. Ciii!',title:'Wyspa Pufiego',sub:'Zdobywaj gwiazdki, a twoja wyspa urośnie!',b:{time:'Wieża zegarowa',read:'Biblioteka',math:'Wieża liczb',world:'Latarnia morska',shapes:'Piramida kształtów',robo:'Warsztat robotów',chess:'Szachowy zamek',pufi:'Domek Pufiego'},
+   grow:c=>`Żeby urosło, zagraj: ${c}!`,max:'Gotowe! ✨',up:(n,k)=>`${n}: poziom ${k}!`,lv:k=>`Poziom ${k}`,
+   eggNeed:k=>`Zdobądź dziś 3 gwiazdki, a jajko się wykluje! (${k}/3)`,eggReady:'Jajko jest gotowe! Stuknij je trzy razy!',hatched:'Na wyspę przybył nowy przyjaciel!',eggDone:'Jutro przyjdzie nowe jajko!',friends:'Przyjaciele'},
+ hu:{hi:'Szia! Játsszunk!',sleep:'Pufi alszik. Pszt!',title:'Pufi szigete',sub:'Gyűjts csillagokat, és nő a szigeted!',b:{time:'Az óratorony',read:'A könyvtár',math:'A számtorony',world:'A világítótorony',shapes:'A formapiramis',robo:'A robotműhely',chess:'A sakkvár',pufi:'Pufi háza'},
+   grow:c=>`Hogy nőjön, játssz: ${c}!`,max:'Kész! ✨',up:(n,k)=>`${n}: ${k}. szint!`,lv:k=>`${k}. szint`,
+   eggNeed:k=>`Szerezz ma 3 csillagot, és kikel a tojás! (${k}/3)`,eggReady:'A tojás készen áll! Koppints rá háromszor!',hatched:'Új barát érkezett a szigetre!',eggDone:'Holnap új tojás jön!',friends:'Barátok'},
+ uk:{hi:'Привіт! Пограймося?',sleep:'Пуфі спить. Тсс!',title:'Острів Пуфі',sub:'Збирай зірочки, і твій острів росте!',b:{time:'Годинникова вежа',read:'Бібліотека',math:'Вежа чисел',world:'Маяк',shapes:'Піраміда фігур',robo:'Майстерня роботів',chess:'Шаховий замок',pufi:'Будиночок Пуфі'},
+   grow:c=>`Щоб росло, грай: ${c}!`,max:'Готово! ✨',up:(n,k)=>`${n}: рівень ${k}!`,lv:k=>`Рівень ${k}`,
+   eggNeed:k=>`Здобудь сьогодні 3 зірочки, і яйце трісне! (${k}/3)`,eggReady:'Яйце готове! Торкнися його тричі!',hatched:'На острів прийшов новий друг!',eggDone:'Завтра буде нове яйце!',friends:'Друзі'},
+ ru:{hi:'Привет! Давай играть!',sleep:'Пуфи спит. Тсс!',title:'Остров Пуфи',sub:'Собирай звёзды, и твой остров растёт!',b:{time:'Башня с часами',read:'Библиотека',math:'Башня чисел',world:'Маяк',shapes:'Пирамида фигур',robo:'Мастерская роботов',chess:'Шахматный замок',pufi:'Домик Пуфи'},
+   grow:c=>`Чтобы росло, играй: ${c}!`,max:'Готово! ✨',up:(n,k)=>`${n}: уровень ${k}!`,lv:k=>`Уровень ${k}`,
+   eggNeed:k=>`Получи сегодня 3 звезды, и яйцо треснет! (${k}/3)`,eggReady:'Яйцо готово! Нажми на него три раза!',hatched:'На остров пришёл новый друг!',eggDone:'Завтра будет новое яйцо!',friends:'Друзья'}};
+/* texte noi: magazin, sarcina zilei, hrănit */
+const DN=['swing','slide','fountain','treehouse','carousel','sandcastle','flowers','pond','kite','balloon','picnic','lamp'];
+const EXT={
+ ro:['Magazin',k=>`Mai trebuie stele: ${k}`,'Atinge insula unde vrei să-l pui!','Super! Arată minunat!','📍 Mută',(c,n)=>`Sarcina zilei: câștigă 5 stele la ${c}. (${n}/5)`,'Gata sarcina zilei! Atinge cadoul!','Surpriză! Ai primit 5 stele!','Mmm, ce bun!',['Leagăn','Tobogan','Fântână','Căsuță în copac','Carusel','Castel de nisip','Flori','Iaz','Zmeu','Balon cu aer cald','Picnic','Bancă cu felinar']],
+ de:['Laden',k=>`Es fehlen noch Sterne: ${k}`,'Tippe auf die Insel, wo es hin soll!','Super! Das sieht toll aus!','📍 Verschieben',(c,n)=>`Tagesaufgabe: Sammle 5 Sterne bei ${c}. (${n}/5)`,'Tagesaufgabe geschafft! Tippe auf das Geschenk!','Überraschung! Du bekommst 5 Sterne!','Mmm, lecker!',['Schaukel','Rutsche','Brunnen','Baumhaus','Karussell','Sandburg','Blumenbeet','Teich','Drachen','Heißluftballon','Picknick','Bank mit Laterne']],
+ en:['Shop',k=>`Stars still needed: ${k}`,'Tap the island where you want to put it!','Great! It looks lovely!','📍 Move',(c,n)=>`Today’s task: win 5 stars in ${c}. (${n}/5)`,'Today’s task is done! Tap the present!','Surprise! You got 5 stars!','Mmm, yummy!',['Swing','Slide','Fountain','Treehouse','Carousel','Sandcastle','Flower bed','Pond','Kite','Hot-air balloon','Picnic','Bench and lamp']],
+ fr:['Boutique',k=>`Il manque encore des étoiles : ${k}`,'Touche l’île là où tu veux le mettre !','Super ! C’est très joli !','📍 Déplacer',(c,n)=>`Mission du jour : gagne 5 étoiles dans ${c}. (${n}/5)`,'Mission du jour réussie ! Touche le cadeau !','Surprise ! Tu gagnes 5 étoiles !','Miam, c’est bon !',['Balançoire','Toboggan','Fontaine','Cabane dans l’arbre','Manège','Château de sable','Fleurs','Mare','Cerf-volant','Montgolfière','Pique-nique','Banc et lampadaire']],
+ it:['Negozio',k=>`Mancano ancora stelle: ${k}`,'Tocca l’isola dove vuoi metterlo!','Fantastico! È bellissimo!','📍 Sposta',(c,n)=>`Missione del giorno: vinci 5 stelle in ${c}. (${n}/5)`,'Missione del giorno compiuta! Tocca il regalo!','Sorpresa! Hai ricevuto 5 stelle!','Mmm, che buono!',['Altalena','Scivolo','Fontana','Casa sull’albero','Giostra','Castello di sabbia','Fiori','Laghetto','Aquilone','Mongolfiera','Picnic','Panchina e lampione']],
+ es:['Tienda',k=>`Todavía faltan estrellas: ${k}`,'¡Toca la isla donde quieras ponerlo!','¡Genial! ¡Queda precioso!','📍 Mover',(c,n)=>`Misión del día: gana 5 estrellas en ${c}. (${n}/5)`,'¡Misión del día cumplida! ¡Toca el regalo!','¡Sorpresa! ¡Has ganado 5 estrellas!','¡Mmm, qué rico!',['Columpio','Tobogán','Fuente','Casa del árbol','Tiovivo','Castillo de arena','Flores','Estanque','Cometa','Globo aerostático','Pícnic','Banco y farola']],
+ pt:['Loja',k=>`Ainda faltam estrelas: ${k}`,'Toque na ilha onde quer colocar!','Ótimo! Ficou lindo!','📍 Mover',(c,n)=>`Missão do dia: ganhe 5 estrelas em ${c}. (${n}/5)`,'Missão do dia concluída! Toque no presente!','Surpresa! Você ganhou 5 estrelas!','Hum, que delícia!',['Balanço','Escorregador','Fonte','Casa na árvore','Carrossel','Castelo de areia','Flores','Lago','Pipa','Balão de ar quente','Piquenique','Banco e poste de luz']],
+ nl:['Winkel',k=>`Nog nodig aan sterren: ${k}`,'Tik op het eiland waar je het wilt zetten!','Super! Het ziet er prachtig uit!','📍 Verplaatsen',(c,n)=>`Opdracht van vandaag: verdien 5 sterren bij ${c}. (${n}/5)`,'Opdracht van vandaag klaar! Tik op het cadeau!','Verrassing! Je krijgt 5 sterren!','Mmm, lekker!',['Schommel','Glijbaan','Fontein','Boomhut','Draaimolen','Zandkasteel','Bloemen','Vijver','Vlieger','Luchtballon','Picknick','Bankje met lantaarn']],
+ pl:['Sklep',k=>`Brakuje jeszcze gwiazdek: ${k}`,'Stuknij wyspę tam, gdzie chcesz to postawić!','Super! Wygląda pięknie!','📍 Przesuń',(c,n)=>`Zadanie dnia: zdobądź 5 gwiazdek w grze: ${c}. (${n}/5)`,'Zadanie dnia wykonane! Stuknij prezent!','Niespodzianka! Dostajesz 5 gwiazdek!','Mniam, pyszne!',['Huśtawka','Zjeżdżalnia','Fontanna','Domek na drzewie','Karuzela','Zamek z piasku','Kwiaty','Staw','Latawiec','Balon','Piknik','Ławka z latarnią']],
+ hu:['Bolt',k=>`Még ennyi csillag kell: ${k}`,'Koppints a szigetre, ahová tenni szeretnéd!','Szuper! Nagyon szép!','📍 Áthelyezés',(c,n)=>`A nap feladata: szerezz 5 csillagot itt: ${c}. (${n}/5)`,'Kész a nap feladata! Koppints az ajándékra!','Meglepetés! Kaptál 5 csillagot!','Hamm, de finom!',['Hinta','Csúszda','Szökőkút','Lombház','Körhinta','Homokvár','Virágágyás','Tó','Sárkány','Hőlégballon','Piknik','Pad lámpával']],
+ uk:['Крамниця',k=>`Ще потрібно зірочок: ${k}`,'Торкнися острова там, де хочеш це поставити!','Чудово! Дуже гарно!','📍 Перемістити',(c,n)=>`Завдання дня: здобудь 5 зірочок у грі «${c}». (${n}/5)`,'Завдання дня виконано! Торкнися подарунка!','Сюрприз! Ти отримуєш 5 зірочок!','Ммм, смачно!',['Гойдалка','Гірка','Фонтан','Будиночок на дереві','Карусель','Замок з піску','Квіти','Ставок','Повітряний змій','Повітряна куля','Пікнік','Лавка з ліхтарем']],
+ ru:['Магазин',k=>`Ещё нужно звёзд: ${k}`,'Нажми на остров там, куда хочешь это поставить!','Отлично! Очень красиво!','📍 Переместить',(c,n)=>`Задание дня: получи 5 звёзд в игре «${c}». (${n}/5)`,'Задание дня выполнено! Нажми на подарок!','Сюрприз! Ты получаешь 5 звёзд!','Ммм, вкусно!',['Качели','Горка','Фонтан','Домик на дереве','Карусель','Замок из песка','Цветы','Пруд','Воздушный змей','Воздушный шар','Пикник','Скамейка с фонарём']]};
+for(const lg in EXT){ const a=EXT[lg]; Object.assign(TX[lg],{shop:a[0],need:a[1],place:a[2],placed:a[3],move:a[4],quest:a[5],qDone:a[6],gift:a[7],yum:a[8],dn:Object.fromEntries(DN.map((k,i)=>[k,a[9][i]]))}); }
+const T=()=>TX[lang]||TX.en;
+const HM=()=>{ try{ return window.__hmT?window.__hmT():{}; }catch(e){ return {}; } };
+const sayT=t=>{ try{ return typeof say==='function'?say(t):null; }catch(e){} };
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const KEYS=['pufi','time','read','math','shapes','robo','chess','world'];
+const TH=[3,12,30,60];
+const ANIMALS=['🐰','🐻','🐼','🐨','🦁','🐷','🐸','🐧','🦆','🦉','🐢','🦔','🐯','🐮','🐵','🐔','🐤','🐴','🦄','🐞','🦋','🦀','🐬','🐳','🐙','🦒','🐘','🐿️','🦩','🦜','🐑','🐐','🦌','🦦','🐶','🐱'];
+const SEA=['🐬','🐳','🐙'];
+const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+const curStars=()=>{ try{ return typeof stars!=='undefined'?(+stars||0):0; }catch(e){ return 0; } };
+/* ---- starea ---- */
+let pts=LS.get('isl_pts',null);
+if(!pts){ const t=curStars(), s=Math.min(12,Math.floor(t/8)); pts={}; KEYS.forEach(k=>pts[k]=s); LS.set('isl_pts',pts); }
+const reload=()=>{ pts=LS.get('isl_pts',pts)||pts; };
+const lvOf=k=>{ const p=(pts[k]||0)+(k==='pufi'?3:0); return TH.filter(t=>p>=t).length; };
+const ptsOf=k=>(pts[k]||0)+(k==='pufi'?3:0);
+const seen=()=>LS.get('isl_seen',{});
+const day=()=>{ let d=LS.get('isl_day',null); if(!d||d.d!==today()){ d={d:today(),n:0}; LS.set('isl_day',d); } return d; };
+const animals=()=>LS.get('isl_ani',[]);
+const eggState=()=>{ const ani=animals(), h=LS.get('isl_hatch',''); if(h===today()) return 'done'; if(!ani.length&&!h) return 'ready'; return day().n>=3?'ready':'wait'; };
+/* ---- iarna, decorațiuni, sarcina zilei ---- */
+const month=()=>window.__islMonth!=null?window.__islMonth:new Date().getMonth();
+const winter=()=>[11,0,1].includes(month());
+const xmas=()=>month()===11||(month()===0&&(window.__islMonth!=null||new Date().getDate()<=6));
+const PRICE={flowers:5,pond:8,swing:10,sandcastle:10,slide:12,picnic:12,kite:15,lamp:15,fountain:20,treehouse:25,balloon:30,carousel:40};
+const DH={swing:115,slide:110,fountain:115,treehouse:200,carousel:170,sandcastle:100,flowers:72,pond:78,kite:185,balloon:205,picnic:72,lamp:150};
+const decos=()=>LS.get('isl_deco',[]);
+const quest=()=>{ let q=LS.get('isl_q',null); const d=today(); if(!q||q.d!==d){ let h=0; for(const c of d) h=(h*31+c.charCodeAt(0))%9973; q={d,k:KEYS[h%KEYS.length],n:0,c:false}; LS.set('isl_q',q); } return q; };
+const giftReady=()=>{ const q=quest(); return q.n>=5&&!q.c; };
+const meadow=(x,y)=>((x-768)/690)**2+((y-560)/215)**2<=1;
+/* ---- cine a câștigat steaua? (cardul deschis) ---- */
+const ROOTS=[['sa','math'],['cg','chess'],['ch','chess'],['pq','pufi'],['pf','pufi'],['tm','time'],['rd','read'],['gm','shapes'],['rb','robo'],['mw','math']];
+function curCard(){ const hm=document.getElementById('hm-root'), ir=document.getElementById('isl-root');
+  for(const [id,k] of ROOTS){ const e=document.getElementById(id+'-root'); if(e&&!e.hidden&&getComputedStyle(e).display!=='none') return k; }
+  if(ir&&!ir.hidden) return null; if(hm&&!hm.hidden) return null;
+  try{ return (typeof game!=='undefined'&&game==='abacus')?'math':'world'; }catch(e){ return 'world'; } }
+let last=curStars();
+setInterval(()=>{ const s=curStars(); if(s>last){ const d=s-last, k=curCard(); const dd=day(); dd.n+=d; LS.set('isl_day',dd);
+    if(k){ const q=quest(); if(q.k===k&&!q.c){ const was=q.n; q.n+=d; LS.set('isl_q',q); if(was<5&&q.n>=5) setTimeout(()=>toast('🎁 '+T().qDone),900); } const before=lvOf(k); pts[k]=(pts[k]||0)+d; LS.set('isl_pts',pts); const after=lvOf(k); if(after>before) toast('🏝️ '+T().up(T().b[k],after)); }
+    if(dd.n>=3&&dd.n-d<3&&eggState()==='ready') toast('🥚 '+T().eggReady); }
+  last=s; },1000);
+function toast(t){ const e=document.createElement('div'); e.className='isl-toast'; e.textContent=t; document.body.appendChild(e); setTimeout(()=>e.remove(),3200); }
+/* ---- ora reală: zi / noapte ---- */
+const hour=()=>{ if(window.__islHour!=null) return window.__islHour; const d=new Date(); return d.getHours()+d.getMinutes()/60; };
+function phase(h){ return (h<6.5||h>=20.5)?'night':h<8?'dawn':h>=18.5?'dusk':'day'; }
+const SKY={day:['#6EC6FF','#CDEBFF','#3BA7E5'],dawn:['#FFB38A','#FFE6B8','#5DB4E0'],dusk:['#FF8A65','#9575CD','#4F63B5'],night:['#0B1640','#2C3E80','#1C3D7A']};
+/* ---- imagini: blob URL o singură dată ---- */
+const IM={}; (()=>{ const S=window.__ISLIMG||{}; for(const k in S){ try{ const b=atob(S[k].d), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i);
+  IM[k]={u:URL.createObjectURL(new Blob([u],{type:'image/webp'})),w:S[k].w,h:S[k].h}; }catch(e){} } })();
+const INK='#24325f';
+const img=(k,h,cls,extra)=>{ const m=IM[k]; if(!m) return ''; const w=h*m.w/m.h; return `<image ${cls?`class="${cls}"`:''} href="${m.u}" x="${(-w/2).toFixed(1)}" y="${(-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" ${extra||''}/>`; };
+const sparkle=(h)=>`<text class="tw" x="${-h*.22}" y="${-h*.9}" font-size="30">✨</text><text class="tw" x="${h*.12}" y="${-h*1.02}" font-size="24" style="animation-delay:-1s">✨</text><text class="tw" x="${h*.2}" y="${-h*.55}" font-size="20" style="animation-delay:-.5s">⭐</text>`;
+/* poziții în coordonatele imaginii de fundal (1536×1024): baza clădirii și înălțimea la nivel maxim */
+const BLD={time:{x:405,y:478,h:330},chess:{x:645,y:462,h:232},math:{x:880,y:468,h:300},shapes:{x:1110,y:482,h:250},
+  read:{x:335,y:655,h:205},pufi:{x:700,y:672,h:235},robo:{x:1060,y:665,h:220},world:{x:1348,y:858,h:290}};
+const SC=[0,1,1,1,1]; const BIMG=(k,l)=>l===1?'b-'+k+'-1':l===2?'b-'+k+'-2':'b-'+k;
+const ORDER=Object.keys(BLD).sort((a,b)=>BLD[a].y-BLD[b].y);
+function bldSVG(k,l,n){ const B=BLD[k], h=B.h*SC[l]; if(!l) return img('b-site',k==='world'?120:150,'bimg');
+  let s=`<ellipse cx="0" cy="-4" rx="${h*.33}" ry="${h*.05}" fill="rgba(30,60,30,.18)"/>`+img(IM[BIMG(k,l)]?BIMG(k,l):'b-'+k,h,'bimg');
+  if(k==='time'&&l>=2){ const m=IM['b-time']; if(m){ const w=h*m.w/m.h, cx=(.497-.5)*w, cy=-h*(1-.392);
+    s+=`<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><line class="isl-hh" x1="0" y1="0" x2="0" y2="${-(w*.11).toFixed(1)}" stroke="#5A3A1E" stroke-width="${Math.max(3,w*.03).toFixed(1)}" stroke-linecap="round"/><line class="isl-mh" x1="0" y1="0" x2="0" y2="${-(w*.165).toFixed(1)}" stroke="#E8505B" stroke-width="${Math.max(2,w*.02).toFixed(1)}" stroke-linecap="round"/><circle r="${Math.max(2.5,w*.022).toFixed(1)}" fill="#5A3A1E"/></g>`; } }
+  if((k==='pufi'||k==='robo')&&l>=3){ const sx=k==='pufi'?h*.33:h*.36, sy=-h*(k==='pufi'?.93:.97); s+=`<circle class="smoke" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(h*.05).toFixed(1)}" fill="#fff" opacity=".8"/><circle class="smoke" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(h*.045).toFixed(1)}" fill="#fff" style="animation-delay:-1.5s"/>`; }
+  if(l>=4) s+=sparkle(h);
+  return s; }
+const POS=Object.fromEntries(Object.entries(BLD).map(([k,v])=>[k,[v.x,v.y]]));
+/* ---- scena ---- */
+function scene(o){ o=o||{}; const h=hour(), ph=phase(h), n=ph==='night';
+  let s=`<svg class="isl-svg${n?' isl-night':''}" viewBox="${o.vb||'0 0 1536 1024'}" preserveAspectRatio="${o.slice?'xMidYMid slice':'xMidYMid meet'}" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="islN${o.id||''}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".42 0 0 0 .02  0 .48 0 0 .04  0 0 .72 0 .12  0 0 0 1 0"/></filter>
+  <radialGradient id="islWin"><stop offset="0" stop-color="#FFD66B" stop-opacity=".75"/><stop offset="1" stop-color="#FFD66B" stop-opacity="0"/></radialGradient>
+  <linearGradient id="islBeam" x1="1" x2="0"><stop offset="0" stop-color="#FFF3B0" stop-opacity=".95"/><stop offset="1" stop-color="#FFF3B0" stop-opacity="0"/></linearGradient>
+  <radialGradient id="islSun"><stop offset="0" stop-color="#FFF6C8"/><stop offset=".55" stop-color="#FFD43B"/><stop offset="1" stop-color="#FFB020"/></radialGradient></defs>`;
+  const bgk=n?'bg-night':winter()&&IM['bg-winter']?'bg-winter':'bg-day'; s+=IM[bgk]?`<image href="${IM[bgk].u}" x="0" y="0" width="1536" height="1024"/>`:'<rect width="1536" height="1024" fill="#3BA7E5"/>';
+  if(n){ for(let i=0;i<34;i++){ const x=(i*163)%1536, y=14+(i*53)%220; s+=`<circle class="tw" cx="${x}" cy="${y}" r="${i%3?2:3.4}" fill="#fff" style="animation-delay:${-(i%7)*.4}s"/>`; }
+    s+=`<g transform="translate(1180 110)"><circle r="62" fill="#FFF3B0" opacity=".25"/><circle r="44" fill="#FFF6D6"/><circle cx="-12" cy="-8" r="8" fill="#EDE3B8"/><circle cx="14" cy="12" r="6" fill="#EDE3B8"/></g>`; }
+  else { const t=Math.max(0,Math.min(1,(h-6)/14)), x=330+t*880, y=200-Math.sin(t*Math.PI)*150;
+    s+=`<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)})"><circle r="92" fill="#FFF3B0" opacity=".35"/><g class="spin" style="animation-duration:24s">${[0,30,60,90,120,150,180,210,240,270,300,330].map(a=>`<rect x="-5" y="-86" width="10" height="22" rx="5" fill="#FFC93C" transform="rotate(${a})"/>`).join('')}</g><circle r="54" fill="url(#islSun)"/><circle cx="-18" cy="-8" r="6" fill="#5A3A1E"/><circle cx="18" cy="-8" r="6" fill="#5A3A1E"/><path d="M-20 14 Q0 32 20 14" stroke="#5A3A1E" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="-32" cy="10" r="8" fill="#FF8FA6" opacity=".7"/><circle cx="32" cy="10" r="8" fill="#FF8FA6" opacity=".7"/></g>`; }
+  const cloud=(y,sc,cls)=>`<g class="${cls}"><g transform="translate(0 ${y}) scale(${sc})" opacity="${n?.3:.92}"><ellipse cx="0" cy="0" rx="70" ry="30" fill="#fff"/><ellipse cx="48" cy="-18" rx="48" ry="34" fill="#fff"/><ellipse cx="-42" cy="-8" rx="38" ry="26" fill="#fff"/></g></g>`;
+  s+=cloud(150,1,'cl')+cloud(90,.75,'cl2');
+  s+=`<g class="boat"><g transform="translate(0 262)"><g class="bob"><path d="M-34 0 H34 L24 16 H-24z" fill="#C0603A"/><line x1="0" y1="0" x2="0" y2="-46" stroke="#5A3A1E" stroke-width="3"/><path d="M3 -44 L30 -6 H3z" fill="#FFF6E5"/><path d="M-3 -38 L-24 -6 H-3z" fill="#FF6B6B"/></g></g></g>`;
+  for(let i=0;i<9;i++){ const x=(i*197+90)%1536, y=880+(i*37)%120; s+=`<ellipse class="tw" cx="${x}" cy="${y}" rx="14" ry="3" fill="#fff" opacity=".7" style="animation-delay:${-i*.37}s"/>`; }
+  const items=ORDER.map(k=>({y:BLD[k].y,k}));
+  const es=eggState(); if(es!=='done'&&!o.noEgg) items.push({y:745,egg:1});
+  decos().forEach((d,i)=>items.push({y:d.y,deco:d,i}));
+  if(winter()) items.push({y:705,w:'w-snowman',x:1225,h:135}); if(xmas()) items.push({y:560,w:'w-tree',x:765,h:205});
+  if(giftReady()&&!o.noEgg) items.push({y:742,gift:1});
+  items.sort((a,b)=>a.y-b.y).forEach(it=>{
+    if(it.deco){ const d=it.deco; s+=`<g class="isl-d" data-i="${it.i}" transform="translate(${d.x} ${d.y})"${n?` filter="url(#islN${o.id||''})"`:''}><g class="bb">${img('d-'+d.k,DH[d.k]||110)}</g></g>`; return; }
+    if(it.w){ s+=`<g class="isl-w" transform="translate(${it.x} ${it.y})"${n?` filter="url(#islN${o.id||''})"`:''}><g class="bb">${img(it.w,it.h)}</g></g>`; if(n&&it.w==='w-tree') s+=`<g transform="translate(${it.x} ${it.y})" pointer-events="none"><ellipse class="glow" cx="0" cy="${-it.h*.5}" rx="${it.h*.3}" ry="${it.h*.38}" fill="url(#islWin)"/></g>`; return; }
+    if(it.gift){ s+=`<g class="isl-gift" transform="translate(560 742)"><g class="egg rdy">${img('i-gift',92)}</g></g>`; return; }
+    if(it.egg){ s+=`<g class="isl-egg" transform="translate(915 745)"><g class="egg ${es==='ready'?'rdy':''}">${img('egg-1',96,'eimg')}</g>${es==='wait'?[0,1,2].map(i=>`<circle cx="${-26+i*26}" cy="22" r="9" fill="${i<day().n?'#FFC93C':'#fff'}" stroke="${INK}" stroke-width="3"/>`).join(''):''}</g>`; return; }
+    const k=it.k, l=lvOf(k), anim=o.grow&&o.grow.includes(k), B=BLD[k];
+    s+=`<g class="isl-b" data-b="${k}" transform="translate(${B.x} ${B.y})"${n?` filter="url(#islN${o.id||''})"`:''}><rect x="${-B.h*.45}" y="${-B.h*1.02}" width="${B.h*.9}" height="${B.h*1.06}" fill="transparent"/><g class="bb${anim?' grow':''}">${bldSVG(k,l,false)}</g></g>`;
+    if(n&&l){ const hh=B.h*SC[l]; let g2=k==='world'?`<g transform="translate(0 ${(-hh*.72).toFixed(1)})"><polygon class="beam" points="0,0 -420,-70 -420,70" fill="url(#islBeam)" opacity=".85"/><circle class="tw" r="30" fill="#FFE27A" opacity=".7"/></g>`:`<ellipse class="glow" cx="0" cy="${(-hh*.42).toFixed(1)}" rx="${(hh*.24).toFixed(1)}" ry="${(hh*.2).toFixed(1)}" fill="url(#islWin)"/>`;
+      s+=`<g transform="translate(${B.x} ${B.y})" pointer-events="none">${g2}</g>`; } });
+  if(winter()){ for(let i=0;i<46;i++){ const x=(i*131+37)%1536, r=2+(i%4)*1.3, du=7+(i*7)%9; s+=`<circle class="sn" cx="${x}" cy="${-(i*97)%1000}" r="${r}" fill="#fff" opacity=".9" style="animation-duration:${du}s;animation-delay:${-(i*1.7)%du}s"/>`; } }
+  if(ph==='dawn'||ph==='dusk') s+=`<rect width="1536" height="1024" fill="${ph==='dawn'?'#FF9A6B':'#7E57C2'}" opacity=".16" pointer-events="none"/>`;
+  s+=`<g id="isl-ani${o.id||''}"></g></svg>`; return s; }
+/* animalele și Pufi se plimbă prin fața clădirilor */
+const ANIMG={'🐰':'a-bunny','🐻':'a-bear','🐼':'a-panda','🐨':'a-koala','🦁':'a-lion','🐷':'a-piglet','🐸':'a-frog','🐧':'a-penguin','🦆':'a-duck','🦉':'a-owl','🐢':'a-turtle','🦔':'a-hedgehog'};
+let walkers=[], walkT=0;
+const PIDLE=()=>winter()&&IM['pufi-winter']?'pufi-winter':'pufi-idle';
+function aniHTML(e,n,sea){ if(e==='🦊') return n?img('pufi-sleep',92,'aimg'):img(PIDLE(),120,'aimg');
+  const k=ANIMG[e]; const body=k&&IM[k]?img(k,92,'aimg'):`<text x="0" y="0" text-anchor="middle" font-size="64">${e}</text>`;
+  return body+(n&&!sea?'<text class="tw" x="30" y="-80" font-size="30">💤</text>':''); }
+function placeAnimals(svg,id,still){ const g=svg.querySelector('#isl-ani'+(id||'')); if(!g) return; const n=phase(hour())==='night'; g.innerHTML='';
+  const list=['🦊'].concat(animals().slice(-12)); const out=[];
+  list.forEach((e,i)=>{ const sea=SEA.includes(e); const x=e==='🦊'&&n?560:sea?120+Math.random()*200+(i%2)*1100:300+Math.random()*900, y=sea?985:e==='🦊'&&n?700:722+((i*23)%46);
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g'); el.setAttribute('class','an'); el.style.transform=`translate(${x}px,${y}px)`; el.dataset.e=e;
+    el.innerHTML=`<g class="ai">${aniHTML(e,n,sea)}</g>`; g.appendChild(el); out.push({el,x,y,sea,e}); });
+  if(!still){ out.forEach(w=>{ w.el.style.cursor='pointer'; w.el.addEventListener('click',ev=>{ ev.stopPropagation(); poke(w); }); }); if(!n) walkers=out; } }
+function setPufi(w,k){ const im=w.el.querySelector('image'); if(!im||!IM[k]) return; const h=k==='pufi-walk'?118:k==='pufi-read'||k==='pufi-eat'?108:120, m=IM[k], ww=h*m.w/m.h; im.setAttribute('href',m.u); im.setAttribute('x',(-ww/2).toFixed(1)); im.setAttribute('y',-h); im.setAttribute('width',ww.toFixed(1)); im.setAttribute('height',h); }
+function walk(){ walkers.forEach(w=>{ if(w.busy||Math.random()<.35) return; const nx=w.sea?Math.max(40,Math.min(1496,w.x+(Math.random()-.5)*300)):Math.max(280,Math.min(1240,w.x+(Math.random()-.5)*300)); const f=nx<w.x?-1:1; w.x=nx;
+  w.el.style.transform=`translate(${nx}px,${w.y}px)`; const inner=w.el.firstChild; if(inner) inner.style.transform=`scaleX(${w.e==='🦊'?f:-f})`;
+  if(w.e==='🦊'){ setPufi(w,'pufi-walk'); clearTimeout(w.t); w.t=setTimeout(()=>{ if(!w.busy) setPufi(w,PIDLE()); },2600); } }); }
+function poke(w){ const inner=w.el.firstChild; try{ tick(); }catch(e){}
+  if(w.e==='🦊'){ if(phase(hour())==='night'){ sayT(T().sleep); return; } w.busy=true; const P=['pufi-jump','pufi-dance','pufi-look','pufi-read','pufi-eat'].filter(k=>IM[k]); setPufi(w,P[Math.floor(Math.random()*P.length)]||'pufi-jump'); sayT(T().hi); setTimeout(()=>{ w.busy=false; setPufi(w,PIDLE()); },2200); }
+  else if(!w.sea&&IM['i-apple']){ const ap=document.createElementNS('http://www.w3.org/2000/svg','g'); ap.setAttribute('class','grow'); ap.setAttribute('transform',`translate(${w.x+46} ${w.y-6})`); ap.innerHTML=img('i-apple',44)+`<text class="pf" x="0" y="-60" font-size="34" style="--dx:0px;--dy:-80px">💛</text>`; w.el.parentNode.appendChild(ap); setTimeout(()=>ap.remove(),1500); sayT(T().yum); }
+  inner.classList.remove('hopn'); void inner.getBoundingClientRect(); inner.classList.add('hopn'); }
+function clockHands(root){ const d=new Date(), hh=(d.getHours()%12+d.getMinutes()/60)*30, mm=d.getMinutes()*6;
+  root.querySelectorAll('.isl-hh').forEach(e=>e.setAttribute('transform',`rotate(${hh})`)); root.querySelectorAll('.isl-mh').forEach(e=>e.setAttribute('transform',`rotate(${mm})`)); }
+/* ---- banner pe ecranul de start ---- */
+function pending(){ const sw=seen(); return KEYS.some(k=>lvOf(k)>(sw[k]||0)); }
+function banner(){ reload(); const hm=document.getElementById('hm-root'); if(!hm) return; let b=document.getElementById('isl-ban');
+  if(!b){ b=document.createElement('button'); b.id='isl-ban'; b.className='isl-ban'; b.onclick=openIsland; hm.insertBefore(b,document.getElementById('hm-grid')); }
+  const es=eggState(), pd=pending();
+  b.innerHTML=scene({slice:1,id:'b',vb:'0 250 1536 720'})+`<div class="cap"><b>🏝️ ${T().title}</b><span>${T().sub}</span></div>`+
+    `<div class="bdg ${es==='ready'||pd||giftReady()?'hot':''}">${pd?'🏗️ !':es==='ready'?'🥚 !':giftReady()?'🎁 !':es==='wait'?'🥚 '+day().n+'/3':'🐾 '+animals().length}</div>`;
+  b.style.background=phase(hour())==='night'?'#1C3D7A':'#2EC4D6'; const sv=b.querySelector('svg'); placeAnimals(sv,'b',true); clockHands(sv); }
+new MutationObserver(()=>{ const hm=document.getElementById('hm-root'); if(hm&&!hm.hidden) banner(); }).observe(document.getElementById('hm-root')||document.body,{attributes:true,attributeFilter:['hidden']});
+/* ---- ecranul insulei ---- */
+const root=document.createElement('div'); root.id='isl-root'; root.hidden=true;
+root.innerHTML=`<div class="rb-top"><button class="ch-btn" id="isl-back"></button><h2 id="isl-title"></h2><button class="ch-btn isl-tb" id="isl-q"></button><button class="ch-btn isl-tb" id="isl-shopb">🛍️</button><div class="ch-pill" id="isl-fr"></div><div class="ch-pill" id="isl-stars">⭐ 0</div></div><div id="isl-stage"></div>
+<div id="isl-pop" hidden></div><div id="isl-shop" hidden></div>`;
+document.body.appendChild(root);
+const $=id=>document.getElementById('isl-'+id);
+let tick=null;
+function texts(){ const q=quest(); $('q').textContent=q.c?'🎁 ✓':q.n>=5?'🎁 !':`🎁 ${Math.min(q.n,5)}/5`; $('q').classList.toggle('hot',q.n>=5&&!q.c); $('shopb').textContent='🛍️ '+T().shop; $('back').textContent=HM().home||'🏠'; $('title').textContent='🏝️ '+T().title; $('fr').textContent='🐾 '+animals().length; $('stars').textContent='⭐ '+curStars(); }
+function draw(grow){ const st=$('stage'); const W=st.clientWidth, H=Math.max(1,st.clientHeight), asp=W/H, por=asp<1.35;
+  let vb; if(por) vb='0 120 1536 880'; else { const vh=Math.max(560,Math.min(1024,1536/asp)), vw=vh*asp>1536?1536:vh*asp, y0=Math.max(0,Math.min(1024-vh,575-vh/2)); vb=`${((1536-vw)/2).toFixed(0)} ${y0.toFixed(0)} ${vw.toFixed(0)} ${vh.toFixed(0)}`; }
+  st.innerHTML=scene({grow,vb,slice:!por}); st.classList.toggle('por',por); root.style.background=phase(hour())==='night'?'#142456':'#2EC4D6'; const sv=st.querySelector('svg');
+  placeAnimals(sv,'',false); clockHands(sv);
+  if(por){ sv.style.width=Math.round(H*1536/880)+'px'; sv.style.height=H+'px'; st.scrollLeft=(sv.clientWidth-W)/2; }
+  sv.querySelectorAll('.isl-b').forEach(e=>e.onclick=ev=>{ ev.stopPropagation(); const bb=e.querySelector('.bb'); bb.classList.remove('grow','squash'); void bb.getBoundingClientRect(); bb.classList.add('squash'); try{ tick(); }catch(_){} building(e.dataset.b); });
+  const eg=sv.querySelector('.isl-egg'); if(eg) eg.onclick=ev=>{ ev.stopPropagation(); eggTap(eg); };
+  sv.querySelectorAll('.isl-d').forEach(e=>e.onclick=ev=>{ ev.stopPropagation(); const bb=e.querySelector('.bb'); bb.classList.remove('squash'); void bb.getBoundingClientRect(); bb.classList.add('squash'); try{ tick(); }catch(_){} decoTap(+e.dataset.i); });
+  sv.querySelectorAll('.isl-w').forEach(e=>e.onclick=ev=>{ ev.stopPropagation(); const bb=e.querySelector('.bb'); bb.classList.remove('squash'); void bb.getBoundingClientRect(); bb.classList.add('squash'); try{ tick(); }catch(_){} });
+  const gf=sv.querySelector('.isl-gift'); if(gf) gf.onclick=ev=>{ ev.stopPropagation(); claimGift(gf); };
+  sv.addEventListener('click',ev=>{ if(!placing) return; ev.stopPropagation(); ev.preventDefault(); const pt=sv.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY; const p=pt.matrixTransform(sv.getScreenCTM().inverse());
+    if(!meadow(p.x,p.y)){ sayT(T().place); try{ beep(false); }catch(_){} return; }
+    const L=decos(); if(placing.i!=null) Object.assign(L[placing.i],{x:Math.round(p.x),y:Math.round(p.y)}); else L.push({k:placing.k,x:Math.round(p.x),y:Math.round(p.y)}); LS.set('isl_deco',L);
+    placing=null; $('pop').hidden=true; draw(); try{ confetti(18); }catch(_){} try{ beep(true); }catch(_){} sayT(T().placed); },true);
+  sv.onclick=()=>{ $('pop').hidden=true; }; }
+let placing=null;
+function decoTap(i){ const d=decos()[i]; if(!d) return; const nm=T().dn[d.k]; const el=pop(`<h3>${nm}</h3><div class="row"><button class="rb-b" data-a="s">🔊</button><button class="rb-b go" data-a="m">${T().move}</button></div>`);
+  el.querySelector('[data-a=s]').onclick=()=>sayT(nm); el.querySelector('[data-a=m]').onclick=()=>startPlace({i,k:d.k}); sayT(nm); }
+function startPlace(p){ placing=p; $('shop').hidden=true; const el=pop(`<h3>${img2(p.k)}</h3><p>${T().place}</p><div class="row"><button class="rb-b" data-a="s">🔊</button><button class="rb-b" data-a="x">✖</button></div>`);
+  el.querySelector('[data-a=s]').onclick=()=>sayT(T().place); el.querySelector('[data-a=x]').onclick=()=>{ placing=null; $('pop').hidden=true; }; sayT(T().place); }
+const img2=(k,h)=>IM['d-'+k]?`<img src="${IM['d-'+k].u}" alt="" style="height:${h||70}px">`:'';
+function shop(){ const sh=$('shop'); const own=new Set(decos().map(d=>d.k)); const st=curStars();
+  sh.innerHTML=`<div class="isl-shopbox"><div class="hd"><b>🛍️ ${T().shop}</b><span>⭐ ${st}</span><button class="rb-b" data-a="x">✖</button></div><div class="gr">${Object.keys(PRICE).map(k=>`<button class="it${own.has(k)?' own':''}${st>=PRICE[k]?' can':''}" data-k="${k}">${img2(k,64)}<span class="nm">${T().dn[k]}</span><span class="pr">${own.has(k)?'✓':'⭐ '+PRICE[k]}</span></button>`).join('')}</div></div>`;
+  sh.hidden=false; $('pop').hidden=true; sh.querySelector('[data-a=x]').onclick=()=>sh.hidden=true; sh.onclick=e=>{ if(e.target===sh) sh.hidden=true; };
+  sh.querySelectorAll('.it').forEach(b=>b.onclick=()=>{ const k=b.dataset.k, nm=T().dn[k]; if(own.has(k)){ sayT(nm); return; } const pr=PRICE[k], have=curStars();
+    if(have<pr){ sayT(nm+'. '+T().need(pr-have)); b.classList.remove('sa-shake'); void b.offsetWidth; b.classList.add('sa-shake'); try{ beep(false); }catch(_){} return; }
+    try{ stars-=pr; renderBar(); }catch(_){} last=curStars(); texts(); try{ beep(true); }catch(_){} sayT(nm+'!'); startPlace({k}); }); }
+function claimGift(gf){ const q=quest(); if(q.c) return; q.c=true; LS.set('isl_q',q); try{ stars+=5; renderBar(); }catch(_){} last=curStars(); gf.innerHTML=burst(0,-50); try{ confetti(40); }catch(_){} try{ beep(true); }catch(_){} sayT(T().gift); texts(); setTimeout(()=>{ if(!root.hidden) draw(); },1500); }
+function questPop(){ const q=quest(), card=HM()[q.k]||q.k; const m=q.c?T().gift:q.n>=5?T().qDone:T().quest(card,Math.min(q.n,5));
+  const el=pop(`<h3>🎁</h3><p>${m}</p><div class="row"><button class="rb-b" data-a="s">🔊</button>${q.n<5?`<button class="rb-b go" data-a="p">▶ ${card}</button>`:''}</div>`);
+  el.querySelector('[data-a=s]').onclick=()=>sayT(m); const pb=el.querySelector('[data-a=p]'); if(pb) pb.onclick=()=>{ close(); setTimeout(()=>{ try{ window.__hmOpen&&window.__hmOpen(q.k); }catch(e){} },30); }; sayT(m); }
+function pop(html){ const p=$('pop'); p.innerHTML=html; p.hidden=false; return p; }
+function building(k){ const l=lvOf(k), p=ptsOf(k), nx=TH[l], pv=l?TH[l-1]:0, name=T().b[k], card=HM()[k]||k;
+  const msg=l>=4?T().max:T().grow(card);
+  const el=pop(`<h3>${name}</h3><p>${l?T().lv(l)+' · ':''}⭐ ${p}${nx?' / '+nx:''}</p>${nx?`<div class="bar"><i style="width:${Math.round(Math.min(1,(p-pv)/(nx-pv))*100)}%"></i></div>`:''}<p>${msg}</p><div class="row"><button class="rb-b" data-a="s">🔊</button><button class="rb-b go" data-a="p">▶ ${card}</button></div>`);
+  el.querySelector('[data-a=s]').onclick=()=>sayT(name+'. '+msg); el.querySelector('[data-a=p]').onclick=()=>{ close(); setTimeout(()=>{ try{ window.__hmOpen&&window.__hmOpen(k); }catch(e){} },30); };
+  sayT(name+'. '+msg); }
+let taps=0;
+function eggTap(eg){ const es=eggState(); if(es==='wait'){ const m=T().eggNeed(day().n); const el=pop(`<h3>🥚</h3><p>${m}</p><div class="row"><button class="rb-b" data-a="s">🔊</button></div>`); el.querySelector('[data-a=s]').onclick=()=>sayT(m); sayT(m); return; }
+  if(es!=='ready') return; taps++; $('pop').hidden=true; const g=eg.querySelector('.egg');
+  if(taps<3){ g.classList.remove('rdy'); void g.getBoundingClientRect(); g.classList.add('rdy'); g.innerHTML=img('egg-2',96+taps*4,'eimg');
+    try{ tick(); }catch(e){} return; }
+  taps=0; const have=animals(); let pool=ANIMALS.filter(a=>!have.includes(a)&&ANIMG[a]); if(!pool.length) pool=ANIMALS.filter(a=>!have.includes(a)); if(!pool.length) pool=ANIMALS; const a=pool[Math.floor(Math.random()*pool.length)];
+  have.push(a); LS.set('isl_ani',have); LS.set('isl_hatch',today());
+  const svg=eg.ownerSVGElement; eg.innerHTML=img('egg-3',70,'eimg')+`<g class="grow" transform="translate(0 -40)">${ANIMG[a]&&IM[ANIMG[a]]?img(ANIMG[a],110):`<text x="0" y="0" text-anchor="middle" font-size="80">${a}</text>`}</g>`+burst(0,-60); try{ confetti&&confetti(24); }catch(e){} try{ beep&&beep(true); }catch(e){}
+  const el=pop(`<h3 style="font-size:3rem;line-height:1">${a}</h3><p>${T().hatched}</p><p style="opacity:.75">${T().eggDone}</p><div class="row"><button class="rb-b" data-a="s">🔊</button></div>`); el.querySelector('[data-a=s]').onclick=()=>sayT(T().hatched+' '+T().eggDone);
+  sayT(T().hatched); texts(); setTimeout(()=>{ if(!root.hidden){ eg.remove(); placeAnimals(svg,'',false); } },2600); }
+function burst(x,y){ let s=''; const E=['⭐','✨','🌟','💛']; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2; s+=`<text class="pf" x="${x}" y="${y}" text-anchor="middle" font-size="38" style="--dx:${(Math.cos(a)*170).toFixed(0)}px;--dy:${(Math.sin(a)*140-50).toFixed(0)}px">${E[i%4]}</text>`; } return s; }
+function openIsland(){ try{ if(typeof ensureStart==='function') ensureStart(); }catch(e){} try{ const s=document.getElementById('start'); if(s&&typeof started!=='undefined'&&!started){ started=true; s.hidden=true; } }catch(e){}
+  reload(); root.hidden=false; texts(); $('pop').hidden=true; taps=0;
+  const sw=seen(), grow=KEYS.filter(k=>lvOf(k)>(sw[k]||0)); draw(grow);
+  const ns={}; KEYS.forEach(k=>ns[k]=lvOf(k)); LS.set('isl_seen',ns);
+  if(grow.length){ const sv=$('stage').querySelector('svg'); grow.forEach(k=>{ const g=sv.querySelector(`[data-b="${k}"]`); if(g) g.insertAdjacentHTML('beforeend',burst(0,-BLD[k].h*.6)); }); try{ confetti&&confetti(20); }catch(e){}
+    sayT(grow.length===1?T().up(T().b[grow[0]],lvOf(grow[0])):T().title+'! '+T().sub); }
+  else if(eggState()==='ready') sayT(T().eggReady); else sayT(T().title+'. '+T().sub);
+  clearInterval(tick); tick=setInterval(()=>{ if(root.hidden) return; walk(); if(++walkT%8===0) clockHands(root); $('stars').textContent='⭐ '+curStars(); },2700); setTimeout(walk,400); }
+function close(){ placing=null; $('shop').hidden=true; root.hidden=true; clearInterval(tick); walkers=[]; try{ speechSynthesis.cancel(); }catch(e){} banner(); }
+$('back').onclick=close; $('shopb').onclick=shop; $('q').onclick=questPop;
+window.openIsland=openIsland; window.__islBanner=banner;
+(window.__LR=window.__LR||[]).push(()=>{ banner(); if(!root.hidden){ texts(); } });
+setTimeout(banner,0);
+})();
+</script>

@@ -1,0 +1,54 @@
+
+<script>
+/* ===== Português — leitura ===== */
+(()=>{ const lg='pt', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Ler',title:'Ler e escrever',back:'⬅ Voltar',menu:'⬅ Menu',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','O alfabeto'],fish:['🎣','Pesque a letra'],train:['🚂','O trem das sílabas'],build:['🧩','A palavra mágica'],read:['👀','Leia e escolha'],story:['📚','Historinhas'],write:['✍️','Escreva com o dedo']},
+  alphaTask:'Toque numa letra para ouvir!',album:(n,t)=>`🏅 Figurinhas: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, de ${w}.`,
+  fishSay:(l,w)=>`Pesque a letra ${l}, de ${w}!`,fishWrong:l=>`Esta é a letra ${l}. Tente de novo!`,fishRight:l=>`Muito bem! Você pescou o ${l}.`,
+  trainSay:w=>`Forme a palavra ${w}! Coloque os vagões em ordem.`,trainDone:w=>`Muito bem! ${w}!`,
+  buildSay:w=>`Escreva a palavra ${w}!`,buildDone:w=>`Super! Você escreveu ${w}.`,
+  readTask:'Leia a palavra e escolha a figura!',readWrong:'Tente de novo!',readRight:w=>`Isso! ${w}!`,
+  storyTask:'Escolha uma historinha!',readMe:'▶ Leia para mim',readSelf:'Toque numa palavra para ouvir.',storyDone:'Muito bem! Você terminou a historinha.',
+  writeTask:l=>`Escreva ${l}. Comece no ponto verde.`,writeDone:l=>`Muito bem! Você escreveu ${l}!`,offTrack:'Siga a linha cinza 🙂',
+  letters:'🔤 Letras',digits:'🔢 Números',next:'▶ Próximo',again:'↺ De novo',listen:'🔊 Ouvir',
+  sylQ:w=>`Quantas sílabas tem a palavra ${w}?`,sylN:n=>n===1?'uma sílaba':n+' sílabas',sylSay:(w,n,x)=>`Isso! ${w} tem ${n}: ${x}.`,sylWrong:'Tente de novo! Bata palma a cada sílaba. 👏',sylShow:(x,n)=>`${x} = ${n} ${n===1?'sílaba':'sílabas'} 👏`,
+  mPick:'🔤 Escolha as letras',mFree:'✏️ Escreva sobre o contorno',mGuide:'✍️ Escreva com ajuda',clear:'🧽 Apagar',freeHint:'Escreva a letra em cima do contorno cinza.',freeBad:'Tente escrever em cima do contorno 🙂',writeLetter:l=>`Escreva a letra ${l}.`};
+D.AQTX[lg]={btn:'🐠 Meu aquário',title:'🐠 Meu aquário',empty:'Pesque peixes para encher o seu aquário!',slow:'🐢 Devagar',fast:'🐇 Rápido',close:'✖ Fechar'};
+D.STX[lg]={syl:'🎨 Sílabas coloridas',listen:'🔊 Leia para mim',self:'👆 Eu leio',next:'Próxima palavra ▶',selfHint:'Leia em voz alta a palavra amarela e aperte ▶. Se não souber uma palavra, toque nela.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, de ${w}!`,(l,w)=>`Cadê o ${l}? ${l}, de ${w}.`,(l,w)=>`Ache o ${l}, de ${w}!`,(l,w)=>`O peixe com o ${l}, de ${w}!`,(l,w)=>`Vamos, o ${l}, de ${w}!`],
+  pic:w=>`Com que letra começa ${w}?`, ok:['Pegou!','Super!','Boa pescaria!','Uau!','Isso!','Que peixe!'], no:['Esse não!','Opa, outro peixe!','Continue procurando!',x=>`Esse é o ${x}.`],
+  gold:'O peixe dourado! Três estrelas!', lvl:n=>`Nível ${n}! Chegaram novos animais do mar!`, bucket:'Balde'};
+D.ALPHA[lg]=[['A','🐝','ABELHA'],['B','⚽','BOLA'],['C','🏠','CASA'],['D','🐬','DOLFINHO'],['E','🐘','ELEFANTE'],['F','🌸','FLOR'],['G','🐱','GATO'],['H','🚁','HELICÓPTERO'],['I','🏝️','ILHA'],['J','🐊','JACARÉ'],['K','🥝','KIWI'],['L','🦁','LEÃO'],['M','🍎','MAÇÃ'],
+  ['N','☁️','NUVEM'],['O','🥚','OVO'],['P','🐟','PEIXE'],['Q','🧀','QUEIJO'],['R','🐭','RATO'],['S','☀️','SOL'],['T','🐢','TARTARUGA'],['U','🐻','URSO'],['V','🐄','VACA'],['W','🧇','WAFFLE'],['X','♟️','XADREZ'],['Y','🪀','IOIÔ'],['Z','🦓','ZEBRA']];
+D.WORDS[lg]=[['👩','MA-MÃE'],['👨','PA-PAI'],['🐱','GA-TO'],['🐶','CA-CHOR-RO'],['🏠','CA-SA'],['🍎','MA-ÇÃ'],['🚗','CAR-RO'],['☀️','SOL'],['🌙','LU-A'],['🐟','PEI-XE'],['🦆','PA-TO'],['🎈','BA-LÃO'],['🌸','FLOR'],['🦁','LE-ÃO'],
+  ['🍌','BA-NA-NA'],['🐸','SA-PO'],['🦋','BOR-BO-LE-TA'],['🍓','MO-RAN-GO'],['🥕','CE-NOU-RA'],['🐭','RA-TO'],['🐄','VA-CA'],['🌳','ÁR-VO-RE'],['🍉','ME-LAN-CI-A'],['🐢','TAR-TA-RU-GA'],['🚂','TREM'],['🐻','UR-SO'],['☁️','NU-VEM'],['🎂','BO-LO'],['🐰','CO-E-LHO'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi e a bola','Pu·fi tem u·ma bo·la ver·me·lha. A bo·la pu·la pa·ra ci·ma, pa·ra ci·ma, pa·ra ci·ma. Pu·fi cor·re a·trás de·la. Que le·gal!'],
+ ['🐱','A gata Mimi','Mi·mi é u·ma ga·ti·nha pe·que·na. E·la be·be lei·te. De·pois dor·me no sol. Miau, diz Mi·mi.'],
+ ['🏖️','Um dia na praia','Ho·je va·mos à prai·a. A á·gua é a·zul. Fa·ço um cas·te·lo de a·rei·a. Que di·a bo·ni·to!'],
+ ['🚂','O trem','O trem vai rá·pi·do. Piuí, faz o trem. Ma·mãe e pa·pai o·lham pe·la ja·ne·la. Va·mos pa·ra a ca·sa da vo·vó.'],
+ ['⛄','O boneco de neve','Lá fo·ra es·tá ne·van·do. Pu·fi faz um bo·ne·co de ne·ve. E·le põe um na·riz de ce·nou·ra. O bo·ne·co de ne·ve sor·ri.'],
+ ['🍯','O urso e o mel','Um ur·so gran·de pro·cu·ra mel. As a·be·lhas vo·am: bzz, bzz! O ur·so a·cha um po·te de mel. Hum, que gos·to·so!'],
+ ['🎂','O aniversário de Pufi','Ho·je é o a·ni·ver·sá·rio de Pu·fi. No bo·lo tem seis ve·li·nhas. Os a·mi·gos can·tam pa·ra·béns. Pu·fi so·pra e ri.'],
+ ['🚀','O foguete','Pu·fi vo·a num fo·gue·te. Pa·ra ci·ma, ca·da vez mais al·to! E·le vê a Lu·a e as es·tre·las. De·pois vol·ta pa·ra ca·sa pa·ra jan·tar.'],
+ ['🌈','A chuva','Es·tá cho·ven·do e Pu·fi tem um guar·da-chu·va a·ma·re·lo. E·le pu·la nas po·ças: splash, splash! De·pois o sol vol·ta. No céu a·pa·re·ce um ar·co-í·ris.'],
+ ['🥕','A horta','A vo·vó tem u·ma hor·ta. Lá cres·cem to·ma·tes e ce·nou·ras. Pu·fi re·ga as flo·res. U·ma les·mi·nha an·da de·va·gar·zi·nho.']];
+D.X2[lg]={ groups:['🔤 Letras e sons','✍️ Escrever','📚 Ler'],
+  games:{hunt:['👂','A caça aos sons'],pos:['📍','Onde você ouve o som?'],bubble:['🫧','Bolhas de letras'],twins:['🔍','Palavras gêmeas']},
+  huntSay:(u,ex)=>`Toque em todas as figuras que começam com ${u}, como ${ex}!`, huntTask:u=>`O que começa com ${u}?`,
+  huntNo:w=>`${w}? Não, esse não serve.`, huntDone:'Muito bem! Você achou todas! As outras não servem.',
+  posSay:(l,w)=>`Onde você ouve o ${l} em ${w}? No começo, no meio ou no fim?`, posTask:l=>`Onde você ouve o ${l}?`,
+  posLbl:['No começo','No meio','No fim'], posRight:(l,w,p)=>`Isso! Em ${w}, o ${l} fica ${p.toLowerCase()}.`, posWrong:'Escute mais uma vez!',
+  bubbleSay:w=>`Estoure as bolhas em ordem e escreva ${w}!`, bubbleTask:f=>`Palavras com ${f}`, bubbleDone:w=>`Super! Você escreveu ${w}.`,
+  twinsSay:'Qual palavra combina com a figura?', twinsWrong:w=>`Aqui está escrito ${w}. Tente de novo!`, twinsRight:w=>`Isso! ${w}!`, listen:'🔊 Ouvir' };
+const RAW='SOL☀️ LUA🌙 CASA🏠 GATO🐱 CACHORRO🐶 PEIXE🐟 SAPO🐸 URSO🐻 LEÃO🦁 VACA🐄 OVELHA🐑 CARACOL🐌 TARTARUGA🐢 NAVIO🚢 LIVRO📖 BOLA⚽ PÃO🍞 LEITE🥛 MANTEIGA🧈 MAÇÃ🍎 BANANA🍌 FLOR🌸 PATO🦆 NARIZ👃 ROSA🌹 TIGRE🐯 TREM🚂 BARCO⛵ FOGUETE🚀 COGUMELO🍄 CORAÇÃO❤️ QUEIJO🧀 BALEIA🐳 RATO🐭 GALINHA🐔 CAVALO🐴 CISNE🦢 COLHER🥄 TOMATE🍅 CEREJA🍒 CENOURA🥕 PERA🍐 LIMÃO🍋 BOCA👄 COROA👑 SINO🔔 VELA🕯️ PINCEL🖌️ VASSOURA🧹 XÍCARA☕ ÓCULOS👓 CAMELO🐪 FORMIGA🐜 ARANHA🕷️ ELEFANTE🐘 JACARÉ🐊 CARRO🚗 OLHO👁️ ABELHA🐝 COBRA🐍 TESOURA✂️ SAPATO👟 CHAVE🔑 BORBOLETA🦋 ESTRELA⭐ CADEIRA🪑 LÁPIS✏️ MEIA🧦 PEDRA🪨 SORVETE🍦 BALDE🪣 CORUJA🦉 CABRA🐐 MACACO🐒 PORCO🐷 VIOLÃO🎸 RELÓGIO⏰ MARTELO🔨 PINTINHO🐤 MAMÃE👩 NUVEM☁️ MELANCIA🍉 MORANGO🍓 GOLFINHO🐬 GIRAFA🦒 ZEBRA🦓 LOBO🐺 RAPOSA🦊 PINGUIM🐧 COELHO🐰 AVIÃO✈️ BICICLETA🚲 FOGO🔥 PRESENTE🎁 BOLO🎂 DADO🎲 MÃO✋ PÉ🦶 DENTE🦷 ORELHA👂 FACA🔪 GALO🐓 CHOCOLATE🍫 VIOLINO🎻 TAMBOR🥁 CADEADO🔒 CARTA✉️ BANDEIRA🚩 SAL🧂 MEL🍯 TELEFONE📱 CEBOLA🧅 CERVO🦌 BOLSA👜 JANELA🪟 ESPELHO🪞 CASACO🧥 ROBÔ🤖 POLVO🐙 RAINHA👸 CAMINHÃO🚚 CHAPÉU🎩 PIZZA🍕 LARANJA🍊 UVA🍇 PASSARINHO🐦 COALA🐨 CAMA🛏️ CACHECOL🧣 FOLHA🍃 ALHO🧄 PUNHO👊 BURRO🫏 TORRE🗼 CHUPETA🍼 NOITE🌃 OVO🥚 MINHOCA🪱 ABACAXI🍍 BONECA🪆 GORRO🧢 CHUVA🌧️ OLHOS👀 PALHAÇO🤡 NINHO🪺  PIPOCA🍿 ESCOVA🪥 PENTE🪮 TERRA🌍';
+const seen={}; D.VOC[lg]=RAW.trim().split(/\s+/).map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; }).filter(x=>!seen[x[1]]&&(seen[x[1]]=1));
+D.GRA[lg]=['ÃO','ÕE','CH','LH','NH','RR','SS','QUE','QUI','GUE','GUI'];
+D.HUNTLONG[lg]=['CH','LH','NH','QU','CE','CI','GE','GI'];
+D.HUNTL[lg]='BCDFGLMNPRSTV';
+D.FAM[lg]=[['CH'],['LH'],['NH'],['RR'],['ÃO']];
+D.POSL[lg]='MPBFTDV';
+D.POSDROP[lg]=['M'];
+})();
+</script>

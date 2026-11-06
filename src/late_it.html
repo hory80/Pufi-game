@@ -1,0 +1,8 @@
+<script>
+/* Italiano — nomi dei pesci */
+(()=>{ const lg='it', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['il carassio','Carassio','Il carassio è un pesce dorato e tranquillo. Gli piacciono le piante e i vermi.'],crap:['la carpa','Carpa','La carpa ha piccoli baffi per cercare il cibo nel fango.'],pastrav:['la trota','Trota','La trota vive nei ruscelli freddi di montagna. Ha macchie nere e una striscia rosa.'],biban:['il pesce persico','Persico','Il pesce persico ha strisce sul dorso e pinne rosse. Caccia i pesciolini.'],somn:['il pesce gatto','Pesce gatto','Il pesce gatto ha lunghi baffi e mangia quasi tutto. Caccia di notte.'],stiuca:['il luccio','Luccio','Il luccio è il grande cacciatore dei fiumi. Si nasconde e attacca velocissimo!'],rac:['il gambero di fiume','Gambero','Il gambero di fiume ha le chele e cammina all’indietro. Pulisce il fondo.'],testoasa:['la tartaruga','Tartaruga','La tartaruga d’acqua porta la sua casa sulla schiena.'],plev:['il pesciolino','Pesciolino','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'le alghe',worm:'i vermi',ins:'gli insetti',plev:'i pesciolini'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>

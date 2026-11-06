@@ -1,0 +1,230 @@
+
+<style>
+.aq-ov{position:fixed;inset:0;z-index:70;background:#0E2A44;display:flex;flex-direction:column;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px);box-sizing:border-box;font-family:var(--display);color:#fff}
+.aq-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.aq-top h3{flex:1 1 200px;margin:0;font-size:clamp(1.3rem,3.4vw,2rem);text-align:center}
+.aq-b{font:inherit;font-weight:800;font-size:clamp(.95rem,2.4vw,1.2rem);border:3px solid #fff;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:5px 14px;cursor:pointer;min-height:46px}
+.aq-b.on{background:#FFC83D;color:#24325F;border-color:#FFC83D}
+.aq-tank{flex:1;min-height:0;position:relative;border-radius:22px;overflow:hidden;border:5px solid #9ED8F5}
+.aq-tank svg{width:100%;height:100%;display:block;touch-action:manipulation}
+.aq-msg{min-height:1.4em;text-align:center;font-weight:800;font-size:clamp(1rem,2.6vw,1.35rem)}
+.aq-pantry{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.aq-food{font:inherit;font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);background:#fff;color:#24325F;border:none;border-radius:16px;padding:6px 12px;min-height:56px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.aq-food .ic{font-size:1.7em;line-height:1}
+.aq-food:disabled{opacity:.4}
+.aq-card{position:absolute;inset:0;background:rgba(14,42,68,.7);display:flex;align-items:center;justify-content:center;z-index:5}
+.aq-card>div{background:#fff;color:#24325F;border-radius:24px;padding:16px 20px;max-width:min(520px,92%);text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.aq-card h4{margin:0;font-size:clamp(1.6rem,5vw,2.4rem)}
+.aq-card h4 b{color:#FF5D7A;font-size:1.25em}
+.aq-card p{margin:0;font-size:clamp(1rem,2.6vw,1.25rem);font-weight:700}
+.aq-card .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.aq-card .rb-b{border-color:#24325F}
+.rd-fish2 .f svg{width:1.9em;height:1.05em;display:block;overflow:visible}
+.rd-btn.rd-newfish{background:#FFD43B;animation:rdNewF 1.1s ease-in-out infinite}.rd-btn.rd-newfish b{background:#fff;border-radius:999px;padding:0 8px;margin-left:4px}
+@keyframes rdNewF{50%{transform:scale(1.08)}}
+</style>
+<script>
+(()=>{
+const NS_ID={n:0};
+const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const L_=()=>({ro:'ro',de:'de',en:'en'})[lang]||lang;
+const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
+function snd(f,d,type,vol){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime; o.type=type||'sine'; o.frequency.value=f; g.gain.setValueAtTime(vol||.1,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.12)); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+(d||.12)+.03);}catch(e){} }
+const R=n=>Math.floor(Math.random()*n);
+
+/* ---------- specii ---------- */
+const SP={
+ caras:{c:'#E9B53B',d:'#B97E14',f:'#E07A2A',h:24,L:.85,sz:.85,diet:['alg','worm'],n:['carasul','die Karausche','the crucian carp'],N:['Caras','Karausche','Crucian carp'],
+  fact:['Carasul e un pește auriu și liniștit. Îi plac plantele și viermișorii.','Die Karausche ist ein goldener, ruhiger Fisch. Sie mag Pflanzen und Würmer.','The crucian carp is a calm golden fish. It likes plants and worms.']},
+ crap:{c:'#B98A3E',d:'#7E5A22',f:'#8B5A2B',h:23,L:1.05,sz:1.1,bar:'s',scales:1,diet:['alg','worm','ins'],n:['crapul','der Karpfen','the carp'],N:['Crap','Karpfen','Carp'],
+  fact:['Crapul are mustăți mici cu care caută mâncare în nămol.','Der Karpfen hat kleine Barteln, mit denen er im Schlamm nach Futter sucht.','The carp has little whiskers to find food in the mud.']},
+ pastrav:{c:'#A9BBB0',d:'#5F7A6C',f:'#8FA49A',h:16,L:1,sz:1,band:'#F29CB0',spots:'#2B2F3A',diet:['ins','worm'],n:['păstrăvul','die Forelle','the trout'],N:['Păstrăv','Forelle','Trout'],
+  fact:['Păstrăvul trăiește în ape reci de munte. Are puncte negre și o dungă roz.','Die Forelle lebt in kalten Bergbächen. Sie hat schwarze Punkte und einen rosa Streifen.','The trout lives in cold mountain streams. It has black spots and a pink stripe.']},
+ biban:{c:'#C9C25A',d:'#7C7A2A',f:'#E5533D',h:20,L:.9,sz:.9,stripes:1,diet:['worm','ins','plev'],n:['bibanul','der Barsch','the perch'],N:['Biban','Barsch','Perch'],
+  fact:['Bibanul are dungi pe spate și aripioare roșii. Vânează peștișori.','Der Barsch hat Streifen auf dem Rücken und rote Flossen. Er jagt kleine Fische.','The perch has stripes on its back and red fins. It hunts little fish.']},
+ somn:{c:'#5A544C',d:'#38332D',f:'#4A443D',h:14,L:1.35,sz:1.3,bar:'l',bottom:1,pred:1,diet:['alg','worm','ins','plev'],n:['somnul','der Wels','the catfish'],N:['Somn','Wels','Catfish'],
+  fact:['Somnul are mustăți lungi și mănâncă aproape orice. Vânează noaptea.','Der Wels hat lange Barteln und frisst fast alles. Er jagt in der Nacht.','The catfish has long whiskers and eats almost anything. It hunts at night.']},
+ stiuca:{c:'#7C9443',d:'#4C5F25',f:'#6B7F35',h:12,L:1.35,sz:1.3,lspots:'#DCE6A6',snout:1,pred:1,diet:['plev'],n:['știuca','der Hecht','the pike'],N:['Știucă','Hecht','Pike'],
+  fact:['Știuca e marele răpitor al râurilor. Stă ascunsă și atacă foarte repede!','Der Hecht ist der große Räuber der Flüsse. Er lauert versteckt und schnappt blitzschnell zu!','The pike is the big hunter of the rivers. It hides and strikes very fast!']},
+ rac:{em:'🦞',sz:.9,bottom:1,diet:['alg','worm','ins','plev'],n:['racul','der Flusskrebs','the crayfish'],N:['Rac','Flusskrebs','Crayfish'],
+  fact:['Racul are clești și merge înapoi. Curăță fundul apei.','Der Flusskrebs hat Scheren und läuft rückwärts. Er putzt den Boden.','The crayfish has claws and walks backwards. It cleans the bottom.']},
+ testoasa:{em:'🐢',sz:1,diet:['alg','worm','ins'],n:['țestoasa','die Schildkröte','the turtle'],N:['Țestoasă','Schildkröte','Turtle'],
+  fact:['Țestoasa de apă își poartă casa în spinare.','Die Wasserschildkröte trägt ihr Haus auf dem Rücken.','The water turtle carries its house on its back.']},
+ plev:{c:'#C9D3E0',d:'#8D99AB',f:'#AEB8C8',h:10,L:.6,sz:.45,food:1,n:['plevușca','die Laube','the minnow'],N:['Plevușcă','Laube','Minnow']}
+};
+window.__aqData=null;
+const FOOD={alg:{em:'🌿',n:['alge','Algen','algae']},worm:{em:'🪱',n:['viermi','Würmer','worms']},ins:{em:'🦟',n:['insecte','Insekten','insects']},plev:{em:'',n:['peștișori','kleine Fische','little fish']}};
+window.__aqData={SP,FOOD};
+const KINDS=Object.keys(SP).filter(k=>!SP[k].food);
+const TX={
+ ro:{title:'🐠 Acvariile mele',main:'🌿 Acvariul',pred:'🦈 Bazinul răpitorilor',close:'✖ Închide',eatOn:'🐟➜🦈 Răpitorii mănâncă: DA',eatOff:'🐟➜🦈 Răpitorii mănâncă: NU',
+  pantry:'Cămara',empty:'Prinde litere ca să aduci pești și mâncare!',hungry:n=>`${n} pești sunt flămânzi! Prinde litere ca să le aduci mâncare.`,hungry1:'Un pește e flămând! Prinde litere ca să-i aduci mâncare.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)} le mănâncă: ${who}.`,nobody:f=>`Aici nimeni nu e flămând de ${f}.`,full:'E sătul!',hungryS:'Flămând',happy:'Sătul și fericit',
+  diet:'Mănâncă:',size:['pui','tânăr','mare'],move2pred:'➜ 🦈 Bazinul răpitorilor',move2main:'➜ 🌿 Acvariul',ok:'👍',
+  warn:n=>`Atenție! ${n} vânează peștii mici. Pune răpitorul în bazinul răpitorilor!`,ate:(p,v)=>`${p} a mâncat ${v}!`,got:(e,f)=>`Ai prins ${f} pentru pești! ${e}`,newFish:n=>`Un pește nou în acvariu: ${n}!`,more:n=>`+${n} în râu`,sated:'Peștii sunt sătui! Mai încearcă mâine.',night:'🌙 Noapte',day:'☀️ Zi',nightSay:'Noapte bună, pești! Noaptea, somnul iese la vânătoare.',daySay:'Bună dimineața, pești!',album:'📖 Album',albumT:'Albumul peștilor',albumSay:(n,t)=>`Ai găsit ${n} din ${t} specii. Prinde litere ca să le găsești pe toate!`,dirty:'Geamul e murdar! Șterge-l cu degetul.',clean:'Acvariul strălucește! Peștii sunt fericiți!',come:'Uite, vin la mâncare!'},
+ de:{title:'🐠 Meine Aquarien',main:'🌿 Aquarium',pred:'🦈 Räuberbecken',close:'✖ Schließen',eatOn:'🐟➜🦈 Räuber fressen: JA',eatOff:'🐟➜🦈 Räuber fressen: NEIN',
+  pantry:'Vorrat',empty:'Fang Buchstaben, um Fische und Futter zu holen!',hungry:n=>`${n} Fische haben Hunger! Fang Buchstaben, um Futter zu holen.`,hungry1:'Ein Fisch hat Hunger! Fang Buchstaben, um Futter zu holen.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)} fressen: ${who}.`,nobody:f=>`Hier hat niemand Hunger auf ${f}.`,full:'Satt!',hungryS:'Hungrig',happy:'Satt und glücklich',
+  diet:'Frisst:',size:['Baby','jung','groß'],move2pred:'➜ 🦈 Räuberbecken',move2main:'➜ 🌿 Aquarium',ok:'👍',
+  warn:n=>`Achtung! ${n} jagt die kleinen Fische. Setz ihn ins Räuberbecken!`,ate:(p,v)=>`${p} hat ${v} gefressen!`,got:(e,f)=>`Du hast ${f} für die Fische gefangen! ${e}`,newFish:n=>`Ein neuer Fisch im Aquarium: ${n}!`,more:n=>`+${n} im Fluss`,sated:'Die Fische sind satt! Versuch es morgen wieder.',night:'🌙 Nacht',day:'☀️ Tag',nightSay:'Gute Nacht, Fische! Nachts geht der Wels auf die Jagd.',daySay:'Guten Morgen, Fische!',album:'📖 Album',albumT:'Fischalbum',albumSay:(n,t)=>`Du hast ${n} von ${t} Arten gefunden. Fang Buchstaben, um alle zu finden!`,dirty:'Die Scheibe ist schmutzig! Wisch sie mit dem Finger sauber.',clean:'Das Aquarium glänzt! Die Fische sind glücklich!',come:'Schau, sie kommen zum Fressen!'},
+ en:{title:'🐠 My aquariums',main:'🌿 Aquarium',pred:'🦈 Predator tank',close:'✖ Close',eatOn:'🐟➜🦈 Predators eat: YES',eatOff:'🐟➜🦈 Predators eat: NO',
+  pantry:'Pantry',empty:'Catch letters to bring fish and food!',hungry:n=>`${n} fish are hungry! Catch letters to bring them food.`,hungry1:'One fish is hungry! Catch letters to bring it food.',
+  eats:(f,who)=>`${f[0].toUpperCase()+f.slice(1)} are eaten by: ${who}.`,nobody:f=>`Nobody here is hungry for ${f}.`,full:'Full!',hungryS:'Hungry',happy:'Full and happy',
+  diet:'Eats:',size:['baby','young','big'],move2pred:'➜ 🦈 Predator tank',move2main:'➜ 🌿 Aquarium',ok:'👍',
+  warn:n=>`Careful! ${n} hunts the little fish. Move it to the predator tank!`,ate:(p,v)=>`${p} ate ${v}!`,got:(e,f)=>`You caught ${f} for the fish! ${e}`,newFish:n=>`A new fish in the aquarium: ${n}!`,more:n=>`+${n} in the river`,sated:'The fish are full! Try again tomorrow.',night:'🌙 Night',day:'☀️ Day',nightSay:'Good night, fish! At night the catfish goes hunting.',daySay:'Good morning, fish!',album:'📖 Album',albumT:'Fish album',albumSay:(n,t)=>`You found ${n} of ${t} species. Catch letters to find them all!`,dirty:'The glass is dirty! Wipe it with your finger.',clean:'The aquarium is sparkling! The fish are happy!',come:'Look, they are coming to eat!'}};
+const T=()=>TR('aq',TX);
+const li=()=>({ro:0,de:1,en:2})[L_()]??(((L10N.aq||{})[lang]||{}).li||2);
+
+/* ---------- desen pește ---------- */
+function body(s){ const L=s.L, h=s.h; const nose=s.snout?62*L:48*L; return `M ${nose} 0 C ${30*L} ${-h*1.25} ${-30*L} ${-h*1.1} ${-42*L} 0 C ${-30*L} ${h*1.1} ${30*L} ${h*1.25} ${nose} 0 Z`; }
+function fishSVG(k,extra){ const s=SP[k]; if(!s) return ''; if(s.em) return `<text x="0" y="16" font-size="54" text-anchor="middle">${s.em}</text>`;
+  const L=s.L, h=s.h, id='aqc'+(NS_ID.n++); const B=body(s); let g='';
+  g+=`<path d="M ${-38*L} 0 L ${-62*L} ${-h*1.05} Q ${-55*L} 0 ${-62*L} ${h*1.05} Z" fill="${s.f}" stroke="${s.d}" stroke-width="1.5"/>`;
+  const dx=s.snout?-22:-6; g+=`<path d="M ${dx*L} ${-h*.92} Q ${(dx+12)*L} ${-h*1.75} ${(dx+26)*L} ${-h*.85} Z" fill="${s.f}" stroke="${s.d}" stroke-width="1.5"/>`;
+  if(s.stripes) g+=`<path d="M ${-4*L} ${-h*.95} l 3 -7 l 3 6 l 3 -7 l 3 6 l 3 -7 l 3 6" stroke="${s.d}" stroke-width="1.5" fill="none"/>`;
+  g+=`<path d="M ${-12*L} ${h*.85} Q ${-2*L} ${h*1.5} ${8*L} ${h*.8} Z" fill="${s.f}" stroke="${s.d}" stroke-width="1"/>`;
+  g+=`<clipPath id="${id}"><path d="${B}"/></clipPath><path d="${B}" fill="${s.c}" stroke="${s.d}" stroke-width="2"/><g clip-path="url(#${id})"><ellipse cx="0" cy="${h*.75}" rx="${50*L}" ry="${h*.6}" fill="#fff" opacity=".35"/>`;
+  if(s.stripes) for(let i=0;i<5;i++) g+=`<rect x="${(-28+i*13)*L}" y="${-h*1.3}" width="${5*L}" height="${h*1.5}" rx="2" fill="${s.d}" opacity=".55"/>`;
+  if(s.band) g+=`<path d="M ${-40*L} 0 Q 0 ${-3} ${44*L} ${-2}" stroke="${s.band}" stroke-width="${h*.45}" fill="none" opacity=".85"/>`;
+  if(s.spots) for(let i=0;i<10;i++) g+=`<circle cx="${(-30+(i*7.3)%64)*L}" cy="${-h*.7+((i*5)%9)*h*.12}" r="1.8" fill="${s.spots}"/>`;
+  if(s.lspots) for(let i=0;i<12;i++) g+=`<ellipse cx="${(-36+(i*9.1)%84)*L}" cy="${-h*.6+((i*7)%10)*h*.11}" rx="3.4" ry="1.6" fill="${s.lspots}"/>`;
+  if(s.scales) for(let i=0;i<5;i++) for(let j=0;j<2;j++) g+=`<path d="M ${(-26+i*11)*L} ${-h*.35+j*h*.5} q 4 -5 8 0" stroke="${s.d}" stroke-width="1" fill="none" opacity=".6"/>`;
+  g+='</g>';
+  const ex=(s.snout?40:34)*L; g+=`<circle cx="${ex}" cy="${-h*.28}" r="${Math.max(3.2,h*.2)}" fill="#fff"/><circle cx="${ex+1}" cy="${-h*.28}" r="${Math.max(1.8,h*.11)}" fill="#1B1B1B"/>`;
+  if(s.bar==='l') g+=`<path d="M ${46*L} 2 Q ${64*L} 10 ${74*L} 28 M ${46*L} 4 Q ${58*L} 18 ${60*L} 36" stroke="${s.d}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  if(s.bar==='s') g+=`<path d="M ${44*L} 3 q 6 4 8 10" stroke="${s.d}" stroke-width="1.6" fill="none"/>`;
+  g+=`<path d="M ${(s.snout?58:44)*L} 3 q -4 2 -8 1" stroke="${s.d}" stroke-width="1.5" fill="none"/>`;
+  return g+(extra||''); }
+const iconSVG=k=>{ const s=SP[k]; if(FOOD[k]&&!SP[k]) return FOOD[k].em; if(!s) return '🐟'; if(s.em) return s.em; const z=Math.min(1.6,.95/s.L); return `<svg viewBox="-80 -48 160 96"><g transform="scale(${-z} ${z})">${fishSVG(k)}</g></svg>`; };
+
+/* ---------- date ---------- */
+let D={fish:[],food:{alg:0,worm:0,ins:0,plev:0},eat:false,nid:1,seen:[],clean:null};
+try{ const d=JSON.parse(localStorage.getItem('rd_aq2')||'null'); if(d) D=Object.assign(D,d); else { /* migrare din acvariul vechi */
+  const old=JSON.parse(localStorage.getItem('rd_aqua')||'{}')||{}; const MAP={'🐟':'caras','🐠':'pastrav','🐡':'crap','🦀':'rac','🐙':'somn','🦑':'biban','🐢':'testoasa','🦈':'stiuca','🐬':'somn'};
+  Object.entries(old).forEach(([e,n])=>{ const k=MAP[e]||'caras'; for(let i=0;i<n;i++) D.fish.push({id:D.nid++,sp:k,grow:3,fed:today(),tank:SP[k].pred?'pred':'main'}); }); } }catch(e){}
+const save=()=>{ try{ localStorage.setItem('rd_aq2',JSON.stringify(D)); }catch(e){} };
+D.fish.forEach(f=>{ if(!D.seen.includes(f.sp)) D.seen.push(f.sp); }); if(!D.clean) D.clean=today(); save();
+const stage=f=>Math.min(2,Math.floor((f.grow||0)/3));
+const hunger=f=>Math.max(0,days(f.fed||today(),today()));
+function pool(lv){ const p=['caras','caras','plev','alg','worm','worm'];
+  if(lv>=2) p.push('crap','ins','alg','plev'); if(lv>=3) p.push('pastrav','biban','ins'); if(lv>=4) p.push('somn','stiuca','rac','testoasa','plev'); return p; }
+/* răpitorii vin garantat: primul la a 5-a captură, apoi cel puțin unul la fiecare 7 pești */
+const PREDS=Object.keys(SP).filter(k=>SP[k].pred&&!SP[k].food);
+if(D.catches==null) D.catches=D.fish.length; if(D.sincePred==null) D.sincePred=(D.seen.some(k=>SP[k]&&SP[k].pred)||!D.fish.length)?0:4; if(D.newN==null) D.newN=0;
+function force(){ const seenPred=D.seen.some(k=>SP[k]&&SP[k].pred); if((!seenPred&&D.catches>=4)||D.sincePred>=6){ const un=PREDS.filter(k=>!D.seen.includes(k)); const L=un.length?un:PREDS; return L[Math.floor(Math.random()*L.length)]; } return null; }
+const newCount=()=>D.newN||0;
+function add(k){ D.catches=(D.catches||0)+1; D.sincePred=SP[k]&&SP[k].pred?0:(D.sincePred||0)+1; if(!FOOD[k]) D.newN=(D.newN||0)+1;
+  if(FOOD[k]){ D.food[k]=(D.food[k]||0)+1; save(); const nm=FOOD[k].n[li()]; return {food:true,say:T().got(k==='plev'?'':FOOD[k].em,nm)}; }
+  D.fish.push({id:D.nid++,sp:k,grow:0,fed:today(),tank:'main'}); if(!D.seen.includes(k)) D.seen.push(k); save(); return {food:false,say:T().newFish(SP[k].N[li()])}; }
+const hungryCount=()=>D.fish.filter(f=>hunger(f)>=1).length;
+
+/* ---------- acvariul ---------- */
+let ov=null, raf=0, tank='main', parts=[], actors=[], warned=false, msgT=0, night=false, dirt=[], saidDirt=false;
+let onDone=null;
+function open(o){ close(); onDone=o&&o.onClose||null; D.newN=0; save(); tank='main'; warned=false; ov=document.createElement('div'); ov.className='aq-ov';
+  ov.innerHTML=`<div class="aq-top"><button class="aq-b" id="aq-close"></button><h3 id="aq-title"></h3><button class="aq-b" id="aq-eat"></button></div>
+   <div class="aq-top" style="justify-content:center"><button class="aq-b" id="aq-tmain"></button><button class="aq-b" id="aq-tpred"></button><button class="aq-b" id="aq-night"></button><button class="aq-b" id="aq-album"></button></div>
+   <div class="aq-tank" id="aq-tank"></div><div class="aq-msg" id="aq-msg"></div><div class="aq-pantry" id="aq-pantry"></div>`;
+  document.body.appendChild(ov); const q=id=>ov.querySelector('#'+id);
+  q('aq-close').onclick=close; q('aq-tmain').onclick=()=>{ tank='main'; build(); }; q('aq-tpred').onclick=()=>{ tank='pred'; build(); };
+  q('aq-eat').onclick=()=>{ D.eat=!D.eat; save(); labels(); snd(600,.08); };
+  q('aq-night').onclick=()=>{ night=!night; labels(); setNight(); say1(night?T().nightSay:T().daySay); };
+  q('aq-album').onclick=album;
+  night=false; saidDirt=false; build(); const h=hungryCount(); if(h) sp(h===1?T().hungry1:T().hungry(h)); else if(!D.fish.length) sp(T().empty); else if(dirt.length){ saidDirt=true; sp(T().dirty); } }
+function close(){ cancelAnimationFrame(raf); raf=0; if(ov){ ov.remove(); ov=null; } const f=onDone; onDone=null; if(f) try{ f(); }catch(e){} }
+function labels(){ const q=id=>ov.querySelector('#'+id); q('aq-close').textContent=T().close; q('aq-title').textContent=T().title; q('aq-eat').textContent=D.eat?T().eatOn:T().eatOff; q('aq-eat').classList.toggle('on',D.eat);
+  q('aq-tmain').textContent=T().main+' ('+D.fish.filter(f=>f.tank==='main').length+')'; q('aq-tpred').textContent=T().pred+' ('+D.fish.filter(f=>f.tank==='pred').length+')';
+  q('aq-night').textContent=night?T().day:T().night; q('aq-album').textContent=T().album+' '+D.seen.length+'/'+KINDS.length; q('aq-tmain').classList.toggle('on',tank==='main'); q('aq-tpred').classList.toggle('on',tank==='pred'); pantry(); }
+function say1(t){ const m=ov&&ov.querySelector('#aq-msg'); if(m){ m.textContent=t; clearTimeout(msgT); msgT=setTimeout(()=>{ if(m) m.textContent=''; },5000); } sp(t); }
+function pantry(){ const p=ov.querySelector('#aq-pantry'); p.innerHTML=''; const lab=document.createElement('div'); lab.style.cssText='align-self:center;font-weight:800'; lab.textContent='🧺 '+T().pantry+':'; p.appendChild(lab);
+  ['alg','worm','ins','plev'].forEach(k=>{ const b=document.createElement('button'); b.className='aq-food'; b.innerHTML=`<span class="ic">${k==='plev'?`<svg viewBox="-50 -30 100 60" style="width:1.3em;height:.8em">${fishSVG('plev')}</svg>`:FOOD[k].em}</span>${FOOD[k].n[li()]} <b>${D.food[k]||0}</b>`;
+    b.disabled=!(D.food[k]>0); b.onclick=()=>drop(k); p.appendChild(b); }); }
+const W=900,H=480;
+function build(){ cancelAnimationFrame(raf); labels(); parts=[];
+  const host=ov.querySelector('#aq-tank'); let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="aq-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tank==='main'?'#7FD6F2':'#5BA9C9'}"/><stop offset="1" stop-color="${tank==='main'?'#1F7FB8':'#18516F'}"/></linearGradient></defs>`;
+  s+=`<rect width="${W}" height="${H}" fill="url(#aq-w)"/><path d="M0 440 Q 200 420 450 440 T 900 435 L900 480 L0 480Z" fill="#E7D3A1"/>`;
+  [[60,'🌿'],[150,'🪨'],[300,'🌿'],[520,'🪸'],[690,'🌿'],[830,'🪨']].forEach(([x,e],i)=>s+=`<text x="${x}" y="${470-(i%2)*6}" font-size="${e==='🪨'?50:70}" opacity=".95">${tank==='pred'&&e==='🪸'?'🌿':e}</text>`);
+  for(let i=0;i<10;i++) s+=`<circle cx="${R(W)}" cy="${R(H)}" r="${2+R(5)}" fill="rgba(255,255,255,.35)"><animate attributeName="cy" from="${H}" to="-10" dur="${4+R(6)}s" begin="-${R(6)}s" repeatCount="indefinite"/></circle>`;
+  s+=`<g id="aq-parts"></g><g id="aq-fish"></g><rect id="aq-nightr" width="${W}" height="${H}" fill="#0A1430" opacity="0" pointer-events="none" style="transition:opacity .8s"/><g id="aq-ripple" pointer-events="none"></g><g id="aq-dirt" pointer-events="none"></g></svg>`; host.innerHTML=s;
+  makeDirt(); setNight(); bindTank(host.querySelector('svg'));
+  const g=host.querySelector('#aq-fish'), list=D.fish.filter(f=>f.tank===tank), show=list.slice(0,18);
+  if(list.length>18){ host.insertAdjacentHTML('beforeend',`<div style="position:absolute;right:12px;top:10px;font-weight:800">${T().more(list.length-18)}</div>`); }
+  if(!D.fish.length) host.insertAdjacentHTML('beforeend',`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;text-align:center;padding:20px">${T().empty}</div>`);
+  actors=show.map(f=>{ const s=SP[f.sp]; const el=document.createElementNS('http://www.w3.org/2000/svg','g'); el.style.cursor='pointer';
+    el.innerHTML=`<g class="aq-body">${fishSVG(f.sp)}</g><text class="aq-th" x="0" y="-38" font-size="26" text-anchor="middle"></text>`; g.appendChild(el);
+    const a={f,el,x:60+R(W-120),y:s.bottom?400+R(30):60+R(320),tx:0,ty:0,v:30+R(30),dir:1,flee:0,pause:0}; pickT(a); el.onclick=()=>card(a); return a; });
+  let last=performance.now(); const loop=now=>{ const dt=Math.min(.12,(now-last)/1000); last=now; step(dt,now); raf=requestAnimationFrame(loop); }; raf=requestAnimationFrame(loop); }
+function setNight(){ const r=ov&&ov.querySelector('#aq-nightr'); if(r) r.setAttribute('opacity',night?.55:0); }
+function makeDirt(){ const lvl=Math.min(3,days(D.clean||today(),today())); dirt=[]; const g=ov.querySelector('#aq-dirt'); if(!g) return; g.innerHTML='';
+  for(let i=0;i<lvl*7;i++){ const d={x:40+R(W-80),y:30+R(H-90),r:18+R(26),o:.55}; const c=document.createElementNS('http://www.w3.org/2000/svg','ellipse'); c.setAttribute('cx',d.x); c.setAttribute('cy',d.y); c.setAttribute('rx',d.r); c.setAttribute('ry',d.r*.75); c.setAttribute('fill',['#6E8F3A','#8A7A3A','#5E7F45'][i%3]); c.setAttribute('opacity',d.o); d.el=c; g.appendChild(c); dirt.push(d); } }
+function bindTank(svg){ let down=null, moved=false;
+  const P=e=>{ const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); };
+  svg.addEventListener('pointerdown',e=>{ if(e.target.closest('#aq-fish g')) return; down=P(e); moved=false; });
+  let lastP=null; svg.addEventListener('pointermove',e=>{ if(!down||!e.buttons) return; const p=P(e); if(Math.hypot(p.x-down.x,p.y-down.y)>10) moved=true; if(!moved) return; const q=lastP||down; const n=Math.max(1,Math.ceil(Math.hypot(p.x-q.x,p.y-q.y)/25)); for(let i=1;i<=n;i++) wipe({x:q.x+(p.x-q.x)*i/n,y:q.y+(p.y-q.y)*i/n}); lastP=p; });
+  svg.addEventListener('pointerdown',()=>{ lastP=null; });
+  svg.addEventListener('pointerup',e=>{ if(!down) return; const p=P(e); if(!moved) tapGlass(p); down=null; }); }
+function wipe(p){ let any=false; dirt.forEach(d=>{ if(d.o>0&&Math.hypot(d.x-p.x,d.y-p.y)<d.r+45){ d.o=Math.max(0,d.o-.2); d.el.setAttribute('opacity',d.o); any=true; } });
+  if(any&&Math.random()<.3) snd(1400+R(400),.04,'sine',.04);
+  if(dirt.length&&dirt.every(d=>d.o<=0)){ dirt=[]; D.clean=today(); save(); [880,1100,1320,1760].forEach((f,i)=>setTimeout(()=>snd(f,.15,'sine',.1),i*90)); say1('✨ '+T().clean); actors.forEach(a=>{ a.el.querySelector('.aq-th').textContent='💖'; setTimeout(()=>{ if(a.el) a.el.querySelector('.aq-th').textContent=''; },1600); }); } }
+function tapGlass(p){ snd(300,.08,'sine',.08); const r=ov.querySelector('#aq-ripple'); r.insertAdjacentHTML('beforeend',`<circle cx="${p.x}" cy="${p.y}" r="10" fill="none" stroke="#fff" stroke-width="3"><animate attributeName="r" from="8" to="70" dur=".8s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" dur=".8s" fill="freeze"/></circle>`); setTimeout(()=>{ if(r.firstChild) r.firstChild.remove(); },900);
+  actors.forEach(a=>{ if(SP[a.f.sp].bottom&&!SP[a.f.sp].pred) return; if(Math.hypot(a.x-p.x,a.y-p.y)<420){ a.tx=p.x+(R(80)-40); a.ty=clamp2(p.y+(R(60)-30),40,420); a.curious=1.5; a.el.querySelector('.aq-th').textContent=a.el.querySelector('.aq-th').textContent||'❓'; setTimeout(()=>{ const t=a.el&&a.el.querySelector('.aq-th'); if(t&&t.textContent==='❓') t.textContent=''; },1200); } }); }
+function album(){ const host=ov.querySelector('#aq-tank'); const c=document.createElement('div'); c.className='aq-card';
+  let g=''; KINDS.forEach(k=>{ const s=SP[k], got=D.seen.includes(k), nm=s.N[li()];
+    g+=`<div style="width:120px;display:flex;flex-direction:column;align-items:center"><svg viewBox="-80 -55 160 110" style="width:110px;height:76px">${s.em?`<text x="0" y="22" font-size="70" text-anchor="middle" ${got?'':'opacity=".15"'}>${s.em}</text>`:`<g ${got?'':'opacity=".18" style="filter:brightness(0)"'}>${fishSVG(k)}</g>`}</svg><b style="font-size:1.05rem">${got?`<span style="color:#FF5D7A;font-size:1.3em">${nm[0]}</span>${nm.slice(1)}`:'❓'}</b></div>`; });
+  c.innerHTML=`<div><h4>${T().albumT} ${D.seen.length}/${KINDS.length}</h4><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">${g}</div><div class="row"><button class="rb-b go" id="aq-aok">👍</button></div></div>`;
+  host.appendChild(c); c.querySelector('#aq-aok').onclick=()=>c.remove(); sp(T().albumSay(D.seen.length,KINDS.length)); }
+function pickT(a){ const s=SP[a.f.sp]; a.tx=50+R(W-100); a.ty=s.bottom?395+R(35):50+R(330); }
+function drop(k){ if(!(D.food[k]>0)) return; D.food[k]--; save(); pantry(); snd(500,.1);
+  const x=120+R(W-240); if(k==='plev'){ parts.push({k,x,y:80,live:1,tx:R(W),ty:100+R(250)}); }
+  else for(let i=0;i<3;i++) parts.push({k,x:x+(i-1)*24+R(10),y:20+R(20),vy:22+R(12)});
+  const eaters=actors.filter(a=>SP[a.f.sp].diet&&SP[a.f.sp].diet.includes(k));
+  const can=eaters.filter(a=>bites(a.f)<3);
+  if(eaters.length&&!can.length){ say1(T().sated); }
+  else if(can.length){ can.forEach(a=>{ a.excited=1; a.el.querySelector('.aq-th').textContent='❗'; setTimeout(()=>{ const t=a.el&&a.el.querySelector('.aq-th'); if(t&&t.textContent==='❗') t.textContent=''; },900); }); const m=ov.querySelector('#aq-msg'); if(m) m.textContent='😋 '+T().come; }
+  if(!eaters.length){ const who=[...new Set(D.fish.filter(f=>SP[f.sp].diet&&SP[f.sp].diet.includes(k)).map(f=>SP[f.sp].n[li()]))];
+    say1(who.length?T().nobody(FOOD[k].n[li()])+' '+T().eats(FOOD[k].n[li()],who.join(', ')):T().eats(FOOD[k].n[li()],Object.keys(SP).filter(s=>SP[s].diet&&SP[s].diet.includes(k)).map(s=>SP[s].n[li()]).join(', '))); }
+  drawParts(); }
+function drawParts(){ const g=ov&&ov.querySelector('#aq-parts'); if(!g) return;
+  parts.forEach(p=>{ if(!p.el){ p.el=document.createElementNS('http://www.w3.org/2000/svg','g'); p.el.innerHTML=p.k==='plev'?`<g class="pb">${fishSVG('plev')}</g>`:`<text y="9" font-size="26" text-anchor="middle">${FOOD[p.k].em}</text>`; g.appendChild(p.el); }
+    p.el.setAttribute('transform',`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`); if(p.k==='plev') p.el.firstChild.setAttribute('transform',`scale(${(p.tx>p.x?1:-1)*.45} .45)`); });
+  [...g.children].forEach(c=>{ if(!parts.some(p=>p.el===c)) c.remove(); }); }
+const bites=f=>f.bd===today()?(f.bn||0):0;
+function feed(a){ const f=a.f; if(f.fed!==today()){ f.grow=(f.grow||0)+1; } f.fed=today(); if(f.bd!==today()){ f.bd=today(); f.bn=0; } f.bn++; save(); a.excited=0; a.chomp=.4; snd(880,.08,'triangle',.08); setTimeout(()=>snd(1180,.08,'triangle',.08),90);
+  a.el.querySelector('.aq-th').textContent='❤️'; setTimeout(()=>{ if(a.el) a.el.querySelector('.aq-th').textContent=''; },1500); }
+const small=f=>!SP[f.sp].pred&&!SP[f.sp].em&&stage(f)===0;
+function step(dt,now){ if(!ov) return;
+  parts.forEach(p=>{ if(p.live){ const dx=p.tx-p.x, dy=p.ty-p.y, d=Math.hypot(dx,dy); if(d<10){ p.tx=40+R(W-80); p.ty=60+R(320); } else { p.x+=dx/d*45*dt; p.y+=dy/d*45*dt; } } else if(p.y<445) p.y+=p.vy*dt; });
+  const preds=actors.filter(a=>SP[a.f.sp].pred&&hunger(a.f)>=1);
+  actors.forEach(a=>{ const s=SP[a.f.sp], hg=hunger(a.f); let tx=a.tx, ty=a.ty, v=a.v;
+    /* mâncare */
+    if(s.diet&&bites(a.f)<3&&!(a.lastBite&&now-a.lastBite<2500&&parts.length&&actors.some(b=>b!==a&&!(b.lastBite&&now-b.lastBite<2500)&&SP[b.f.sp].diet&&parts.some(p=>SP[b.f.sp].diet.includes(p.k))))){ let best=null,bd=1e9; parts.forEach(p=>{ if(!s.diet.includes(p.k)) return; const d=Math.hypot(p.x-a.x,p.y-a.y); if(d<bd){ bd=d; best=p; } });
+      if(best){ tx=best.x; ty=best.y; v=a.excited?150:110; if(bd<24){ parts.splice(parts.indexOf(best),1); a.lastBite=now; feed(a); } } }
+    /* răpitori */
+    if(s.pred&&hg>=1&&!parts.some(p=>s.diet.includes(p.k))){ const prey=actors.filter(b=>b!==a&&small(b.f)); if(prey.length){ let best=prey[0],bd=1e9; prey.forEach(b=>{ const d=Math.hypot(b.x-a.x,b.y-a.y); if(d<bd){ bd=d; best=b; } });
+        tx=best.x; ty=best.y; v=D.eat?85:55; best.flee=1.5; best.fx=a.x; best.fy=a.y;
+        if(!warned){ warned=true; say1(T().warn(SP[a.f.sp].N[li()])); }
+        if(D.eat&&bd<26){ D.fish=D.fish.filter(f=>f!==best.f); actors=actors.filter(b=>b!==best); best.el.remove(); feed(a); say1(T().ate(SP[a.f.sp].N[li()],SP[best.f.sp].n[li()])); labels(); } } }
+    if(a.flee>0){ a.flee-=dt; const ax=a.x-(a.fx||0), ay=a.y-(a.fy||0), d=Math.hypot(ax,ay)||1; tx=a.x+ax/d*120; ty=clamp2(a.y+ay/d*60,40,420); v=110; }
+    if(night){ if(a.f.sp==='somn') v*=1.6; else if(!parts.length) v*=.3; }
+    const dx=tx-a.x, dy=ty-a.y, d=Math.hypot(dx,dy); if(d<8&&tx===a.tx){ pickT(a); }
+    else if(d>1){ const sv=v*(hg>=2?.6:1); a.x+=dx/d*Math.min(sv*dt,d); a.y+=dy/d*Math.min(sv*dt,d); if(Math.abs(dx)>3) a.dir=dx<0?-1:1; }
+    a.x=clamp2(a.x,30,W-30); a.y=clamp2(a.y,30,450);
+    if(a.chomp>0) a.chomp-=dt; const sc=(s.sz||1)*[.6,.85,1.1][stage(a.f)]*(s.em?.9:1)*.9*(a.chomp>0?1+Math.sin(a.chomp*40)*.08:1), wob=Math.sin(now/300+a.f.id)*3;
+    a.el.setAttribute('transform',`translate(${a.x.toFixed(1)} ${(a.y+wob).toFixed(1)})`);
+    a.el.querySelector('.aq-body').setAttribute('transform',`scale(${(s.em?1:a.dir)*sc} ${sc})`); a.el.querySelector('.aq-body').setAttribute('opacity',hg>=2?.7:1);
+    const th=a.el.querySelector('.aq-th'), cur=th.textContent; if(cur===''||cur==='💭🍽️'||cur==='💤') th.textContent=night&&a.f.sp!=='somn'&&!parts.length?'💤':(hg>=1&&Math.floor(now/1800+a.f.id)%3===0?'💭🍽️':''); });
+  drawParts(); }
+const clamp2=(v,a,b)=>Math.max(a,Math.min(b,v));
+function card(a){ const f=a.f, s=SP[f.sp], hg=hunger(f), host=ov.querySelector('#aq-tank'); const c=document.createElement('div'); c.className='aq-card';
+  const name=s.N[li()]; const dietStr=(s.diet||[]).map(k=>k==='plev'?'🐟':FOOD[k].em).join(' ');
+  c.innerHTML=`<div><svg viewBox="-80 -55 160 110" style="width:min(260px,60vw);height:auto">${s.em?`<text x="0" y="22" font-size="80" text-anchor="middle">${s.em}</text>`:fishSVG(f.sp)}</svg>
+    <h4><b>${name[0]}</b>${name.slice(1)}</h4><p>${s.fact[li()]}</p><p>${T().diet} ${dietStr}</p><p>${hg>=1?'🍽️ '+T().hungryS:'😊 '+T().happy} · 📏 ${T().size[stage(f)]}</p>
+    <div class="row"><button class="rb-b" id="aq-mv">${f.tank==='main'?T().move2pred:T().move2main}</button><button class="rb-b go" id="aq-ok">${T().ok}</button></div></div>`;
+  host.appendChild(c); sp(name+'. '+s.fact[li()]);
+  c.querySelector('#aq-ok').onclick=()=>c.remove(); c.onclick=e=>{ if(e.target===c) c.remove(); };
+  c.querySelector('#aq-mv').onclick=()=>{ f.tank=f.tank==='main'?'pred':'main'; save(); c.remove(); snd(400,.15); build(); }; }
+window.RDAQ={open,close,add,pool,force,newCount,iconSVG,hungryCount,T:()=>T(),SP,fishSVG};
+(window.__LR=window.__LR||[]).push(()=>{ if(ov) try{ labels(); }catch(e){} });
+})();
+</script>

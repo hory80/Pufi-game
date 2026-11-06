@@ -1,0 +1,371 @@
+
+<style>
+/* ===== ecran de start cu carduri ===== */
+#hm-root{position:fixed;inset:0;z-index:45;background:var(--sky);background-image:radial-gradient(rgba(74,168,255,.12) 2px,transparent 2px);background-size:30px 30px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px calc(env(safe-area-inset-bottom,0px) + 14px);box-sizing:border-box;overflow:auto;font-family:var(--display);color:var(--ink)}
+#hm-root[hidden]{display:none}
+.hm-head{display:flex;align-items:center;gap:10px;width:100%;max-width:1000px;flex-wrap:wrap;justify-content:center}
+.hm-head h1{flex:1 1 300px;margin:0;font-size:clamp(1.9rem,5.5vw,3.2rem);text-align:center;line-height:1.05}
+.hm-head h1 small{display:block;font-size:.5em;margin-top:4px;opacity:.85;letter-spacing:.02em}
+.hm-langs{display:flex;gap:6px}
+.hm-langs button{font:inherit;font-weight:800;font-size:1.05rem;border:3px solid var(--ink);background:#fff;border-radius:999px;padding:4px 12px;cursor:pointer}
+.hm-langs button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.hm-q{font-size:clamp(1.2rem,3.4vw,1.8rem);font-weight:800}
+.hm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(44%,200px),1fr));gap:16px;width:100%;max-width:1000px}
+.hm-card{font:inherit;color:var(--ink);border:none;border-radius:26px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;box-shadow:0 8px 0 rgba(36,50,95,.18);min-height:150px;justify-content:center;position:relative}
+.hm-card:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(36,50,95,.18)}
+.hm-card .ic{font-size:clamp(2.8rem,8vh,4rem);line-height:1}
+.hm-card .t{font-weight:800;font-size:clamp(1.1rem,2.8vw,1.45rem);text-align:center;line-height:1.1}
+.hm-card .s{font-size:.95rem;font-weight:700;opacity:.75}
+.hm-par{position:absolute;inset:0;z-index:2;background:rgba(36,50,95,.5);display:flex;align-items:center;justify-content:center}
+.hm-par>div{background:#fff;border-radius:24px;padding:18px 22px;display:flex;flex-direction:column;gap:12px;align-items:center;max-width:92%}
+.hm-par>div.hm-lp{display:grid!important;grid-template-columns:repeat(3,1fr);gap:10px;width:min(640px,92vw);padding:18px}
+.hm-lpb{display:flex;align-items:center;gap:10px;width:100%;height:58px;padding:0 14px;border:3px solid #dfe6f5;border-radius:18px;background:#f6f8ff;font:inherit;font-size:1.1rem;font-weight:800;color:#24325f;white-space:nowrap;overflow:hidden;cursor:pointer;box-sizing:border-box}
+.hm-lpb .f{font-size:1.6rem;line-height:1;flex:none}.hm-lpb .n{overflow:hidden;text-overflow:ellipsis}
+.hm-lpb.cur{background:#3ecf8e;border-color:#2bb57a;color:#fff}
+@media (max-width:560px){.hm-par>div.hm-lp{grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}.hm-lpb{font-size:.95rem;gap:7px;padding:0 9px;height:52px}.hm-lpb .f{font-size:1.35rem}}
+.hm-par select{font:inherit;font-size:1.1rem;padding:6px;border-radius:12px;max-width:80vw}
+#sa-root{z-index:55!important}
+#gHome{background:var(--sun)!important;flex:0 0 auto!important}
+.tabs>button:not(#gHome){display:none!important}
+/* ===== lumea matematicii ===== */
+#mw-root{position:fixed;inset:0;z-index:50;background:#FFF9E8;background-image:linear-gradient(rgba(255,180,60,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(255,180,60,.12) 1px,transparent 1px);background-size:36px 36px;color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 10px);overflow:hidden}
+#mw-root[hidden]{display:none}
+#mw-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto;position:relative}
+.mw-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(44%,190px),1fr));gap:14px;align-content:start;padding:4px}
+.mw-stage{flex:1;min-height:0;width:100%;display:flex;justify-content:center;position:relative}
+.mw-stage>svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
+.mw-ans{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.mw-ans button{font:inherit;font-weight:800;font-size:clamp(1.6rem,5vh,2.4rem);min-width:2.6em;min-height:64px;border-radius:20px;border:3px solid var(--ink);background:#fff;cursor:pointer}
+.mw-ans button.ok{background:var(--leaf);color:#fff}.mw-ans button.no{background:#FFB3C0;opacity:.6}
+.mw-sym svg{width:64px;height:44px;display:block}
+.mw-blink{animation:rbAnt .5s infinite}
+</style>
+<div id="hm-root">
+  <div class="hm-head"><h1 id="hm-title"></h1><div class="hm-langs" id="hm-langs"></div><div class="ch-pill" id="hm-stars">⭐ 0</div></div>
+  <div class="hm-q" id="hm-q"></div>
+  <div class="hm-grid" id="hm-grid"></div>
+</div>
+<div id="mw-root" hidden>
+  <div class="rb-top"><button class="ch-btn" id="mw-back"></button><h2 id="mw-title"></h2><button class="ch-btn" id="mw-all" hidden></button><div class="ch-pill" id="mw-stars">⭐ 0</div></div>
+  <div id="mw-main"></div>
+  <div class="rb-ov" id="mw-ov" hidden><div><div class="big" id="mw-ovS"></div><h3 id="mw-ovT"></h3>
+    <div class="rb-ctrl"><button class="rb-b go" id="mw-ovNext"></button><button class="rb-b" id="mw-ovAgain"></button><button class="rb-b" id="mw-ovBack"></button></div></div></div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById('mw-'+id), root=$('root'), main=$('main');
+const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const sp=t=>(typeof say==='function')?say(t):Promise.resolve(false);
+const spW=(t,ms)=>Promise.all([sp(t),wait(ms)]);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function btn(txt,cls,fn){ const b=el('button','rb-b'+(cls?' '+cls:''),txt); b.onclick=fn; return b; }
+function snd(f,d,type,vol){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime; o.type=type||'triangle'; o.frequency.value=f; g.gain.setValueAtTime(vol||.12,t); g.gain.exponentialRampToValueAtTime(.001,t+(d||.12)); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+(d||.12)+.03);}catch(e){} }
+const blip=()=>snd(880,.07), boing=()=>{ snd(320,.15,'sine',.2); setTimeout(()=>snd(170,.25,'sine',.2),100); }, chime=()=>[784,988,1319].forEach((f,i)=>setTimeout(()=>snd(f,.2,'sine',.12),i*90)), pop=n=>snd(380+n*30,.08,'triangle',.1);
+const EMO=['🍎','🍓','🐥','🎈','⭐','🐟','🍪','🌸','🐞','⚽','🦋','🍊'];
+
+/* ================= texte ================= */
+const TX={
+ro:{title:'🔢 Lumea numerelor',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff:'🔓 Toate: NU',hint:'💡 Ajutor',lvl:n=>`Nivelul ${n}`,
+ hello:'Bine ai venit în lumea numerelor! Alege un joc.',done:s=>`Gata! Ai câștigat ${['','o stea','două stele','trei stele'][s]}!`,next:'▶ Nivelul următor',again:'↺ Din nou',toMenu:'⬅ Niveluri',locked:'Termină întâi nivelul de dinainte.',
+ games:{add:['➕','Adunări și scăderi'],cmp:['🐊','Crocodilul lacom'],nb:['🏠','Strada vecinilor'],ord:['🐧','Pinguinii în ordine'],box:['🎁','Cutia cu secret'],sb:['🧮','Soroban'],ten:['🍒','Face 10']},
+ lvAdd:['Adunări până la 5','Adunări până la 10','Scăderi până la 10','Adunări până la 20','Scăderi până la 20','Amestec până la 20','Zeci întregi','Până la 100'],
+ lvCmp:['Grămezi de obiecte','Semnele < > =','Numere până la 20','Numere până la 100','Compară sume'],
+ lvNb:['Vecinul din dreapta','Vecinul din stânga','Ambii vecini până la 20','Ambii vecini până la 100','Numărul din mijloc'],
+ lvOrd:['Trei numere, crescător','Patru numere, descrescător','Până la 20, amestecat','Până la 100, crescător','Până la 100, amestecat'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Amestec până la 20','Amestec până la 100'],
+ plus:'plus',minus:'minus',make:'fac',addQ:(a,o,b)=>`${a} ${o} ${b} cât fac?`,addA:(a,o,b,c)=>`${a} ${o} ${b} fac ${c}!`,
+ addStory:(a,b,e)=>`Ai ${a} ${e}. Mai vin ${b}. Câte sunt?`,subStory:(a,b)=>`Sunt ${a}. ${b} pleacă. Câte rămân?`,
+ frog:'Broscuța sare pe linia numerelor. Numără săriturile!',
+ cmpPile:'Crocodilul lacom vrea grămada mai mare! Atinge-o!',cmpSym:'Ce semn punem? Gura crocodilului se deschide spre numărul mai mare!',cmpBad:'Crocodilul vrea mereu mai mult!',
+ gt:(a,b)=>`${a} este mai mare decât ${b}.`,lt:(a,b)=>`${a} este mai mic decât ${b}.`,eq:(a,b)=>`${a} este egal cu ${b}.`,chomp:'Ham!',
+ nbR:n=>`Cine stă în dreapta lui ${n}? Vecinul din dreapta e cu unu mai mare.`,nbL:n=>`Cine stă în stânga lui ${n}? Vecinul din stânga e cu unu mai mic.`,nbLR:n=>`Găsește ambii vecini ai lui ${n}!`,nbB:(a,b)=>`Ce număr stă între ${a} și ${b}?`,
+ nbOk:s=>`${s}. Bravo, vecinii sunt la locul lor!`,nbNo:'Nu stă acolo. Mai încearcă!',
+ ordUp:'Pune pinguinii în ordine crescătoare: de la cel mai mic la cel mai mare. Fă o scară care urcă!',ordDown:'Pune pinguinii în ordine descrescătoare: de la cel mai mare la cel mai mic. Fă un tobogan!',
+ ordOk:'Perfect! Ordinea e corectă!',ordNo:'Hopa, aici ordinea nu e bună. Mai încearcă!',up:'🪜 Crescător',down:'🛝 Descrescător',
+ boxQ:'Câte mere sunt în cutia cu secret? Pune mere în cutie până când balanța stă dreaptă!',boxQ100:'Ce număr e în cutia cu secret? Pune mere până când balanța stă dreaptă!',boxOk:(e)=>`Balanța stă dreaptă! ${e}`,heavyL:'Partea stângă e mai grea.',heavyR:'Partea dreaptă e mai grea.'},
+de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',hint:'💡 Hilfe',lvl:n=>`Level ${n}`,
+ hello:'Willkommen in der Welt der Zahlen! Such dir ein Spiel aus.',done:s=>`Geschafft! Du hast ${['','einen Stern','zwei Sterne','drei Sterne'][s]} bekommen!`,next:'▶ Nächstes Level',again:'↺ Nochmal',toMenu:'⬅ Level',locked:'Schaff zuerst das Level davor.',
+ games:{add:['➕','Plus und Minus'],cmp:['🐊','Das gierige Krokodil'],nb:['🏠','Die Nachbarstraße'],ord:['🐧','Pinguine in Reihe'],box:['🎁','Die Geheimbox'],sb:['🧮','Abakus'],ten:['🍒','Mach 10']},
+ lvAdd:['Plus bis 5','Plus bis 10','Minus bis 10','Plus bis 20','Minus bis 20','Gemischt bis 20','Ganze Zehner','Bis 100'],
+ lvCmp:['Haufen vergleichen','Die Zeichen < > =','Zahlen bis 20','Zahlen bis 100','Summen vergleichen'],
+ lvNb:['Der rechte Nachbar','Der linke Nachbar','Beide Nachbarn bis 20','Beide Nachbarn bis 100','Die Zahl in der Mitte'],
+ lvOrd:['Drei Zahlen, aufsteigend','Vier Zahlen, absteigend','Bis 20, gemischt','Bis 100, aufsteigend','Bis 100, gemischt'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Gemischt bis 20','Gemischt bis 100'],
+ plus:'plus',minus:'minus',make:'ist',addQ:(a,o,b)=>`Wie viel ist ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} ist ${c}!`,
+ addStory:(a,b,e)=>`Du hast ${a} ${e}. Es kommen ${b} dazu. Wie viele sind es?`,subStory:(a,b)=>`Es sind ${a}. ${b} gehen weg. Wie viele bleiben?`,
+ frog:'Der Frosch hüpft auf dem Zahlenstrahl. Zähl die Sprünge!',
+ cmpPile:'Das gierige Krokodil will den größeren Haufen! Tippe ihn an!',cmpSym:'Welches Zeichen kommt hin? Das Krokodil öffnet sein Maul zur größeren Zahl!',cmpBad:'Das Krokodil will immer mehr!',
+ gt:(a,b)=>`${a} ist größer als ${b}.`,lt:(a,b)=>`${a} ist kleiner als ${b}.`,eq:(a,b)=>`${a} ist gleich ${b}.`,chomp:'Happs!',
+ nbR:n=>`Wer wohnt rechts von ${n}? Der rechte Nachbar ist um eins größer.`,nbL:n=>`Wer wohnt links von ${n}? Der linke Nachbar ist um eins kleiner.`,nbLR:n=>`Finde beide Nachbarn von ${n}!`,nbB:(a,b)=>`Welche Zahl wohnt zwischen ${a} und ${b}?`,
+ nbOk:s=>`${s}. Super, die Nachbarn sind an ihrem Platz!`,nbNo:'Die wohnt nicht da. Versuch es nochmal!',
+ ordUp:'Stell die Pinguine aufsteigend auf: vom kleinsten zum größten. Bau eine Treppe nach oben!',ordDown:'Stell die Pinguine absteigend auf: vom größten zum kleinsten. Bau eine Rutsche!',
+ ordOk:'Perfekt! Die Reihenfolge stimmt!',ordNo:'Hoppla, hier stimmt die Reihenfolge nicht. Versuch es nochmal!',up:'🪜 Aufsteigend',down:'🛝 Absteigend',
+ boxQ:'Wie viele Äpfel sind in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxQ100:'Welche Zahl steckt in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxOk:(e)=>`Die Waage ist gerade! ${e}`,heavyL:'Die linke Seite ist schwerer.',heavyR:'Die rechte Seite ist schwerer.'},
+en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',hint:'💡 Help',lvl:n=>`Level ${n}`,
+ hello:'Welcome to the world of numbers! Pick a game.',done:s=>`Done! You earned ${['','1 star','2 stars','3 stars'][s]}!`,next:'▶ Next level',again:'↺ Again',toMenu:'⬅ Levels',locked:'Finish the level before first.',
+ games:{add:['➕','Adding and taking away'],cmp:['🐊','The greedy crocodile'],nb:['🏠','Neighbour street'],ord:['🐧','Penguins in order'],box:['🎁','The secret box'],sb:['🧮','Abacus'],ten:['🍒','Make 10']},
+ lvAdd:['Adding to 5','Adding to 10','Taking away to 10','Adding to 20','Taking away to 20','Mixed to 20','Whole tens','Up to 100'],
+ lvCmp:['Compare piles','The signs < > =','Numbers to 20','Numbers to 100','Compare sums'],
+ lvNb:['The right neighbour','The left neighbour','Both neighbours to 20','Both neighbours to 100','The number in the middle'],
+ lvOrd:['Three numbers, ascending','Four numbers, descending','To 20, mixed','To 100, ascending','To 100, mixed'],
+ lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mixed to 20','Mixed to 100'],
+ plus:'plus',minus:'minus',make:'makes',addQ:(a,o,b)=>`What is ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} makes ${c}!`,
+ addStory:(a,b,e)=>`You have ${a} ${e}. ${b} more come. How many now?`,subStory:(a,b)=>`There are ${a}. ${b} go away. How many are left?`,
+ frog:'The frog hops along the number line. Count the hops!',
+ cmpPile:'The greedy crocodile wants the bigger pile! Tap it!',cmpSym:'Which sign goes here? The crocodile opens its mouth towards the bigger number!',cmpBad:'The crocodile always wants more!',
+ gt:(a,b)=>`${a} is greater than ${b}.`,lt:(a,b)=>`${a} is less than ${b}.`,eq:(a,b)=>`${a} is equal to ${b}.`,chomp:'Chomp!',
+ nbR:n=>`Who lives to the right of ${n}? The right neighbour is one more.`,nbL:n=>`Who lives to the left of ${n}? The left neighbour is one less.`,nbLR:n=>`Find both neighbours of ${n}!`,nbB:(a,b)=>`Which number lives between ${a} and ${b}?`,
+ nbOk:s=>`${s}. Well done, the neighbours are in place!`,nbNo:'That one doesn’t live there. Try again!',
+ ordUp:'Put the penguins in ascending order: from smallest to biggest. Make stairs that go up!',ordDown:'Put the penguins in descending order: from biggest to smallest. Make a slide!',
+ ordOk:'Perfect! The order is right!',ordNo:'Oops, the order is not right here. Try again!',up:'🪜 Ascending',down:'🛝 Descending',
+ boxQ:'How many apples are in the secret box? Put apples in the box until the scale is level!',boxQ100:'What number is in the secret box? Put apples in until the scale is level!',boxOk:(e)=>`The scale is level! ${e}`,heavyL:'The left side is heavier.',heavyR:'The right side is heavier.'}};
+const X=()=>TR('mw',TX);
+
+/* ================= date + cadru ================= */
+let data={prog:{},all:false}; try{ const d=JSON.parse(localStorage.getItem('mw_data')||'null'); if(d) data=Object.assign(data,d); }catch(e){}
+const save=()=>{ try{ localStorage.setItem('mw_data',JSON.stringify(data)); }catch(e){} };
+const pill=()=>{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); };
+function award(){ try{ stars++; renderBar(); }catch(e){} pill(); }
+let back=null, curRestart=null, curNext=null, timers=[], gen=0;
+function stopAll(){ timers.forEach(clearTimeout); timers=[]; try{ speechSynthesis.cancel(); }catch(e){} $('ov').hidden=true; gen++; }
+const rate=e=>e===0?3:e<=2?2:1;
+function frame(task,n){ main.innerHTML=''; const head=el('div','rb-head'); const face=el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦉</div>'); const bub=el('div','rb-bubble'); bub.textContent=task||'';
+  const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(face,bub,dots);
+  const stage=el('div','mw-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=face.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
+  return {bub,stage,ctrl,set:t=>bub.textContent=t,dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
+function finish(key,s,onNext){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+  $('ovNext').textContent=X().next; $('ovNext').hidden=!onNext; curNext=onNext; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
+$('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
+$('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
+$('ovBack').onclick=()=>{ $('ov').hidden=true; back&&back(); };
+$('back').onclick=()=>{ stopAll(); if(back) back(); else root.hidden=true; };
+$('all').onclick=()=>{ data.all=!data.all; save(); curLevels&&curLevels(); };
+let curLevels=null;
+const PER=6;
+/* liniuța numerelor cu broscuța */
+function numLine(svg,lo,hi,start,steps,y){ y=y||330; const W=860, x0=20, k=W/(hi-lo); let s=`<g id="mw-nl"><line x1="${x0}" y1="${y}" x2="${x0+W}" y2="${y}" stroke="#24325F" stroke-width="4"/>`;
+  const stepT=hi-lo>30?10:1; for(let v=lo;v<=hi;v+=stepT){ const x=x0+(v-lo)*k; s+=`<line x1="${x}" y1="${y-8}" x2="${x}" y2="${y+8}" stroke="#24325F" stroke-width="3"/><text x="${x}" y="${y+30}" font-size="${hi-lo>20?16:20}" font-weight="800" text-anchor="middle" fill="#24325F">${v}</text>`; }
+  s+=`<text id="mw-frog" x="${x0+(start-lo)*k}" y="${y-8}" font-size="36" text-anchor="middle">🐸</text></g>`; svg.insertAdjacentHTML('beforeend',s);
+  const frog=svg.querySelector('#mw-frog'); let cur=start; const list=Array.isArray(steps)?steps:Array(Math.abs(steps)).fill(Math.sign(steps)); const my=gen;
+  (async()=>{ for(let i=0;i<list.length;i++){ if(my!==gen) return; const nx=cur+list[i], x1=x0+(cur-lo)*k, x2=x0+(nx-lo)*k; svg.insertAdjacentHTML('beforeend',`<path d="M${x1} ${y-14} Q${(x1+x2)/2} ${y-70} ${x2} ${y-14}" stroke="#3BC48A" stroke-width="3" fill="none" stroke-dasharray="6 5"/><text x="${(x1+x2)/2}" y="${y-60}" font-size="18" font-weight="800" text-anchor="middle" fill="#2FA772">${Math.abs(list[i])===10?(list[i]>0?'+10':'−10'):i+1}</text>`);
+      frog.setAttribute('x',x2); frog.setAttribute('y',y-30); pop(i+1); await wait(170); frog.setAttribute('y',y-8); await wait(330); cur=nx; } })(); }
+
+/* ================= meniul lumii ================= */
+const GAMES=['add','cmp','nb','ord','box','sb','ten'];
+const LEVELS={add:'lvAdd',cmp:'lvCmp',nb:'lvNb',ord:'lvOrd',box:'lvBox'};
+function home(){ stopAll(); back=null; curLevels=null; $('title').textContent=X().title; $('back').textContent=X().back; $('all').hidden=true; pill(); main.innerHTML='';
+  const head=el('div','rb-head'); head.append(el('div','rb-face','<div style="font-size:clamp(40px,7vh,58px);line-height:1">🦉</div>')); const b=el('div','rb-bubble'); b.textContent=X().hello; head.append(b); main.append(head);
+  const g=el('div','mw-grid'); GAMES.forEach(k=>{ const L=LEVELS[k]?X()[LEVELS[k]].length:0, got=L?[...Array(L)].reduce((s,_,i)=>s+(data.prog[k+i]||0),0):null;
+    const c=el('button','rb-card',`<span class="ic">${X().games[k][0]}</span><span class="t">${X().games[k][1]}</span>${got!=null?`<span class="p">⭐ ${got}/${L*3}</span>`:''}`);
+    c.dataset.lk='mw:'+k; c.onclick=()=>{ blip(); if(k==='sb'){ window.openSoroban&&window.openSoroban(); return; } if(k==='ten'){ root.hidden=true; window.__openMainGame&&window.__openMainGame('ten'); return; } levels(k); }; g.appendChild(c); });
+  main.appendChild(g); sp(X().hello); }
+const isOpen=(k,i)=>data.all||i===0||(data.prog[k+(i-1)]||0)>0;
+function levels(k){ stopAll(); back=home; curLevels=()=>levels(k); $('all').hidden=false; $('all').textContent=data.all?X().allOn:X().allOff; main.innerHTML='';
+  const head=el('div','rb-head'); head.append(el('div','rb-face',`<div style="font-size:clamp(40px,7vh,58px);line-height:1">${X().games[k][0]}</div>`)); const b=el('div','rb-bubble'); b.textContent=X().games[k][1]; head.append(b); main.append(head);
+  const g=el('div','mw-grid'); const names=X()[LEVELS[k]]; const cur=names.findIndex((_,i)=>isOpen(k,i)&&!(data.prog[k+i]>0));
+  names.forEach((nm,i)=>{ const open=isOpen(k,i), s=data.prog[k+i]||0; const c=el('button','rb-card'+(open?'':' lock')+(i===cur?' cur':''),`<span class="n">${X().lvl(i+1)}</span><span class="t">${nm}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`);
+    c.onclick=()=>{ if(!open){ sp(X().locked); return; } blip(); play(k,i); }; g.appendChild(c); });
+  main.appendChild(g); }
+function play(k,i){ stopAll(); back=()=>levels(k); curRestart=()=>play(k,i); $('all').hidden=true; ({add:gAdd,cmp:gCmp,nb:gNb,ord:gOrd,box:gBox})[k](i); }
+function levelDone(k,i,errs){ finish(k+i,rate(errs),i<X()[LEVELS[k]].length-1?()=>play(k,i+1):null); }
+
+/* ================= 1. ADUNĂRI ȘI SCĂDERI ================= */
+const ADDL=[{t:'add',max:5,obj:1},{t:'add',max:10,obj:1},{t:'sub',max:10,obj:1},{t:'add',max:20,obj:1},{t:'sub',max:20,obj:1},{t:'mix',max:20},{t:'tens',max:100},{t:'h',max:100}];
+function genAdd(L){ let op=L.t==='mix'||L.t==='h'?(R(2)?'add':'sub'):L.t==='tens'?(R(3)?'add':'sub'):L.t, a,b;
+  if(L.t==='tens'){ if(op==='add'){ a=RR(1,8)*10; b=RR(1,9-a/10)*10; } else { a=RR(2,9)*10; b=RR(1,a/10-1)*10; } }
+  else if(L.t==='h'){ if(op==='add'){ do{ a=RR(11,88); b=RR(1,98-a); }while((a%10)+(b%10)>9||a+b>99); } else { do{ a=RR(20,99); b=RR(1,a-10); }while((a%10)<(b%10)); } }
+  else if(op==='add'){ a=RR(1,L.max-1); b=RR(1,L.max-a); } else { a=RR(2,L.max); b=RR(1,a-1); }
+  return {op,a,b,c:op==='add'?a+b:a-b}; }
+function blocks(n,x,y,col){ /* zeci ca bare, unități ca pătrățele */ let s=''; const t=Math.floor(n/10), u=n%10; for(let i=0;i<t;i++){ for(let j=0;j<10;j++) s+=`<rect x="${x+i*26}" y="${y+j*15}" width="22" height="13" rx="2" fill="${col}" stroke="#24325F" stroke-width="1"/>`; }
+  for(let j=0;j<u;j++) s+=`<rect x="${x+t*26+6+(j%2)*18}" y="${y+150-Math.floor(j/2)*18-13}" width="15" height="13" rx="2" fill="${col}" stroke="#24325F" stroke-width="1"/>`; return s; }
+function gAdd(li){ const L=ADDL[li]; let ti=0, errs=0, busy=false, task=null; const F=frame('',PER); const myGen=gen;
+  function show(){ task=genAdd(L); const {op,a,b,c}=task, e=EMO[R(EMO.length)], o=op==='add'?'+':'−';
+    let s=`<svg viewBox="0 0 900 400"><rect width="900" height="400" rx="22" fill="#fff"/>`;
+    s+=`<text x="450" y="70" font-size="60" font-weight="800" text-anchor="middle" fill="#24325F">${a} ${o} ${b} = <tspan id="mw-res" fill="#FF5D7A">?</tspan></text>`;
+    if(L.obj){ const big=Math.max(a,b), sz=big<=5?78:big<=10?60:44;
+      const draw=(n,cx,cls,fade)=>{ let t=''; const cols=Math.min(5,n), w=cols*sz*1.08; for(let i=0;i<n;i++){ const x=cx-w/2+(i%5)*sz*1.08, y=115+Math.floor(i/5)*sz*1.08; t+=`<text class="${cls}" data-i="${i}" x="${x}" y="${y+sz}" font-size="${sz}" ${fade&&i>=n-fade?'opacity=".4"':''}>${e}</text>`; if(fade&&i>=n-fade) t+=`<text x="${x+sz*.65}" y="${y+sz*.35}" font-size="${sz*.4}">↗</text>`; } return t; };
+      if(op==='add'){ s+=draw(a,230,'mw-a')+`<text x="450" y="240" font-size="70" text-anchor="middle" font-weight="800" fill="#3BC48A">+</text>`+draw(b,670,'mw-b'); }
+      else { s+=draw(a,450,'mw-a',b); } }
+    else if(L.t==='tens'||L.t==='h'){ s+=blocks(a,120,150,'#4AA8FF')+`<text x="450" y="260" font-size="60" text-anchor="middle" font-weight="800" fill="${op==='add'?'#3BC48A':'#FF5D7A'}">${o}</text>`+blocks(b,560,150,'#FFC83D'); }
+    F.stage.innerHTML=s+'</svg>';
+    const q=L.obj?(op==='add'?X().addStory(a,b,e):X().subStory(a,b)):X().addQ(a,op==='add'?X().plus:X().minus,b); F.set((L.obj?e+' ':'')+q); sp(q);
+    const opts=new Set([c]); while(opts.size<4){ const d=c+(R(2)?1:-1)*RR(1,L.max>20?(L.t==='tens'?3:12):3)*(L.t==='tens'?10:1); if(d>=0&&d<=L.max+10) opts.add(d); }
+    F.ctrl.innerHTML=''; const box=el('div','mw-ans'); shuf([...opts]).forEach(v=>{ const bt=el('button',null,String(v)); bt.onclick=()=>answer(v,bt); box.appendChild(bt); }); F.ctrl.append(box,btn(X().hint,'',hint)); }
+  async function answer(v,bt){ if(busy) return; const {op,a,b,c}=task; if(v!==c){ errs++; bt.classList.add('no'); boing(); sp(X().addQ(a,op==='add'?X().plus:X().minus,b)); return; }
+    busy=true; bt.classList.add('ok'); const svg=F.stage.firstChild; svg.querySelector('#mw-res').textContent=c;
+    if(L.obj){ if(op==='add'){ const bs=[...svg.querySelectorAll('.mw-b')]; for(const t of bs){ t.setAttribute('opacity','.0'); } let k=0; for(const t of [...svg.querySelectorAll('.mw-a'),...bs]){ k++; t.setAttribute('opacity','1'); svg.insertAdjacentHTML('beforeend',`<text x="${+t.getAttribute('x')+14}" y="${+t.getAttribute('y')+18}" font-size="18" font-weight="800" fill="#24325F">${k}</text>`); pop(k); await wait(160); if(myGen!==gen) return; } }
+      else { const as=[...svg.querySelectorAll('.mw-a')]; as.slice(a-b).forEach(t=>{ t.style.transition='transform .8s, opacity .8s'; t.style.transform='translateY(-120px)'; t.style.opacity='0'; }); await wait(800); let k=0; for(const t of as.slice(0,a-b)){ k++; svg.insertAdjacentHTML('beforeend',`<text x="${+t.getAttribute('x')+14}" y="${+t.getAttribute('y')+18}" font-size="18" font-weight="800" fill="#24325F">${k}</text>`); pop(k); await wait(160); } } }
+    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} const m=X().addA(a,op==='add'?X().plus:X().minus,b,c); F.set('🎉 '+m); await spW(m,1300); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=PER) return levelDone('add',li,errs); show(); }
+  function hint(){ if(busy) return; errs++; const {op,a,b}=task, svg=F.stage.firstChild; const old=svg.querySelector('#mw-nl'); if(old) return; const hi=L.max<=10?10:L.max<=20?20:100;
+    if(!L.obj) { svg.querySelectorAll('rect').forEach((r,i)=>{ if(i>0) r.setAttribute('opacity','.25'); }); }
+    const sg=op==='add'?1:-1; const list=hi===100?[...Array(Math.floor(b/10)).fill(10*sg),...Array(b%10).fill(sg)]:Array(b).fill(sg); numLine(svg,0,hi,a,list,350); sp(X().frog); }
+  show(); }
+
+/* ================= 2. CROCODILUL LACOM ================= */
+const CMPL=[{m:'pile',max:10},{m:'sym',max:10,obj:1},{m:'sym',max:20},{m:'sym',max:100},{m:'sum',max:20}];
+function croc(open,x,y,sc){ /* L: gura deschisă spre stânga (>) ; R: spre dreapta (<) ; E: = ; C: închis */
+  const ang=open==='C'?4:open==='E'?0:24, gap=open==='E'?26:0;
+  const jaw=up=>{ const s=up?-1:1; const rot=open==='E'?0:s*ang; return `<g transform="translate(0 ${s*gap}) rotate(${-rot})"><path d="M10 0 L-150 ${s*4} Q-168 ${s*14} -150 ${s*30} L10 ${s*34} Z" fill="${up?'#3BC48A':'#2FA772'}" stroke="#1F7A4D" stroke-width="5" stroke-linejoin="round"/>${[...Array(7)].map((_,i)=>`<path d="M${-140+i*20} ${s*4} l9 0 l-4.5 ${s*14} Z" fill="#fff" stroke="#ccc" stroke-width="1"/>`).join('')}${up?`<circle cx="-148" cy="${s*-2}" r="4" fill="#1F7A4D"/><g><circle cx="-30" cy="-40" r="17" fill="#3BC48A" stroke="#1F7A4D" stroke-width="5"/><circle cx="-34" cy="-42" r="8" fill="#fff"/><circle cx="-36" cy="-42" r="4.5" fill="#24325F"/></g>`:''}</g>`; };
+  return `<g transform="translate(${x} ${y}) scale(${(open==='R'?-1:1)*sc} ${sc})"><path d="M0 -34 Q70 -50 110 -14 Q126 0 110 16 Q70 52 0 34 Z" fill="#3BC48A" stroke="#1F7A4D" stroke-width="5"/>${[0,1,2].map(i=>`<circle cx="${30+i*26}" cy="-18" r="5" fill="#2FA772"/>`).join('')}${jaw(true)}${jaw(false)}</g>`; }
+const SYM={L:'>',R:'<',E:'='};
+function gCmp(li){ const L=CMPL[li]; let ti=0, errs=0, busy=false, t=null; const F=frame('',PER); const myGen=gen;
+  function gen2(){ let a,b,ea,eb; if(L.m==='sum'){ const x=RR(1,9),y=RR(1,9); a=x+y; ea=`${x} + ${y}`; b=R(3)===0?a:clamp(a+(R(2)?1:-1)*RR(1,3),2,20); eb=String(b); return {a,b,ea,eb}; }
+    a=RR(L.max>20?10:1,L.max); b=R(5)===0&&L.m!=='pile'?a:RR(L.max>20?10:1,L.max); if(L.m==='pile'&&a===b) b=a===1?2:a-1; return {a,b,ea:String(a),eb:String(b)}; }
+  function show(){ t=gen2(); const e=EMO[R(EMO.length)]; let s=`<svg viewBox="0 0 900 400"><rect width="900" height="400" rx="22" fill="#E8F7FF"/><rect y="320" width="900" height="80" fill="#9FDB86"/>`;
+    const pile=(n,cx,cls)=>{ let r=''; const sz=L.obj?(n>5?40:52):(n>5?52:68); for(let i=0;i<n;i++){ const x=cx-2.5*sz+(i%5)*sz, y=300-Math.floor(i/5)*sz*.95; r+=`<text x="${x}" y="${y}" font-size="${sz}">${e}</text>`; } return `<g class="${cls}" style="cursor:pointer">${r}<rect x="${cx-150}" y="60" width="300" height="260" fill="transparent"/></g>`; };
+    if(L.m==='pile'){ s+=pile(t.a,200,'mw-pa')+pile(t.b,700,'mw-pb'); }
+    else { if(L.obj){ s+=pile(t.a,180,'')+pile(t.b,720,''); }
+      const fs=L.m==='sum'?80:L.obj?70:120; s+=`<text x="${L.obj?180:170}" y="${L.obj?110:235}" font-size="${fs}" font-weight="800" text-anchor="middle" fill="#24325F">${t.ea}</text><text x="${L.obj?720:730}" y="${L.obj?110:235}" font-size="${fs}" font-weight="800" text-anchor="middle" fill="#24325F">${t.eb}</text>`; }
+    s+=`<g id="mw-croc">${croc('C',450,L.obj?230:200,.9)}</g></svg>`; F.stage.innerHTML=s; const svg=F.stage.firstChild; F.ctrl.innerHTML='';
+    if(L.m==='pile'){ svg.querySelector('.mw-pa').onclick=()=>pick(t.a>t.b?'L':'R','L'); svg.querySelector('.mw-pb').onclick=()=>pick(t.a>t.b?'L':'R','R'); F.set('🐊 '+X().cmpPile); sp(X().cmpPile); }
+    else { const box=el('div','mw-ans'); ['L','E','R'].forEach(k=>{ const b=el('button',null,`<span style="font-size:3rem;line-height:1">${SYM[k]}</span>`); b.style.minWidth='120px'; b.onclick=()=>pick(t.a>t.b?'L':t.a<t.b?'R':'E',k,b); box.appendChild(b); }); F.ctrl.appendChild(box); F.set('🐊 '+X().cmpSym); if(ti===0) sp(X().cmpSym); else sp(`${t.ea} … ${t.eb}`); } }
+  async function pick(right,k,b){ if(busy) return; const svg=F.stage.firstChild; svg.querySelector('#mw-croc').innerHTML=croc(k,450,L.obj?230:200,.9);
+    if(k!==right){ errs++; boing(); if(b) b.classList.add('no'); sp(X().cmpBad); setTimeout(()=>{ const c=svg.querySelector('#mw-croc'); if(c) c.innerHTML=croc('C',450,L.obj?230:200,.9); },700); return; }
+    busy=true; if(b) b.classList.add('ok'); snd(200,.12,'square',.12); setTimeout(()=>snd(160,.15,'square',.12),130);
+    const g=svg.querySelector('#mw-croc'); g.style.transition='transform .5s'; g.style.transform=`translateX(${k==='L'?-60:k==='R'?60:0}px)`;
+    if(L.m==='pile'){ const p=svg.querySelector(k==='L'?'.mw-pa':'.mw-pb'); p.style.transition='opacity .6s'; await wait(250); p.style.opacity='.15'; }
+    else svg.insertAdjacentHTML('beforeend',`<text x="450" y="350" font-size="70" font-weight="800" text-anchor="middle" fill="#FF5D7A">${t.ea} ${SYM[k]} ${t.eb}</text>`);
+    chime(); award(); F.dot(ti+1); const m=(k==='L'?X().gt(t.ea,t.eb):k==='R'?X().lt(t.ea,t.eb):X().eq(t.ea,t.eb)); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=PER) return levelDone('cmp',li,errs); show(); }
+  show(); }
+
+/* ================= 3. STRADA VECINILOR ================= */
+const NBL=[{ask:'R',max:10},{ask:'L',max:10},{ask:'LR',max:20},{ask:'LR',max:100},{ask:'B',max:100}];
+const ANI=['🐻','🐰','🦊','🐱','🐶','🐼','🐸','🐷','🐨','🦁'];
+function gNb(li){ const L=NBL[li]; let ti=0, errs=0, busy=false, n=0, slots=[], need=[]; const F=frame('',PER); const myGen=gen;
+  function show(){ const lo=L.ask==='L'||L.ask==='LR'||L.ask==='B'?1:0; n=RR(lo+ (L.max>20?10:0), L.max-1); const ani=ANI[R(ANI.length)];
+    if(L.ask==='R'){ slots=[n,null]; need=[n+1]; } else if(L.ask==='L'){ slots=[null,n]; need=[n-1]; } else if(L.ask==='LR'){ slots=[null,n,null]; need=[n-1,n+1]; } else { slots=[n-1,null,n+1]; need=[n]; }
+    const q=L.ask==='R'?X().nbR(n):L.ask==='L'?X().nbL(n):L.ask==='LR'?X().nbLR(n):X().nbB(n-1,n+1); F.set('🏠 '+q); sp(q); draw(ani);
+    const opts=new Set(need); const pool=[n-2,n+2,n-10,n+10,n,n-1,n+1,n+3].filter(v=>v>=0&&v<=L.max+1&&!need.includes(v)&&!slots.includes(v)); shuf(pool).forEach(v=>{ if(opts.size<need.length+3) opts.add(v); });
+    F.ctrl.innerHTML=''; const box=el('div','mw-ans'); shuf([...opts]).forEach(v=>{ const b=el('button',null,'🎈'+v); b.onclick=()=>place(v,b); box.appendChild(b); }); F.ctrl.append(box,btn(X().hint,'',hint)); }
+  function draw(ani){ const N=slots.length, w=220, x0=450-N*w/2; let s=`<svg viewBox="0 0 900 400"><rect width="900" height="400" rx="22" fill="#EAF6FF"/><rect y="330" width="900" height="70" fill="#9FDB86"/><rect y="318" width="900" height="16" fill="#C9D3E0"/>`;
+    slots.forEach((v,i)=>{ const x=x0+i*w+10, col=['#FF8A3D','#4AA8FF','#3BC48A','#9B7BFF'][i%4]; s+=`<path d="M${x} 150 L${x+100} 60 L${x+200} 150 Z" fill="${col}" stroke="#24325F" stroke-width="4"/><rect x="${x+20}" y="150" width="160" height="170" fill="#FFF6E0" stroke="#24325F" stroke-width="4"/><rect x="${x+70}" y="240" width="60" height="80" rx="8" fill="#C98A4E"/>`;
+      s+=`<circle cx="${x+100}" cy="${v==null?195:195}" r="36" fill="${v==null?'#fff':'#FFC83D'}" stroke="#24325F" stroke-width="4" ${v==null?'stroke-dasharray="8 6" class="mw-blink"':''}/><text x="${x+100}" y="210" font-size="${v!=null&&v>99?30:40}" font-weight="800" text-anchor="middle" fill="#24325F">${v==null?'?':v}</text>`;
+      if(v===n&&L.ask!=='B') s+=`<text x="${x+100}" y="138" font-size="44" text-anchor="middle">${ani}</text>`; });
+    F.stage.innerHTML=s+'</svg>'; }
+  async function place(v,b){ if(busy) return; const idx=slots.indexOf(null); if(idx<0) return; const want=L.ask==='R'?n+1:L.ask==='L'?n-1:L.ask==='B'?n:(idx===0?n-1:n+1);
+    if(v!==want){ errs++; boing(); b.classList.add('no'); setTimeout(()=>b.classList.remove('no'),700); sp(X().nbNo); return; }
+    b.classList.add('ok'); b.disabled=true; slots[idx]=v; pop(5); draw('');
+    if(slots.includes(null)) return; busy=true; chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} const m=X().nbOk(slots.join(', ')); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=PER) return levelDone('nb',li,errs); show(); }
+  function hint(){ if(busy) return; errs++; const svg=F.stage.firstChild; if(svg.querySelector('#mw-nl')) return; const c=L.ask==='B'?n:n; const lo=Math.max(0,c-5), hi=lo+10; svg.setAttribute('viewBox','0 0 900 400'); numLine(svg,lo,hi,c-1,[1,1],380); sp(X().frog); }
+  show(); }
+
+/* ================= 4. PINGUINII ÎN ORDINE ================= */
+const ORDL=[{n:3,max:10,d:'up'},{n:4,max:10,d:'down'},{n:4,max:20,d:'mix'},{n:5,max:100,d:'up'},{n:5,max:100,d:'mix'}];
+function gOrd(li){ const L=ORDL[li]; let ti=0, errs=0, busy=false, nums=[], placed=[], dir='up'; const F=frame('',PER); const myGen=gen;
+  function show(){ const s=new Set(); while(s.size<L.n) s.add(RR(L.max>20?5:1,L.max)); nums=shuf([...s]); placed=[]; dir=L.d==='mix'?(R(2)?'up':'down'):L.d;
+    const q=dir==='up'?X().ordUp:X().ordDown; F.set((dir==='up'?'🪜 ':'🛝 ')+q); sp(q); draw(); F.ctrl.innerHTML=''; F.ctrl.append(btn('↺','',()=>{ if(busy) return; placed=[]; draw(); })); }
+  function draw(bad){ const N=nums.length, mx=Math.max(...nums), mn=Math.min(...nums); let s=`<svg viewBox="0 0 900 420"><rect width="900" height="420" rx="22" fill="#EAF6FF"/><rect y="380" width="900" height="40" fill="#fff"/>`;
+    const H=v=>56+(v-mn)/Math.max(1,mx-mn)*70;
+    /* sloturile (scară sau tobogan) */ const sw=Math.min(150,760/N), sx=450-N*sw/2;
+    for(let i=0;i<N;i++){ const h=dir==='up'?40+i*22:40+(N-1-i)*22; s+=`<rect x="${sx+i*sw+4}" y="${210-h}" width="${sw-8}" height="${h}" rx="6" fill="${bad===i?'#FFB3C0':'#C9D3E0'}" stroke="#9AA5B8" stroke-width="2"/>`;
+      const v=placed[i]; if(v!=null){ const ph=H(v); s+=`<g class="mw-pl" data-i="${i}" style="cursor:pointer"><text x="${sx+i*sw+sw/2}" y="${210-h}" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${sx+i*sw+sw/2}" cy="${210-h-ph*.33}" r="17" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${sx+i*sw+sw/2}" y="${210-h-ph*.33+7}" font-size="18" font-weight="800" text-anchor="middle">${v}</text></g>`; } }
+    s+=`<text x="${dir==='up'?sx-30:sx+N*sw+30}" y="${dir==='up'?200:200}" font-size="34" text-anchor="middle">${dir==='up'?'⬆':'🛝'}</text>`;
+    /* pinguinii de așezat */ const rest=nums.filter(v=>!placed.includes(v)); const rw=Math.min(160,800/Math.max(1,rest.length)), rx=450-rest.length*rw/2;
+    rest.forEach((v,i)=>{ const ph=H(v)+10; s+=`<g class="mw-pg" data-v="${v}" style="cursor:pointer"><text x="${rx+i*rw+rw/2}" y="378" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${rx+i*rw+rw/2}" cy="${378-ph*.33}" r="20" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${rx+i*rw+rw/2}" y="${378-ph*.33+8}" font-size="21" font-weight="800" text-anchor="middle">${v}</text></g>`; });
+    F.stage.innerHTML=s+'</svg>'; const svg=F.stage.firstChild;
+    svg.querySelectorAll('.mw-pg').forEach(g=>g.onclick=()=>{ if(busy) return; placed.push(+g.dataset.v); pop(placed.length); draw(); if(placed.length===nums.length) check(); });
+    svg.querySelectorAll('.mw-pl').forEach(g=>g.onclick=()=>{ if(busy) return; placed=placed.slice(0,+g.dataset.i); snd(300,.06); draw(); }); }
+  async function check(){ const ok=placed.every((v,i)=>i===0||(dir==='up'?v>placed[i-1]:v<placed[i-1]));
+    if(!ok){ errs++; boing(); const bad=placed.findIndex((v,i)=>i>0&&(dir==='up'?v<placed[i-1]:v>placed[i-1])); draw(bad); sp(X().ordNo); busy=true; await wait(1400); if(myGen!==gen) return; placed=placed.slice(0,bad); busy=false; draw(); return; }
+    busy=true; const svg=F.stage.firstChild; const N=nums.length, sw=Math.min(150,760/N), sx=450-N*sw/2;
+    svg.insertAdjacentHTML('beforeend',`<text id="mw-run" x="${dir==='up'?sx:sx+N*sw}" y="150" font-size="40" text-anchor="middle">${dir==='up'?'🧗':'⚽'}</text>`); const r=svg.querySelector('#mw-run');
+    for(let i=0;i<N;i++){ const idx=dir==='up'?i:N-1-i, h=dir==='up'?40+idx*22:40+(N-1-idx)*22; r.setAttribute('x',sx+idx*sw+sw/2); r.setAttribute('y',210-h-80); pop(i+1); await wait(260); if(myGen!==gen) return; }
+    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} const m=X().ordOk+' '+placed.join(', '); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+    ti++; busy=false; if(ti>=PER) return levelDone('ord',li,errs); show(); }
+  show(); }
+
+/* ================= 5. CUTIA CU SECRET ================= */
+const BOXL=[{f:['a+?'],max:10},{f:['?+b'],max:10},{f:['a-?'],max:10},{f:['a+?','?+b','a-?','?-b'],max:20},{f:['a+?','?+b','a-?','?-b'],max:100}];
+function gBox(li){ const L=BOXL[li]; let ti=0, errs=0, busy=false, t=null, x=0; const F=frame('',PER); const myGen=gen;
+  function gen2(){ const f=L.f[R(L.f.length)], big=L.max>20; let a,b,c,ans;
+    const rnd=(lo,hi)=>big?RR(Math.ceil(lo/10),Math.floor(hi/10))*10+(R(2)?RR(0,9):0):RR(lo,hi);
+    if(f==='a+?'||f==='?+b'){ do{ a=rnd(1,L.max-1); ans=rnd(1,L.max-a); c=a+ans; }while(c>L.max||ans<1); return {f,a,ans,c,L:f==='a+?'?[a,'?']:['?',a],R:[c],txt:f==='a+?'?`${a} + ? = ${c}`:`? + ${a} = ${c}`}; }
+    if(f==='a-?'){ do{ a=rnd(3,L.max); ans=rnd(1,a-1); c=a-ans; }while(c<1); return {f,a,ans,c,L:[a],R:[c,'?'],txt:`${a} − ? = ${c}`}; }
+    do{ b=rnd(1,L.max-2); c=rnd(1,L.max-b); ans=b+c; }while(ans>L.max); return {f,a:b,ans,c,L:['?'],R:[b,c],txt:`? − ${b} = ${c}`}; }
+  const side=arr=>arr.reduce((s,v)=>s+(v==='?'?x:v),0);
+  function items(v,cx,y,col){ if(v==='?') return `<g><rect x="${cx-44}" y="${y-70}" width="88" height="70" rx="10" fill="#FF5D7A" stroke="#B0153A" stroke-width="3"/><rect x="${cx-6}" y="${y-70}" width="12" height="70" fill="#FFD84A"/><text x="${cx}" y="${y-22}" font-size="30" font-weight="800" text-anchor="middle" fill="#fff">${x}</text><text x="${cx}" y="${y-80}" font-size="30" text-anchor="middle">🎁</text></g>`;
+    if(L.max>20){ const tn=Math.floor(v/10), u=v%10; let s=''; for(let i=0;i<tn;i++) s+=`<rect x="${cx-50+(i%5)*20}" y="${y-28-Math.floor(i/5)*30}" width="18" height="26" rx="3" fill="${col}" stroke="#24325F"/>`; for(let i=0;i<u;i++) s+=`<circle cx="${cx-40+(i%5)*20}" cy="${y-80-Math.floor(i/5)*20}" r="8" fill="${col}" stroke="#24325F"/>`; return s+`<text x="${cx}" y="${y+28}" font-size="22" font-weight="800" text-anchor="middle" fill="#24325F">${v}</text>`; }
+    let s=''; for(let i=0;i<v;i++) s+=`<text x="${cx-50+(i%5)*22}" y="${y-Math.floor(i/5)*22}" font-size="24">🍎</text>`; return s+`<text x="${cx}" y="${y+28}" font-size="22" font-weight="800" text-anchor="middle" fill="#24325F">${v}</text>`; }
+  function draw(){ const l=side(t.L), r=side(t.R), deg=clamp((r-l)*(L.max>20?.4:2.5),-12,12);
+    let s=`<svg viewBox="0 0 900 430"><rect width="900" height="430" rx="22" fill="#FFF6E8"/><text x="450" y="54" font-size="46" font-weight="800" text-anchor="middle" fill="#24325F">${t.txt.replace('?','<tspan fill="#FF5D7A">🎁</tspan>')}</text>`;
+    s+=`<rect x="440" y="150" width="20" height="240" fill="#8F5427"/><path d="M380 400 L520 400 L450 370 Z" fill="#8F5427"/>`;
+    s+=`<g style="transition:transform .6s cubic-bezier(.3,1.5,.5,1);transform-origin:450px 150px;transform:rotate(${deg}deg)"><rect x="130" y="144" width="640" height="14" rx="7" fill="#C98A4E" stroke="#8F5427" stroke-width="3"/>`;
+    const pan=(cx,arr)=>{ let g=`<line x1="${cx}" y1="150" x2="${cx-90}" y2="290" stroke="#5A6070" stroke-width="2"/><line x1="${cx}" y1="150" x2="${cx+90}" y2="290" stroke="#5A6070" stroke-width="2"/><path d="M${cx-110} 290 L${cx+110} 290 Q${cx} 330 ${cx-110} 290 Z" fill="#C9D3E0" stroke="#5A6070" stroke-width="3"/>`;
+      const n=arr.length; arr.forEach((v,i)=>{ g+=items(v,cx+(n===1?0:(i===0?-58:58)),285,i===0?'#4AA8FF':'#FFC83D'); if(i<n-1) g+=`<text x="${cx}" y="270" font-size="30" font-weight="800" text-anchor="middle">+</text>`; }); return g; };
+    s+=pan(230,t.L)+pan(670,t.R)+`</g><circle cx="450" cy="150" r="10" fill="#FFC83D"/><text x="450" y="125" font-size="34" text-anchor="middle">${l===r?'😊':l>r?'⬅':'➡'}</text></svg>`;
+    F.stage.innerHTML=s; }
+  function show(){ t=gen2(); x=0; draw(); const q=L.max>20?X().boxQ100:X().boxQ; F.set('🎁 '+q); if(ti===0) sp(q); else sp(t.txt.replace('?','…').replace('−',X().minus).replace('+',X().plus));
+    F.ctrl.innerHTML=''; const row=el('div','mw-ans'); const add=d=>{ if(busy) return; x=clamp(x+d,0,L.max); pop(Math.min(x,20)); draw(); check(); };
+    if(L.max>20) row.append(btn('−10','',()=>add(-10)));
+    row.append(btn('−🍎','',()=>add(-1)),btn('+🍎','go',()=>add(1)));
+    if(L.max>20) row.append(btn('+10','go',()=>add(10)));
+    F.ctrl.append(row,btn(X().hint,'',()=>{ if(busy) return; errs++; const l=side(t.L), r=side(t.R); sp(l>r?X().heavyL:X().heavyR); })); }
+  let chk=0; function check(){ clearTimeout(chk); if(x!==t.ans) return; chk=setTimeout(async()=>{ if(x!==t.ans||busy) return; busy=true; chime(); award(); F.dot(ti+1); try{ confetti(12); }catch(e){}
+      const eq=t.txt.replace('?',t.ans); const m=X().boxOk(eq); F.set('🎉 '+m); await spW(m.replace('−',X().minus).replace('+',X().plus),1600); if(myGen!==gen) return; ti++; busy=false; if(ti>=PER) return levelDone('box',li,errs); show(); },500); }
+  show(); }
+
+/* ================= intrare ================= */
+const __rm=f=>{ const w=(...a)=>{ __scr=()=>w(...a); return f(...a); }; return w; }; let __scr=null; levels=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('mw',k)) return; return f(k,...a); })(levels); play=(f=>(k,...a)=>{ if(window.__gate&&window.__gate('mw',k)) return home(); return f(k,...a); })(play); home=__rm(home); levels=__rm(levels); play=__rm(play);
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden||!__scr) return; try{ $('title').textContent=X().title; $('back').textContent=X().back; }catch(e){} __scr(); });
+window.openMath=()=>{ root.hidden=false; home(); };
+window.__mw={genAdd,ADDL,BOXL};
+})();
+</script>
+<script>
+(()=>{
+/* ===== ecranul de start cu carduri ===== */
+const $=id=>document.getElementById('hm-'+id), root=$('root');
+const HT={ro:{title:'Pufi – Școala jocurilor ⭐',q:'Ce jucăm azi?',math:'Matematică',world:'Lumea',read:'Citește',time:'Timpul',bday:'🎂 Ziua de naștere a copilului',pname:'🗣️ Cum să spună vocea „Pufi”? Atinge și ascultă:',psample:'Bună! Eu sunt Pufi.',shapes:'Forme',robo:'RoboPufi',chess:'Șah',pufi:'Pufi',par:'Părinți',home:'🏠 Acasă',voice:'Vocea',on:'🔊 Vocea: DA',off:'🔇 Vocea: NU',close:'✖ Închide',hello:'Ce jucăm azi? Alege un card!'},
+ de:{title:'Pufi – Die Spieleschule ⭐',q:'Was spielen wir heute?',math:'Mathe',world:'Die Welt',read:'Lesen',time:'Die Zeit',bday:'🎂 Geburtstag des Kindes',pname:'🗣️ Wie soll die Stimme „Pufi“ sagen? Tippen und anhören:',psample:'Hallo! Ich bin Pufi.',shapes:'Formen',robo:'RoboPufi',chess:'Schach',pufi:'Pufi',par:'Eltern',home:'🏠 Start',voice:'Stimme',on:'🔊 Stimme: AN',off:'🔇 Stimme: AUS',close:'✖ Schließen',hello:'Was spielen wir heute? Such dir eine Karte aus!'},
+ en:{title:'Pufi – The Game School ⭐',q:'What shall we play today?',math:'Maths',world:'The world',read:'Reading',time:'Time',bday:'🎂 Child’s birthday',pname:'🗣️ How should the voice say “Pufi”? Tap to listen:',psample:'Hello! I am Pufi.',shapes:'Shapes',robo:'RoboPufi',chess:'Chess',pufi:'Pufi',par:'Parents',home:'🏠 Home',voice:'Voice',on:'🔊 Voice: ON',off:'🔇 Voice: OFF',close:'✖ Close',hello:'What shall we play today? Pick a card!'}};
+const H=()=>TR('hm',HT);
+/* pronunția numelui „Pufi”: părintele alege varianta care sună bine pe dispozitivul lui */
+function pufiVar(){ return {ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',it:'Pufi',es:'Pufi',pt:'Pufi',nl:'Poefie',pl:'Pufi',hu:'Pufi',uk:'Пуфі',ru:'Пуфи'}[lang]||'Pufi'; }
+try{ if(window.speechSynthesis&&!speechSynthesis.__pufi){ const _sp=speechSynthesis.speak.bind(speechSynthesis); speechSynthesis.speak=u=>{ try{ const v=pufiVar(); if(u&&u.text&&v!=='Pufi') u.text=u.text.replace(/Pufi(?=s?\b)/g,v); }catch(e){} return _sp(u); }; speechSynthesis.__pufi=1; } }catch(e){}
+const CARDS=[['math','🔢','#FFE9A8'],['world','🌍','#CDEBFF'],['read','📖','#FFD9E2'],['time','⏳','#D8F3E3'],['shapes','📐','#FFE6C2'],['robo','🤖','#D9E4FF'],['chess','♟️','#E6E9F2'],['pufi','🦊','#FFE0C7'],['par','⚙️','#EEEEEE']];
+let mainReturn='home';
+function ensureStart(){ if(typeof started!=='undefined'&&!started){ started=true; const s=document.getElementById('start'); if(s) s.hidden=true; try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function render(){ { const t=H().title.replace(/\s*⭐\s*$/,''), pr=t.split(' – '), e=$('title'); if(pr.length===2){ e.innerHTML=''; e.append(pr[0]+' ⭐'); const sm=document.createElement('small'); sm.textContent=pr[1]; e.appendChild(sm); } else e.textContent=H().title; try{ document.title=t; }catch(_){} } $('q').textContent=H().q; $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0);
+  paintLangs();
+  const g=$('grid'); g.innerHTML=''; CARDS.forEach(([k,ic,bg])=>{ const c=document.createElement('button'); c.className='hm-card'; c.style.background=bg; c.innerHTML=`<span class="ic">${ic}</span><span class="t">${H()[k]}</span>`; c.onclick=()=>openCard(k); g.appendChild(c); });
+  const hb=document.getElementById('gHome'); if(hb) hb.textContent=H().home; }
+function openCard(k){ ensureStart(); try{ if(synth) synth.cancel(); }catch(e){}
+  if(k==='math') return window.openMath&&window.openMath();
+  if(k==='world') return openMainGame('flags');
+  if(k==='read') return window.openReading&&window.openReading();
+  if(k==='time') return window.openTime&&window.openTime();
+  if(k==='shapes') return window.openShapes&&window.openShapes();
+  if(k==='robo') return window.openRobo&&window.openRobo();
+  if(k==='chess') return window.openChess&&window.openChess();
+  if(k==='pufi') return window.openPufi&&window.openPufi(lang);
+  if(k==='par'){ if(window.__parentsGate) return window.__parentsGate().then(ok=>{ if(ok) parents(); }); return parents(); } }
+function openMainGame(g){ ensureStart(); mainReturn=g==='ten'?'math':'home'; try{ game=g==='ten'?'abacus':'flags'; if(g==='ten') sbMode='ten'; store('joc',game); syncChips(); next(); }catch(e){} root.hidden=true; }
+window.__openMainGame=openMainGame; window.__hmT=()=>H(); window.__hmOpen=openCard;
+function parents(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); ov.appendChild(box);
+  const v=document.getElementById('voice'), m=document.getElementById('mute'); const h=document.createElement('h3'); h.textContent='⚙️ '+H().par; h.style.margin='0'; box.appendChild(h);
+  const lab=document.createElement('div'); lab.textContent=H().voice+':'; lab.style.fontWeight='800'; box.appendChild(lab); const ph=document.createElement('span'); if(v){ v.parentNode.insertBefore(ph,v); box.appendChild(v); }
+  const mb=document.createElement('button'); mb.className='rb-b'; const upd=()=>mb.textContent=voiceOn?H().on:H().off; upd(); mb.onclick=()=>{ if(m) m.click(); upd(); }; box.appendChild(mb);
+  const bl=document.createElement('div'); bl.textContent=H().bday; bl.style.fontWeight='800'; box.appendChild(bl); const bi=document.createElement('input'); bi.type='date'; bi.style.cssText='font:inherit;font-size:1.1rem;padding:6px;border-radius:12px;border:2px solid #24325F'; try{ bi.value=localStorage.getItem('tm_bday')||''; }catch(e){} bi.onchange=()=>{ try{ localStorage.setItem('tm_bday',bi.value); }catch(e){} }; box.appendChild(bi);
+  const cb=document.createElement('button'); cb.className='rb-b go'; cb.textContent=H().close; cb.onclick=()=>{ if(v) ph.replaceWith(v); ov.remove(); }; box.appendChild(cb);
+  root.appendChild(ov); if(window.__parentsExtra) window.__parentsExtra(box); }
+function paintLangs(){ const box=$('langs'); const cur=LANG_ALL.find(x=>x[0]===lang)||LANG_ALL[0]; box.innerHTML=''; const b=document.createElement('button'); b.textContent=cur[1]+' '+cur[2]+' ▾'; b.setAttribute('aria-pressed','true'); b.onclick=langPicker; box.appendChild(b); }
+function langPicker(){ const ov=document.createElement('div'); ov.className='hm-par'; const box=document.createElement('div'); box.className='hm-lp'; ov.appendChild(box);
+  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='hm-lpb'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`; b.onclick=()=>{ ov.remove(); setAppLang(c); }; box.appendChild(b); });
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
+(window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden) render(); });
+function setAppLang(c){ if(window.__switchLang) window.__switchLang(c); else if(window.__setLang) window.__setLang(c); else lang=c; render(); try{ pickVoice(); }catch(e){} }
+/* buton Acasă în pagina principală */
+try{ const tabs=document.querySelector('.tabs'); if(tabs&&!document.getElementById('gHome')){ const b=document.createElement('button'); b.id='gHome'; b.onclick=()=>{ try{ if(synth) synth.cancel(); }catch(e){} if(mainReturn==='math'&&window.openMath){ window.openMath(); root.hidden=false; } else root.hidden=false; render(); }; tabs.insertBefore(b,tabs.firstChild); } }catch(e){}
+/* la pornire nu mai începe matematica: ecranul cu carduri e primul */
+try{ const s=document.getElementById('start'); if(s) s.hidden=true; }catch(e){}
+document.querySelectorAll('.langs button').forEach(b=>b.addEventListener('click',()=>setTimeout(render,0)));
+const _ob=window.openMath; render();
+setInterval(()=>{ if(!root.hidden) $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); },1500);
+})();
+</script>

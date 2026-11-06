@@ -1,0 +1,8 @@
+<script>
+/* Magyar — halnevek */
+(()=>{ const lg='hu', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['a kárász','Kárász','A kárász aranyszínű, nyugodt hal. Szereti a növényeket és a kukacokat.'],crap:['a ponty','Ponty','A pontynak bajusza van, azzal keres ennivalót az iszapban.'],pastrav:['a pisztráng','Pisztráng','A pisztráng hideg hegyi patakokban él. Fekete pöttyei és rózsaszín csíkja van.'],biban:['a sügér','Sügér','A sügér hátán csíkok vannak, az uszonyai pirosak. Kis halakra vadászik.'],somn:['a harcsa','Harcsa','A harcsának hosszú bajusza van, és szinte mindent megeszik. Éjjel vadászik.'],stiuca:['a csuka','Csuka','A csuka a folyók nagy vadásza. Elbújik, és villámgyorsan támad!'],rac:['a folyami rák','Rák','A folyami ráknak ollói vannak, és hátrafelé megy. Kitakarítja a meder alját.'],testoasa:['a teknős','Teknős','A vízi teknős a hátán hordja a házát.'],plev:['a kishal','Kishal','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'az alga',worm:'a kukac',ins:'a rovar',plev:'a kishal'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>

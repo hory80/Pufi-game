@@ -1,0 +1,120 @@
+
+<style>
+.nt-sec{display:flex;flex-direction:column;gap:6px;align-items:center;border-top:2px dashed #C9D5EE;padding-top:10px;width:100%}
+.nt-sec h4{margin:0;font-size:1.1rem}
+.nt-rec{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.nt-rec span{font-weight:800;min-width:9em;text-align:right}
+.nt-rec button{font:inherit;font-weight:800;border:3px solid var(--ink);background:#fff;border-radius:999px;padding:2px 12px;cursor:pointer;min-height:40px}
+.nt-rec button.on{background:#FF5D7A;color:#fff;animation:rdPulse 1s infinite}
+.rd-w.ok{background:#D7F5E6}.rd-w.ok .sy{color:#24935F!important;opacity:1!important}
+.hm-par>div{max-height:92vh;overflow:auto}
+.rd-w.help{animation:ntHelp .7s ease-in-out infinite alternate;outline:3px dashed var(--plum);outline-offset:2px}
+@keyframes ntHelp{to{transform:scale(1.12)}}
+.nt-mic{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:1.2rem}
+.nt-mic i{width:16px;height:16px;border-radius:50%;background:#FF5D7A;animation:rdPulse 1s infinite}
+.nt-heard{opacity:.65;font-weight:700;font-size:.95em;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+<script>
+/* ===== integrarea cu aplicația iOS (window.native există doar în aplicație) ===== */
+(()=>{
+const N=window.native; if(!N) return;
+const NT={ro:{recT:'🎙️ Vocea părintelui',recH:'Înregistrează laude cu vocea ta. Copilul le aude când reușește.',slot:i=>`Laudă ${i}`,rec:'⏺ Înregistrează',stop:'⏹ Gata',play:'▶',del:'🗑',
+   buyT:'💎 Versiunea completă',buy:p=>`Deblochează tot ${p||''}`,restore:'Restaurează cumpărăturile',owned:'✅ Ai versiunea completă. Mulțumim!',voice:q=>`Vocea: ${q}`,
+   mic:'🎤 Citesc cu voce',micHint:'Citește cu voce tare! Fiecare cuvânt citit se face verde. Dacă nu știi un cuvânt, atinge-l.',micNo:'Microfonul nu este disponibil. Încearcă „Citesc eu”.',listenMe:'🔊 Ascultă-te',micRead:n=>`Ai citit singur ${n} cuvinte!`,listening:'Te ascult…'},
+ de:{recT:'🎙️ Stimme der Eltern',recH:'Nimm Lob mit deiner Stimme auf. Dein Kind hört es, wenn es etwas schafft.',slot:i=>`Lob ${i}`,rec:'⏺ Aufnehmen',stop:'⏹ Fertig',play:'▶',del:'🗑',
+   buyT:'💎 Vollversion',buy:p=>`Alles freischalten ${p||''}`,restore:'Käufe wiederherstellen',owned:'✅ Du hast die Vollversion. Danke!',voice:q=>`Stimme: ${q}`,
+   mic:'🎤 Ich lese laut',micHint:'Lies laut vor! Jedes gelesene Wort wird grün. Wenn du ein Wort nicht kennst, tippe darauf.',micNo:'Das Mikrofon ist nicht verfügbar. Versuch „Ich lese selbst“.',listenMe:'🔊 Hör dir zu',micRead:n=>`Du hast ${n} Wörter selbst gelesen!`,listening:'Ich höre zu…'},
+ en:{recT:'🎙️ Parent’s voice',recH:'Record praise in your own voice. Your child hears it after a success.',slot:i=>`Praise ${i}`,rec:'⏺ Record',stop:'⏹ Done',play:'▶',del:'🗑',
+   buyT:'💎 Full version',buy:p=>`Unlock everything ${p||''}`,restore:'Restore purchases',owned:'✅ You have the full version. Thank you!',voice:q=>`Voice: ${q}`,
+   mic:'🎤 I read aloud',micHint:'Read out loud! Every word you read turns green. If you don’t know a word, tap it.',micNo:'The microphone is not available. Try “I read myself”.',listenMe:'🔊 Listen to yourself',micRead:n=>`You read ${n} words by yourself!`,listening:'Listening…'}};
+const Y=()=>TR('nt',NT);
+const PUFI={ro:'Pu-fi',de:'Pufi',en:'Poofy',fr:'Poufi',nl:'Poefie',uk:'Пуфі',ru:'Пуфи'};
+window.__micLabel=()=>Y().mic; window.__premium=undefined; const iapCheck=()=>N.call('iap.status').then(v=>{ if(window.__setPremium) window.__setPremium(v); else window.__premium=!!v; }); iapCheck(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) iapCheck(); });
+let recs=[]; const refreshRecs=()=>N.call('rec.list').then(l=>{ recs=Array.isArray(l)?l:[]; }); refreshRecs();
+
+/* --- orice oprire a vocii din joc oprește și vocea nativă --- */
+try{ const _sc=speechSynthesis.cancel.bind(speechSynthesis); speechSynthesis.cancel=function(){ try{ _sc(); }catch(e){} N.call('stopSpeak'); }; }catch(e){}
+/* --- vocea: say() trece prin vocea nativă (voci Premium) --- */
+let praiseNext=false, lastPraise=0;
+window.__nativeSay=async(text,opts)=>{ opts=opts||{}; if(typeof voiceOn!=='undefined'&&!voiceOn) return false;
+  let t=(typeof fixSpeech==='function')?fixSpeech(text):text; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]);
+  if(praiseNext&&recs.length){ praiseNext=false; lastPraise=Date.now(); await N.call('rec.play',{key:recs[Math.floor(Math.random()*recs.length)]}); }
+  return N.call('speak',{text:t,lang,rate:opts.rate||.9,words:!!opts.words}); };
+/* după o reușită (confetti), următoarea frază începe uneori cu lauda înregistrată de părinte */
+const _conf=window.confetti; if(typeof _conf==='function') window.confetti=function(n){ if(recs.length&&Date.now()-lastPraise>15000&&Math.random()<.45) praiseNext=true; return _conf.apply(this,arguments); };
+
+/* --- karaoke: evidențiere sincronizată cu vocea nativă --- */
+const spoken=s=>{ let t=(typeof fixSpeech==='function')?fixSpeech(s):s; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]); return t; };
+window.__nativeKaraoke=(text,words,cancelled)=>new Promise(res=>{ const t=spoken(text), tl=t.toLowerCase(), starts=[]; let pos=0;
+  /* pozițiile cuvintelor se calculează pe textul rostit efectiv (cu înlocuirile de pronunție) */
+  words.forEach(o=>{ const w=o.sp.textContent.replace(/[.,!?:;«»„“”"]/g,''); let p=-1;
+    for(const v of [w,spoken(w)]){ if(!v) continue; p=tl.indexOf(v.toLowerCase(),pos); if(p>=0){ pos=p+v.length; break; } }
+    if(p<0){ p=pos; pos+=Math.max(1,w.length); } starts.push(p); });
+  const mark=n=>words.forEach((o,j)=>{ o.sp.classList.toggle('hl',j===n); if(j<n) o.sp.classList.add('read'); });
+  const onW=e=>{ if(cancelled()){ N.call('stopSpeak'); return; } let n=0; for(let j=0;j<starts.length;j++) if(starts[j]<=e.loc) n=j; mark(n); };
+  N.on('speak.word',onW); mark(0);
+  N.call('speak',{text:t,lang,rate:.8,words:true}).then(ok=>{ N.off('speak.word',onW);
+    words.forEach(o=>o.sp.classList.remove('hl'));
+    if(ok!==false&&!cancelled()) words.forEach(o=>o.sp.classList.add('read'));
+    setTimeout(res,200); }); });
+
+/* --- citire cu voce: recunoașterea vorbirii mută evidențierea --- */
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\p{L}\p{N}]+/gu,'');
+function lev(a,b){ const d=[...Array(b.length+1).keys()]; for(let i=1;i<=a.length;i++){ let p=d[0]; d[0]=i; for(let j=1;j<=b.length;j++){ const t=d[j]; d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1)); p=t; } } return d[b.length]; }
+/* numele lui Pufi e inventat: recunoașterea îl scrie oricum („Puffy”, „Bufi”, „Poofy”), așa că orice cuvânt auzit în locul lui e bun */
+const NAMES=new Set(['pufi','pufis','pufiego','pufiemu','pufim','pufinak','пуфі','пуфи','пуфика','poofy','poefie','poufi']);
+const near=(a,b)=>{ if(a===b) return true; if(NAMES.has(b)) return a.length>=2; if(a.length<2||b.length<2) return false;
+  if(b.length<=3) return a[0]===b[0]&&lev(a,b)<=1&&Math.abs(a.length-b.length)<=1;
+  return lev(a,b)<=Math.max(1,Math.floor(b.length/3))||(b.length>=5&&a.length>=4&&b.startsWith(a.slice(0,4))); };
+window.__micRead=({spans,row,task,alive,onDone})=>{ const W=spans.map(o=>norm(o.sp.textContent)); let i=0, base=0, last=Date.now(), active=true, done=false;
+  const ind=document.createElement('div'); ind.className='nt-mic'; ind.innerHTML=`<i></i>${Y().listening} <span class="nt-heard"></span>`; row.insertBefore(ind,row.firstChild); task.textContent=Y().micHint;
+  const mark=()=>spans.forEach((o,j)=>{ o.sp.classList.toggle('hl',j===i); o.sp.classList.toggle('ok',j<i); o.sp.classList.remove('help'); });
+  const onPart=p=>{ if(!active) return; const hw=(p.text||'').trim().split(/\s+/).slice(-3).join(' '); const he=ind.querySelector('.nt-heard'); if(he&&hw) he.textContent='«'+hw+'»'; const toks=(p.text||'').split(/\s+/).map(norm).filter(Boolean); let j=base;
+    for(const tk of toks){ for(let k=j;k<Math.min(W.length,j+3);k++){ if(near(tk,W[k])){ j=k+1; break; } } }
+    if(j>i){ i=j; last=Date.now(); mark(); try{ tick(); }catch(e){} if(i>=W.length) finish(); } };
+  const onEnd=()=>{ if(active&&!done&&alive()){ base=i; setTimeout(start,250); } };
+  N.on('asr.partial',onPart); N.on('asr.end',onEnd);
+  let asked=false;
+  async function start(){ if(!active||!alive()) return cleanup(); if(!asked){ asked=true; if(window.__micEnsure&&!(await window.__micEnsure())){ task.textContent=Y().micNo; ind.remove(); active=false; return cleanup(); } } const ok=await N.call('asr.start',{lang,words:[...new Set(spans.map(o=>o.sp.textContent.replace(/[.,!?:]/g,'')))]}); if(!(ok===true||(ok&&ok.ok))){ task.textContent=Y().micNo; ind.remove(); active=false; cleanup(); if(window.__micFail) window.__micFail(ok&&ok.reason); } }
+  spans.forEach((o,j)=>{ o.sp.onclick=async()=>{ if(!active) return; await N.call('asr.stop'); await window.__nativeSay(o.sp.textContent.replace(/[.,!?:]/g,'')); if(j===i){ i++; mark(); if(i>=W.length) return finish(); } base=i; last=Date.now(); start(); }; });
+  const timer=setInterval(()=>{ if(!alive()){ cleanup(); return; } if(active&&Date.now()-last>5000&&spans[i]) spans[i].sp.classList.add('help'); },500);
+  function cleanup(){ clearInterval(timer); N.off('asr.partial',onPart); N.off('asr.end',onEnd); if(active){ active=false; N.call('asr.stop'); } }
+  function finish(){ if(done) return; done=true; cleanup(); ind.remove(); spans.forEach(o=>o.sp.classList.add('ok')); task.textContent=Y().micRead(W.length);
+    const b=document.createElement('button'); b.className='rd-btn'; b.textContent=Y().listenMe; b.onclick=()=>N.call('asr.playLast'); row.insertBefore(b,row.firstChild); onDone(); }
+  mark(); start(); };
+
+/* --- panoul părinților: poartă + vocea părintelui + cumpărare --- */
+window.__parentsGate=()=>N.call('gate',{lang});
+window.__parentsExtra=async box=>{ const s=document.createElement('div'); s.className='nt-sec'; s.innerHTML=`<h4>${Y().recT}</h4><div style="font-size:.95rem;text-align:center;max-width:420px">${Y().recH}</div>`;
+  await refreshRecs();
+  for(let k=1;k<=5;k++){ const key='praise'+k, r=document.createElement('div'); r.className='nt-rec'; const lab=document.createElement('span'); lab.textContent=Y().slot(k)+(recs.includes(key)?' ✅':'');
+    const rb=document.createElement('button'), pb=document.createElement('button'), db=document.createElement('button'); rb.textContent=Y().rec; pb.textContent=Y().play; db.textContent=Y().del; let on=false;
+    let watch=null;
+    const stopRec=async()=>{ clearInterval(watch); watch=null; if(!on) return; on=false; await N.call('rec.stop'); rb.textContent=Y().rec; rb.classList.remove('on'); await refreshRecs(); lab.textContent=Y().slot(k)+(recs.includes(key)?' ✅':''); };
+    rb.onclick=async()=>{ if(!on&&window.__gate&&window.__gate('nt','rec')) return; if(!on){ if(await N.call('rec.start',{key})){ on=true; rb.textContent=Y().stop; rb.classList.add('on'); const t0=Date.now();
+        /* aplicația oprește singură înregistrarea după 12 s; la fel și când se închide panoul */
+        watch=setInterval(()=>{ if(!box.isConnected||Date.now()-t0>12300) stopRec(); },300); } } else stopRec(); };
+    pb.onclick=()=>N.call('rec.play',{key}); db.onclick=async()=>{ await N.call('rec.delete',{key}); await refreshRecs(); lab.textContent=Y().slot(k); };
+    r.append(lab,rb,pb,db); s.appendChild(r); }
+  box.insertBefore(s,box.lastChild);
+  const v=await N.call('voiceInfo',{lang}); if(v&&v.name){ const d=document.createElement('div'); d.style.cssText='font-size:.9rem;opacity:.8'; d.textContent=Y().voice(`${v.name} (${v.quality})`); s.appendChild(d); }
+  const b=document.createElement('div'); b.className='nt-sec'; b.innerHTML=`<h4>${Y().buyT}</h4>`; box.insertBefore(b,box.lastChild);
+  const paint=async()=>{ b.querySelectorAll('button,div.m').forEach(x=>x.remove());
+    if(window.__premium){ const m=document.createElement('div'); m.className='m'; m.textContent=Y().owned; b.appendChild(m); return; }
+    const price=await N.call('iap.price'); const bb=document.createElement('button'); bb.className='rb-b go'; bb.textContent=Y().buy(price); bb.onclick=async()=>{ const v=!!await N.call('iap.buy'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); };
+    const rs=document.createElement('button'); rs.className='rb-b'; rs.textContent=Y().restore; rs.onclick=async()=>{ const v=!!await N.call('iap.restore'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); }; b.append(bb,rs); };
+  paint(); };
+
+/* --- copie de siguranță a progresului --- */
+const snapObj=()=>{ const o={}; try{ for(let k=0;k<localStorage.length;k++){ const key=localStorage.key(k); o[key]=localStorage.getItem(key); } }catch(e){} return o; };
+let restored=false;
+const save=()=>{ if(!restored) return; const o=snapObj(); if(Object.keys(o).length) N.call('store.set',{snapshot:JSON.stringify(o)}); };
+/* la pornire: completează doar cheile care lipsesc din localStorage (nu suprascrie nimic) */
+N.call('store.get').then(s=>{ let added=0; try{ if(s){ const o=JSON.parse(s)||{}; for(const k of Object.keys(o)){ if(localStorage.getItem(k)===null){ localStorage.setItem(k,o[k]); added++; } } } }catch(e){}
+  restored=true; let again=false; try{ again=sessionStorage.getItem('nt-restored')==='1'; }catch(e){}
+  if(added&&!again){ try{ sessionStorage.setItem('nt-restored','1'); }catch(e){} location.reload(); return; } save(); });
+/* salvare la fiecare progres (cu mică întârziere), la ieșire și periodic */
+let st=null; try{ const _set=Storage.prototype.setItem; Storage.prototype.setItem=function(k,v){ _set.call(this,k,v); if(this===localStorage){ clearTimeout(st); st=setTimeout(save,1500); } }; }catch(e){}
+setInterval(save,20000); document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); }); addEventListener('pagehide',save);
+})();
+</script>

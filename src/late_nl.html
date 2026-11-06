@@ -1,0 +1,8 @@
+<script>
+/* Nederlands — vissennamen */
+(()=>{ const lg='nl', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['de giebel','Giebel','De giebel is een goudkleurige, rustige vis. Hij houdt van planten en wormpjes.'],crap:['de karper','Karper','De karper heeft snorharen om eten te zoeken in de modder.'],pastrav:['de forel','Forel','De forel woont in koude bergbeekjes. Hij heeft zwarte stippen en een roze streep.'],biban:['de baars','Baars','De baars heeft strepen op zijn rug en rode vinnen. Hij jaagt op visjes.'],somn:['de meerval','Meerval','De meerval heeft lange snorharen en eet bijna alles. Hij jaagt ’s nachts.'],stiuca:['de snoek','Snoek','De snoek is de grote jager van de rivier. Hij verstopt zich en valt bliksemsnel aan!'],rac:['de rivierkreeft','Rivierkreeft','De rivierkreeft heeft scharen en loopt achteruit. Hij maakt de bodem schoon.'],testoasa:['de schildpad','Schildpad','De waterschildpad draagt haar huisje op haar rug.'],plev:['het visje','Visje','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'de algen',worm:'de wormen',ins:'de insecten',plev:'de visjes'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>

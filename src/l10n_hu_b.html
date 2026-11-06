@@ -1,0 +1,53 @@
+
+<script>
+/* ===== Magyar — olvasás ===== */
+(()=>{ const lg='hu', D=window.__rdData; if(!D) return;
+L10N.rd=L10N.rd||{};
+L10N.rd[lg]={tab:'📖 Olvasás',title:'Olvasás és írás',back:'⬅ Vissza',menu:'⬅ Menü',upper:'ABC',lower:'abc',
+  games:{alpha:['🔤','Az ábécé'],fish:['🎣','Fogd ki a betűt'],train:['🚂','A szótagvonat'],build:['🧩','A varázsszó'],read:['👀','Olvasd el és válassz'],story:['📚','Mesék'],write:['✍️','Írj az ujjaddal']},
+  alphaTask:'Koppints egy betűre, és meghallod!',album:(n,t)=>`🏅 Matricák: ${n} / ${t}`,alphaSay:(l,w)=>`${l}, mint ${w}.`,
+  fishSay:(l,w)=>`Fogd ki ezt a betűt: ${l}, mint ${w}!`,fishWrong:l=>`Ez a betű: ${l}. Próbáld újra!`,fishRight:l=>`Ügyes! Kifogtad: ${l}.`,
+  trainSay:w=>`Rakd ki a szót: ${w}! Tedd sorba a vagonokat.`,trainDone:w=>`Ügyes! ${w}!`,
+  buildSay:w=>`Írd le a szót: ${w}!`,buildDone:w=>`Szuper! Leírtad: ${w}.`,
+  readTask:'Olvasd el a szót, és válaszd ki a képet!',readWrong:'Próbáld újra!',readRight:w=>`Igen! ${w}!`,
+  storyTask:'Válassz egy mesét!',readMe:'▶ Olvasd fel',readSelf:'Koppints egy szóra, és meghallod.',storyDone:'Ügyes! Végigolvastad a mesét.',
+  writeTask:l=>`Írd le: ${l}. A zöld pöttynél kezdd.`,writeDone:l=>`Ügyes! Leírtad: ${l}!`,offTrack:'Kövesd a szürke vonalat 🙂',
+  letters:'🔤 Betűk',digits:'🔢 Számjegyek',next:'▶ Tovább',again:'↺ Még egyszer',listen:'🔊 Meghallgatom',
+  sylQ:w=>`Hány szótagból áll ez a szó: ${w}?`,sylN:n=>`${n===1?'egy':n} szótag`,sylSay:(w,n,x)=>`Igen! ${w}: ${n}. ${x}.`,sylWrong:'Próbáld újra! Tapsolj minden szótagnál. 👏',sylShow:(x,n)=>`${x} = ${n} szótag 👏`,
+  mPick:'🔤 Válassz betűket',mFree:'✏️ Írj a vonalra',mGuide:'✍️ Írj segítséggel',clear:'🧽 Törlés',freeHint:'Írd a betűt a szürke vonalra.',freeBad:'Próbálj a vonalra írni 🙂',writeLetter:l=>`Írd le ezt a betűt: ${l}.`};
+D.AQTX[lg]={btn:'🐠 Az akváriumom',title:'🐠 Az akváriumom',empty:'Fogj halakat, hogy megteljen az akváriumod!',slow:'🐢 Lassan',fast:'🐇 Gyorsan',close:'✖ Bezárás'};
+D.STX[lg]={syl:'🎨 Színes szótagok',listen:'🔊 Olvasd fel',self:'👆 Én olvasom',next:'Következő szó ▶',selfHint:'Olvasd fel hangosan a sárga szót, aztán nyomd meg a ▶ gombot. Ha nem ismersz egy szót, koppints rá.'};
+D.FISHTX[lg]={ask:[(l,w)=>`${l}, mint ${w}!`,(l,w)=>`Hol van ez a betű: ${l}? ${l}, mint ${w}.`,(l,w)=>`Keresd: ${l}, mint ${w}!`,(l,w)=>`A hal ezzel a betűvel: ${l}, mint ${w}!`,(l,w)=>`Gyerünk: ${l}, mint ${w}!`],
+  pic:w=>`Milyen betűvel kezdődik: ${w}?`, ok:['Megvan!','Szuper!','Szép fogás!','Hűha!','Igen!','Micsoda hal!'], no:['Nem az!','Hoppá, másik hal!','Keresd tovább!',x=>`Ez: ${x}.`],
+  gold:'Az aranyhal! Három csillag!', lvl:n=>`${n}. szint! Új tengeri állatok érkeznek!`, bucket:'Vödör'};
+D.ALPHA[lg]=[['A','🍎','ALMA'],['Á','🛏️','ÁGY'],['B','🐸','BÉKA'],['C','🐱','CICA'],['D','🐬','DELFIN'],['E','🐭','EGÉR'],['É','🏢','ÉPÜLET'],['F','🌳','FA'],['G','🍄','GOMBA'],['H','🐟','HAL'],['I','🏫','ISKOLA'],['Í','🏹','ÍJ'],['J','🍦','JÉGKRÉM'],['K','🐶','KUTYA'],['L','🐴','LÓ'],['M','🐝','MÉH'],
+  ['N','☀️','NAP'],['O','🦁','OROSZLÁN'],['Ó','⏰','ÓRA'],['Ö','🐂','ÖKÖR'],['Ő','🦌','ŐZ'],['P','🕷️','PÓK'],['R','🦊','RÓKA'],['S','🧢','SAPKA'],['T','🐢','TEKNŐS'],['U','🥒','UBORKA'],['Ú','🛣️','ÚT'],['Ü','🍾','ÜVEG'],['Ű','🪡','TŰ'],['V','🌸','VIRÁG'],['Z','🦓','ZEBRA']];
+D.WORDS[lg]=[['👩','A-NYA'],['👨','A-PA'],['🐱','CI-CA'],['🐶','KU-TYA'],['🏠','HÁZ'],['🍎','AL-MA'],['🚗','AU-TÓ'],['☀️','NAP'],['🌙','HOLD'],['🐟','HAL'],['🦆','KA-CSA'],['🎈','LU-FI'],['🌸','VI-RÁG'],['🦁','O-ROSZ-LÁN'],
+  ['🍌','BA-NÁN'],['🐸','BÉ-KA'],['🦋','PIL-LAN-GÓ'],['🍓','E-PER'],['🥕','RÉ-PA'],['🐭','E-GÉR'],['🐄','TE-HÉN'],['🌳','FA'],['🍉','GÖ-RÖG-DIN-NYE'],['🐢','TEK-NŐS'],['🚂','VO-NAT'],['🐻','MA-CI'],['☁️','FEL-HŐ'],['🎂','TOR-TA'],['🐰','NYÚL'],['🍕','PIZ-ZA']];
+D.STORIES[lg]=[['⚽','Pufi és a labda','Pu·fi·nak van egy pi·ros lab·dá·ja. A lab·da pat·tog fel, fel, fel. Pu·fi fut·ni kezd utá·na. De jó mu·lat·ság!'],
+ ['🐱','Mimi cica','Mi·mi egy ki·csi ci·ca. Te·jet i·szik. Az·tán a na·pon al·szik. Mi·áu, mond·ja Mi·mi.'],
+ ['🏖️','Egy nap a tengerparton','Ma a ten·ger·hez me·gyünk. A víz kék. Ho·mok·vá·rat é·pí·tek. Mi·lyen szép nap!'],
+ ['🚂','A vonat','A vo·nat gyor·san megy. Pö·fö·gő, mond·ja a vo·nat. A·nya és a·pa ki·néz az ab·la·kon. Me·gyünk a ma·má·hoz.'],
+ ['⛄','A hóember','Kint e·sik a hó. Pu·fi hó·em·bert é·pít. Ré·pá·ból or·rot kap. A hó·em·ber mo·so·lyog.'],
+ ['🍯','A maci és a méz','Egy nagy ma·ci mé·zet ke·res. A mé·hek re·pül·nek: zzz, zzz! A ma·ci ta·lál egy üveg mé·zet. Hmm, de fi·nom!'],
+ ['🎂','Pufi születésnapja','Ma van Pu·fi szü·le·tés·nap·ja. A tor·tán hat gyer·tya van. A ba·rá·tok éne·kel·nek. Pu·fi el·fúj·ja a gyer·tyá·kat és ne·vet.'],
+ ['🚀','A rakéta','Pu·fi ra·ké·tán re·pül. Fel, egy·re ma·ga·sab·ra! Lát·ja a Hol·dat és a csil·la·go·kat. Az·tán ha·za·megy va·cso·ráz·ni.'],
+ ['🌈','Az eső','E·sik az e·ső, és Pu·fi·nak sár·ga e·ser·nyő·je van. Ug·rál a po·cso·lyák·ban: csobb, csobb! Az·tán ki·süt a nap. Az é·gen szi·vár·vány van.'],
+ ['🥕','A kert','A ma·má·nak van egy kert·je. Pa·ra·di·csom és ré·pa nő ben·ne. Pu·fi meg·lo·csol·ja a vi·rá·go·kat. Egy kis csi·ga las·san má·szik.']];
+D.X2[lg]={ groups:['🔤 Betűk és hangok','✍️ Írás','📚 Olvasás'],
+  games:{hunt:['👂','Hangvadászat'],pos:['📍','Hol hallod a hangot?'],bubble:['🫧','Betűbuborékok'],twins:['🔍','Ikerszavak']},
+  huntSay:(u,ex)=>`Koppints minden képre, amely ezzel kezdődik: ${u}, mint ${ex}!`, huntTask:u=>`Mi kezdődik ezzel: ${u}?`,
+  huntNo:w=>`${w}? Nem, ez nem jó.`, huntDone:'Ügyes! Mindet megtaláltad! A többi nem illik ide.',
+  posSay:(l,w)=>`Hol hallod ezt a hangot: ${l}? A szó: ${w}. Az elején, a közepén vagy a végén?`, posTask:l=>`Hol hallod: ${l}?`,
+  posLbl:['Az elején','A közepén','A végén'], posRight:(l,w,p)=>`Igen! ${w}: a ${l} ${p.toLowerCase()} van.`, posWrong:'Hallgasd meg még egyszer!',
+  bubbleSay:w=>`Pukkaszd ki sorban a buborékokat, és írd le: ${w}!`, bubbleTask:f=>`Szavak ezzel: ${f}`, bubbleDone:w=>`Szuper! Leírtad: ${w}.`,
+  twinsSay:'Melyik szó illik a képhez?', twinsWrong:w=>`Ez van ideírva: ${w}. Próbáld újra!`, twinsRight:w=>`Igen! ${w}!`, listen:'🔊 Meghallgatom' };
+const RAW='NAP☀️ HOLD🌙 HÁZ🏠 CICA🐱 KUTYA🐶 HAL🐟 BÉKA🐸 MACI🐻 OROSZLÁN🦁 TEHÉN🐄 BÁRÁNY🐑 CSIGA🐌 TEKNŐS🐢 HAJÓ🚢 ESERNYŐ☂️ FA🌳 KÖNYV📖 LABDA⚽ KENYÉR🍞 TEJ🥛 VAJ🧈 ALMA🍎 BANÁN🍌 VIRÁG🌸 KACSA🦆 SÜNI🦔 ORR👃 RÓZSA🌹 TIGRIS🐯 VONAT🚂 VITORLÁS⛵ RAKÉTA🚀 GOMBA🍄 SZÍV❤️ SAJT🧀 BÁLNA🐳 EGÉR🐭 TYÚK🐔 LÓ🐴 HATTYÚ🦢 KANÁL🥄 PARADICSOM🍅 CSERESZNYE🍒 RÉPA🥕 KÖRTE🍐 CITROM🍋 SZÁJ👄 KORONA👑 CSENGŐ🔔 GYERTYA🕯️ ECSET🖌️ SEPRŰ🧹 BÖGRE☕ SZEMÜVEG👓 TEVE🐪 HANGYA🐜 PÓK🕷️ ELEFÁNT🐘 KROKODIL🐊 AUTÓ🚗 SZEM👁️ MÉH🐝 KÍGYÓ🐍 OLLÓ✂️ CIPŐ👟 KULCS🔑 PILLANGÓ🦋 CSILLAG⭐ SZÉK🪑 CERUZA✏️ ZOKNI🧦 KŐ🪨 FAGYI🍦 VÖDÖR🪣 BAGOLY🦉 KECSKE🐐 MAJOM🐒 MALAC🐷 GITÁR🎸 ÓRA⏰ KALAPÁCS🔨 CSIBE🐤 ANYA👩 FELHŐ☁️ DINNYE🍉 EPER🍓 DELFIN🐬 ZSIRÁF🦒 ZEBRA🦓 FARKAS🐺 RÓKA🦊 PINGVIN🐧 NYÚL🐰 REPÜLŐ✈️ BICIKLI🚲 TŰZ🔥 FENYŐFA🎄 AJÁNDÉK🎁 TORTA🎂 KOCKA🎲 KÉZ✋ LÁB🦶 FOG🦷 FÜL👂 KÉS🔪 KAKAS🐓 CSOKI🍫 HEGEDŰ🎻 DOB🥁 LAKAT🔒 LEVÉL✉️ ZÁSZLÓ🚩 SÓ🧂 MÉZ🍯 TELEFON📱 HAGYMA🧅 SZARVAS🦌 TÁSKA👜 ABLAK🪟 TÜKÖR🪞 KABÁT🧥 ROBOT🤖 POLIP🐙 KIRÁLYNŐ👸 TEHERAUTÓ🚚 KALAP🎩 PIZZA🍕 NARANCS🍊 SZŐLŐ🍇 MADÁR🐦 KOALA🐨 ÁGY🛏️ MAKK🌰 SÁL🧣 FOKHAGYMA🧄 ÖKÖL👊 SZAMÁR🫏 SAPKA🧢 TORONY🗼 CUMI🍼 ÉJSZAKA🌃 TOJÁS🥚 GILISZTA🪱 ANANÁSZ🍍 BABA🪆 ESŐ🌧️ BOHÓC🤡 FÉSZEK🪺 SZÉL🌬️ GYÜMÖLCS🍑 GYEREK🧒 NYAKKENDŐ👔 PAPAGÁJ🦜 UBORKA🥒 LYUK🕳️ KANNA🫖 GYÜMÖLCSLÉ🧃 SZAKÁCS👨‍🍳 MOSOLY😊 KÁPOSZTA🥬 ÍJ🏹 ÜVEG🍾 ÚT🛣️';
+const seen={}; D.VOC[lg]=RAW.trim().split(/\s+/).map(t=>{ const m=t.match(/^(\p{Lu}+)(.+)$/u); return [m[2],m[1]]; }).filter(x=>!seen[x[1]]&&!seen[x[0]]&&(seen[x[1]]=seen[x[0]]=1));
+D.GRA[lg]=['DZS','CS','DZ','GY','LY','NY','SZ','TY','ZS'];
+D.HUNTLONG[lg]=['DZS','CS','DZ','GY','LY','NY','SZ','TY','ZS'];
+D.HUNTL[lg]='BCDFGHJKLMNPRSTVZ';
+D.FAM[lg]=[['CS'],['SZ'],['ZS'],['GY'],['NY'],['TY'],['LY','J']];
+D.POSL[lg]='MLNPRTK';
+})();
+</script>

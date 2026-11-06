@@ -1,0 +1,26 @@
+<script>
+/* Timpul: jocuri noi (Trezește-l pe Pufi, Baloanele cu ore) — texte în celelalte 9 limbi */
+(()=>{ const T=(window.L10N||{}).tm; if(!T) return;
+const ADD={
+ fr:{g:{wake:['⏰','Réveille Pufi'],balloon:['🎈','Les ballons-horloges']},lv:{wake:['Heures pile','Et demie','Les quarts','De 5 en 5 minutes'],balloon:['Heures pile','Et demie','Les quarts']},
+   wakeTask:t=>`Pufi dort. Il doit se réveiller à ${t}. Règle le réveil !`,ring:'⏰ Sonne !',wakeWrong:t=>`Le réveil indique ${t}. Pufi se réveillerait à une autre heure. Essaie encore !`,wakeDone:'Bonjour, Pufi !',balTask:t=>`Attrape le ballon qui indique ${t} !`},
+ it:{g:{wake:['⏰','Sveglia Pufi'],balloon:['🎈','I palloncini-orologio']},lv:{wake:['Ore precise','E mezza','I quarti','Di 5 in 5 minuti'],balloon:['Ore precise','E mezza','I quarti']},
+   wakeTask:t=>`Pufi dorme. Ora della sveglia: ${t}. Regola la sveglia!`,ring:'⏰ Suona!',wakeWrong:t=>`La sveglia segna: ${t}. Pufi si sveglierebbe a un’altra ora. Riprova!`,wakeDone:'Buongiorno, Pufi!',balTask:t=>`Prendi il palloncino che segna: ${t}!`},
+ es:{g:{wake:['⏰','Despierta a Pufi'],balloon:['🎈','Los globos-reloj']},lv:{wake:['Horas en punto','Y media','Los cuartos','De 5 en 5 minutos'],balloon:['Horas en punto','Y media','Los cuartos']},
+   wakeTask:t=>`Pufi está dormido. Tiene que despertarse a ${t}. ¡Pon el despertador!`,ring:'⏰ ¡Suena!',wakeWrong:t=>`El despertador marca ${t}. Pufi se despertaría a otra hora. ¡Inténtalo otra vez!`,wakeDone:'¡Buenos días, Pufi!',balTask:t=>`¡Atrapa el globo que marca ${t}!`},
+ pt:{g:{wake:['⏰','Acorde o Pufi'],balloon:['🎈','Os balões-relógio']},lv:{wake:['Horas certas','E meia','Os quartos de hora','De 5 em 5 minutos'],balloon:['Horas certas','E meia','Os quartos de hora']},
+   wakeTask:t=>`O Pufi está dormindo. Hora de acordar: ${t}. Acerte o despertador!`,ring:'⏰ Tocar!',wakeWrong:t=>`O despertador mostra: ${t}. O Pufi acordaria em outra hora. Tente de novo!`,wakeDone:'Bom dia, Pufi!',balTask:t=>`Pegue o balão que mostra: ${t}!`},
+ nl:{g:{wake:['⏰','Maak Pufi wakker'],balloon:['🎈','Klokballonnen']},lv:{wake:['Hele uren','Half','De kwartieren','Per 5 minuten'],balloon:['Hele uren','Half','De kwartieren']},
+   wakeTask:t=>`Pufi slaapt. Hij moet om ${t} wakker worden. Zet de wekker!`,ring:'⏰ Rinkelen!',wakeWrong:t=>`De wekker staat op ${t}. Dan wordt Pufi op een andere tijd wakker. Probeer het nog eens!`,wakeDone:'Goedemorgen, Pufi!',balTask:t=>`Vang de ballon die ${t} aanwijst!`},
+ pl:{g:{wake:['⏰','Obudź Pufiego'],balloon:['🎈','Baloniki z zegarami']},lv:{wake:['Pełne godziny','Wpół do','Kwadranse','Co 5 minut'],balloon:['Pełne godziny','Wpół do','Kwadranse']},
+   wakeTask:t=>`Pufi śpi. Godzina pobudki: ${t}. Nastaw budzik!`,ring:'⏰ Dzwoń!',wakeWrong:t=>`Budzik pokazuje: ${t}. Pufi obudziłby się o innej godzinie. Spróbuj jeszcze raz!`,wakeDone:'Dzień dobry, Pufi!',balTask:t=>`Złap balonik, który pokazuje: ${t}!`},
+ hu:{g:{wake:['⏰','Ébreszd fel Pufit'],balloon:['🎈','Órás lufik']},lv:{wake:['Egész órák','Fél','Negyedek','5 percenként'],balloon:['Egész órák','Fél','Negyedek']},
+   wakeTask:t=>`Pufi alszik. Ébresztés ideje: ${t}. Állítsd be az ébresztőórát!`,ring:'⏰ Csörögj!',wakeWrong:t=>`Az ébresztő ezt mutatja: ${t}. Akkor Pufi máskor ébredne. Próbáld újra!`,wakeDone:'Jó reggelt, Pufi!',balTask:t=>`Kapd el a lufit, amelyik ezt mutatja: ${t}!`},
+ uk:{g:{wake:['⏰','Розбуди Пуфі'],balloon:['🎈','Кульки з годинниками']},lv:{wake:['Рівні години','Пів на','Чверті','Кожні 5 хвилин'],balloon:['Рівні години','Пів на','Чверті']},
+   wakeTask:t=>`Пуфі спить. Час прокидатися: ${t}. Постав будильник!`,ring:'⏰ Дзвони!',wakeWrong:t=>`Будильник показує: ${t}. Тоді Пуфі прокинеться в інший час. Спробуй ще раз!`,wakeDone:'Доброго ранку, Пуфі!',balTask:t=>`Злови кульку, яка показує: ${t}!`},
+ ru:{g:{wake:['⏰','Разбуди Пуфи'],balloon:['🎈','Шарики с часами']},lv:{wake:['Ровные часы','Половина','Четверти','Каждые 5 минут'],balloon:['Ровные часы','Половина','Четверти']},
+   wakeTask:t=>`Пуфи спит. Время просыпаться: ${t}. Поставь будильник!`,ring:'⏰ Звени!',wakeWrong:t=>`Будильник показывает: ${t}. Тогда Пуфи проснётся в другое время. Попробуй ещё раз!`,wakeDone:'Доброе утро, Пуфи!',balTask:t=>`Поймай шарик, который показывает: ${t}!`}};
+for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.assign(o.games,a.g); Object.assign(o.lv,a.lv);
+  ['wakeTask','ring','wakeWrong','wakeDone','balTask'].forEach(k=>o[k]=a[k]); }
+})();
+</script>

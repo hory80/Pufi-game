@@ -1,0 +1,40 @@
+<style>
+.lp-grp{display:inline-flex;align-items:center;gap:0;flex:none;margin-left:auto}
+.lp-mini{display:inline-flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;font:inherit;font-size:1.25rem;line-height:1;border:3px solid #dfe6f5;background:#fff;border-radius:999px;padding:4px 9px;cursor:pointer;margin-right:6px;flex:none;box-shadow:0 2px 0 rgba(36,50,95,.12)}
+.lp-mini:active{transform:translateY(1px)}
+.lp-ov{position:fixed;inset:0;z-index:99999;background:rgba(36,50,95,.5);display:flex;align-items:center;justify-content:center}
+.lp-box{background:#fff;border-radius:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(640px,92vw);padding:18px;box-sizing:border-box}
+.lp-b{display:flex;align-items:center;gap:10px;width:100%;height:58px;padding:0 14px;border:3px solid #dfe6f5;border-radius:18px;background:#f6f8ff;font:inherit;font-size:1.1rem;font-weight:800;color:#24325f;white-space:nowrap;overflow:hidden;cursor:pointer;box-sizing:border-box}
+.lp-b .f{font-size:1.6rem;line-height:1;flex:none}.lp-b .n{overflow:hidden;text-overflow:ellipsis}
+.lp-b.cur{background:#3ecf8e;border-color:#2bb57a;color:#fff}
+@media (max-width:560px){.lp-box{grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}.lp-b{font-size:.95rem;gap:7px;padding:0 9px;height:52px}.lp-b .f{font-size:1.35rem}.lp-mini{font-size:1.1rem;padding:3px 7px}}
+</style>
+<script>
+/* buton de limbă lângă stele, în fiecare ecran — schimbă limba fără întoarcere la start */
+(()=>{
+const flag=()=>((LANG_ALL.find(x=>x[0]===lang)||LANG_ALL[0])[1]);
+function paint(){ document.querySelectorAll('.lp-mini').forEach(b=>{ b.textContent=flag(); b.setAttribute('aria-label',(LANG_ALL.find(x=>x[0]===lang)||[])[2]||''); }); }
+function switchLang(c){
+  if(c===lang) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  if(window.__setLang) window.__setLang(c); else lang=c;
+  (window.__LR||[]).forEach(f=>{ try{ f(); }catch(e){ console.warn('lang refresh',e); } });
+  paint();
+}
+function picker(){
+  const ov=document.createElement('div'); ov.className='lp-ov'; const box=document.createElement('div'); box.className='lp-box'; ov.appendChild(box);
+  LANG_ALL.filter(x=>langReady(x[0])).forEach(([c,f,n])=>{ const b=document.createElement('button'); b.className='lp-b'+(c===lang?' cur':''); b.innerHTML=`<span class="f">${f}</span><span class="n">${n}</span>`;
+    b.onclick=()=>{ ov.remove(); switchLang(c); }; box.appendChild(b); });
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; document.body.appendChild(ov);
+}
+window.__switchLang=switchLang; window.__langPicker=picker;
+const IDS=['stars','ch-stars','rd-stars','sa-stars','cg-stars','gm-stars','mw-stars','rb-stars','tm-stars','isl-stars'];
+function add(){ IDS.forEach(id=>document.querySelectorAll('[id="'+id+'"]').forEach(p=>{ const host=id==='stars'?p.parentElement:p; if(host.parentElement&&host.parentElement.classList.contains('lp-grp')) return;
+  const g=document.createElement('span'); g.className='lp-grp'; host.parentElement.insertBefore(g,host);
+  const b=document.createElement('span'); b.className='lp-mini'; b.setAttribute('role','button'); b.tabIndex=0; b.onclick=e=>{ e.stopPropagation(); picker(); };
+  g.appendChild(b); g.appendChild(host); })); paint(); }
+add();
+/* butonul mare de pe start folosește aceeași schimbare */
+const hl=document.getElementById('hm-langs'); if(hl) new MutationObserver(paint).observe(hl,{childList:true,subtree:true});
+})();
+</script>

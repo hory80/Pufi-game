@@ -1,0 +1,21 @@
+<script>
+/* semne diacritice pentru scrisul cu degetul în toate limbile cu alfabet latin */
+(()=>{ const M=window.__rdData&&window.__rdData.MARKS; if(!M) return;
+const AC='L 46 4 58 -7', GR='L 42 -7 54 4', CI='L 40 4 50 -5 L 60 4', DI=['D 38 0','D 62 0'], TI='L 37 2 44 -4 L 56 3 L 63 -3', DA=['L 38 4 44 -7','L 54 4 60 -7'], DOT='D 50 -3', CED='L 52 80 52 88 L 45 95', OG='L 66 80 58 90 L 66 96';
+const ac='L 46 33 57 22', gr='L 43 22 54 33', ci='L 41 32 50 24 L 59 32', di=['D 40 28','D 60 28'], ti='L 38 30 44 25 L 56 31 L 62 26', da=['L 39 33 45 22','L 55 33 61 22'], dot='D 50 26', ced='L 52 80 52 87 L 46 94', og='L 64 80 56 89 L 64 95';
+const add=(k,base,...m)=>{ if(!M[k]) M[k]=[base,...m]; };
+'AEIOUY'.split('').forEach(V=>{ add(V==='Y'?'Ý':({A:'Á',E:'É',I:'Í',O:'Ó',U:'Ú'})[V],V,AC); });
+[['À','A'],['È','E'],['Ì','I'],['Ò','O'],['Ù','U']].forEach(([k,b])=>add(k,b,GR));
+[['Ê','E'],['Ô','O'],['Û','U']].forEach(([k,b])=>add(k,b,CI));
+[['Ë','E'],['Ï','I'],['Ÿ','Y']].forEach(([k,b])=>add(k,b,...DI));
+[['Ã','A'],['Õ','O'],['Ñ','N']].forEach(([k,b])=>add(k,b,TI));
+add('Ç','C',CED); add('Ő','O',...DA); add('Ű','U',...DA); add('Ą','A',OG); add('Ę','E',OG); add('Ł','L','L 18 56 44 40');
+[['Ś','S'],['Ź','Z'],['Ć','C'],['Ń','N']].forEach(([k,b])=>add(k,b,AC)); add('Ż','Z',DOT);
+[['á','a'],['é','e'],['í','ı'],['ó','o'],['ú','u'],['ý','y'],['ś','s'],['ź','z'],['ć','c'],['ń','n']].forEach(([k,b])=>add(k,b,ac));
+[['à','a'],['è','e'],['ì','ı'],['ò','o'],['ù','u']].forEach(([k,b])=>add(k,b,gr));
+[['ê','e'],['ô','o'],['û','u']].forEach(([k,b])=>add(k,b,ci));
+[['ë','e'],['ï','ı'],['ÿ','y']].forEach(([k,b])=>add(k,b,...di));
+[['ã','a'],['õ','o'],['ñ','n']].forEach(([k,b])=>add(k,b,ti));
+add('ç','c',ced); add('ő','o',...da); add('ű','u',...da); add('ą','a',og); add('ę','e',og); add('ł','l','L 36 64 62 48'); add('ż','z',dot);
+})();
+</script>

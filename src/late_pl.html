@@ -1,0 +1,8 @@
+<script>
+/* Polski — nazwy ryb */
+(()=>{ const lg='pl', A=window.__aqData; if(!A||!L10N.aq||!L10N.aq[lg]) return; const i=A.SP.caras.N.length; L10N.aq[lg].li=i;
+  const NM={caras:['karaś','Karaś','Karaś to złocista, spokojna rybka. Lubi rośliny i robaczki.'],crap:['karp','Karp','Karp ma wąsiki, żeby szukać jedzenia w mule.'],pastrav:['pstrąg','Pstrąg','Pstrąg mieszka w zimnych górskich strumieniach. Ma czarne kropki i różowy pasek.'],biban:['okoń','Okoń','Okoń ma paski na grzbiecie i czerwone płetwy. Poluje na rybki.'],somn:['sum','Sum','Sum ma długie wąsy i je prawie wszystko. Poluje w nocy.'],stiuca:['szczupak','Szczupak','Szczupak to wielki łowca rzek. Chowa się i atakuje błyskawicznie!'],rac:['rak','Rak','Rak ma szczypce i chodzi do tyłu. Sprząta dno.'],testoasa:['żółw','Żółw','Żółw wodny nosi swój domek na plecach.'],plev:['rybka','Rybka','']};
+  for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
+  const FD={alg:'glony',worm:'robaki',ins:'owady',plev:'rybki'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>

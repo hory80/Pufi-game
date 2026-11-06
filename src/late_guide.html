@@ -1,0 +1,417 @@
+<style>
+/* ===== Școala lui Pufi: lecții animate de soroban ===== */
+#sg-root{position:fixed;inset:0;z-index:57;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 10px);font-family:var(--display);color:var(--ink);background:linear-gradient(#E8F6FF,#FFF4E2);overflow:hidden}
+#sg-root[hidden]{display:none}
+.sg-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sg-top h2{flex:1 1 160px;margin:0;text-align:center;font-size:clamp(1.3rem,3.4vw,2rem)}
+.sg-menu{flex:1;min-height:0;overflow:auto;width:100%;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-bottom:10px}
+.sg-path{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,200px),1fr));gap:12px}
+.sg-card{font:inherit;position:relative;background:#fff;border:none;border-radius:24px;box-shadow:0 7px 0 #C9DDF0;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--ink);min-height:128px}
+.sg-card:active{transform:translateY(5px);box-shadow:0 2px 0 #C9DDF0}
+.sg-card .ic{font-size:clamp(2.2rem,6vh,3rem);line-height:1.1}
+.sg-card .n{font-size:.85rem;opacity:.6;font-weight:700}
+.sg-card .t{font-weight:800;font-size:clamp(1rem,2.3vw,1.2rem);text-align:center;line-height:1.15}
+.sg-card .st{color:#F2A900;letter-spacing:2px;font-size:1.1rem}
+.sg-card.lock{opacity:.45;filter:grayscale(.7)}
+.sg-card.lock::after{content:'🔒';position:absolute;top:8px;right:10px}
+.sg-card.cur{outline:4px solid #FFD43B;animation:sgBob 1.6s ease-in-out infinite}
+@keyframes sgBob{50%{transform:translateY(-4px)}}
+.sg-par{font:inherit;font-weight:800;font-size:clamp(1.05rem,2.6vw,1.3rem);border:3px solid var(--ink);background:#fff;border-radius:999px;padding:8px 18px;cursor:pointer;align-self:center}
+.sg-play{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;width:100%;max-width:1000px;margin:0 auto;align-items:center}
+.sg-head{display:flex;align-items:center;gap:10px;width:100%}
+.sg-owl{font-size:clamp(2.4rem,7vh,3.4rem);line-height:1;cursor:pointer;animation:sgBob 2.2s ease-in-out infinite}
+.sg-bub{flex:1;background:#fff;border-radius:20px;padding:8px 14px;font-weight:800;font-size:clamp(1.05rem,2.7vw,1.5rem);line-height:1.25;min-height:2.4em;display:flex;align-items:center;cursor:pointer;position:relative}
+.sg-bub::before{content:'';position:absolute;left:-12px;top:50%;margin-top:-10px;border:10px solid transparent;border-right:14px solid #fff;border-left:0}
+.sg-dots{display:flex;gap:6px}.sg-dots span{width:15px;height:15px;border-radius:50%;background:#D5E3F2}.sg-dots span.on{background:#3ECF8E}
+.sg-phase{font-weight:800;font-size:clamp(1rem,2.4vw,1.25rem);background:#5B4BD6;color:#fff;border-radius:999px;padding:3px 16px}
+.sg-task{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;min-height:1.2em}
+.sg-task .q{font-size:clamp(2rem,6.5vh,3.4rem);font-weight:800;line-height:1}
+.sg-task .f{font-size:clamp(1.2rem,3.6vh,1.9rem);font-weight:800;background:#FFF3B0;border:3px dashed #E0A800;border-radius:16px;padding:2px 12px}
+.sg-task .f.hot{animation:sgPulse .9s ease-in-out 3}
+@keyframes sgPulse{50%{transform:scale(1.15)}}
+.sg-board{flex:1;min-height:0;width:100%;position:relative;display:flex;justify-content:center}
+.sg-board svg{height:100%;width:100%;max-width:760px;display:block;touch-action:none}
+.sg-board .bd{cursor:pointer;transition:transform .2s cubic-bezier(.3,1.4,.6,1)}
+.sg-board .bd path{stroke:rgba(60,30,10,.45);stroke-width:2;stroke-linejoin:round}
+.sg-board .bd.mk path:first-child{stroke:#fff;stroke-width:7;animation:sgBlink .7s infinite}
+.sg-board .beam.mk{animation:sgBlink .7s infinite}
+.sg-board .lb{font:800 22px var(--display);text-anchor:middle}
+.sg-board .fg{font-size:34px;pointer-events:none}
+@keyframes sgBlink{50%{opacity:.35}}
+.sg-hand{position:absolute;font-size:clamp(40px,7vh,60px);line-height:1;pointer-events:none;transition:left .55s ease,top .55s ease,opacity .3s;z-index:3;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));transform:translate(-50%,0)}
+.sg-ctrl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sg-ctrl button,.sg-ov button,.sg-ans button{font:inherit;font-weight:800;font-size:clamp(1rem,2.6vw,1.3rem);border:3px solid var(--ink);background:#fff;color:var(--ink);border-radius:999px;padding:6px 18px;cursor:pointer;min-height:52px}
+.sg-ctrl .go,.sg-ov .go{background:#3ECF8E;border-color:#2bb57a;color:#fff}
+.sg-ans{display:flex;gap:12px;justify-content:center}.sg-ans button{font-size:clamp(1.8rem,6vh,2.6rem);min-width:2.4em;border-radius:20px}
+.sg-ov{position:absolute;inset:0;background:rgba(36,50,95,.5);display:flex;align-items:center;justify-content:center;z-index:9}
+.sg-ov>div{background:#fff;border-radius:28px;padding:20px 24px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;max-width:min(680px,92vw);max-height:86vh;overflow:auto;box-sizing:border-box}
+.sg-ov .big{font-size:3rem;color:#F2A900;letter-spacing:6px}
+.sg-ov h3{margin:0;font-size:clamp(1.3rem,3.6vw,1.9rem)}
+.sg-ov .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sg-guide{text-align:left!important;align-items:stretch!important}
+.sg-guide p{margin:0;font-weight:700;line-height:1.4;font-size:clamp(1rem,2.4vw,1.15rem)}
+.sg-guide .pp{display:flex;gap:8px;align-items:flex-start}
+.sg-guide .pp button{flex:none;min-height:40px;padding:2px 10px}
+.sg-fr{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sg-fr span{background:#E8F6FF;border-radius:14px;padding:4px 10px;font-weight:800;font-size:1.2rem}
+.sa-guide{font:inherit;width:100%;flex:none;border:none;border-radius:24px;padding:12px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;color:var(--ink);text-align:left;background:linear-gradient(120deg,#FFE27A,#FFB347);box-shadow:0 7px 0 #E09A2E;position:relative}
+.sa-guide:active{transform:translateY(5px);box-shadow:0 2px 0 #E09A2E}
+.sa-guide .ic{font-size:clamp(2.4rem,7vh,3.4rem);line-height:1}
+.sa-guide b{display:block;font-size:clamp(1.25rem,3.2vw,1.7rem)}
+.sa-guide span.s{font-weight:700;opacity:.85;font-size:clamp(.9rem,2.2vw,1.1rem)}
+.sa-guide .fire{margin-left:auto;background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;font-size:1.2rem;white-space:nowrap}
+</style>
+<script>
+(()=>{
+const TX={
+ ro:{title:'Școala lui Pufi',sub:'Lecții animate de soroban, pas cu pas',les:['Cunoaște sorobanul','Degetele magice','Numerele 0–9','Adunări directe','Prietenii lui 5: adunare','Prietenii lui 5: scădere','Prietenii lui 10: adunare','Prietenii lui 10: scădere','Sorobanul fantomă'],
+  lvl:n=>`Lecția ${n}`,back:'⬅ Înapoi',menu:'⬅ Lecții',watch:'👀 Uite cum fac eu',you:'🙌 Acum tu!',alone:'⭐ Singur!',replay:'👀 Arată-mi',hint:'💡 Ajutor',check:'✔ Gata',
+  done:'Lecție terminată! Bravo!',next:'▶ Lecția următoare',again:'↺ Încă o dată',locked:'Termină întâi lecția de dinainte.',parents:'👨‍👩‍👧 Ghid pentru părinți',close:'✖ Închide',streak:'zile la rând',
+  t:['Acesta este sorobanul! Fiecare bară verticală este o cifră.','Bara din mijloc se numește podul. Atinge podul!','Bila de sus valorează 5. Atinge bila de 5!','Bilele de jos valorează câte 1. Urcă o bilă până la pod!','O bilă numără doar când atinge podul. Acum mai urcă două!','Ai 3! Punctul alb arată bara unităților.'],
+  f:['Degetul mare urcă bilele de jos. Arată 2!','Arătătorul coboară bilele de jos. Fă 0!','Arătătorul mută și bila de 5. Arată 5!','Acum amândouă degetele odată, ca un clește: arată 7!','Arătătorul curăță tot. Fă 0!'],
+  show:n=>`Arată ${n}.`,up:n=>n===1?'Urcă o bilă de 1.':`Urcă ${n} bile de 1.`,down:n=>n===1?'Coboară o bilă de 1.':`Coboară ${n} bile de 1.`,h5on:'Coboară bila de 5.',h5off:'Urcă bila de 5.',t10up:'Urcă o bilă pe bara zecilor.',t10down:'Coboară o bilă de pe bara zecilor.',
+  direct:'E loc! Mutăm direct.',noRoom:b=>`Nu mai e loc pentru ${b}!`,notEnough:b=>`Nu sunt destule bile ca să scoți ${b}!`,f5:(b,f)=>`Prietenul lui ${b} până la 5 este ${f}.`,f10:(b,f)=>`Prietenul lui ${b} până la 10 este ${f}.`,
+  tryBlink:'Mută bilele care clipesc.',have:v=>`Pe soroban ai ${v}. Mai încearcă!`,right:n=>`Da! ${n}!`,good:'Bravo!',ghost:'Bilele dispar încet. Imaginează-ți-le în minte!',ghostLast:'Închide ochii și vezi sorobanul în minte. Cât face?',
+  pg:['Ce este sorobanul? Un abac japonez: fiecare bară este o cifră. Bila de sus valorează 5, cele 4 bile de jos câte 1. O bilă numără doar când atinge bara din mijloc.',
+   'Regula 1, prietenii lui 5: 1 și 4, 2 și 3. Când nu mai e loc să adaugi bile de 1, adaugi 5 și scoți prietenul. Exemplu: 4 plus 3 este 4 plus 5 minus 2, adică 7.',
+   'Regula 2, prietenii lui 10: 1 și 9, 2 și 8, 3 și 7, 4 și 6, 5 și 5. Când nu mai e loc pe bara unităților, adaugi 10 pe bara din stânga și scoți prietenul. Exemplu: 8 plus 5 este 8 plus 10 minus 5, adică 13.',
+   'La scădere este invers: minus 3 înseamnă plus 2 minus 5, iar minus 7 înseamnă minus 10 plus 3.',
+   'Degetele: degetul mare urcă bilele de jos. Arătătorul le coboară și mută bila de 5.',
+   'Cum exersați: 10–15 minute pe zi, în fiecare zi. Un soroban adevărat ajută mult. După câteva luni copilul începe să vadă sorobanul în minte. Asta se numește anzan.',
+   'Drumul în aplicație: Școala lui Pufi, apoi Academia Soroban, apoi Arena Anzan cu centuri și concursuri.']},
+ de:{title:'Pufis Schule',sub:'Abakus-Lektionen mit Animation, Schritt für Schritt',les:['Lerne den Abakus kennen','Die Zauberfinger','Die Zahlen 0–9','Direktes Plus','Freunde der 5: Plus','Freunde der 5: Minus','Freunde der 10: Plus','Freunde der 10: Minus','Der Geister-Abakus'],
+  lvl:n=>`Lektion ${n}`,back:'⬅ Zurück',menu:'⬅ Lektionen',watch:'👀 Schau, wie ich es mache',you:'🙌 Jetzt du!',alone:'⭐ Allein!',replay:'👀 Zeig es mir',hint:'💡 Hilfe',check:'✔ Fertig',
+  done:'Lektion geschafft! Super!',next:'▶ Nächste Lektion',again:'↺ Nochmal',locked:'Schaff zuerst die Lektion davor.',parents:'👨‍👩‍👧 Für Eltern',close:'✖ Schließen',streak:'Tage in Folge',
+  t:['Das ist der Abakus! Jede senkrechte Stange ist eine Ziffer.','Die Leiste in der Mitte heißt Brücke. Tippe auf die Brücke!','Die obere Perle ist 5 wert. Tippe auf die Fünferperle!','Die unteren Perlen sind je 1 wert. Schieb eine Perle hoch zur Brücke!','Eine Perle zählt nur, wenn sie die Brücke berührt. Schieb noch zwei hoch!','Du hast 3! Der weiße Punkt zeigt die Einerstange.'],
+  f:['Der Daumen schiebt die unteren Perlen hoch. Zeig 2!','Der Zeigefinger schiebt die unteren Perlen runter. Mach 0!','Der Zeigefinger bewegt auch die Fünferperle. Zeig 5!','Jetzt beide Finger zusammen, wie eine Zange: zeig 7!','Der Zeigefinger räumt alles weg. Mach 0!'],
+  show:n=>`Zeig ${n}.`,up:n=>n===1?'Schieb eine Einerperle hoch.':`Schieb ${n} Einerperlen hoch.`,down:n=>n===1?'Schieb eine Einerperle runter.':`Schieb ${n} Einerperlen runter.`,h5on:'Schieb die Fünferperle runter.',h5off:'Schieb die Fünferperle hoch.',t10up:'Schieb eine Perle auf der Zehnerstange hoch.',t10down:'Schieb eine Perle auf der Zehnerstange runter.',
+  direct:'Es ist Platz! Wir schieben direkt.',noRoom:b=>`Kein Platz mehr für ${b}!`,notEnough:b=>`Nicht genug Perlen, um ${b} wegzunehmen!`,f5:(b,f)=>`Der Freund von ${b} bis 5 ist ${f}.`,f10:(b,f)=>`Der Freund von ${b} bis 10 ist ${f}.`,
+  tryBlink:'Beweg die blinkenden Perlen.',have:v=>`Auf dem Abakus ist ${v}. Versuch es nochmal!`,right:n=>`Ja! ${n}!`,good:'Super!',ghost:'Die Perlen verschwinden langsam. Stell sie dir im Kopf vor!',ghostLast:'Mach die Augen zu und sieh den Abakus im Kopf. Wie viel ist das?',
+  pg:['Was ist ein Soroban? Ein japanischer Abakus: Jede Stange ist eine Ziffer. Die obere Perle ist 5 wert, die 4 unteren je 1. Eine Perle zählt nur, wenn sie die Mittelleiste berührt.',
+   'Regel 1, Freunde der 5: 1 und 4, 2 und 3. Wenn kein Platz mehr für Einerperlen ist, nimmst du die 5 dazu und den Freund weg. Beispiel: 4 plus 3 ist 4 plus 5 minus 2, also 7.',
+   'Regel 2, Freunde der 10: 1 und 9, 2 und 8, 3 und 7, 4 und 6, 5 und 5. Wenn auf der Einerstange kein Platz ist, nimmst du links eine 10 dazu und den Freund weg. Beispiel: 8 plus 5 ist 8 plus 10 minus 5, also 13.',
+   'Beim Minus ist es umgekehrt: minus 3 heißt plus 2 minus 5, und minus 7 heißt minus 10 plus 3.',
+   'Die Finger: Der Daumen schiebt die unteren Perlen hoch. Der Zeigefinger schiebt sie runter und bewegt die Fünferperle.',
+   'So übt ihr: 10 bis 15 Minuten täglich. Ein echter Soroban hilft sehr. Nach einigen Monaten sieht das Kind den Abakus im Kopf. Das nennt man Anzan.',
+   'Der Weg in der App: Pufis Schule, dann die Abakus-Akademie, dann die Anzan-Arena mit Gürteln und Wettbewerben.']},
+ en:{title:'Pufi’s School',sub:'Animated soroban lessons, step by step',les:['Meet the soroban','Magic fingers','Numbers 0–9','Direct adding','Friends of 5: adding','Friends of 5: taking away','Friends of 10: adding','Friends of 10: taking away','The ghost soroban'],
+  lvl:n=>`Lesson ${n}`,back:'⬅ Back',menu:'⬅ Lessons',watch:'👀 Watch me',you:'🙌 Your turn!',alone:'⭐ On your own!',replay:'👀 Show me',hint:'💡 Help',check:'✔ Done',
+  done:'Lesson complete! Well done!',next:'▶ Next lesson',again:'↺ Again',locked:'Finish the lesson before this one first.',parents:'👨‍👩‍👧 Parents’ guide',close:'✖ Close',streak:'days in a row',
+  t:['This is the soroban! Each upright rod is one digit.','The bar in the middle is called the bridge. Tap the bridge!','The top bead is worth 5. Tap the 5-bead!','Each bottom bead is worth 1. Push one bead up to the bridge!','A bead only counts when it touches the bridge. Now push up two more!','You have 3! The white dot shows the ones rod.'],
+  f:['Your thumb pushes the bottom beads up. Show 2!','Your pointing finger moves the bottom beads down. Make 0!','Your pointing finger also moves the 5-bead. Show 5!','Now both fingers together, like a pinch: show 7!','Your pointing finger clears everything. Make 0!'],
+  show:n=>`Show ${n}.`,up:n=>n===1?'Push one 1-bead up.':`Push ${n} 1-beads up.`,down:n=>n===1?'Move one 1-bead down.':`Move ${n} 1-beads down.`,h5on:'Move the 5-bead down.',h5off:'Move the 5-bead up.',t10up:'Push one bead up on the tens rod.',t10down:'Move one bead down on the tens rod.',
+  direct:'There is room! We move it directly.',noRoom:b=>`No room for ${b}!`,notEnough:b=>`Not enough beads to take away ${b}!`,f5:(b,f)=>`The friend of ${b} to make 5 is ${f}.`,f10:(b,f)=>`The friend of ${b} to make 10 is ${f}.`,
+  tryBlink:'Move the blinking beads.',have:v=>`The soroban shows ${v}. Try again!`,right:n=>`Yes! ${n}!`,good:'Well done!',ghost:'The beads slowly disappear. Picture them in your mind!',ghostLast:'Close your eyes and see the soroban in your mind. What is the answer?',
+  pg:['What is a soroban? A Japanese abacus: each rod is one digit. The top bead is worth 5, the 4 bottom beads are worth 1 each. A bead only counts when it touches the middle bar.',
+   'Rule 1, friends of 5: 1 and 4, 2 and 3. When there is no room to add 1-beads, add 5 and take away the friend. Example: 4 plus 3 is 4 plus 5 minus 2, which is 7.',
+   'Rule 2, friends of 10: 1 and 9, 2 and 8, 3 and 7, 4 and 6, 5 and 5. When there is no room on the ones rod, add 10 on the rod to the left and take away the friend. Example: 8 plus 5 is 8 plus 10 minus 5, which is 13.',
+   'Taking away works the other way round: minus 3 means plus 2 minus 5, and minus 7 means minus 10 plus 3.',
+   'Fingers: the thumb pushes the bottom beads up. The pointing finger moves them down and moves the 5-bead.',
+   'How to practise: 10 to 15 minutes every day. A real soroban helps a lot. After a few months the child starts to see the soroban in their mind. This is called anzan.',
+   'The path in the app: Pufi’s School, then the Soroban Academy, then the Anzan Arena with belts and contests.']},
+ fr:{title:'L’école de Pufi',sub:'Leçons animées de soroban, pas à pas',les:['Découvre le soroban','Les doigts magiques','Les nombres de 0 à 9','Additions directes','Les amis de 5 : addition','Les amis de 5 : soustraction','Les amis de 10 : addition','Les amis de 10 : soustraction','Le soroban fantôme'],
+  lvl:n=>`Leçon ${n}`,back:'⬅ Retour',menu:'⬅ Leçons',watch:'👀 Regarde comment je fais',you:'🙌 À toi !',alone:'⭐ Tout seul !',replay:'👀 Montre-moi',hint:'💡 Aide',check:'✔ Fini',
+  done:'Leçon terminée ! Bravo !',next:'▶ Leçon suivante',again:'↺ Encore',locked:'Termine d’abord la leçon précédente.',parents:'👨‍👩‍👧 Guide pour les parents',close:'✖ Fermer',streak:'jours de suite',
+  t:['Voici le soroban ! Chaque tige verticale est un chiffre.','La barre du milieu s’appelle le pont. Touche le pont !','La perle du haut vaut 5. Touche la perle de 5 !','Les perles du bas valent 1 chacune. Monte une perle jusqu’au pont !','Une perle compte seulement quand elle touche le pont. Monte-en encore deux !','Tu as 3 ! Le point blanc montre la tige des unités.'],
+  f:['Le pouce monte les perles du bas. Montre 2 !','L’index descend les perles du bas. Fais 0 !','L’index bouge aussi la perle de 5. Montre 5 !','Maintenant les deux doigts ensemble, comme une pince : montre 7 !','L’index efface tout. Fais 0 !'],
+  show:n=>`Montre ${n}.`,up:n=>n===1?'Monte une perle de 1.':`Monte ${n} perles de 1.`,down:n=>n===1?'Descends une perle de 1.':`Descends ${n} perles de 1.`,h5on:'Descends la perle de 5.',h5off:'Monte la perle de 5.',t10up:'Monte une perle sur la tige des dizaines.',t10down:'Descends une perle sur la tige des dizaines.',
+  direct:'Il y a de la place ! On bouge directement.',noRoom:b=>`Plus de place pour ${b} !`,notEnough:b=>`Pas assez de perles pour enlever ${b} !`,f5:(b,f)=>`L’ami de ${b} pour faire 5, c’est ${f}.`,f10:(b,f)=>`L’ami de ${b} pour faire 10, c’est ${f}.`,
+  tryBlink:'Bouge les perles qui clignotent.',have:v=>`Le soroban montre ${v}. Réessaie !`,right:n=>`Oui ! ${n} !`,good:'Bravo !',ghost:'Les perles disparaissent peu à peu. Imagine-les dans ta tête !',ghostLast:'Ferme les yeux et vois le soroban dans ta tête. Combien ça fait ?',
+  pg:['Qu’est-ce que le soroban ? Un boulier japonais : chaque tige est un chiffre. La perle du haut vaut 5, les 4 perles du bas valent 1 chacune. Une perle compte seulement quand elle touche la barre du milieu.',
+   'Règle 1, les amis de 5 : 1 et 4, 2 et 3. Quand il n’y a plus de place pour ajouter des perles de 1, on ajoute 5 et on enlève l’ami. Exemple : 4 plus 3, c’est 4 plus 5 moins 2, donc 7.',
+   'Règle 2, les amis de 10 : 1 et 9, 2 et 8, 3 et 7, 4 et 6, 5 et 5. Quand il n’y a plus de place sur la tige des unités, on ajoute 10 sur la tige de gauche et on enlève l’ami. Exemple : 8 plus 5, c’est 8 plus 10 moins 5, donc 13.',
+   'Pour la soustraction, c’est l’inverse : moins 3 veut dire plus 2 moins 5, et moins 7 veut dire moins 10 plus 3.',
+   'Les doigts : le pouce monte les perles du bas. L’index les descend et bouge la perle de 5.',
+   'Comment s’entraîner : 10 à 15 minutes chaque jour. Un vrai soroban aide beaucoup. Après quelques mois, l’enfant commence à voir le soroban dans sa tête. C’est l’anzan.',
+   'Le chemin dans l’application : l’école de Pufi, puis l’Académie Soroban, puis l’Arène Anzan avec ceintures et concours.']},
+ it:{title:'La scuola di Pufi',sub:'Lezioni animate di soroban, passo dopo passo',les:['Conosci il soroban','Le dita magiche','I numeri da 0 a 9','Addizioni dirette','Gli amici del 5: addizione','Gli amici del 5: sottrazione','Gli amici del 10: addizione','Gli amici del 10: sottrazione','Il soroban fantasma'],
+  lvl:n=>`Lezione ${n}`,back:'⬅ Indietro',menu:'⬅ Lezioni',watch:'👀 Guarda come faccio',you:'🙌 Ora tu!',alone:'⭐ Da solo!',replay:'👀 Fammi vedere',hint:'💡 Aiuto',check:'✔ Fatto',
+  done:'Lezione finita! Bravo!',next:'▶ Lezione successiva',again:'↺ Ancora',locked:'Prima finisci la lezione precedente.',parents:'👨‍👩‍👧 Guida per i genitori',close:'✖ Chiudi',streak:'giorni di fila',
+  t:['Questo è il soroban! Ogni asta verticale è una cifra.','La barra in mezzo si chiama ponte. Tocca il ponte!','La perla in alto vale 5. Tocca la perla da 5!','Le perle in basso valgono 1 ciascuna. Spingi una perla su fino al ponte!','Una perla conta solo quando tocca il ponte. Ora spingine su altre due!','Hai 3! Il punto bianco mostra l’asta delle unità.'],
+  f:['Il pollice spinge su le perle in basso. Mostra 2!','L’indice porta giù le perle in basso. Fai 0!','L’indice muove anche la perla da 5. Mostra 5!','Ora tutte e due le dita insieme, come una pinza: mostra 7!','L’indice pulisce tutto. Fai 0!'],
+  show:n=>`Mostra ${n}.`,up:n=>n===1?'Spingi su una perla da 1.':`Spingi su ${n} perle da 1.`,down:n=>n===1?'Porta giù una perla da 1.':`Porta giù ${n} perle da 1.`,h5on:'Porta giù la perla da 5.',h5off:'Porta su la perla da 5.',t10up:'Spingi su una perla sull’asta delle decine.',t10down:'Porta giù una perla sull’asta delle decine.',
+  direct:'C’è posto! Muoviamo direttamente.',noRoom:b=>`Non c’è più posto per ${b}!`,notEnough:b=>`Non ci sono abbastanza perle per togliere ${b}!`,f5:(b,f)=>`L’amico di ${b} per fare 5 è ${f}.`,f10:(b,f)=>`L’amico di ${b} per fare 10 è ${f}.`,
+  tryBlink:'Muovi le perle che lampeggiano.',have:v=>`Il soroban mostra ${v}. Riprova!`,right:n=>`Sì! ${n}!`,good:'Bravo!',ghost:'Le perle spariscono piano piano. Immaginale nella tua testa!',ghostLast:'Chiudi gli occhi e vedi il soroban nella tua testa. Quanto fa?',
+  pg:['Che cos’è il soroban? Un abaco giapponese: ogni asta è una cifra. La perla in alto vale 5, le 4 perle in basso valgono 1 ciascuna. Una perla conta solo quando tocca la barra in mezzo.',
+   'Regola 1, gli amici del 5: 1 e 4, 2 e 3. Quando non c’è più posto per aggiungere perle da 1, aggiungi 5 e togli l’amico. Esempio: 4 più 3 è 4 più 5 meno 2, cioè 7.',
+   'Regola 2, gli amici del 10: 1 e 9, 2 e 8, 3 e 7, 4 e 6, 5 e 5. Quando non c’è più posto sull’asta delle unità, aggiungi 10 sull’asta a sinistra e togli l’amico. Esempio: 8 più 5 è 8 più 10 meno 5, cioè 13.',
+   'Nella sottrazione è al contrario: meno 3 vuol dire più 2 meno 5, e meno 7 vuol dire meno 10 più 3.',
+   'Le dita: il pollice spinge su le perle in basso. L’indice le porta giù e muove la perla da 5.',
+   'Come esercitarsi: 10–15 minuti ogni giorno. Un soroban vero aiuta molto. Dopo qualche mese il bambino comincia a vedere il soroban nella testa. Questo si chiama anzan.',
+   'Il percorso nell’app: la scuola di Pufi, poi l’Accademia Soroban, poi l’Arena Anzan con cinture e gare.']},
+ es:{title:'La escuela de Pufi',sub:'Lecciones animadas de soroban, paso a paso',les:['Conoce el soroban','Los dedos mágicos','Los números del 0 al 9','Sumas directas','Los amigos del 5: suma','Los amigos del 5: resta','Los amigos del 10: suma','Los amigos del 10: resta','El soroban fantasma'],
+  lvl:n=>`Lección ${n}`,back:'⬅ Volver',menu:'⬅ Lecciones',watch:'👀 Mira cómo lo hago',you:'🙌 ¡Ahora tú!',alone:'⭐ ¡Tú solo!',replay:'👀 Enséñame',hint:'💡 Ayuda',check:'✔ Listo',
+  done:'¡Lección terminada! ¡Muy bien!',next:'▶ Siguiente lección',again:'↺ Otra vez',locked:'Primero termina la lección anterior.',parents:'👨‍👩‍👧 Guía para padres',close:'✖ Cerrar',streak:'días seguidos',
+  t:['¡Este es el soroban! Cada varilla vertical es una cifra.','La barra del medio se llama puente. ¡Toca el puente!','La cuenta de arriba vale 5. ¡Toca la cuenta de 5!','Las cuentas de abajo valen 1 cada una. ¡Sube una cuenta hasta el puente!','Una cuenta solo cuenta cuando toca el puente. ¡Ahora sube dos más!','¡Tienes 3! El punto blanco muestra la varilla de las unidades.'],
+  f:['El pulgar sube las cuentas de abajo. ¡Muestra 2!','El índice baja las cuentas de abajo. ¡Haz 0!','El índice también mueve la cuenta de 5. ¡Muestra 5!','Ahora los dos dedos juntos, como una pinza: ¡muestra 7!','El índice lo limpia todo. ¡Haz 0!'],
+  show:n=>`Muestra ${n}.`,up:n=>n===1?'Sube una cuenta de 1.':`Sube ${n} cuentas de 1.`,down:n=>n===1?'Baja una cuenta de 1.':`Baja ${n} cuentas de 1.`,h5on:'Baja la cuenta de 5.',h5off:'Sube la cuenta de 5.',t10up:'Sube una cuenta en la varilla de las decenas.',t10down:'Baja una cuenta en la varilla de las decenas.',
+  direct:'¡Hay sitio! Lo movemos directamente.',noRoom:b=>`¡No hay sitio para ${b}!`,notEnough:b=>`¡No hay cuentas suficientes para quitar ${b}!`,f5:(b,f)=>`El amigo de ${b} para hacer 5 es ${f}.`,f10:(b,f)=>`El amigo de ${b} para hacer 10 es ${f}.`,
+  tryBlink:'Mueve las cuentas que parpadean.',have:v=>`El soroban muestra ${v}. ¡Inténtalo otra vez!`,right:n=>`¡Sí! ¡${n}!`,good:'¡Muy bien!',ghost:'Las cuentas desaparecen poco a poco. ¡Imagínalas en tu mente!',ghostLast:'Cierra los ojos y ve el soroban en tu mente. ¿Cuánto es?',
+  pg:['¿Qué es el soroban? Un ábaco japonés: cada varilla es una cifra. La cuenta de arriba vale 5 y las 4 de abajo valen 1 cada una. Una cuenta solo cuenta cuando toca la barra del medio.',
+   'Regla 1, los amigos del 5: 1 y 4, 2 y 3. Cuando no hay sitio para añadir cuentas de 1, se suma 5 y se quita el amigo. Ejemplo: 4 más 3 es 4 más 5 menos 2, o sea 7.',
+   'Regla 2, los amigos del 10: 1 y 9, 2 y 8, 3 y 7, 4 y 6, 5 y 5. Cuando no hay sitio en la varilla de las unidades, se suma 10 en la varilla de la izquierda y se quita el amigo. Ejemplo: 8 más 5 es 8 más 10 menos 5, o sea 13.',
+   'En la resta es al revés: menos 3 significa más 2 menos 5, y menos 7 significa menos 10 más 3.',
+   'Los dedos: el pulgar sube las cuentas de abajo. El índice las baja y mueve la cuenta de 5.',
+   'Cómo practicar: de 10 a 15 minutos cada día. Un soroban de verdad ayuda mucho. Después de unos meses el niño empieza a ver el soroban en su mente. Eso se llama anzan.',
+   'El camino en la app: la escuela de Pufi, luego la Academia Soroban y después la Arena Anzan con cinturones y concursos.']},
+ pt:{title:'A escola do Pufi',sub:'Aulas animadas de soroban, passo a passo',les:['Conheça o soroban','Os dedos mágicos','Os números de 0 a 9','Somas diretas','Os amigos do 5: soma','Os amigos do 5: subtração','Os amigos do 10: soma','Os amigos do 10: subtração','O soroban fantasma'],
+  lvl:n=>`Aula ${n}`,back:'⬅ Voltar',menu:'⬅ Aulas',watch:'👀 Veja como eu faço',you:'🙌 Agora você!',alone:'⭐ Sozinho!',replay:'👀 Mostre de novo',hint:'💡 Ajuda',check:'✔ Pronto',
+  done:'Aula concluída! Muito bem!',next:'▶ Próxima aula',again:'↺ De novo',locked:'Primeiro termine a aula anterior.',parents:'👨‍👩‍👧 Guia para os pais',close:'✖ Fechar',streak:'dias seguidos',
+  t:['Este é o soroban! Cada haste vertical é um algarismo.','A barra do meio se chama ponte. Toque na ponte!','A conta de cima vale 5. Toque na conta de 5!','As contas de baixo valem 1 cada. Suba uma conta até a ponte!','Uma conta só vale quando encosta na ponte. Agora suba mais duas!','Você tem 3! O ponto branco mostra a haste das unidades.'],
+  f:['O polegar sobe as contas de baixo. Mostre 2!','O indicador desce as contas de baixo. Faça 0!','O indicador também move a conta de 5. Mostre 5!','Agora os dois dedos juntos, como uma pinça: mostre 7!','O indicador limpa tudo. Faça 0!'],
+  show:n=>`Mostre ${n}.`,up:n=>n===1?'Suba uma conta de 1.':`Suba ${n} contas de 1.`,down:n=>n===1?'Desça uma conta de 1.':`Desça ${n} contas de 1.`,h5on:'Desça a conta de 5.',h5off:'Suba a conta de 5.',t10up:'Suba uma conta na haste das dezenas.',t10down:'Desça uma conta na haste das dezenas.',
+  direct:'Tem lugar! Movemos direto.',noRoom:b=>`Não tem mais lugar para ${b}!`,notEnough:b=>`Não há contas suficientes para tirar ${b}!`,f5:(b,f)=>`O amigo de ${b} para fazer 5 é ${f}.`,f10:(b,f)=>`O amigo de ${b} para fazer 10 é ${f}.`,
+  tryBlink:'Mova as contas que piscam.',have:v=>`O soroban mostra ${v}. Tente de novo!`,right:n=>`Sim! ${n}!`,good:'Muito bem!',ghost:'As contas desaparecem aos poucos. Imagine-as na sua mente!',ghostLast:'Feche os olhos e veja o soroban na sua mente. Quanto dá?',
+  pg:['O que é o soroban? Um ábaco japonês: cada haste é um algarismo. A conta de cima vale 5 e as 4 de baixo valem 1 cada. Uma conta só vale quando encosta na barra do meio.',
+   'Regra 1, os amigos do 5: 1 e 4, 2 e 3. Quando não há lugar para somar contas de 1, soma-se 5 e tira-se o amigo. Exemplo: 4 mais 3 é 4 mais 5 menos 2, ou seja, 7.',
+   'Regra 2, os amigos do 10: 1 e 9, 2 e 8, 3 e 7, 4 e 6, 5 e 5. Quando não há lugar na haste das unidades, soma-se 10 na haste da esquerda e tira-se o amigo. Exemplo: 8 mais 5 é 8 mais 10 menos 5, ou seja, 13.',
+   'Na subtração é ao contrário: menos 3 significa mais 2 menos 5, e menos 7 significa menos 10 mais 3.',
+   'Os dedos: o polegar sobe as contas de baixo. O indicador desce essas contas e move a conta de 5.',
+   'Como praticar: de 10 a 15 minutos todos os dias. Um soroban de verdade ajuda muito. Depois de alguns meses a criança começa a ver o soroban na mente. Isso se chama anzan.',
+   'O caminho no app: a escola do Pufi, depois a Academia Soroban e então a Arena Anzan com faixas e competições.']},
+ nl:{title:'De school van Pufi',sub:'Geanimeerde sorobanlessen, stap voor stap',les:['Leer de soroban kennen','De toovervingers','De getallen 0–9','Direct optellen','Vrienden van 5: optellen','Vrienden van 5: aftrekken','Vrienden van 10: optellen','Vrienden van 10: aftrekken','De spooksoroban'],
+  lvl:n=>`Les ${n}`,back:'⬅ Terug',menu:'⬅ Lessen',watch:'👀 Kijk hoe ik het doe',you:'🙌 Nu jij!',alone:'⭐ Helemaal zelf!',replay:'👀 Laat zien',hint:'💡 Hulp',check:'✔ Klaar',
+  done:'Les klaar! Goed gedaan!',next:'▶ Volgende les',again:'↺ Nog eens',locked:'Maak eerst de les hiervoor af.',parents:'👨‍👩‍👧 Gids voor ouders',close:'✖ Sluiten',streak:'dagen op rij',
+  t:['Dit is de soroban! Elke rechtopstaande staaf is één cijfer.','De balk in het midden heet de brug. Tik op de brug!','De bovenste kraal is 5 waard. Tik op de vijfkraal!','De onderste kralen zijn elk 1 waard. Duw één kraal omhoog naar de brug!','Een kraal telt alleen als hij de brug raakt. Duw er nog twee omhoog!','Je hebt 3! De witte stip wijst de staaf van de eenheden aan.'],
+  f:['Je duim duwt de onderste kralen omhoog. Laat 2 zien!','Je wijsvinger schuift de onderste kralen omlaag. Maak 0!','Je wijsvinger beweegt ook de vijfkraal. Laat 5 zien!','Nu beide vingers samen, als een knijper: laat 7 zien!','Je wijsvinger ruimt alles op. Maak 0!'],
+  show:n=>`Laat ${n} zien.`,up:n=>n===1?'Duw één eenkraal omhoog.':`Duw ${n} eenkralen omhoog.`,down:n=>n===1?'Schuif één eenkraal omlaag.':`Schuif ${n} eenkralen omlaag.`,h5on:'Schuif de vijfkraal omlaag.',h5off:'Schuif de vijfkraal omhoog.',t10up:'Duw één kraal omhoog op de staaf van de tientallen.',t10down:'Schuif één kraal omlaag op de staaf van de tientallen.',
+  direct:'Er is plaats! We schuiven direct.',noRoom:b=>`Geen plaats meer voor ${b}!`,notEnough:b=>`Niet genoeg kralen om ${b} weg te halen!`,f5:(b,f)=>`De vriend van ${b} om 5 te maken is ${f}.`,f10:(b,f)=>`De vriend van ${b} om 10 te maken is ${f}.`,
+  tryBlink:'Schuif de knipperende kralen.',have:v=>`De soroban laat ${v} zien. Probeer het nog eens!`,right:n=>`Ja! ${n}!`,good:'Goed zo!',ghost:'De kralen verdwijnen langzaam. Zie ze in je hoofd!',ghostLast:'Doe je ogen dicht en zie de soroban in je hoofd. Hoeveel is het?',
+  pg:['Wat is een soroban? Een Japans telraam: elke staaf is één cijfer. De bovenste kraal is 5 waard, de 4 onderste kralen elk 1. Een kraal telt alleen als hij de middelste balk raakt.',
+   'Regel 1, vrienden van 5: 1 en 4, 2 en 3. Als er geen plaats meer is om eenkralen toe te voegen, tel je 5 erbij en haal je de vriend weg. Voorbeeld: 4 plus 3 is 4 plus 5 min 2, dus 7.',
+   'Regel 2, vrienden van 10: 1 en 9, 2 en 8, 3 en 7, 4 en 6, 5 en 5. Als er op de staaf van de eenheden geen plaats is, tel je 10 erbij op de staaf links en haal je de vriend weg. Voorbeeld: 8 plus 5 is 8 plus 10 min 5, dus 13.',
+   'Bij aftrekken is het omgekeerd: min 3 betekent plus 2 min 5, en min 7 betekent min 10 plus 3.',
+   'De vingers: de duim duwt de onderste kralen omhoog. De wijsvinger schuift ze omlaag en beweegt de vijfkraal.',
+   'Zo oefen je: elke dag 10 tot 15 minuten. Een echte soroban helpt veel. Na een paar maanden begint het kind de soroban in het hoofd te zien. Dat heet anzan.',
+   'De route in de app: de school van Pufi, dan de Soroban-academie, dan de Anzan-arena met banden en wedstrijden.']},
+ pl:{title:'Szkoła Pufiego',sub:'Animowane lekcje sorobanu, krok po kroku',les:['Poznaj soroban','Magiczne palce','Liczby od 0 do 9','Dodawanie bezpośrednie','Przyjaciele 5: dodawanie','Przyjaciele 5: odejmowanie','Przyjaciele 10: dodawanie','Przyjaciele 10: odejmowanie','Soroban-duszek'],
+  lvl:n=>`Lekcja ${n}`,back:'⬅ Wstecz',menu:'⬅ Lekcje',watch:'👀 Zobacz, jak to robię',you:'🙌 Teraz ty!',alone:'⭐ Samodzielnie!',replay:'👀 Pokaż mi',hint:'💡 Pomoc',check:'✔ Gotowe',
+  done:'Lekcja ukończona! Brawo!',next:'▶ Następna lekcja',again:'↺ Jeszcze raz',locked:'Najpierw skończ poprzednią lekcję.',parents:'👨‍👩‍👧 Poradnik dla rodziców',close:'✖ Zamknij',streak:'dni z rzędu',
+  t:['To jest soroban! Każdy pionowy pręt to jedna cyfra.','Belka pośrodku to most. Dotknij mostu!','Górny koralik jest wart 5. Dotknij koralika 5!','Dolne koraliki są warte po 1. Przesuń jeden koralik w górę do mostu!','Koralik liczy się tylko wtedy, gdy dotyka mostu. Teraz przesuń w górę jeszcze dwa!','Masz 3! Biała kropka pokazuje pręt jedności.'],
+  f:['Kciuk przesuwa dolne koraliki w górę. Pokaż 2!','Palec wskazujący przesuwa dolne koraliki w dół. Zrób 0!','Palec wskazujący przesuwa też koralik 5. Pokaż 5!','Teraz oba palce naraz, jak szczypce: pokaż 7!','Palec wskazujący wszystko czyści. Zrób 0!'],
+  show:n=>`Pokaż ${n}.`,up:n=>n===1?'Przesuń w górę jeden koralik 1.':`Przesuń w górę koraliki 1: ${n}.`,down:n=>n===1?'Przesuń w dół jeden koralik 1.':`Przesuń w dół koraliki 1: ${n}.`,h5on:'Przesuń w dół koralik 5.',h5off:'Przesuń w górę koralik 5.',t10up:'Przesuń w górę jeden koralik na pręcie dziesiątek.',t10down:'Przesuń w dół jeden koralik na pręcie dziesiątek.',
+  direct:'Jest miejsce! Przesuwamy od razu.',noRoom:b=>`Nie ma już miejsca na ${b}!`,notEnough:b=>`Za mało koralików, żeby zabrać ${b}!`,f5:(b,f)=>`Przyjaciel liczby ${b} do 5 to ${f}.`,f10:(b,f)=>`Przyjaciel liczby ${b} do 10 to ${f}.`,
+  tryBlink:'Przesuń migające koraliki.',have:v=>`Soroban pokazuje ${v}. Spróbuj jeszcze raz!`,right:n=>`Tak! ${n}!`,good:'Brawo!',ghost:'Koraliki powoli znikają. Wyobraź je sobie w głowie!',ghostLast:'Zamknij oczy i zobacz soroban w głowie. Ile to jest?',
+  pg:['Co to jest soroban? Japońskie liczydło: każdy pręt to jedna cyfra. Górny koralik jest wart 5, a 4 dolne po 1. Koralik liczy się tylko wtedy, gdy dotyka środkowej belki.',
+   'Zasada 1, przyjaciele 5: 1 i 4, 2 i 3. Gdy nie ma miejsca, by dodać koraliki 1, dodajemy 5 i zabieramy przyjaciela. Przykład: 4 plus 3 to 4 plus 5 minus 2, czyli 7.',
+   'Zasada 2, przyjaciele 10: 1 i 9, 2 i 8, 3 i 7, 4 i 6, 5 i 5. Gdy na pręcie jedności nie ma miejsca, dodajemy 10 na pręcie po lewej i zabieramy przyjaciela. Przykład: 8 plus 5 to 8 plus 10 minus 5, czyli 13.',
+   'Przy odejmowaniu jest odwrotnie: minus 3 to plus 2 minus 5, a minus 7 to minus 10 plus 3.',
+   'Palce: kciuk przesuwa dolne koraliki w górę. Palec wskazujący przesuwa je w dół i porusza koralikiem 5.',
+   'Jak ćwiczyć: 10–15 minut codziennie. Prawdziwy soroban bardzo pomaga. Po kilku miesiącach dziecko zaczyna widzieć soroban w głowie. To się nazywa anzan.',
+   'Droga w aplikacji: Szkoła Pufiego, potem Akademia Sorobanu, a potem Arena Anzan z pasami i zawodami.']},
+ hu:{title:'Pufi iskolája',sub:'Animált szorobán-leckék, lépésről lépésre',les:['Ismerd meg a szorobánt','A varázsujjak','A számok 0-tól 9-ig','Közvetlen összeadás','Az 5 barátai: összeadás','Az 5 barátai: kivonás','A 10 barátai: összeadás','A 10 barátai: kivonás','A szellem-szorobán'],
+  lvl:n=>`${n}. lecke`,back:'⬅ Vissza',menu:'⬅ Leckék',watch:'👀 Nézd, hogyan csinálom',you:'🙌 Most te!',alone:'⭐ Egyedül!',replay:'👀 Mutasd meg',hint:'💡 Segítség',check:'✔ Kész',
+  done:'Kész a lecke! Ügyes vagy!',next:'▶ Következő lecke',again:'↺ Újra',locked:'Előbb fejezd be az előző leckét.',parents:'👨‍👩‍👧 Útmutató szülőknek',close:'✖ Bezárás',streak:'nap egymás után',
+  t:['Ez a szorobán! Minden függőleges rúd egy számjegy.','A középső léc neve híd. Érintsd meg a hidat!','A felső golyó 5-öt ér. Érintsd meg az ötös golyót!','Az alsó golyók 1-et érnek. Tolj fel egy golyót a hídig!','Egy golyó csak akkor számít, ha hozzáér a hídhoz. Most tolj fel még kettőt!','Megvan a 3! A fehér pötty mutatja az egyesek rúdját.'],
+  f:['A hüvelykujj feltolja az alsó golyókat. Mutasd a 2-t!','A mutatóujj letolja az alsó golyókat. Legyen 0!','A mutatóujj az ötös golyót is mozgatja. Mutasd az 5-öt!','Most mindkét ujj együtt, mint egy csipesz: mutasd a 7-et!','A mutatóujj mindent letöröl. Legyen 0!'],
+  show:n=>`Mutasd: ${n}.`,up:n=>n===1?'Tolj fel egy egyes golyót.':`Tolj fel egyes golyókat: ${n}.`,down:n=>n===1?'Tolj le egy egyes golyót.':`Tolj le egyes golyókat: ${n}.`,h5on:'Told le az ötös golyót.',h5off:'Told fel az ötös golyót.',t10up:'Tolj fel egy golyót a tízesek rúdján.',t10down:'Tolj le egy golyót a tízesek rúdján.',
+  direct:'Van hely! Közvetlenül toljuk.',noRoom:b=>`Nincs több hely ennek: ${b}!`,notEnough:b=>`Nincs elég golyó, hogy elvegyük ezt: ${b}!`,f5:(b,f)=>`${b} barátja az 5-höz: ${f}.`,f10:(b,f)=>`${b} barátja a 10-hez: ${f}.`,
+  tryBlink:'Mozgasd a villogó golyókat.',have:v=>`A szorobánon ez van: ${v}. Próbáld újra!`,right:n=>`Igen! ${n}!`,good:'Ügyes!',ghost:'A golyók lassan eltűnnek. Képzeld el őket a fejedben!',ghostLast:'Csukd be a szemed, és lásd a szorobánt a fejedben. Mennyi az eredmény?',
+  pg:['Mi a szorobán? Japán golyós számológép: minden rúd egy számjegy. A felső golyó 5-öt ér, a 4 alsó golyó egyenként 1-et. Egy golyó csak akkor számít, ha hozzáér a középső léchez.',
+   '1. szabály, az 5 barátai: 1 és 4, 2 és 3. Ha nincs hely egyes golyókat hozzáadni, hozzáadunk 5-öt, és elvesszük a barátot. Példa: 4 meg 3 az 4 meg 5 mínusz 2, vagyis 7.',
+   '2. szabály, a 10 barátai: 1 és 9, 2 és 8, 3 és 7, 4 és 6, 5 és 5. Ha az egyesek rúdján nincs hely, a bal oldali rúdon hozzáadunk 10-et, és elvesszük a barátot. Példa: 8 meg 5 az 8 meg 10 mínusz 5, vagyis 13.',
+   'Kivonásnál fordítva: mínusz 3 azt jelenti, plusz 2 mínusz 5, a mínusz 7 pedig mínusz 10 plusz 3.',
+   'Az ujjak: a hüvelykujj feltolja az alsó golyókat. A mutatóujj letolja őket, és mozgatja az ötös golyót.',
+   'Hogyan gyakoroljatok: naponta 10–15 percet, minden nap. Egy igazi szorobán sokat segít. Néhány hónap után a gyerek elkezdi a fejében látni a szorobánt. Ezt hívják anzannak.',
+   'Az út az alkalmazásban: Pufi iskolája, utána a Szorobán Akadémia, végül az Anzan Aréna övekkel és versenyekkel.']},
+ uk:{title:'Школа Пуфі',sub:'Анімовані уроки соробану, крок за кроком',les:['Знайомство з соробаном','Чарівні пальці','Числа від 0 до 9','Пряме додавання','Друзі п’ятірки: додавання','Друзі п’ятірки: віднімання','Друзі десятки: додавання','Друзі десятки: віднімання','Соробан-привид'],
+  lvl:n=>`Урок ${n}`,back:'⬅ Назад',menu:'⬅ Уроки',watch:'👀 Дивись, як я роблю',you:'🙌 Тепер ти!',alone:'⭐ Сам!',replay:'👀 Покажи',hint:'💡 Допомога',check:'✔ Готово',
+  done:'Урок завершено! Молодець!',next:'▶ Наступний урок',again:'↺ Ще раз',locked:'Спершу заверши попередній урок.',parents:'👨‍👩‍👧 Порадник для батьків',close:'✖ Закрити',streak:'днів поспіль',
+  t:['Це соробан! Кожен вертикальний стрижень — це одна цифра.','Планка посередині називається місток. Торкнися містка!','Верхня кісточка важить 5. Торкнися п’ятірки!','Нижні кісточки важать по 1. Підніми одну кісточку до містка!','Кісточка рахується, тільки коли торкається містка. Тепер підніми ще дві!','У тебе 3! Біла крапка показує стрижень одиниць.'],
+  f:['Великий палець піднімає нижні кісточки. Покажи 2!','Вказівний палець опускає нижні кісточки. Зроби 0!','Вказівний палець рухає і п’ятірку. Покажи 5!','Тепер обидва пальці разом, як щипчики: покажи 7!','Вказівний палець усе прибирає. Зроби 0!'],
+  show:n=>`Покажи ${n}.`,up:n=>n===1?'Підніми одну одиничку.':`Підніми одинички: ${n}.`,down:n=>n===1?'Опусти одну одиничку.':`Опусти одинички: ${n}.`,h5on:'Опусти п’ятірку.',h5off:'Підніми п’ятірку.',t10up:'Підніми одну кісточку на стрижні десятків.',t10down:'Опусти одну кісточку на стрижні десятків.',
+  direct:'Місце є! Рухаємо одразу.',noRoom:b=>`Немає місця для ${b}!`,notEnough:b=>`Замало кісточок, щоб забрати ${b}!`,f5:(b,f)=>`Друг числа ${b} до п’яти — ${f}.`,f10:(b,f)=>`Друг числа ${b} до десяти — ${f}.`,
+  tryBlink:'Рухай кісточки, що блимають.',have:v=>`На соробані ${v}. Спробуй ще раз!`,right:n=>`Так! ${n}!`,good:'Молодець!',ghost:'Кісточки поволі зникають. Уяви їх у голові!',ghostLast:'Заплющ очі й побач соробан у голові. Скільки буде?',
+  pg:['Що таке соробан? Японська рахівниця: кожен стрижень — одна цифра. Верхня кісточка важить 5, чотири нижні — по 1. Кісточка рахується, тільки коли торкається середньої планки.',
+   'Правило 1, друзі п’ятірки: 1 і 4, 2 і 3. Коли немає місця додати одинички, додаємо 5 і забираємо друга. Приклад: 4 плюс 3 — це 4 плюс 5 мінус 2, тобто 7.',
+   'Правило 2, друзі десятки: 1 і 9, 2 і 8, 3 і 7, 4 і 6, 5 і 5. Коли на стрижні одиниць немає місця, додаємо 10 на стрижні ліворуч і забираємо друга. Приклад: 8 плюс 5 — це 8 плюс 10 мінус 5, тобто 13.',
+   'При відніманні навпаки: мінус 3 означає плюс 2 мінус 5, а мінус 7 означає мінус 10 плюс 3.',
+   'Пальці: великий палець піднімає нижні кісточки. Вказівний опускає їх і рухає п’ятірку.',
+   'Як тренуватися: 10–15 хвилин щодня. Справжній соробан дуже допомагає. Через кілька місяців дитина починає бачити соробан у голові. Це називається анзан.',
+   'Шлях у застосунку: Школа Пуфі, потім Академія соробану, потім Арена Анзан з поясами та змаганнями.']},
+ ru:{title:'Школа Пуфи',sub:'Анимированные уроки соробана, шаг за шагом',les:['Знакомство с соробаном','Волшебные пальцы','Числа от 0 до 9','Прямое сложение','Друзья пятёрки: сложение','Друзья пятёрки: вычитание','Друзья десятки: сложение','Друзья десятки: вычитание','Соробан-призрак'],
+  lvl:n=>`Урок ${n}`,back:'⬅ Назад',menu:'⬅ Уроки',watch:'👀 Смотри, как я делаю',you:'🙌 Теперь ты!',alone:'⭐ Сам!',replay:'👀 Покажи',hint:'💡 Помощь',check:'✔ Готово',
+  done:'Урок пройден! Молодец!',next:'▶ Следующий урок',again:'↺ Ещё раз',locked:'Сначала пройди предыдущий урок.',parents:'👨‍👩‍👧 Советы для родителей',close:'✖ Закрыть',streak:'дней подряд',
+  t:['Это соробан! Каждый вертикальный стержень — одна цифра.','Планка посередине называется мостик. Нажми на мостик!','Верхняя косточка стоит 5. Нажми на пятёрку!','Нижние косточки стоят по 1. Подними одну косточку к мостику!','Косточка считается, только когда касается мостика. Теперь подними ещё две!','У тебя 3! Белая точка показывает стержень единиц.'],
+  f:['Большой палец поднимает нижние косточки. Покажи 2!','Указательный палец опускает нижние косточки. Сделай 0!','Указательный палец двигает и пятёрку. Покажи 5!','Теперь оба пальца вместе, как щипчики: покажи 7!','Указательный палец всё убирает. Сделай 0!'],
+  show:n=>`Покажи ${n}.`,up:n=>n===1?'Подними одну единичку.':`Подними единички: ${n}.`,down:n=>n===1?'Опусти одну единичку.':`Опусти единички: ${n}.`,h5on:'Опусти пятёрку.',h5off:'Подними пятёрку.',t10up:'Подними одну косточку на стержне десятков.',t10down:'Опусти одну косточку на стержне десятков.',
+  direct:'Место есть! Двигаем сразу.',noRoom:b=>`Нет места для ${b}!`,notEnough:b=>`Не хватает косточек, чтобы убрать ${b}!`,f5:(b,f)=>`Друг числа ${b} до пяти — ${f}.`,f10:(b,f)=>`Друг числа ${b} до десяти — ${f}.`,
+  tryBlink:'Двигай мигающие косточки.',have:v=>`На соробане ${v}. Попробуй ещё раз!`,right:n=>`Да! ${n}!`,good:'Молодец!',ghost:'Косточки медленно исчезают. Представь их в голове!',ghostLast:'Закрой глаза и увидь соробан в голове. Сколько получилось?',
+  pg:['Что такое соробан? Японские счёты: каждый стержень — одна цифра. Верхняя косточка стоит 5, четыре нижние — по 1. Косточка считается, только когда касается средней планки.',
+   'Правило 1, друзья пятёрки: 1 и 4, 2 и 3. Когда нет места прибавить единички, прибавляем 5 и убираем друга. Пример: 4 плюс 3 — это 4 плюс 5 минус 2, то есть 7.',
+   'Правило 2, друзья десятки: 1 и 9, 2 и 8, 3 и 7, 4 и 6, 5 и 5. Когда на стержне единиц нет места, прибавляем 10 на стержне слева и убираем друга. Пример: 8 плюс 5 — это 8 плюс 10 минус 5, то есть 13.',
+   'При вычитании наоборот: минус 3 значит плюс 2 минус 5, а минус 7 значит минус 10 плюс 3.',
+   'Пальцы: большой палец поднимает нижние косточки. Указательный опускает их и двигает пятёрку.',
+   'Как заниматься: по 10–15 минут каждый день. Настоящий соробан очень помогает. Через несколько месяцев ребёнок начинает видеть соробан в голове. Это называется анзан.',
+   'Путь в приложении: Школа Пуфи, затем Академия соробана, затем Арена Анзан с поясами и соревнованиями.']}};
+const X=()=>TX[lang]||TX.en;
+const sp=t=>{ try{ return typeof say==='function'?say(t):Promise.resolve(false); }catch(e){ return Promise.resolve(false); } };
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const R=n=>Math.floor(Math.random()*n), RR=(a,b)=>a+R(b-a+1), pick=a=>a[R(a.length)];
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const ICONS=['🧭','✋','🔢','➕','🖐️','🤲','🔟','🎯','👻'];
+/* ---- zile la rând ---- */
+const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+function markDay(){ const days=LS.get('sg_days',[]); const t=today(); if(!days.includes(t)){ days.push(t); LS.set('sg_days',days.slice(-400)); } }
+function streak(){ const days=new Set(LS.get('sg_days',[])); let n=0; const d=new Date(); if(!days.has(today())) d.setDate(d.getDate()-1);
+  for(;;){ const k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); if(days.has(k)){ n++; d.setDate(d.getDate()-1); } else break; } return n; }
+{ let last=null; setInterval(()=>{ let s=0; try{ s=typeof stars!=='undefined'?+stars:0; }catch(e){} if(last!=null&&s>last){ const vis=id=>{ const e=document.getElementById(id); return e&&!e.hidden; }; if(vis('sa-root')||vis('sg-root')||vis('sp-root')) markDay(); } last=s; },1500); }
+/* ---- soroban interactiv ---- */
+const RC=[['#FFE27A','#E9A916'],['#8EE6B6','#2FA772'],['#C3B1FF','#7C5BE6']], GX=120, BH=17, TOP=26, BEAM=112, BOT=338;
+const hy=on=>on?BEAM-BH-1:TOP+BH+8, ey=(i,e)=>i<e?BEAM+14+BH+1+i*(2*BH):BOT-BH-(3-i)*(2*BH), rx=r=>50+GX*r+GX/2-20;
+const bead='M-50,0 L-30,-17 L30,-17 L50,0 L30,17 L-30,17 Z';
+const stOf=(n,nR)=>{ const o=[]; for(let i=nR-1;i>=0;i--){ const d=Math.floor(n/10**i)%10; o.push({h:d>=5,e:d%5}); } return o; };
+const vOf=st=>st.reduce((s,r)=>s*10+(r.h?5:0)+r.e,0);
+const cl=st=>st.map(r=>({h:r.h,e:r.e}));
+let SV=null;
+function makeSor(host,nR){ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); const W=40+nR*GX+20; svg.setAttribute('viewBox',`0 0 ${W} 380`);
+  let h=`<defs>${RC.map((c,i)=>`<linearGradient id="sgE${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient>`).join('')}<linearGradient id="sgH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FA6"/><stop offset="1" stop-color="#D93A5A"/></linearGradient><linearGradient id="sgW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C98A4E"/><stop offset="1" stop-color="#8F5427"/></linearGradient></defs>`;
+  h+=`<g class="frame"><rect x="4" y="4" width="${W-8}" height="${BOT+12}" rx="22" fill="url(#sgW)"/><rect x="18" y="${TOP-8}" width="${W-36}" height="${BOT-TOP+14}" rx="10" fill="#FBF0E1"/>`;
+  for(let r=0;r<nR;r++) h+=`<line x1="${rx(r)}" y1="${TOP-8}" x2="${rx(r)}" y2="${BOT+6}" stroke="#7A4A22" stroke-width="6" stroke-linecap="round"/>`;
+  h+=`<rect class="beam" x="14" y="${BEAM}" width="${W-28}" height="14" rx="4" fill="url(#sgW)"/>`;
+  for(let r=0;r<nR;r++){ const place=nR-1-r; if(place===0) h+=`<circle cx="${rx(r)}" cy="${BEAM+7}" r="4.5" fill="#fff"/>`; h+=`<text class="lb" x="${rx(r)}" y="374" fill="${RC[place][1]}">${['1','10','100'][place]}</text>`; }
+  h+='</g><g class="beads">';
+  for(let r=0;r<nR;r++){ const place=nR-1-r;
+    h+=`<g class="bd" data-r="${r}" data-k="h"><path d="${bead}" fill="url(#sgH)"/><path d="M-26,-10 L26,-10" stroke="rgba(255,255,255,.55)" stroke-width="4" stroke-linecap="round"/></g>`;
+    for(let i=0;i<4;i++) h+=`<g class="bd" data-r="${r}" data-k="${i}"><path d="${bead}" fill="url(#sgE${place})"/><path d="M-26,-10 L26,-10" stroke="rgba(255,255,255,.55)" stroke-width="4" stroke-linecap="round"/></g>`; }
+  h+='</g><g class="fgs"></g>'; svg.innerHTML=h; host.innerHTML=''; host.appendChild(svg);
+  const S={svg,nR,st:stOf(0,nR),on:null,lock:false,
+    bd:(r,k)=>svg.querySelector(`.bd[data-r="${r}"][data-k="${k}"]`),
+    draw(instant){ S.st.forEach((rd,r)=>{ const x=rx(r); const set=(el,y)=>{ if(instant){ el.style.transition='none'; el.style.transform=`translate(${x}px,${y}px)`; void el.getBBox(); el.style.transition=''; } else el.style.transform=`translate(${x}px,${y}px)`; };
+      set(S.bd(r,'h'),hy(rd.h)); for(let i=0;i<4;i++) set(S.bd(r,i),ey(i,rd.e)); }); },
+    set(n){ S.st=stOf(n,nR); S.draw(true); }, setSt(st,anim){ S.st=cl(st); S.draw(!anim); }, val:()=>vOf(S.st),
+    mark(list){ S.unmark(); const fg=svg.querySelector('.fgs'); list.forEach(m=>{ if(m.beam){ svg.querySelector('.beam').classList.add('mk'); return; }
+        const ks=m.k==='h'?['h']:m.ks; ks.forEach(k=>S.bd(m.r,k).classList.add('mk'));
+        if(m.fg){ const k=ks[ks.length-1], y=k==='h'?hy(S.st[m.r].h):ey(+k,S.st[m.r].e); const t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('class','fg'); t.setAttribute('x',rx(m.r)+54); t.setAttribute('y',y+12); t.textContent=m.fg; fg.appendChild(t); } }); },
+    unmark(){ svg.querySelectorAll('.mk').forEach(e=>e.classList.remove('mk')); svg.querySelector('.fgs').innerHTML=''; },
+    opacity(o){ svg.querySelector('.beads').style.opacity=o; } };
+  /* atingere + tragere */
+  let drag=null; const changed=r=>{ clack(r,nR); S.draw(); S.on&&S.on(); };
+  svg.addEventListener('pointerdown',e=>{ const g=e.target.closest('.bd'); if(e.target.closest('.beam')&&S.onBeam){ S.onBeam(); return; } if(!g||S.lock) return; e.preventDefault(); drag={r:+g.dataset.r,k:g.dataset.k,y:e.clientY,moved:false}; try{ svg.setPointerCapture(e.pointerId); }catch(_){} });
+  svg.addEventListener('pointermove',e=>{ if(!drag||drag.moved) return; const dy=e.clientY-drag.y; if(Math.abs(dy)<10) return; drag.moved=true; const rd=S.st[drag.r], up=dy<0, b=rd.h+'|'+rd.e;
+    if(drag.k==='h') rd.h=!up; else { const i=+drag.k; rd.e=up?Math.max(rd.e,i+1):Math.min(rd.e,i); } if(b!==rd.h+'|'+rd.e) changed(drag.r); });
+  svg.addEventListener('pointerup',()=>{ if(!drag) return; if(!drag.moved){ const rd=S.st[drag.r]; if(drag.k==='h') rd.h=!rd.h; else { const i=+drag.k; rd.e=i<rd.e?i:i+1; } changed(drag.r); } drag=null; });
+  svg.addEventListener('pointercancel',()=>drag=null);
+  S.draw(true); return S; }
+let actx=null; function clack(r,nR){ try{ actx=actx||(typeof ctx!=='undefined'&&ctx)||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime; o.type='triangle'; o.frequency.value=[900,700,560][nR-1-r]||800; g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.07); o.connect(g).connect(actx.destination); o.start(t); o.stop(t+.08); }catch(e){} }
+function ding(){ try{ beep(true); }catch(e){} }
+/* ---- planificatorul pașilor ---- */
+/* un pas = o mișcare pe o bară: {r, h} sau {r, e}; text + degetul folosit */
+function mv(st,r,ch){ const s=cl(st); Object.assign(s[r],ch); return s; }
+function stepsTo(st,r,targetDigit){ const out=[]; let s=cl(st); const th=targetDigit>=5, te=targetDigit%5;
+  if(s[r].h!==th){ const ns=mv(s,r,{h:th}); out.push({st:ns,txt:th?X().h5on:X().h5off,mk:{r,k:'h',fg:'☝️'}}); s=ns; }
+  if(s[r].e!==te){ const up=te>s[r].e, n=Math.abs(te-s[r].e), ks=[]; for(let i=Math.min(te,s[r].e);i<Math.max(te,s[r].e);i++) ks.push(i); const ns=mv(s,r,{e:te}); out.push({st:ns,txt:up?X().up(n):X().down(n),mk:{r,ks,fg:up?'👍':'☝️'}}); s=ns; }
+  return out; }
+function plan(L,nR){ /* întoarce {a,b,op,ans,start,steps,why,formula} */
+  const U=nR-1;
+  if(L===2){ const n=RR(1,9); const st=stOf(0,nR); return {q:X().show(n),say:X().show(n),ans:n,start:st,steps:stepsTo(st,U,n)}; }
+  if(L===3){ let a,b; do{ a=RR(0,8); b=RR(1,9-a); }while(!(b<5?(a%5)+b<=4:(a<5&&(a%5)+(b-5)<=4))); const st=stOf(a,nR); return {q:`${a} + ${b}`,ans:a+b,start:st,why:[X().direct],steps:stepsTo(st,U,a+b),f:`+${b}`}; }
+  if(L===4){ const a=RR(1,4), b=RR(5-a,4), f=5-b, st=stOf(a,nR); let s1=mv(st,U,{h:true}); const s2=mv(s1,U,{e:st[U].e-f}); const ks=[]; for(let i=st[U].e-f;i<st[U].e;i++) ks.push(i);
+    return {q:`${a} + ${b}`,ans:a+b,start:st,why:[X().noRoom(b),X().f5(b,f)],f:`+${b} = +5 − ${f}`,steps:[{st:s1,txt:X().h5on+' (+5)',mk:{r:U,k:'h',fg:'☝️'}},{st:s2,txt:X().down(f)+` (−${f})`,mk:{r:U,ks,fg:'☝️'}}]}; }
+  if(L===5){ let a,b; do{ a=RR(5,8); b=RR(1,4); }while(!(a%5<b)); const f=5-b, st=stOf(a,nR); const s1=mv(st,U,{e:st[U].e+f}); const s2=mv(s1,U,{h:false}); const ks=[]; for(let i=st[U].e;i<st[U].e+f;i++) ks.push(i);
+    return {q:`${a} − ${b}`,ans:a-b,start:st,why:[X().notEnough(b),X().f5(b,f)],f:`−${b} = +${f} − 5`,steps:[{st:s1,txt:X().up(f)+` (+${f})`,mk:{r:U,ks,fg:'👍'}},{st:s2,txt:X().h5off+' (−5)',mk:{r:U,k:'h',fg:'☝️'}}]}; }
+  if(L===6){ let t,u,b,c; const rem=(u,c)=>c<5?(u%5)>=c:(u>=5&&(u%5)>=c-5); do{ t=pick([0,1,2,3,5,6,7,8]); u=RR(1,9); b=RR(2,9); c=10-b; }while(!(u+b>=10&&rem(u,c)));
+    const a=t*10+u, st=stOf(a,nR), T=U-1; const s1=mv(st,T,{e:st[T].e+1}); const steps=[{st:s1,txt:X().t10up+' (+10)',mk:{r:T,ks:[st[T].e],fg:'👍'}}]; stepsTo(s1,U,u-c).forEach(s=>steps.push(s)); return {q:`${a} + ${b}`,ans:a+b,start:st,why:[X().noRoom(b),X().f10(b,c)],f:`+${b} = +10 − ${c}`,steps}; }
+  if(L===7){ let t,u,b,c; const add=(u,c)=>c<5?(u<5?u+c<=4:(u%5)+c<=4):(u<5&&u+(c-5)<=4); do{ t=pick([1,2,3,4,6,7,8,9]); u=RR(0,8); b=RR(u+1,9); c=10-b; }while(!add(u,c));
+    const a=t*10+u, st=stOf(a,nR), T=U-1; const s1=mv(st,T,{e:st[T].e-1}); const steps=[{st:s1,txt:X().t10down+' (−10)',mk:{r:T,ks:[st[T].e-1],fg:'☝️'}}]; stepsTo(s1,U,u+c).forEach(s=>steps.push(s));
+    return {q:`${a} − ${b}`,ans:a-b,start:st,why:[X().notEnough(b),X().f10(b,c)],f:`−${b} = −10 + ${c}`,steps}; }
+  if(L===8){ const k=R(4); return plan([3,4,5,6][k],nR); }
+}
+const NR=[1,1,1,1,1,1,2,2,2];
+/* ---- interfață ---- */
+const root=document.createElement('div'); root.id='sg-root'; root.hidden=true;
+root.innerHTML=`<div class="sg-top"><button class="ch-btn" id="sg-back"></button><h2 id="sg-title"></h2><div class="ch-pill" id="sg-fire"></div><div class="ch-pill" id="sg-stars">⭐ 0</div></div>
+<div class="sg-menu" id="sg-menu"></div>
+<div class="sg-play" id="sg-play" hidden><div class="sg-head"><div class="sg-owl" id="sg-owl">🦉</div><div class="sg-bub" id="sg-bub"></div><div class="sg-dots" id="sg-dots"></div></div>
+<div class="sg-phase" id="sg-phase"></div><div class="sg-task" id="sg-task"></div>
+<div class="sg-board" id="sg-board"><div class="sg-hand" id="sg-hand" style="opacity:0">👆</div></div><div class="sg-ans" id="sg-ans" hidden></div>
+<div class="sg-ctrl"><button id="sg-replay"></button><button id="sg-hint"></button><button id="sg-clear">🧹</button><button id="sg-check" class="go"></button></div></div>`;
+document.body.appendChild(root);
+const $=id=>document.getElementById('sg-'+id);
+let view='menu', L=0, tk=null, ti=0, errs=0, phase='', sv=null, stepI=0, token=0, busy=false;
+const best=()=>LS.get('sg_best',{});
+const isOpen=i=>{ let all=false; try{ all=localStorage.getItem('sa_all')==='1'; }catch(e){} return i===0||(best()[i-1]||0)>0||all; };
+const qs=q=>q.replace('−','-');
+function pill(){ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); const n=streak(); $('fire').textContent='🔥 '+n; $('fire').title=X().streak; }
+function say2(t){ $('bub').textContent=t; return sp(t); }
+function menu(){ view='menu'; token++; try{ speechSynthesis.cancel(); }catch(e){} $('menu').hidden=false; $('play').hidden=true; $('title').textContent='🎓 '+X().title; $('back').textContent=X().back; pill();
+  const m=$('menu'); m.innerHTML=''; const pb=document.createElement('button'); pb.className='sg-par'; pb.textContent=X().parents; pb.onclick=guide; m.appendChild(pb);
+  const g=document.createElement('div'); g.className='sg-path'; const b=best(); const cur=X().les.findIndex((_,i)=>isOpen(i)&&!(b[i]>0));
+  X().les.forEach((n,i)=>{ const c=document.createElement('button'); const open=isOpen(i); c.className='sg-card'+(open?'':' lock')+(i===cur?' cur':''); c.dataset.lk='sa:g'+i;
+    c.innerHTML=`<span class="ic">${ICONS[i]}</span><span class="n">${X().lvl(i+1)}</span><span class="t">${n}</span><span class="st">${'★'.repeat(b[i]||0)}${'☆'.repeat(3-(b[i]||0))}</span>`;
+    c.onclick=()=>{ if(!open){ sp(X().locked); return; } if(window.__gate&&window.__gate('sa','g'+i)) return; lesson(i); }; g.appendChild(c); });
+  m.appendChild(g); }
+function guide(){ const ov=document.createElement('div'); ov.className='sg-ov'; const P=X().pg;
+  const fr5='<div class="sg-fr"><span>1 ↔ 4</span><span>2 ↔ 3</span></div>', fr10='<div class="sg-fr"><span>1 ↔ 9</span><span>2 ↔ 8</span><span>3 ↔ 7</span><span>4 ↔ 6</span><span>5 ↔ 5</span></div>';
+  ov.innerHTML=`<div class="sg-guide"><h3>${X().parents}</h3>${P.map((p,i)=>`<div class="pp"><button data-i="${i}">🔊</button><p>${p}</p></div>${i===1?fr5:i===2?fr10:''}`).join('')}<div class="row"><button class="go" data-a="x">${X().close}</button></div></div>`;
+  ov.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>sp(P[+b.dataset.i])); ov.querySelector('[data-a=x]').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} ov.remove(); };
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); }; root.appendChild(ov); }
+function dots(n,on){ const d=$('dots'); d.innerHTML=''; for(let i=0;i<n;i++){ const s=document.createElement('span'); if(i<on) s.className='on'; d.appendChild(s); } }
+function enter(){ view='play'; $('menu').hidden=true; $('play').hidden=false; $('back').textContent=X().menu; $('replay').textContent=X().replay; $('hint').textContent=X().hint; $('check').textContent=X().check; pill(); }
+function newBoard(nR){ const b=$('board'); const hand=$('hand'); b.innerHTML=''; b.appendChild(hand); const host=document.createElement('div'); host.style.cssText='width:100%;height:100%;display:flex;justify-content:center'; b.appendChild(host); sv=makeSor(host,nR); hand.style.opacity=0; return sv; }
+/* mânuța: arată și mută bilele */
+async function handTo(m,my){ const hand=$('hand'), b=$('board').getBoundingClientRect(); const k=m.k==='h'?'h':m.ks[m.fg==='👍'?0:m.ks.length-1];
+  const el=sv.bd(m.r,k).getBoundingClientRect(); hand.textContent=m.fg==='👍'?'👍':'☝️';
+  hand.style.left=(el.left-b.left+el.width/2)+'px'; hand.style.top=(m.fg==='👍'?el.bottom-b.top-6:el.top-b.top-hand.offsetHeight+10)+'px'; hand.style.opacity=1; await wait(650); return token===my; }
+async function demo(){ const my=++token; busy=true; sv.lock=true; sv.unmark(); sv.setSt(tk.start); phase='demo'; $('phase').textContent=X().watch; await wait(300);
+  for(const s of tk.steps){ if(token!==my) return; sv.mark([s.mk]); say2(s.txt); if(!await handTo(s.mk,my)) return; sv.setSt(s.st,true); clack(s.mk.r,sv.nR); await wait(1300); sv.unmark(); }
+  if(token!==my) return; $('hand').style.opacity=0; await wait(500); if(token!==my) return; sv.setSt(tk.start); sv.lock=false; busy=false; }
+async function guided(){ const my=++token; phase='guided'; $('phase').textContent=X().you; stepI=0; sv.setSt(tk.start); sv.lock=false; busy=false; showStep(my); }
+function showStep(){ const s=tk.steps[stepI]; if(!s) return; sv.mark([s.mk]); say2(s.txt); }
+function alone(){ token++; phase='alone'; $('phase').textContent=X().alone; sv.unmark(); sv.setSt(tk.start); sv.lock=false; busy=false; say2(tk.say||qs(tk.q)); }
+function onBeads(){ if(busy||view!=='play') return;
+  if(L===0||L===1) return scriptCheck();
+  if(phase==='guided'){ const s=tk.steps[stepI]; const v=JSON.stringify(sv.st), want=JSON.stringify(s.st);
+    if(v===want){ ding(); stepI++; sv.unmark(); if(stepI>=tk.steps.length) return win(); setTimeout(()=>{ if(phase==='guided') showStep(); },350); return; }
+    /* pe drum spre țintă? (bilele de 1 mutate pe rând) */
+    const prev=stepI?tk.steps[stepI-1].st:tk.start; const ok=sv.st.every((r,i)=>{ const a=prev[i], b=s.st[i]; return (r.h===a.h||r.h===b.h)&&r.e>=Math.min(a.e,b.e)&&r.e<=Math.max(a.e,b.e); });
+    if(!ok){ errs++; try{ beep(false); }catch(e){} busy=true; say2(X().tryBlink); setTimeout(()=>{ sv.setSt(prev,true); busy=false; showStep(); },700); } return; }
+  if(phase==='alone'&&sv.val()===tk.ans){ busy=true; setTimeout(win,250); } }
+async function win(){ const my=++token; busy=true; sv.lock=true; ding(); try{ confetti(14); }catch(e){} try{ stars++; renderBar(); }catch(e){} markDay(); pill();
+  ti++; dots(TASKS(),ti); await Promise.all([say2(X().right(tk.ans)+' '+X().good),wait(1300)]); if(token!==my) return; if(ti>=TASKS()) return finish(); nextTask(); }
+const TASKS=()=>L===0||L===1?1:L===8?5:5;
+function nextTask(){ tk=plan(L,NR[L]); if(L===8||!tk) return ghostTask(); sv.setSt(tk.start); $('ans').hidden=true;
+  const fHTML=tk.f?`<span class="f hot">${tk.f}</span>`:''; $('task').innerHTML=`<span class="q">${tk.q}</span>${fHTML}`;
+  const why=(tk.why||[]).join(' '); const intro=(why?why+' ':'');
+  if(ti<2){ (async()=>{ const my=token; if(intro){ busy=true; sv.lock=true; await Promise.all([say2(qs(tk.q)+'. '+intro),wait(1500)]); } if(token!==my&&intro) return; await demo(); guided(); })(); }
+  else if(ti<4){ (async()=>{ if(intro){ busy=true; sv.lock=true; const my=++token; await Promise.all([say2(intro),wait(1200)]); if(token!==my) return; } guided(); })(); }
+  else alone(); }
+/* lecția 8: sorobanul fantomă */
+const GH=[1,.55,.3,.12,.04];
+function ghostTask(){ tk=plan(8,NR[8]); const o=GH[Math.min(ti,GH.length-1)]; sv.setSt(tk.start); sv.opacity(o); $('task').innerHTML=`<span class="q">${tk.q}</span>`;
+  if(ti===TASKS()-1){ /* ultimul: doar în minte, alege răspunsul */ sv.opacity(0); sv.lock=true; phase='mind'; $('phase').textContent='🧠'; say2(X().ghostLast);
+    const box=$('ans'); box.innerHTML=''; box.hidden=false; const o2=new Set([tk.ans]); [tk.ans+1,tk.ans-1,tk.ans+5,tk.ans-5,tk.ans+10].forEach(v=>{ if(o2.size<3&&v>=0) o2.add(v); });
+    [...o2].sort(()=>Math.random()-.5).forEach(v=>{ const b=document.createElement('button'); b.textContent=v; b.onclick=()=>{ if(busy) return; if(v===tk.ans){ box.hidden=true; sv.opacity(1); sv.setSt(stOf(tk.ans,sv.nR),true); win(); } else { errs++; b.disabled=true; b.style.opacity=.4; try{ beep(false); }catch(e){} } }; box.appendChild(b); }); return; }
+  alone(); if(ti===0) say2(X().ghost+' '+qs(tk.q)); }
+/* lecțiile 0 și 1: scenariu */
+let scr=[], si=0;
+function scripted(){ const T=X();
+  if(L===0) scr=[{say:T.t[0],auto:1200},{say:T.t[1],beam:1},{say:T.t[2],want:5,mk:[{r:0,k:'h',fg:'☝️'}]},{say:T.t[3],want:1,reset:0,mk:[{r:0,ks:[0],fg:'👍'}]},{say:T.t[4],want:3,mk:[{r:0,ks:[1,2],fg:'👍'}]},{say:T.t[5],auto:2600}];
+  else scr=[{say:T.f[0],want:2,mk:[{r:0,ks:[0,1],fg:'👍'}]},{say:T.f[1],want:0,mk:[{r:0,ks:[0,1],fg:'☝️'}]},{say:T.f[2],want:5,mk:[{r:0,k:'h',fg:'☝️'}]},{say:T.f[3],want:7,reset:0,mk:[{r:0,k:'h',fg:'☝️'},{r:0,ks:[0,1],fg:'👍'}]},{say:T.f[4],want:0,mk:[{r:0,k:'h',fg:'☝️'},{r:0,ks:[0,1],fg:'☝️'}]}];
+  si=0; runScr(); }
+async function runScr(){ const my=++token; const s=scr[si]; if(!s){ return finish(); } busy=false; sv.lock=!!(s.auto||s.beam); if(s.reset!=null) sv.set(s.reset); sv.unmark();
+  if(s.beam){ sv.mark([{beam:1}]); sv.onBeam=()=>{ if(token!==my) return; sv.onBeam=null; ding(); si++; runScr(); }; }
+  if(s.mk) sv.mark(s.mk); $('task').innerHTML=s.want!=null?`<span class="q">${s.want}</span>`:''; await say2(s.say);
+  if(s.auto){ await wait(s.auto); if(token===my){ si++; runScr(); } } }
+function scriptCheck(){ const s=scr[si]; if(!s||s.want==null) return; if(sv.val()===s.want){ busy=true; ding(); sv.unmark(); const my=token; setTimeout(()=>{ if(token!==my) return; si++; runScr(); },700); } }
+function lesson(i){ L=i; ti=0; errs=0; enter(); newBoard(NR[i]); sv.on=onBeads; $('title').textContent=ICONS[i]+' '+X().les[i]; $('ans').hidden=true; $('task').innerHTML=''; sv.opacity(1);
+  dots(TASKS(),0); const scriptedL=i<=1; $('replay').hidden=scriptedL||i===8; $('hint').hidden=scriptedL; $('check').hidden=scriptedL; $('clear').hidden=false;
+  if(scriptedL){ phase='script'; $('phase').textContent=X().you; scripted(); } else nextTask(); }
+function finish(){ token++; busy=true; const s=errs===0?3:errs<=2?2:1; const b=best(); b[L]=Math.max(b[L]||0,s); LS.set('sg_best',b); markDay(); try{ stars+=2; renderBar(); }catch(e){} pill(); try{ confetti(40); }catch(e){}
+  const ov=document.createElement('div'); ov.className='sg-ov'; ov.innerHTML=`<div><div class="big">${'★'.repeat(s)}${'☆'.repeat(3-s)}</div><h3>${X().done}</h3><div class="row">${L<8?`<button class="go" data-a="n">${X().next}</button>`:''}<button data-a="a">${X().again}</button><button data-a="m">${X().menu}</button></div></div>`;
+  $('play').appendChild(ov); sp(X().done); const go=f=>()=>{ ov.remove(); f(); };
+  const n=ov.querySelector('[data-a=n]'); if(n) n.onclick=go(()=>{ if(window.__gate&&window.__gate('sa','g'+(L+1))) return menu(); lesson(L+1); });
+  ov.querySelector('[data-a=a]').onclick=go(()=>lesson(L)); ov.querySelector('[data-a=m]').onclick=go(menu); }
+/* butoane */
+$('back').onclick=()=>{ if(view==='menu'){ token++; try{ speechSynthesis.cancel(); }catch(e){} root.hidden=true; try{ window.openSoroban&&window.openSoroban(); }catch(e){} } else { root.querySelectorAll('.sg-ov').forEach(o=>o.remove()); menu(); } };
+$('replay').onclick=()=>{ if(!tk||L<2||L===8) return; (async()=>{ await demo(); guided(); })(); };
+$('hint').onclick=()=>{ if(!tk||busy) return; errs++; if(phase==='alone'){ phase='guided'; $('phase').textContent=X().you; stepI=0; sv.setSt(tk.start); showStep(); } else if(phase==='guided') showStep(); };
+$('clear').onclick=()=>{ if(busy||sv.lock) return; if(L<=1){ sv.set(0); sv.on&&sv.on(); return; } sv.setSt(phase==='guided'&&stepI?tk.steps[stepI-1].st:tk.start); };
+$('check').onclick=()=>{ if(!tk||busy||phase==='mind') return; if(sv.val()===tk.ans){ busy=true; win(); return; } errs++; try{ beep(false); }catch(e){} say2(X().have(sv.val())); };
+const rep=()=>{ if(view!=='play') return sp(X().sub); sp($('bub').textContent); }; $('owl').onclick=rep; $('bub').onclick=rep;
+window.openSorGuide=()=>{ root.hidden=false; menu(); };
+window.__saGuide=m=>{ const b=document.createElement('button'); b.className='sa-guide'; const n=streak(); b.innerHTML=`<span class="ic">🎓</span><span><b>${X().title}</b><span class="s">${X().sub}</span></span><span class="fire">🔥 ${n}</span>`; b.onclick=()=>window.openSorGuide(); m.appendChild(b); };
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='menu') menu(); else lesson(L); });
+window.__sg={plan,stOf,streak};
+})();
+</script>
