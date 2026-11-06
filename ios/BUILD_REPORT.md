@@ -240,3 +240,15 @@ fost activat un serviciu terț care ar schimba declarația Data Not Collected.
 
 Aceste corecții web și rezolvarea problemelor de licențiere deja raportate rămân
 separate de acest PR nativ. Nu se cere merge automat.
+
+### Verificare după rebase-ul final
+
+`main` a avansat la `837d01f` (modulul Mașini simple; numai `index.html`, fără
+schimbări în ios). După rebase, jocul actualizat a fost recopiat în build:
+**13/13 teste PASS pe iPhone și 13/13 pe iPad**, inclusiv încărcarea jocului și
+captura IAP. Jurnale: `/tmp/pufi-iap-phone-rebased.log`,
+`/tmp/pufi-iap-pad-rebased.log`; rezultate `PufiIAPPhoneRebased.xcresult` și
+`PufiIAPPadRebased.xcresult` în `/tmp`. Capturile livrate provin din probele finale
+anterioare pe `81e8b56`; interfața Părinți/IAP și serviciile native sunt identice
+pe cele două baze. Captura iPad și notele din App Store Connect au confirmare
+vizibilă **Saved**, fără trimitere la review.
