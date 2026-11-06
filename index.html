@@ -6704,6 +6704,15 @@ for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.as
 .rb-pop{animation:rbBoom .4s ease-out;transform-box:fill-box;transform-origin:center}
 .sunny .rb-cell{animation:rbCell 1.4s ease-in-out infinite alternate}@keyframes rbCell{to{fill:#6FA2FF}}
 .rb-beam{animation:rbFlow .5s linear infinite}
+.rb-rule{display:flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:4px 8px}
+.rb-rc,.rb-ra{font:inherit;font-size:2rem;border:none;background:#EEF3FA;border-radius:14px;min-width:60px;min-height:56px;cursor:pointer}
+.rb-ra{background:#FFF3B8;animation:rbPulse 1.6s ease-in-out infinite}.rb-arr{font-size:1.6rem;font-weight:800}
+.rb-belt{animation:rbFlow .4s linear infinite}
+.rb-snow{animation:rbSmoke 2.4s linear infinite}
+.rb-sway{animation:rbSway 1.2s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}@keyframes rbSway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.rb-flick{animation:rbAnt .2s infinite}
+.rb-spin2{animation:rbSpin .25s linear infinite;transform-box:fill-box;transform-origin:center}
+.rb-ani.happy .rb-anf{animation:rbJump .3s ease-in-out 2;transform-box:fill-box}.rb-ani.bump .rb-anf{animation:rbShake .45s;transform-box:fill-box}
 .rb-tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rb-tray button{font:inherit;font-size:2.2rem;border:3px solid var(--ink);background:#fff;border-radius:18px;padding:2px 12px;cursor:grab;touch-action:none;min-width:84px}
 .rb-tray button b{font-size:1rem;display:block;line-height:1}
@@ -6937,7 +6946,7 @@ let view='home';
 
 /* ================= acasă ================= */
 function zoneScore(z){
-  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?['lever','gears','bike','ramp']:z==='sens'?['light','line','touch']:z==='col'?['tubes','shirts','guess']:null;
+  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?['lever','gears','bike','ramp']:z==='sens'?['light','line','touch','sonar','thermo','sort']:z==='col'?['tubes','shirts','guess']:null;
   if(!k){ let n=0,t=0; for(const c in PARTS) PARTS[c].forEach(([,need])=>{ t++; if(gstars()>=need) n++; }); return `🔓 ${n}/${t}`; }
   return `⭐ ${k.reduce((s,x)=>s+(data.prog[x]||0),0)}/${k.length*3}`;
 }
@@ -7122,7 +7131,7 @@ for(const l in TX2) Object.assign(TX[l],TX2[l]); window.__rbTX=TX;
 
 /* ================= 2. MAȘINI SIMPLE ================= */
 function zoneMech(){ stopAll(); view='mech'; setTop(false); back=home; menu3('mech',{lever,gears,bike,ramp}); }
-function zoneSens(){ stopAll(); view='sens'; setTop(false); back=home; menu3('sens',{light:lightGame,line:lineGame,touch:touchGame}); }
+function zoneSens(){ stopAll(); view='sens'; setTop(false); back=home; menu3('sens',{light:lightGame,line:lineGame,touch:touchGame,sonar:sonarGame,thermo:thermoGame,sort:sortGame}); }
 function menu3(z,fns){ main.innerHTML=''; const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().zoneSay[z]; head.append(b); main.append(head);
   const g=el('div','rb-cards'); g.style.margin='auto';
   Object.keys(fns).forEach(k=>{ const s=data.prog[k]||0; const c=el('button','rb-card',`<span class="ic">${X()[z][k][0]}</span><span class="t">${X()[z][k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.onclick=()=>{ blip(); fns[k](); }; g.appendChild(c); });
@@ -7593,10 +7602,10 @@ function circLevel(li){
 }
 
 /* ================= 4. SENZORI ================= */
-const LR=[{bot:[130,400],pad:[780,130],box:[]},{bot:[130,420],pad:[780,420],box:[[420,190,70,330]]},{bot:[120,110],pad:[790,420],box:[[300,0,70,330],[560,190,70,330]]}];
+const LR=[{bot:[130,400],pad:[780,130],box:[]},{bot:[130,420],pad:[780,420],box:[[420,190,70,330]]},{bot:[120,110],pad:[790,420],box:[[300,0,70,330],[560,190,70,330]]},{bot:[110,430],pad:[800,100],box:[[240,150,70,370],[470,0,70,330],[690,190,70,330]]}];
 function lightGame(){
   stopAll(); view='light'; setTop(false); back=zoneSens; curRestart=lightGame; const myGen=gen;
-  let ri=0, busy=false; const F=frame(X().lightIntro,3); F.bub.onclick=()=>sp(X().lightIntro);
+  let ri=0, busy=false; const F=frame(X().lightIntro,LR.length); F.bub.onclick=()=>sp(X().lightIntro);
   let b, lt, svg, last;
   function setup(){ const Lv=LR[ri]; b={x:Lv.bot[0],y:Lv.bot[1]}; lt={x:b.x+150,y:b.y-60};
     let s=`<svg viewBox="0 0 900 520"><defs><radialGradient id="rb-lg"><stop offset="0" stop-color="#FFF7B0" stop-opacity=".95"/><stop offset=".5" stop-color="#FFE45C" stop-opacity=".35"/><stop offset="1" stop-color="#FFE45C" stop-opacity="0"/></radialGradient></defs><rect width="900" height="520" rx="24" fill="#1B2340"/>`;
@@ -7625,10 +7634,10 @@ function lightGame(){
     await spW(X().lightOk,1500); if(myGen!==gen) return; ri++; if(ri>=LR.length){ cancelAnimationFrame(raf); return finish('light',3,null,null); } busy=false; setup(); F.set(X().lightIntro); }
   setup(); sp(X().lightIntro); raf=requestAnimationFrame(loop);
 }
-const LN=[{bot:[110,260],bat:[790,260],rocks:[]},{bot:[110,410],bat:[790,120],rocks:[[450,260]]},{bot:[110,110],bat:[790,410],rocks:[[330,210],[580,330],[470,80]]}];
+const LN=[{bot:[110,260],bat:[790,260],rocks:[]},{bot:[110,410],bat:[790,120],rocks:[[450,260]]},{bot:[110,110],bat:[790,410],rocks:[[330,210],[580,330],[470,80]]},{bot:[110,420],bat:[800,100],rocks:[[300,420],[300,280],[560,120],[560,260],[700,380]]}];
 function lineGame(){
   stopAll(); view='line'; setTop(false); back=zoneSens; curRestart=lineGame; const myGen=gen;
-  let ri=0, errs=0, pts=[], drawing=false, busy=false, svg; const F=frame(X().lineIntro,3); F.bub.onclick=()=>sp(X().lineIntro);
+  let ri=0, errs=0, pts=[], drawing=false, busy=false, svg; const F=frame(X().lineIntro,LN.length); F.bub.onclick=()=>sp(X().lineIntro);
   function setup(){ const Lv=LN[ri]; pts=[];
     let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#F4EFE6"/>`;
     for(let i=0;i<18;i++) s+=`<line x1="${i*50}" y1="0" x2="${i*50}" y2="520" stroke="#E6DED0" stroke-width="2"/>`;
@@ -7668,6 +7677,153 @@ function touchGame(){
     busy=true; n++; F.dot(n); award(); try{ confetti(8); }catch(_){} await spW(X().touchOk(pnameN(p)),1200); if(myGen!==gen) return; busy=false;
     if(n>=5) return finish('touch',rate(errs),null,null); ask(); };
   spW(X().touchIntro,600).then(()=>{ if(myGen===gen) ask(); });
+}
+
+/* ================= 5b. SENZORI NOI: distanță, termostat, culoare ================= */
+const SX=()=>X().sx||{};
+/* --- senzorul de distanță (ultrasunete, ca liliacul) --- */
+const SON=[{v:150,ob:'🧱'},{v:220,ob:'📦'},{v:300,ob:'🐈'},{v:540,ob:'🏰',auto:true}];
+const SON_TRG=[[70,'#FF5D7A'],[160,'#3BC48A'],[340,'#4AA8FF']];
+function sonarGame(){
+  stopAll(); view='sonar'; setTop(false); back=zoneSens; curRestart=sonarGame; const myGen=gen;
+  const OBX=790, Y=372, FR=42, DEC=1150;
+  let ri=0, errs=0, svg, bx, vel=0, run=false, brake=false, trig=null, last=0, beepT=0, waveT=0, waves=[], busy=false;
+  const F=frame(SX().sonIntro,SON.length); F.bub.onclick=()=>sp(F.bub.textContent);
+  const dist=()=>OBX-(bx+FR);
+  function setup(){ const L=SON[ri]; bx=90; vel=0; run=false; brake=false; trig=null; waves=[]; busy=false;
+    let s=`<svg viewBox="0 0 900 520"><defs><linearGradient id="rb-sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8FF"/><stop offset="1" stop-color="#E6F6FF"/></linearGradient></defs><rect width="900" height="520" rx="24" fill="url(#rb-sk)"/>`;
+    s+=`<circle cx="120" cy="110" r="40" fill="#FFE45C" opacity=".9"/><text x="560" y="120" font-size="54" opacity=".8">☁️</text><text x="300" y="80" font-size="40" opacity=".7">☁️</text>`;
+    s+=`<rect x="0" y="420" width="900" height="100" fill="#7D8CA3"/>`; for(let i=0;i<12;i++) s+=`<rect x="${10+i*80}" y="468" width="44" height="8" rx="4" fill="#fff" opacity=".7"/>`;
+    s+=`<rect x="${OBX-46}" y="421" width="46" height="40" fill="rgba(59,196,138,.45)" stroke="#fff" stroke-width="3" stroke-dasharray="8 6"/><text x="${OBX-23}" y="452" font-size="26" text-anchor="middle">🅿️</text>`;
+    s+=`<text x="${OBX-6}" y="428" font-size="${L.ob==='🧱'||L.ob==='🏰'?160:120}">${L.ob}</text>`;
+    if(L.auto) SON_TRG.forEach(([d,c],i)=>{ s+=`<g class="rb-flag" data-i="${i}" style="cursor:pointer"><rect x="${OBX-d-34}" y="200" width="68" height="236" fill="rgba(255,255,255,.01)"/><line x1="${OBX-d}" y1="250" x2="${OBX-d}" y2="436" stroke="${c}" stroke-width="7" stroke-dasharray="12 7"/><circle cx="${OBX-d}" cy="236" r="30" fill="${c}" stroke="#fff" stroke-width="4" class="rb-goal"/><text x="${OBX-d}" y="248" font-size="32" text-anchor="middle">📡</text></g>`; });
+    s+=`<g id="rb-wv"></g><g id="rb-bot"><g class="rb-fc">${robo()}</g></g><text id="rb-fx" font-size="56" text-anchor="middle"></text>`;
+    s+=`<g transform="translate(260 28)"><rect width="380" height="34" rx="17" fill="#fff" stroke="#24325F" stroke-width="3"/><rect id="rb-mt" x="4" y="4" width="372" height="26" rx="13" fill="#3BC48A"/><text x="-30" y="28" font-size="32" text-anchor="middle">🦇</text><text id="rb-mtx" x="410" y="28" font-size="30" text-anchor="middle">🟢</text></g></svg>`;
+    F.stage.innerHTML=s; svg=F.stage.firstChild; place(); meter();
+    F.ctrl.innerHTML='';
+    if(L.auto){ svg.querySelectorAll('.rb-flag').forEach(g=>g.onclick=()=>{ if(run||busy) return; trig=SON_TRG[+g.dataset.i][0]; blip(); svg.querySelectorAll('.rb-flag').forEach(x=>x.style.opacity=x===g?1:.35); go(); });
+      const t=SX().sonAuto; F.set(t); sp(t); }
+    else { const st=btn('🛑 STOP','go',stop); st.style.fontSize='1.9rem'; st.style.minWidth='200px'; st.style.background='#FF3B5C'; st.style.color='#fff';
+      F.ctrl.append(btn('▶️','',go),st); svg.onpointerdown=e=>{ if(run&&!brake){ e.preventDefault(); stop(); } };
+      const t=ri===0?SX().sonIntro:SX().sonNext; F.set(t); sp(t); } }
+  const place=()=>{ const b=svg.querySelector('#rb-bot'); b.setAttribute('transform',`translate(${bx} ${Y}) scale(.66)`); };
+  function meter(){ const d=Math.max(0,dist()), w=clamp(d/560,0.03,1)*372, c=d>260?'#3BC48A':d>110?'#FFD34A':d>45?'#FF9F43':'#FF3B5C';
+    const m=svg.querySelector('#rb-mt'); m.setAttribute('width',w.toFixed(0)); m.setAttribute('fill',c); svg.querySelector('#rb-mtx').textContent=d>260?'🟢':d>110?'🟡':d>45?'🟠':'🔴'; }
+  function go(){ if(run||busy) return; run=true; brake=false; vel=SON[ri].v; last=0; svg.querySelector('#rb-bot').classList.add('go'); snd(300,.1,'sawtooth',.04); }
+  function stop(){ if(!run||brake) return; brake=true; snd(200,.12,'square',.06); }
+  function drawWaves(){ svg.querySelector('#rb-wv').innerHTML=waves.map(w=>`<path d="M${w.x} ${Y-60} Q${w.x+(w.dir>0?26:-26)} ${Y-20} ${w.x} ${Y+20}" stroke="${w.dir>0?'#4AA8FF':'#B07CFF'}" stroke-width="6" fill="none" stroke-linecap="round" opacity="${w.dir>0?.9:.7}"/>`).join(''); }
+  async function end(d){ run=false; busy=true; const bt=svg.querySelector('#rb-bot'); bt.classList.remove('go'); const L=SON[ri]; let msg, ok=false;
+    if(d<=0){ errs++; boing(); react(bt,'bump',600); const fx=svg.querySelector('#rb-fx'); fx.setAttribute('x',OBX-20); fx.setAttribute('y',Y-70); fx.textContent='💫'; msg=L.auto?SX().sonTooLate:SX().sonCrash; }
+    else if(d<=48){ ok=true; msg=SX().sonPerfect; }
+    else if(d<=120&&!L.auto){ ok=true; msg=SX().sonGood; }
+    else { if(L.auto) errs++; msg=L.auto?SX().sonTooEarly:SX().sonFar; }
+    if(ok){ chime(); award(); try{ confetti(10); }catch(_){} react(bt,'happy'); robo2(); F.dot(ri+1); msg+=' '+(SX().sonWhy[ri]||''); }
+    F.set((ok?'✅ ':'🔁 ')+msg); await spW(msg,1500); if(myGen!==gen) return;
+    if(ok){ ri++; if(ri>=SON.length){ cancelAnimationFrame(raf); return finish('sonar',rate(errs),null,null); } }
+    setup(); }
+  function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+    if(svg&&run){ if(trig!=null&&!brake&&dist()<=trig) brake=true;
+      if(brake){ vel=Math.max(0,vel-DEC*dt); }
+      bx+=vel*dt; let d=dist(); if(d<0){ bx=OBX-FR; d=0; } place(); meter();
+      waveT-=dt; if(waveT<=0&&vel>0){ waveT=.32; waves.push({x:bx+FR+10,dir:1}); snd(2400,.02,'sine',.02); }
+      waves.forEach(w=>{ w.x+=w.dir*900*dt; if(w.dir>0&&w.x>=OBX-8){ w.dir=-1; } }); waves=waves.filter(w=>!(w.dir<0&&w.x<=bx+FR)); drawWaves();
+      beepT-=dt; const iv=d<48?0.08:clamp(d/650,0.1,0.6); if(beepT<=0&&vel>0){ beepT=iv; snd(d<48?1500:1050,.05,'square',.05); }
+      if(d<=0) end(0); else if(brake&&vel<=0) end(d); }
+    raf=requestAnimationFrame(loop); }
+  setup(); raf=requestAnimationFrame(loop);
+}
+/* --- termostatul din seră: senzor + regulă „dacă… atunci…” + acțiune --- */
+const TH=[
+ {rules:['cold'],out:i=>2,night:i=>true,T0:20},
+ {rules:['cold','hot'],out:i=>[4,4,5,8,14,22,30,36,38,37,33,26,18,10,6,4][i],night:i=>i<3||i>12,T0:19},
+ {rules:['cold','hot','dark'],out:i=>[3,3,4,7,14,24,32,38,40,38,32,22,12,6,4,3][i],night:i=>i<4||i>11,T0:19}];
+const TACT=['heat','fan','lamp','none'], TIC={heat:'🔥',fan:'🌀',lamp:'💡',none:'💤',unset:'❓'}, TCOND={cold:'🥶',hot:'🥵',dark:'🌙'};
+function thermoGame(){
+  stopAll(); view='thermo'; setTop(false); back=zoneSens; curRestart=thermoGame; const myGen=gen;
+  let li=0, errs=0, rule={}, busy=false, svg;
+  const F=frame(SX().thIntro[0],TH.length); F.bub.onclick=()=>sp(F.bub.textContent);
+  const N=16;
+  function scene(T,step,st){ const L=TH[li], nt=L.night(step), out=L.out(step);
+    const sky=nt?'#1B2340':out>28?'#FFD27A':'#9FD8FF', p=clamp((T+5)/45,0,1), ty=420-p*300;
+    let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="${sky}"/>`;
+    if(nt){ for(let i=0;i<22;i++) s+=`<circle cx="${(i*137)%880+10}" cy="${(i*61)%160+14}" r="2" fill="#fff" opacity=".7"/>`; s+=`<text x="${120+step*42}" y="96" font-size="58">🌙</text>`; }
+    else s+=`<text x="${120+step*42}" y="96" font-size="64">${out>28?'🔆':'☀️'}</text>`;
+    if(out<6) s+=`<text x="40" y="200" font-size="40" class="rb-snow">❄️</text><text x="820" y="170" font-size="34" class="rb-snow">❄️</text><text x="700" y="60" font-size="30" class="rb-snow">❄️</text>`;
+    s+=`<path d="M170 190 L450 110 L730 190 Z" fill="rgba(210,240,255,.55)" stroke="#FFFFFF" stroke-width="5"/><rect x="170" y="190" width="560" height="250" fill="rgba(210,240,255,.35)" stroke="#fff" stroke-width="5"/>`;
+    for(let i=1;i<4;i++) s+=`<line x1="${170+i*140}" y1="190" x2="${170+i*140}" y2="440" stroke="#fff" stroke-width="3" opacity=".7"/>`;
+    s+=`<rect x="0" y="440" width="900" height="80" fill="#6E8B3D"/>`;
+    const plant=st.dead==='cold'?'🥶':st.dead==='hot'?'🥀':st.dead==='dark'?'🥀':st.g>=12?'🌻':st.g>=8?'🌷':st.g>=4?'🌿':'🌱';
+    [260,370,480,590].forEach((x,i)=>{ s+=`<path d="M${x-30} 400 L${x+30} 400 L${x+22} 440 L${x-22} 440 Z" fill="#C46A3A"/><text x="${x}" y="${398-(st.g>=8?6:0)}" font-size="${st.g>=8?62:48}" text-anchor="middle" class="${st.g>=12&&!st.dead?'rb-sway':''}">${plant}</text>`; });
+    const on=st.on||{};
+    s+=`<g transform="translate(690 330)"><rect x="-24" y="-40" width="48" height="80" rx="10" fill="${on.heat?'#FF7A45':'#8D99AB'}"/>${[0,1,2].map(i=>`<rect x="${-16+i*12}" y="-32" width="6" height="64" rx="3" fill="${on.heat?'#FFD34A':'#5A6070'}"/>`).join('')}${on.heat?'<text y="-52" font-size="34" text-anchor="middle" class="rb-flick">🔥</text>':''}</g>`;
+    s+=`<g transform="translate(220 280)"><circle r="34" fill="#E3E9F3" stroke="#8D99AB" stroke-width="3"/><g class="${on.fan?'rb-spin2':''}">${[0,120,240].map(a=>`<ellipse rx="8" ry="26" cy="-14" fill="#4AA8FF" transform="rotate(${a})"/>`).join('')}<circle r="7" fill="#24325F"/></g></g>`;
+    s+=`<g transform="translate(450 205)"><line y1="-20" y2="6" stroke="#5A6070" stroke-width="4"/><path d="M-26 6 L26 6 L16 26 L-16 26Z" fill="#5A6070"/>${on.lamp?'<path d="M-16 26 L-120 190 L120 190 L16 26Z" fill="#FFF3A0" opacity=".45"/><circle cy="30" r="12" fill="#FFE45C"/>':'<circle cy="30" r="10" fill="#C9D3E0"/>'}</g>`;
+    s+=`<g transform="translate(70 0)"><rect x="-22" y="110" width="44" height="320" rx="22" fill="#fff" stroke="#24325F" stroke-width="4"/><rect x="-14" y="${420-((18+5)/45)*300}" width="28" height="${((26-18)/45)*300}" fill="#3BC48A" opacity=".45"/><rect x="-9" y="${ty}" width="18" height="${430-ty}" rx="9" fill="${T<14?'#4AA8FF':T>29?'#FF3B3B':'#FF6B3B'}" style="transition:all .3s"/><circle cy="440" r="26" fill="${T<14?'#4AA8FF':T>29?'#FF3B3B':'#FF6B3B'}" stroke="#24325F" stroke-width="4"/><text y="100" font-size="34" text-anchor="middle">${T<14?'🥶':T>29?'🥵':'🙂'}</text></g>`;
+    s+=`<g transform="translate(800 400) scale(.5)"><g class="rb-fc">${robo()}</g></g><text x="836" y="330" font-size="30">🌡️</text>`;
+    s+=`<rect x="170" y="470" width="560" height="14" rx="7" fill="rgba(255,255,255,.4)"/><rect x="170" y="470" width="${(step/(N-1))*560}" height="14" rx="7" fill="#FFD34A"/><text x="${170+(step/(N-1))*560}" y="508" font-size="22" text-anchor="middle">${nt?'🌙':'☀️'}</text></svg>`;
+    F.stage.innerHTML=s; svg=F.stage.firstChild; }
+  function panel(){ const L=TH[li]; F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
+    L.rules.forEach(c=>{ const r=el('div','rb-rule'); const ci=el('button','rb-rc',TCOND[c]); ci.onclick=()=>sp(SX().thCond[c]);
+      const a=el('button','rb-ra',TIC[rule[c]||'unset']); a.onclick=()=>{ if(busy) return; const opts=L.rules.includes('dark')?TACT:TACT.filter(x=>x!=='lamp'); const i=opts.indexOf(rule[c]); rule[c]=opts[(i+1)%opts.length]; a.textContent=TIC[rule[c]]; snd(700,.05,'square',.06); sp(SX().thCond[c]+', '+SX().thAct[rule[c]]); };
+      r.append(ci,el('span','rb-arr','➜'),a); box.appendChild(r); });
+    F.ctrl.append(box,btn('▶️','go',runDay)); }
+  function setup(){ const L=TH[li]; L.rules.forEach(c=>{ if(!(c in rule)) rule[c]=undefined; }); scene(L.T0,0,{g:0}); panel(); const t=SX().thIntro[li]; F.set(t); sp(t); }
+  async function runDay(){ if(busy) return; const L=TH[li]; if(L.rules.some(c=>!rule[c])){ sp(SX().thUnset); F.set(SX().thUnset); return; }
+    busy=true; let T=L.T0, st={g:0}, frz=0, hot=0, dk=0;
+    for(let i=0;i<N;i++){ if(myGen!==gen) return; const out=L.out(i), nt=L.night(i);
+      const sense={cold:T<18,hot:T>26,dark:nt}, on={}; L.rules.forEach(c=>{ if(sense[c]&&rule[c]&&rule[c]!=='none') on[rule[c]]=true; });
+      T+= (out-T)*0.3 + (on.heat?5:0) - (on.fan?5:0);
+      if(T<12) frz++; if(T>32) hot++; if(L.rules.includes('dark')&&nt&&!on.lamp) dk++;
+      if(T>=15&&T<=29&&!(L.rules.includes('dark')&&nt&&!on.lamp)) st.g++;
+      if(frz>=2) st.dead='cold'; else if(hot>=2) st.dead='hot'; else if(dk>=4) st.dead='dark';
+      st.on=on; scene(T,i,st); if(on.heat) snd(180,.15,'sawtooth',.03); if(on.fan) snd(120,.15,'triangle',.05);
+      if(st.dead) break; await wait(430); }
+    if(myGen!==gen) return;
+    if(st.dead){ errs++; boing(); const m=st.dead==='cold'?SX().thFrz:st.dead==='hot'?SX().thHot:SX().thDark; F.set('🔁 '+m); await spW(m,1000); if(myGen!==gen) return; busy=false; scene(L.T0,0,{g:0}); return; }
+    chime(); award(); try{ confetti(14); }catch(_){} F.dot(li+1); const m=SX().thOk[li]; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return;
+    li++; busy=false; if(li>=TH.length) return finish('thermo',rate(errs),null,null); setup(); }
+  setup();
+}
+/* --- senzorul de culoare: banda de sortare --- */
+const SFOOD={r:['🍓','🍎','🍒','🍅'],y:['🍌','🍋','🌽','🧀'],g:['🥦','🍏','🥒','🥝']}, SCOL={r:'#FF3B3B',y:'#FFD21E',g:'#3BC48A'};
+const SANI=[['bunny','🐰','g'],['monkey','🐵','y'],['bear','🐻','r']];
+function sortGame(){
+  stopAll(); view='sort'; setTop(false); back=zoneSens; curRestart=sortGame; const myGen=gen;
+  let round=0, errs=0, n=0, cur=null, busy=false, svg, rule={};
+  const F=frame(SX().sortIntro,2); F.bub.onclick=()=>sp(F.bub.textContent);
+  const AY=[110,260,410];
+  function scene(){ let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#FFF4E0"/><rect y="420" width="900" height="100" fill="#E9D7B8"/>`;
+    s+=`<rect x="30" y="300" width="560" height="46" rx="23" fill="#3A4256"/><line class="rb-belt" x1="52" y1="323" x2="568" y2="323" stroke="#8D99AB" stroke-width="10" stroke-dasharray="18 14"/>`;
+    [60,560].forEach(x=>s+=`<circle cx="${x}" cy="323" r="20" fill="#5A6070" stroke="#2B2F3A" stroke-width="4"/>`);
+    s+=`<g transform="translate(330 150)"><rect x="-56" y="-40" width="112" height="70" rx="18" fill="#24325F"/><circle r="22" cy="-5" fill="#1E2A4A" stroke="#8D99AB" stroke-width="4"/><circle id="rb-eye" r="12" cy="-5" fill="#9AA5B8"/><text x="0" y="-52" font-size="34" text-anchor="middle">🎨</text><path id="rb-beam" d="M-24 30 L-60 140 L60 140 L24 30Z" fill="#fff" opacity=".15"/></g>`;
+    s+=`<path d="M600 320 Q650 300 690 ${AY[1]}" stroke="#C9D3E0" stroke-width="0" fill="none"/>`;
+    SANI.forEach(([k,e,c],i)=>{ s+=`<g class="rb-ani" data-k="${k}" style="cursor:pointer"><rect x="660" y="${AY[i]-66}" width="210" height="124" rx="24" fill="#fff" stroke="#24325F" stroke-width="4"/><text x="730" y="${AY[i]+20}" font-size="74" text-anchor="middle" class="rb-anf">${e}</text><ellipse cx="820" cy="${AY[i]+30}" rx="38" ry="14" fill="${SCOL[c]}" stroke="#24325F" stroke-width="3"/><text x="820" y="${AY[i]+12}" font-size="34" text-anchor="middle">${round===0?SFOOD[c][0]:'🥣'}</text></g>`; });
+    s+=`<g id="rb-item" style="transition:transform .7s ease-in-out"><text font-size="70" text-anchor="middle" y="24">${cur?cur.e:''}</text></g><text id="rb-fx2" font-size="46" text-anchor="middle"></text>`;
+    s+=`<g transform="translate(110 430) scale(.55)"><g class="rb-fc">${robo()}</g></g></svg>`;
+    F.stage.innerHTML=s; svg=F.stage.firstChild;
+    svg.querySelectorAll('.rb-ani').forEach(g=>g.onclick=()=>pick(g.dataset.k)); }
+  const mv=(x,y,ms)=>{ const it=svg.querySelector('#rb-item'); it.style.transition=`transform ${ms||700}ms ease-in-out`; it.style.transform=`translate(${x}px,${y}px)`; };
+  const look=(c)=>{ const e=svg.querySelector('#rb-eye'), b=svg.querySelector('#rb-beam'); e.setAttribute('fill',c?SCOL[c]:'#9AA5B8'); b.setAttribute('fill',c?SCOL[c]:'#fff'); b.setAttribute('opacity',c?.45:.15); };
+  function newItem(){ const cs=['r','y','g']; const c=cs[R(3)]; return {c,e:SFOOD[c][R(4)]}; }
+  async function feed(){ if(myGen!==gen) return; cur=newItem(); scene(); mv(40,300,0); await wait(40); mv(330,300,round===0?1000:450); await wait(round===0?1050:480); if(myGen!==gen) return;
+    look(cur.c); snd(900,.08,'sine',.08); }
+  async function fly(k,ok){ const i=SANI.findIndex(a=>a[0]===k); mv(800,AY[i]-10,round===0?600:300); await wait(round===0?650:330); if(myGen!==gen) return;
+    const g=svg.querySelectorAll('.rb-ani')[i]; if(ok){ snd(660,.08); setTimeout(()=>snd(990,.1),90); react(g,'happy',600); } else { boing(); react(g,'bump',600); const fx=svg.querySelector('#rb-fx2'); fx.setAttribute('x',730); fx.setAttribute('y',AY[i]-60); fx.textContent='🤢'; } }
+  async function pick(k){ if(round!==0||busy||!cur) return; busy=true; const ok=SANI.find(a=>a[0]===k)[2]===cur.c;
+    sp(SX().colN[cur.c]); await fly(k,ok); if(myGen!==gen) return;
+    if(!ok){ errs++; const m=SX().sortWrong(SX().an[k]); F.set(m); await spW(m,900); if(myGen!==gen) return; scene(); mv(330,300,0); look(cur.c); busy=false; return; }
+    n++; award(); if(n>=6){ F.dot(1); chime(); await spW(SX().sortMan,1200); if(myGen!==gen) return; round=1; return progRound(); }
+    busy=false; await feed(); }
+  function progRound(){ cur=null; busy=false; scene(); F.set(SX().sortProg); sp(SX().sortProg); F.ctrl.innerHTML=''; const box=el('div','rb-ctrl');
+    ['r','y','g'].forEach(c=>{ const r=el('div','rb-rule'); const ci=el('button','rb-rc',`<span style="display:inline-block;width:34px;height:34px;border-radius:50%;background:${SCOL[c]};border:3px solid #24325F;vertical-align:middle"></span>`); ci.onclick=()=>sp(SX().colN[c]);
+      const a=el('button','rb-ra',rule[c]?SANI.find(x=>x[0]===rule[c])[1]:'❓'); a.onclick=()=>{ if(busy) return; const i=SANI.findIndex(x=>x[0]===rule[c]); rule[c]=SANI[(i+1)%3][0]; a.textContent=SANI.find(x=>x[0]===rule[c])[1]; snd(700,.05,'square',.06); sp(SX().colN[c]+', '+SX().an[rule[c]]); };
+      r.append(ci,el('span','rb-arr','➜'),a); box.appendChild(r); });
+    F.ctrl.append(box,btn('▶️','go',auto)); }
+  async function auto(){ if(busy) return; if(['r','y','g'].some(c=>!rule[c])){ sp(SX().thUnset); return; } busy=true;
+    for(let i=0;i<9;i++){ await feed(); if(myGen!==gen) return; const k=rule[cur.c], ok=SANI.find(a=>a[0]===k)[2]===cur.c; await fly(k,ok); if(myGen!==gen) return;
+      if(!ok){ errs++; const m=SX().sortWrong(SX().an[k])+' '+SX().sortFix; F.set('🔁 '+m); await spW(m,900); if(myGen!==gen) return; busy=false; return; } }
+    F.dot(2); chime(); award(); try{ confetti(16); }catch(_){} const m=SX().sortWhy; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return; finish('sort',rate(errs),null,null); }
+  scene(); F.ctrl.innerHTML=''; spW(SX().sortIntro,300).then(()=>{ if(myGen===gen) feed(); });
 }
 
 /* ================= 6. LABORATORUL DE CULORI ================= */
@@ -13173,6 +13329,207 @@ apply();
   const NM={caras:['карась','Карась','Карась — золотистая спокойная рыбка. Он любит растения и червячков.'],crap:['карп','Карп','У карпа есть усики, чтобы искать еду в иле.'],pastrav:['форель','Форель','Форель живёт в холодных горных ручьях. У неё чёрные пятнышки и розовая полоска.'],biban:['окунь','Окунь','У окуня полоски на спине и красные плавники. Он охотится на рыбок.'],somn:['сом','Сом','У сома длинные усы, и он ест почти всё. Охотится ночью.'],stiuca:['щука','Щука','Щука — большой охотник рек. Она прячется и нападает молниеносно!'],rac:['рак','Рак','У рака есть клешни, и он ходит задом наперёд. Он убирает дно.'],testoasa:['черепаха','Черепаха','Водяная черепаха носит свой домик на спине.'],plev:['рыбка','Рыбка','']};
   for(const k in A.SP){ const s=A.SP[k], v=NM[k]; if(!v) continue; if(s.n) s.n[i]=v[0]; if(s.N) s.N[i]=v[1]; if(s.fact) s.fact[i]=v[2]; }
   const FD={alg:'водоросли',worm:'червячки',ins:'насекомые',plev:'рыбки'}; for(const k in A.FOOD) A.FOOD[k].n[i]=FD[k];
+})();
+</script>
+<script>
+/* Robotică › Senzori: distanță (ultrasunete), termostat (seră), culoare (sortare) — 12 limbi */
+(function(){
+const M={
+ro:{menu:{sonar:['🦇','Senzorul de distanță'],thermo:['🌡️','Sera cu termostat'],sort:['🎨','Senzorul de culoare']},
+ sonIntro:'RoboPufi are un senzor de distanță, ca liliacul: trimite un sunet și ascultă ecoul. Cu cât se apropie, cu atât piuie mai repede! Apasă Start, apoi STOP ca să parchezi pe locul verde.',
+ sonNext:'Acum merge mai repede! Apasă Start și oprește-l pe locul verde.',
+ sonAuto:'Acum RoboPufi merge foarte repede și frânează singur! Alege steagul de unde să înceapă să frâneze.',
+ sonCrash:'Bum! S-a lovit. Apasă STOP mai devreme, când piuie repede!',sonTooLate:'Bum! A început să frâneze prea târziu. La viteză mare îi trebuie mai mult loc ca să se oprească!',
+ sonPerfect:'Perfect! Parcat exact pe locul verde!',sonGood:'Bine! Puteai să te apropii puțin mai mult.',sonFar:'S-a oprit prea departe. Mai așteaptă puțin înainte de STOP!',sonTooEarly:'S-a oprit prea departe. Alege un steag mai aproape!',
+ sonWhy:['Liliecii zboară noaptea așa: ascultă ecoul!','Mașinile au și ele senzori de parcare care piuie.','Cu cât mergi mai repede, cu atât îți trebuie mai mult loc ca să frânezi.','Așa frânează singure mașinile moderne: senzorul vede, programul decide!'],
+ thIntro:['Iarnă în seră! Plantele au nevoie de căldură. Spune-i lui RoboPufi ce să facă atunci când senzorul simte frig, apoi apasă Start.','O zi de vară: noaptea e frig, la prânz e foarte cald. Fă câte o regulă pentru frig și pentru cald!','Plantele au nevoie și de lumină! Fă reguli pentru frig, pentru cald și pentru întuneric.'],
+ thCond:{cold:'Când e frig',hot:'Când e cald',dark:'Când e întuneric'},thAct:{heat:'pornește încălzirea',fan:'pornește ventilatorul',lamp:'aprinde lampa',none:'nu face nimic'},
+ thUnset:'Atinge semnul întrebării și alege ce face RoboPufi!',thFrz:'Brrr! Plantele au înghețat. Ce trebuie să facă RoboPufi când e frig?',thHot:'Uf! Plantele s-au ofilit de căldură. Ce trebuie să facă RoboPufi când e cald?',thDark:'Plantele n-au avut lumină noaptea și nu cresc. Ce trebuie să facă RoboPufi când e întuneric?',
+ thOk:['Bravo! Senzorul de temperatură simte frigul și pornește încălzirea. Asta e un termostat!','Super! Când e frig, încălzește. Când e cald, răcorește. Plantele sunt fericite!','Grădinar de roboți! Doi senzori și trei reguli, iar sera are grijă singură de plante.'],
+ sortIntro:'Iepurașul vrea mâncare verde, maimuțica galbenă, iar ursulețul roșie. Senzorul de culoare îți spune culoarea. Atinge animalul potrivit!',
+ colN:{r:'Roșu',y:'Galben',g:'Verde'},an:{bunny:'Iepurașul',monkey:'Maimuțica',bear:'Ursulețul'},
+ sortWrong:n=>`Bleah! ${n} nu vrea culoarea asta.`,sortMan:'Bravo! Ai sortat toată mâncarea!',
+ sortProg:'Acum programează-l pe RoboPufi: alege pentru fiecare culoare animalul. Apoi apasă Start și el sortează singur, foarte repede!',
+ sortFix:'Schimbă regula și încearcă din nou!',sortWhy:'Senzorul vede culoarea, iar programul decide unde merge. Așa sortează roboții în fabrici și la reciclare!'},
+de:{menu:{sonar:['🦇','Der Abstandssensor'],thermo:['🌡️','Das Gewächshaus'],sort:['🎨','Der Farbsensor']},
+ sonIntro:'RoboPufi hat einen Abstandssensor wie eine Fledermaus: Er schickt einen Ton und hört das Echo. Je näher er kommt, desto schneller piept er! Drück Start und dann STOPP, um auf dem grünen Platz zu parken.',
+ sonNext:'Jetzt fährt er schneller! Drück Start und halte ihn auf dem grünen Platz an.',
+ sonAuto:'Jetzt fährt RoboPufi ganz schnell und bremst von selbst! Wähle die Fahne, ab der er bremsen soll.',
+ sonCrash:'Bumm! Zusammengestoßen. Drück STOPP früher, wenn es schnell piept!',sonTooLate:'Bumm! Er hat zu spät gebremst. Bei hoher Geschwindigkeit braucht er mehr Platz zum Anhalten!',
+ sonPerfect:'Perfekt! Genau auf dem grünen Platz geparkt!',sonGood:'Gut! Du hättest noch ein bisschen näher fahren können.',sonFar:'Er hat zu weit weg angehalten. Warte etwas länger mit STOPP!',sonTooEarly:'Er hat zu weit weg angehalten. Wähle eine nähere Fahne!',
+ sonWhy:['So fliegen Fledermäuse nachts: Sie hören auf das Echo!','Autos haben auch Parksensoren, die piepen.','Je schneller du fährst, desto mehr Platz brauchst du zum Bremsen.','So bremsen moderne Autos von selbst: Der Sensor sieht, das Programm entscheidet!'],
+ thIntro:['Winter im Gewächshaus! Die Pflanzen brauchen Wärme. Sag RoboPufi, was er tun soll, wenn der Sensor Kälte spürt, und drück dann Start.','Ein Sommertag: Nachts ist es kalt, mittags sehr heiß. Mach eine Regel für kalt und eine für heiß!','Pflanzen brauchen auch Licht! Mach Regeln für kalt, für heiß und für dunkel.'],
+ thCond:{cold:'Wenn es kalt ist',hot:'Wenn es heiß ist',dark:'Wenn es dunkel ist'},thAct:{heat:'schalte die Heizung ein',fan:'schalte den Ventilator ein',lamp:'mach die Lampe an',none:'tu nichts'},
+ thUnset:'Tippe auf das Fragezeichen und wähle, was RoboPufi tun soll!',thFrz:'Brrr! Die Pflanzen sind erfroren. Was soll RoboPufi tun, wenn es kalt ist?',thHot:'Puh! Die Pflanzen sind vor Hitze verwelkt. Was soll RoboPufi tun, wenn es heiß ist?',thDark:'Die Pflanzen hatten nachts kein Licht und wachsen nicht. Was soll RoboPufi tun, wenn es dunkel ist?',
+ thOk:['Super! Der Temperatursensor spürt die Kälte und schaltet die Heizung ein. Das ist ein Thermostat!','Toll! Wenn es kalt ist, heizt er. Wenn es heiß ist, kühlt er. Die Pflanzen sind glücklich!','Roboter-Gärtner! Zwei Sensoren und drei Regeln, und das Gewächshaus kümmert sich selbst um die Pflanzen.'],
+ sortIntro:'Der Hase will grünes Essen, der Affe gelbes und der Bär rotes. Der Farbsensor sagt dir die Farbe. Tippe auf das richtige Tier!',
+ colN:{r:'Rot',y:'Gelb',g:'Grün'},an:{bunny:'Der Hase',monkey:'Der Affe',bear:'Der Bär'},
+ sortWrong:n=>`Bäh! ${n} mag diese Farbe nicht.`,sortMan:'Super! Du hast alles sortiert!',
+ sortProg:'Jetzt programmiere RoboPufi: Wähle für jede Farbe ein Tier. Dann drück Start, und er sortiert ganz allein und ganz schnell!',
+ sortFix:'Ändere die Regel und versuch es nochmal!',sortWhy:'Der Sensor sieht die Farbe, und das Programm entscheidet, wohin es geht. So sortieren Roboter in Fabriken und beim Recycling!'},
+en:{menu:{sonar:['🦇','The distance sensor'],thermo:['🌡️','The greenhouse'],sort:['🎨','The colour sensor']},
+ sonIntro:'RoboPufi has a distance sensor, like a bat: it sends a sound and listens for the echo. The closer he gets, the faster it beeps! Press Start, then STOP to park on the green spot.',
+ sonNext:'Now he goes faster! Press Start and stop him on the green spot.',
+ sonAuto:'Now RoboPufi goes really fast and brakes by himself! Choose the flag where he should start braking.',
+ sonCrash:'Bump! He crashed. Press STOP sooner, when it beeps fast!',sonTooLate:'Bump! He started braking too late. At high speed he needs more room to stop!',
+ sonPerfect:'Perfect! Parked right on the green spot!',sonGood:'Good! You could have gone a little closer.',sonFar:'He stopped too far away. Wait a little longer before STOP!',sonTooEarly:'He stopped too far away. Choose a closer flag!',
+ sonWhy:['That is how bats fly at night: they listen for the echo!','Cars have parking sensors that beep too.','The faster you go, the more room you need to brake.','That is how modern cars brake by themselves: the sensor sees, the program decides!'],
+ thIntro:['Winter in the greenhouse! The plants need warmth. Tell RoboPufi what to do when the sensor feels cold, then press Start.','A summer day: cold at night, very hot at noon. Make one rule for cold and one for hot!','Plants need light too! Make rules for cold, for hot and for dark.'],
+ thCond:{cold:'When it is cold',hot:'When it is hot',dark:'When it is dark'},thAct:{heat:'turn on the heater',fan:'turn on the fan',lamp:'turn on the lamp',none:'do nothing'},
+ thUnset:'Tap the question mark and choose what RoboPufi does!',thFrz:'Brrr! The plants froze. What should RoboPufi do when it is cold?',thHot:'Phew! The plants wilted in the heat. What should RoboPufi do when it is hot?',thDark:'The plants had no light at night and do not grow. What should RoboPufi do when it is dark?',
+ thOk:['Well done! The temperature sensor feels the cold and turns on the heater. That is a thermostat!','Great! When it is cold, he heats. When it is hot, he cools. The plants are happy!','Robot gardener! Two sensors and three rules, and the greenhouse looks after the plants by itself.'],
+ sortIntro:'The bunny wants green food, the monkey yellow and the bear red. The colour sensor tells you the colour. Tap the right animal!',
+ colN:{r:'Red',y:'Yellow',g:'Green'},an:{bunny:'The bunny',monkey:'The monkey',bear:'The bear'},
+ sortWrong:n=>`Yuck! ${n} does not want this colour.`,sortMan:'Well done! You sorted all the food!',
+ sortProg:'Now program RoboPufi: choose an animal for each colour. Then press Start and he sorts all by himself, really fast!',
+ sortFix:'Change the rule and try again!',sortWhy:'The sensor sees the colour, and the program decides where it goes. That is how robots sort things in factories and for recycling!'},
+fr:{menu:{sonar:['🦇','Le capteur de distance'],thermo:['🌡️','La serre'],sort:['🎨','Le capteur de couleur']},
+ sonIntro:'RoboPufi a un capteur de distance, comme la chauve-souris : il envoie un son et écoute l’écho. Plus il s’approche, plus il bipe vite ! Appuie sur Départ, puis sur STOP pour te garer sur la place verte.',
+ sonNext:'Maintenant il va plus vite ! Appuie sur Départ et arrête-le sur la place verte.',
+ sonAuto:'Maintenant RoboPufi va très vite et freine tout seul ! Choisis le drapeau où il doit commencer à freiner.',
+ sonCrash:'Boum ! Il a cogné. Appuie sur STOP plus tôt, quand ça bipe vite !',sonTooLate:'Boum ! Il a freiné trop tard. À grande vitesse, il lui faut plus de place pour s’arrêter !',
+ sonPerfect:'Parfait ! Garé pile sur la place verte !',sonGood:'Bien ! Tu pouvais t’approcher un peu plus.',sonFar:'Il s’est arrêté trop loin. Attends un peu avant STOP !',sonTooEarly:'Il s’est arrêté trop loin. Choisis un drapeau plus proche !',
+ sonWhy:['C’est comme ça que les chauves-souris volent la nuit : elles écoutent l’écho !','Les voitures ont aussi des capteurs de stationnement qui bipent.','Plus tu vas vite, plus il te faut de place pour freiner.','C’est ainsi que les voitures modernes freinent toutes seules : le capteur voit, le programme décide !'],
+ thIntro:['L’hiver dans la serre ! Les plantes ont besoin de chaleur. Dis à RoboPufi quoi faire quand le capteur sent le froid, puis appuie sur Départ.','Une journée d’été : froid la nuit, très chaud à midi. Fais une règle pour le froid et une pour le chaud !','Les plantes ont aussi besoin de lumière ! Fais des règles pour le froid, le chaud et le noir.'],
+ thCond:{cold:'Quand il fait froid',hot:'Quand il fait chaud',dark:'Quand il fait noir'},thAct:{heat:'allume le chauffage',fan:'allume le ventilateur',lamp:'allume la lampe',none:'ne fais rien'},
+ thUnset:'Touche le point d’interrogation et choisis ce que fait RoboPufi !',thFrz:'Brrr ! Les plantes ont gelé. Que doit faire RoboPufi quand il fait froid ?',thHot:'Ouf ! Les plantes ont fané à cause de la chaleur. Que doit faire RoboPufi quand il fait chaud ?',thDark:'Les plantes n’ont pas eu de lumière la nuit et ne poussent pas. Que doit faire RoboPufi quand il fait noir ?',
+ thOk:['Bravo ! Le capteur de température sent le froid et allume le chauffage. C’est un thermostat !','Super ! Quand il fait froid, il chauffe. Quand il fait chaud, il rafraîchit. Les plantes sont heureuses !','Jardinier robot ! Deux capteurs et trois règles, et la serre s’occupe toute seule des plantes.'],
+ sortIntro:'Le lapin veut de la nourriture verte, le singe jaune et l’ours rouge. Le capteur de couleur te dit la couleur. Touche le bon animal !',
+ colN:{r:'Rouge',y:'Jaune',g:'Vert'},an:{bunny:'Le lapin',monkey:'Le singe',bear:'L’ours'},
+ sortWrong:n=>`Beurk ! ${n} ne veut pas cette couleur.`,sortMan:'Bravo ! Tu as tout trié !',
+ sortProg:'Maintenant, programme RoboPufi : choisis un animal pour chaque couleur. Puis appuie sur Départ, et il trie tout seul, très vite !',
+ sortFix:'Change la règle et réessaie !',sortWhy:'Le capteur voit la couleur, et le programme décide où ça va. C’est ainsi que les robots trient dans les usines et pour le recyclage !'},
+es:{menu:{sonar:['🦇','El sensor de distancia'],thermo:['🌡️','El invernadero'],sort:['🎨','El sensor de color']},
+ sonIntro:'RoboPufi tiene un sensor de distancia, como el murciélago: envía un sonido y escucha el eco. ¡Cuanto más se acerca, más rápido pita! Pulsa Empezar y luego STOP para aparcar en la plaza verde.',
+ sonNext:'¡Ahora va más rápido! Pulsa Empezar y páralo en la plaza verde.',
+ sonAuto:'¡Ahora RoboPufi va muy rápido y frena solo! Elige la bandera donde debe empezar a frenar.',
+ sonCrash:'¡Pum! Ha chocado. ¡Pulsa STOP antes, cuando pite rápido!',sonTooLate:'¡Pum! Empezó a frenar demasiado tarde. ¡A mucha velocidad necesita más sitio para pararse!',
+ sonPerfect:'¡Perfecto! ¡Aparcado justo en la plaza verde!',sonGood:'¡Bien! Podías acercarte un poco más.',sonFar:'Se paró demasiado lejos. ¡Espera un poco más antes de STOP!',sonTooEarly:'Se paró demasiado lejos. ¡Elige una bandera más cerca!',
+ sonWhy:['¡Así vuelan los murciélagos de noche: escuchan el eco!','Los coches también tienen sensores de aparcamiento que pitan.','Cuanto más rápido vas, más sitio necesitas para frenar.','¡Así frenan solos los coches modernos: el sensor ve y el programa decide!'],
+ thIntro:['¡Invierno en el invernadero! Las plantas necesitan calor. Dile a RoboPufi qué hacer cuando el sensor note frío y pulsa Empezar.','Un día de verano: frío de noche, mucho calor al mediodía. ¡Haz una regla para el frío y otra para el calor!','¡Las plantas también necesitan luz! Haz reglas para el frío, el calor y la oscuridad.'],
+ thCond:{cold:'Cuando hace frío',hot:'Cuando hace calor',dark:'Cuando está oscuro'},thAct:{heat:'enciende la calefacción',fan:'enciende el ventilador',lamp:'enciende la lámpara',none:'no hagas nada'},
+ thUnset:'¡Toca el signo de interrogación y elige qué hace RoboPufi!',thFrz:'¡Brrr! Las plantas se han helado. ¿Qué debe hacer RoboPufi cuando hace frío?',thHot:'¡Uf! Las plantas se marchitaron por el calor. ¿Qué debe hacer RoboPufi cuando hace calor?',thDark:'Las plantas no tuvieron luz de noche y no crecen. ¿Qué debe hacer RoboPufi cuando está oscuro?',
+ thOk:['¡Bravo! El sensor de temperatura nota el frío y enciende la calefacción. ¡Eso es un termostato!','¡Genial! Cuando hace frío, calienta. Cuando hace calor, refresca. ¡Las plantas están felices!','¡Jardinero robot! Dos sensores y tres reglas, y el invernadero cuida solo de las plantas.'],
+ sortIntro:'El conejo quiere comida verde, el mono amarilla y el oso roja. El sensor de color te dice el color. ¡Toca el animal correcto!',
+ colN:{r:'Rojo',y:'Amarillo',g:'Verde'},an:{bunny:'El conejo',monkey:'El mono',bear:'El oso'},
+ sortWrong:n=>`¡Puaj! ${n} no quiere este color.`,sortMan:'¡Bravo! ¡Has clasificado toda la comida!',
+ sortProg:'Ahora programa a RoboPufi: elige un animal para cada color. ¡Luego pulsa Empezar y él clasifica solo, muy rápido!',
+ sortFix:'¡Cambia la regla e inténtalo otra vez!',sortWhy:'El sensor ve el color y el programa decide adónde va. ¡Así clasifican los robots en las fábricas y en el reciclaje!'},
+it:{menu:{sonar:['🦇','Il sensore di distanza'],thermo:['🌡️','La serra'],sort:['🎨','Il sensore di colore']},
+ sonIntro:'RoboPufi ha un sensore di distanza, come il pipistrello: manda un suono e ascolta l’eco. Più si avvicina, più suona veloce! Premi Via, poi STOP per parcheggiare sul posto verde.',
+ sonNext:'Ora va più veloce! Premi Via e fermalo sul posto verde.',
+ sonAuto:'Ora RoboPufi va velocissimo e frena da solo! Scegli la bandierina da cui deve iniziare a frenare.',
+ sonCrash:'Bum! Ha sbattuto. Premi STOP prima, quando suona veloce!',sonTooLate:'Bum! Ha frenato troppo tardi. Ad alta velocità gli serve più spazio per fermarsi!',
+ sonPerfect:'Perfetto! Parcheggiato proprio sul posto verde!',sonGood:'Bene! Potevi avvicinarti ancora un po’.',sonFar:'Si è fermato troppo lontano. Aspetta un po’ prima di STOP!',sonTooEarly:'Si è fermato troppo lontano. Scegli una bandierina più vicina!',
+ sonWhy:['Così volano i pipistrelli di notte: ascoltano l’eco!','Anche le auto hanno sensori di parcheggio che suonano.','Più vai veloce, più spazio ti serve per frenare.','Così frenano da sole le auto moderne: il sensore vede, il programma decide!'],
+ thIntro:['Inverno nella serra! Le piante hanno bisogno di caldo. Di’ a RoboPufi cosa fare quando il sensore sente freddo, poi premi Via.','Una giornata d’estate: freddo di notte, caldissimo a mezzogiorno. Fai una regola per il freddo e una per il caldo!','Le piante hanno bisogno anche di luce! Fai regole per il freddo, il caldo e il buio.'],
+ thCond:{cold:'Quando fa freddo',hot:'Quando fa caldo',dark:'Quando è buio'},thAct:{heat:'accendi il riscaldamento',fan:'accendi il ventilatore',lamp:'accendi la lampada',none:'non fare niente'},
+ thUnset:'Tocca il punto interrogativo e scegli cosa fa RoboPufi!',thFrz:'Brrr! Le piante si sono gelate. Cosa deve fare RoboPufi quando fa freddo?',thHot:'Uff! Le piante sono appassite per il caldo. Cosa deve fare RoboPufi quando fa caldo?',thDark:'Le piante non hanno avuto luce di notte e non crescono. Cosa deve fare RoboPufi quando è buio?',
+ thOk:['Bravo! Il sensore di temperatura sente il freddo e accende il riscaldamento. Questo è un termostato!','Super! Quando fa freddo riscalda, quando fa caldo rinfresca. Le piante sono felici!','Giardiniere robot! Due sensori e tre regole, e la serra si prende cura delle piante da sola.'],
+ sortIntro:'Il coniglio vuole cibo verde, la scimmia giallo e l’orso rosso. Il sensore di colore ti dice il colore. Tocca l’animale giusto!',
+ colN:{r:'Rosso',y:'Giallo',g:'Verde'},an:{bunny:'Il coniglio',monkey:'La scimmia',bear:'L’orso'},
+ sortWrong:n=>`Bleah! ${n} non vuole questo colore.`,sortMan:'Bravo! Hai smistato tutto il cibo!',
+ sortProg:'Ora programma RoboPufi: scegli un animale per ogni colore. Poi premi Via e lui smista da solo, velocissimo!',
+ sortFix:'Cambia la regola e riprova!',sortWhy:'Il sensore vede il colore e il programma decide dove va. Così smistano i robot nelle fabbriche e nel riciclo!'},
+pt:{menu:{sonar:['🦇','O sensor de distância'],thermo:['🌡️','A estufa'],sort:['🎨','O sensor de cor']},
+ sonIntro:'O RoboPufi tem um sensor de distância, como o morcego: envia um som e ouve o eco. Quanto mais perto, mais depressa apita! Carrega em Começar e depois em STOP para estacionar no lugar verde.',
+ sonNext:'Agora vai mais depressa! Carrega em Começar e para-o no lugar verde.',
+ sonAuto:'Agora o RoboPufi vai muito depressa e trava sozinho! Escolhe a bandeira onde ele deve começar a travar.',
+ sonCrash:'Bum! Bateu. Carrega em STOP mais cedo, quando apitar depressa!',sonTooLate:'Bum! Começou a travar tarde demais. A grande velocidade precisa de mais espaço para parar!',
+ sonPerfect:'Perfeito! Estacionado mesmo no lugar verde!',sonGood:'Bem! Podias ter chegado um pouco mais perto.',sonFar:'Parou longe demais. Espera mais um pouco antes do STOP!',sonTooEarly:'Parou longe demais. Escolhe uma bandeira mais perto!',
+ sonWhy:['É assim que os morcegos voam à noite: ouvem o eco!','Os carros também têm sensores de estacionamento que apitam.','Quanto mais depressa vais, mais espaço precisas para travar.','É assim que os carros modernos travam sozinhos: o sensor vê, o programa decide!'],
+ thIntro:['Inverno na estufa! As plantas precisam de calor. Diz ao RoboPufi o que fazer quando o sensor sente frio e carrega em Começar.','Um dia de verão: frio à noite, muito calor ao meio-dia. Faz uma regra para o frio e outra para o calor!','As plantas também precisam de luz! Faz regras para o frio, para o calor e para o escuro.'],
+ thCond:{cold:'Quando está frio',hot:'Quando está calor',dark:'Quando está escuro'},thAct:{heat:'liga o aquecimento',fan:'liga a ventoinha',lamp:'acende a lâmpada',none:'não faças nada'},
+ thUnset:'Toca no ponto de interrogação e escolhe o que faz o RoboPufi!',thFrz:'Brrr! As plantas congelaram. O que deve fazer o RoboPufi quando está frio?',thHot:'Ufa! As plantas murcharam com o calor. O que deve fazer o RoboPufi quando está calor?',thDark:'As plantas não tiveram luz à noite e não crescem. O que deve fazer o RoboPufi quando está escuro?',
+ thOk:['Muito bem! O sensor de temperatura sente o frio e liga o aquecimento. Isso é um termóstato!','Boa! Quando está frio, aquece. Quando está calor, arrefece. As plantas estão felizes!','Jardineiro robô! Dois sensores e três regras, e a estufa cuida das plantas sozinha.'],
+ sortIntro:'O coelho quer comida verde, o macaco amarela e o urso vermelha. O sensor de cor diz-te a cor. Toca no animal certo!',
+ colN:{r:'Vermelho',y:'Amarelo',g:'Verde'},an:{bunny:'O coelho',monkey:'O macaco',bear:'O urso'},
+ sortWrong:n=>`Que nojo! ${n} não quer esta cor.`,sortMan:'Muito bem! Separaste a comida toda!',
+ sortProg:'Agora programa o RoboPufi: escolhe um animal para cada cor. Depois carrega em Começar e ele separa sozinho, muito depressa!',
+ sortFix:'Muda a regra e tenta outra vez!',sortWhy:'O sensor vê a cor e o programa decide para onde vai. É assim que os robôs separam coisas nas fábricas e na reciclagem!'},
+nl:{menu:{sonar:['🦇','De afstandssensor'],thermo:['🌡️','De kas'],sort:['🎨','De kleursensor']},
+ sonIntro:'RoboPufi heeft een afstandssensor, net als een vleermuis: hij stuurt een geluid en luistert naar de echo. Hoe dichterbij, hoe sneller hij piept! Druk op Start en dan op STOP om op het groene plekje te parkeren.',
+ sonNext:'Nu gaat hij sneller! Druk op Start en stop hem op het groene plekje.',
+ sonAuto:'Nu gaat RoboPufi heel snel en remt hij zelf! Kies het vlaggetje waar hij moet beginnen met remmen.',
+ sonCrash:'Boem! Hij botste. Druk eerder op STOP, als het snel piept!',sonTooLate:'Boem! Hij begon te laat met remmen. Met hoge snelheid heeft hij meer ruimte nodig om te stoppen!',
+ sonPerfect:'Perfect! Precies op het groene plekje geparkeerd!',sonGood:'Goed! Je had nog iets dichterbij kunnen komen.',sonFar:'Hij stopte te ver weg. Wacht nog even met STOP!',sonTooEarly:'Hij stopte te ver weg. Kies een vlaggetje dichterbij!',
+ sonWhy:['Zo vliegen vleermuizen ’s nachts: ze luisteren naar de echo!','Auto’s hebben ook parkeersensoren die piepen.','Hoe sneller je gaat, hoe meer ruimte je nodig hebt om te remmen.','Zo remmen moderne auto’s zelf: de sensor ziet, het programma beslist!'],
+ thIntro:['Winter in de kas! De planten hebben warmte nodig. Vertel RoboPufi wat hij moet doen als de sensor kou voelt, en druk dan op Start.','Een zomerdag: ’s nachts koud, ’s middags heel heet. Maak een regel voor koud en een voor heet!','Planten hebben ook licht nodig! Maak regels voor koud, voor heet en voor donker.'],
+ thCond:{cold:'Als het koud is',hot:'Als het heet is',dark:'Als het donker is'},thAct:{heat:'zet de verwarming aan',fan:'zet de ventilator aan',lamp:'doe de lamp aan',none:'doe niets'},
+ thUnset:'Tik op het vraagteken en kies wat RoboPufi doet!',thFrz:'Brrr! De planten zijn bevroren. Wat moet RoboPufi doen als het koud is?',thHot:'Pff! De planten zijn verwelkt door de hitte. Wat moet RoboPufi doen als het heet is?',thDark:'De planten hadden ’s nachts geen licht en groeien niet. Wat moet RoboPufi doen als het donker is?',
+ thOk:['Goed zo! De temperatuursensor voelt de kou en zet de verwarming aan. Dat is een thermostaat!','Super! Als het koud is, verwarmt hij. Als het heet is, koelt hij. De planten zijn blij!','Robottuinier! Twee sensoren en drie regels, en de kas zorgt zelf voor de planten.'],
+ sortIntro:'Het konijn wil groen eten, de aap geel en de beer rood. De kleursensor vertelt je de kleur. Tik op het goede dier!',
+ colN:{r:'Rood',y:'Geel',g:'Groen'},an:{bunny:'Het konijn',monkey:'De aap',bear:'De beer'},
+ sortWrong:n=>`Bah! ${n} wil deze kleur niet.`,sortMan:'Goed zo! Je hebt al het eten gesorteerd!',
+ sortProg:'Programmeer nu RoboPufi: kies voor elke kleur een dier. Druk dan op Start en hij sorteert helemaal zelf, heel snel!',
+ sortFix:'Verander de regel en probeer het opnieuw!',sortWhy:'De sensor ziet de kleur en het programma beslist waar het heen gaat. Zo sorteren robots in fabrieken en bij het recyclen!'},
+pl:{menu:{sonar:['🦇','Czujnik odległości'],thermo:['🌡️','Szklarnia'],sort:['🎨','Czujnik koloru']},
+ sonIntro:'RoboPufi ma czujnik odległości, jak nietoperz: wysyła dźwięk i słucha echa. Im bliżej, tym szybciej pika! Naciśnij Start, a potem STOP, żeby zaparkować na zielonym miejscu.',
+ sonNext:'Teraz jedzie szybciej! Naciśnij Start i zatrzymaj go na zielonym miejscu.',
+ sonAuto:'Teraz RoboPufi jedzie bardzo szybko i hamuje sam! Wybierz chorągiewkę, od której ma zacząć hamować.',
+ sonCrash:'Bum! Uderzył. Naciśnij STOP wcześniej, kiedy szybko pika!',sonTooLate:'Bum! Zaczął hamować za późno. Przy dużej prędkości potrzebuje więcej miejsca, żeby się zatrzymać!',
+ sonPerfect:'Idealnie! Zaparkowany dokładnie na zielonym miejscu!',sonGood:'Dobrze! Mogłeś podjechać trochę bliżej.',sonFar:'Zatrzymał się za daleko. Poczekaj chwilę dłużej ze STOP!',sonTooEarly:'Zatrzymał się za daleko. Wybierz bliższą chorągiewkę!',
+ sonWhy:['Tak latają nietoperze w nocy: słuchają echa!','Samochody też mają czujniki parkowania, które pikają.','Im szybciej jedziesz, tym więcej miejsca potrzebujesz do hamowania.','Tak hamują same nowoczesne samochody: czujnik widzi, program decyduje!'],
+ thIntro:['Zima w szklarni! Rośliny potrzebują ciepła. Powiedz RoboPufiemu, co ma robić, gdy czujnik poczuje zimno, a potem naciśnij Start.','Letni dzień: w nocy zimno, w południe bardzo gorąco. Zrób jedną regułę na zimno i jedną na gorąco!','Rośliny potrzebują też światła! Zrób reguły na zimno, na gorąco i na ciemność.'],
+ thCond:{cold:'Kiedy jest zimno',hot:'Kiedy jest gorąco',dark:'Kiedy jest ciemno'},thAct:{heat:'włącz ogrzewanie',fan:'włącz wiatrak',lamp:'zapal lampę',none:'nic nie rób'},
+ thUnset:'Dotknij znaku zapytania i wybierz, co robi RoboPufi!',thFrz:'Brrr! Rośliny zamarzły. Co ma zrobić RoboPufi, kiedy jest zimno?',thHot:'Uff! Rośliny zwiędły od upału. Co ma zrobić RoboPufi, kiedy jest gorąco?',thDark:'Rośliny nie miały w nocy światła i nie rosną. Co ma zrobić RoboPufi, kiedy jest ciemno?',
+ thOk:['Brawo! Czujnik temperatury czuje zimno i włącza ogrzewanie. To jest termostat!','Super! Kiedy jest zimno, grzeje. Kiedy jest gorąco, chłodzi. Rośliny są szczęśliwe!','Robot ogrodnik! Dwa czujniki i trzy reguły, a szklarnia sama dba o rośliny.'],
+ sortIntro:'Królik chce zielone jedzenie, małpka żółte, a miś czerwone. Czujnik koloru powie ci kolor. Dotknij właściwego zwierzątka!',
+ colN:{r:'Czerwony',y:'Żółty',g:'Zielony'},an:{bunny:'Królik',monkey:'Małpka',bear:'Miś'},
+ sortWrong:n=>`Fuj! ${n} nie chce tego koloru.`,sortMan:'Brawo! Posortowałeś całe jedzenie!',
+ sortProg:'Teraz zaprogramuj RoboPufiego: wybierz zwierzątko dla każdego koloru. Potem naciśnij Start, a on posortuje sam, bardzo szybko!',
+ sortFix:'Zmień regułę i spróbuj jeszcze raz!',sortWhy:'Czujnik widzi kolor, a program decyduje, dokąd to trafi. Tak sortują roboty w fabrykach i przy recyklingu!'},
+uk:{menu:{sonar:['🦇','Датчик відстані'],thermo:['🌡️','Теплиця'],sort:['🎨','Датчик кольору']},
+ sonIntro:'У РобоПуфі є датчик відстані, як у кажана: він посилає звук і слухає луну. Що ближче, то швидше пищить! Натисни Старт, а потім СТОП, щоб припаркуватися на зеленому місці.',
+ sonNext:'Тепер він їде швидше! Натисни Старт і зупини його на зеленому місці.',
+ sonAuto:'Тепер РобоПуфі їде дуже швидко й гальмує сам! Обери прапорець, звідки він почне гальмувати.',
+ sonCrash:'Бум! Він врізався. Натисни СТОП раніше, коли швидко пищить!',sonTooLate:'Бум! Він почав гальмувати запізно. На великій швидкості йому треба більше місця, щоб зупинитися!',
+ sonPerfect:'Чудово! Припаркований точно на зеленому місці!',sonGood:'Добре! Можна було під’їхати трохи ближче.',sonFar:'Він зупинився надто далеко. Почекай трохи довше зі СТОП!',sonTooEarly:'Він зупинився надто далеко. Обери ближчий прапорець!',
+ sonWhy:['Так кажани літають уночі: вони слухають луну!','Автомобілі теж мають датчики паркування, які пищать.','Що швидше їдеш, то більше місця треба, щоб загальмувати.','Так сучасні автомобілі гальмують самі: датчик бачить, програма вирішує!'],
+ thIntro:['Зима в теплиці! Рослинам потрібне тепло. Скажи РобоПуфі, що робити, коли датчик відчуває холод, і натисни Старт.','Літній день: уночі холодно, опівдні дуже спекотно. Зроби одне правило для холоду й одне для спеки!','Рослинам потрібне й світло! Зроби правила для холоду, спеки й темряви.'],
+ thCond:{cold:'Коли холодно',hot:'Коли спекотно',dark:'Коли темно'},thAct:{heat:'увімкни обігрів',fan:'увімкни вентилятор',lamp:'увімкни лампу',none:'нічого не роби'},
+ thUnset:'Торкнися знака питання й обери, що робить РобоПуфі!',thFrz:'Бррр! Рослини замерзли. Що має робити РобоПуфі, коли холодно?',thHot:'Ох! Рослини зів’яли від спеки. Що має робити РобоПуфі, коли спекотно?',thDark:'Уночі рослини не мали світла й не ростуть. Що має робити РобоПуфі, коли темно?',
+ thOk:['Молодець! Датчик температури відчуває холод і вмикає обігрів. Це термостат!','Чудово! Коли холодно, він гріє. Коли спекотно, охолоджує. Рослини щасливі!','Робот-садівник! Два датчики й три правила, і теплиця сама дбає про рослини.'],
+ sortIntro:'Зайчик хоче зелену їжу, мавпочка жовту, а ведмедик червону. Датчик кольору скаже тобі колір. Торкнися правильної тваринки!',
+ colN:{r:'Червоний',y:'Жовтий',g:'Зелений'},an:{bunny:'Зайчик',monkey:'Мавпочка',bear:'Ведмедик'},
+ sortWrong:n=>`Фу! ${n} не хоче цей колір.`,sortMan:'Молодець! Ти розсортував усю їжу!',
+ sortProg:'Тепер запрограмуй РобоПуфі: обери тваринку для кожного кольору. Потім натисни Старт, і він сортуватиме сам, дуже швидко!',
+ sortFix:'Зміни правило й спробуй ще раз!',sortWhy:'Датчик бачить колір, а програма вирішує, куди це піде. Так роботи сортують на заводах і для переробки!'},
+ru:{menu:{sonar:['🦇','Датчик расстояния'],thermo:['🌡️','Теплица'],sort:['🎨','Датчик цвета']},
+ sonIntro:'У РобоПуфи есть датчик расстояния, как у летучей мыши: он посылает звук и слушает эхо. Чем ближе, тем быстрее пищит! Нажми Старт, а потом СТОП, чтобы припарковаться на зелёном месте.',
+ sonNext:'Теперь он едет быстрее! Нажми Старт и останови его на зелёном месте.',
+ sonAuto:'Теперь РобоПуфи едет очень быстро и тормозит сам! Выбери флажок, откуда он начнёт тормозить.',
+ sonCrash:'Бум! Он врезался. Нажми СТОП раньше, когда быстро пищит!',sonTooLate:'Бум! Он начал тормозить слишком поздно. На большой скорости ему нужно больше места, чтобы остановиться!',
+ sonPerfect:'Отлично! Припаркован точно на зелёном месте!',sonGood:'Хорошо! Можно было подъехать чуть ближе.',sonFar:'Он остановился слишком далеко. Подожди чуть дольше со СТОП!',sonTooEarly:'Он остановился слишком далеко. Выбери флажок поближе!',
+ sonWhy:['Так летучие мыши летают ночью: они слушают эхо!','У машин тоже есть датчики парковки, которые пищат.','Чем быстрее едешь, тем больше места нужно, чтобы затормозить.','Так современные машины тормозят сами: датчик видит, программа решает!'],
+ thIntro:['Зима в теплице! Растениям нужно тепло. Скажи РобоПуфи, что делать, когда датчик чувствует холод, и нажми Старт.','Летний день: ночью холодно, в полдень очень жарко. Сделай одно правило для холода и одно для жары!','Растениям нужен и свет! Сделай правила для холода, жары и темноты.'],
+ thCond:{cold:'Когда холодно',hot:'Когда жарко',dark:'Когда темно'},thAct:{heat:'включи обогрев',fan:'включи вентилятор',lamp:'включи лампу',none:'ничего не делай'},
+ thUnset:'Нажми на знак вопроса и выбери, что делает РобоПуфи!',thFrz:'Бррр! Растения замёрзли. Что должен делать РобоПуфи, когда холодно?',thHot:'Ух! Растения завяли от жары. Что должен делать РобоПуфи, когда жарко?',thDark:'Ночью у растений не было света, и они не растут. Что должен делать РобоПуфи, когда темно?',
+ thOk:['Молодец! Датчик температуры чувствует холод и включает обогрев. Это термостат!','Отлично! Когда холодно, он греет. Когда жарко, охлаждает. Растения счастливы!','Робот-садовник! Два датчика и три правила, и теплица сама заботится о растениях.'],
+ sortIntro:'Зайчик хочет зелёную еду, обезьянка жёлтую, а мишка красную. Датчик цвета скажет тебе цвет. Нажми на нужного зверька!',
+ colN:{r:'Красный',y:'Жёлтый',g:'Зелёный'},an:{bunny:'Зайчик',monkey:'Обезьянка',bear:'Мишка'},
+ sortWrong:n=>`Фу! ${n} не хочет этот цвет.`,sortMan:'Молодец! Ты рассортировал всю еду!',
+ sortProg:'Теперь запрограммируй РобоПуфи: выбери зверька для каждого цвета. Потом нажми Старт, и он будет сортировать сам, очень быстро!',
+ sortFix:'Измени правило и попробуй ещё раз!',sortWhy:'Датчик видит цвет, а программа решает, куда это пойдёт. Так роботы сортируют на заводах и для переработки!'},
+hu:{menu:{sonar:['🦇','A távolságérzékelő'],thermo:['🌡️','Az üvegház'],sort:['🎨','A színérzékelő']},
+ sonIntro:'RoboPufinak távolságérzékelője van, mint a denevérnek: hangot küld, és figyeli a visszhangot. Minél közelebb ér, annál gyorsabban sípol! Nyomd meg a Startot, aztán a STOP-ot, hogy a zöld helyen parkolj.',
+ sonNext:'Most gyorsabban megy! Nyomd meg a Startot, és állítsd meg a zöld helyen.',
+ sonAuto:'Most RoboPufi nagyon gyorsan megy, és magától fékez! Válaszd ki a zászlót, ahol fékezni kezd.',
+ sonCrash:'Bumm! Nekiment. Nyomd meg korábban a STOP-ot, amikor gyorsan sípol!',sonTooLate:'Bumm! Túl későn kezdett fékezni. Nagy sebességnél több hely kell a megálláshoz!',
+ sonPerfect:'Tökéletes! Pont a zöld helyen parkolt!',sonGood:'Jó! Egy kicsit még közelebb mehettél volna.',sonFar:'Túl messze állt meg. Várj még egy kicsit a STOP-pal!',sonTooEarly:'Túl messze állt meg. Válassz közelebbi zászlót!',
+ sonWhy:['Így repülnek éjjel a denevérek: figyelik a visszhangot!','Az autóknak is vannak sípoló parkolóérzékelői.','Minél gyorsabban mész, annál több hely kell a fékezéshez.','Így fékeznek maguktól a modern autók: az érzékelő lát, a program dönt!'],
+ thIntro:['Tél az üvegházban! A növényeknek meleg kell. Mondd meg RoboPufinak, mit tegyen, ha az érzékelő hideget érez, aztán nyomd meg a Startot.','Egy nyári nap: éjjel hideg van, délben nagyon meleg. Készíts egy szabályt a hidegre és egyet a melegre!','A növényeknek fény is kell! Készíts szabályokat a hidegre, a melegre és a sötétre.'],
+ thCond:{cold:'Ha hideg van',hot:'Ha meleg van',dark:'Ha sötét van'},thAct:{heat:'kapcsold be a fűtést',fan:'kapcsold be a ventilátort',lamp:'kapcsold fel a lámpát',none:'ne csinálj semmit'},
+ thUnset:'Érintsd meg a kérdőjelet, és válaszd ki, mit csináljon RoboPufi!',thFrz:'Brrr! A növények megfagytak. Mit tegyen RoboPufi, ha hideg van?',thHot:'Hű! A növények elhervadtak a melegben. Mit tegyen RoboPufi, ha meleg van?',thDark:'A növényeknek éjjel nem volt fényük, és nem nőnek. Mit tegyen RoboPufi, ha sötét van?',
+ thOk:['Ügyes! A hőmérséklet-érzékelő érzi a hideget, és bekapcsolja a fűtést. Ez egy termosztát!','Szuper! Ha hideg van, fűt. Ha meleg van, hűt. A növények boldogok!','Robotkertész! Két érzékelő és három szabály, és az üvegház magától gondozza a növényeket.'],
+ sortIntro:'A nyuszi zöld ételt szeretne, a majom sárgát, a maci pedig pirosat. A színérzékelő megmondja a színt. Érintsd meg a megfelelő állatot!',
+ colN:{r:'Piros',y:'Sárga',g:'Zöld'},an:{bunny:'A nyuszi',monkey:'A majom',bear:'A maci'},
+ sortWrong:n=>`Fúj! ${n} nem kéri ezt a színt.`,sortMan:'Ügyes! Minden ételt szétválogattál!',
+ sortProg:'Most programozd be RoboPufit: válassz minden színhez egy állatot. Aztán nyomd meg a Startot, és egyedül válogat, nagyon gyorsan!',
+ sortFix:'Változtass a szabályon, és próbáld újra!',sortWhy:'Az érzékelő látja a színt, a program pedig eldönti, hová kerül. Így válogatnak a robotok a gyárakban és az újrahasznosításnál!'}
+};
+const R=(window.L10N&&L10N.rb)||{}, T=window.__rbTX||{};
+for(const l in M){ const o=T[l]||R[l]; if(!o) continue; const {menu,...sx}=M[l]; o.sx=sx; o.sens=Object.assign({},o.sens||{},menu); }
 })();
 </script>
 <script>
