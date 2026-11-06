@@ -6716,6 +6716,7 @@ for(const lg in ADD){ const o=T[lg]; if(!o) continue; const a=ADD[lg]; Object.as
 .rb-hl{filter:drop-shadow(0 0 10px #FFE45C) drop-shadow(0 0 5px #fff) brightness(1.35)}
 .rb-bat{animation:rbBatF 2.4s ease-in-out infinite alternate}@keyframes rbBatF{to{transform:translate(160px,40px)}}
 .rb-rain{animation:rbSmoke 0.9s linear infinite reverse}
+.rb-strain{animation:rbShake .3s infinite}
 .rb-tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rb-tray button{font:inherit;font-size:2.2rem;border:3px solid var(--ink);background:#fff;border-radius:18px;padding:2px 12px;cursor:grab;touch-action:none;min-width:84px}
 .rb-tray button b{font-size:1rem;display:block;line-height:1}
@@ -6949,7 +6950,7 @@ let view='home';
 
 /* ================= acasă ================= */
 function zoneScore(z){
-  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?['lever','gears','bike','ramp']:z==='sens'?sensKeys():z==='col'?['tubes','shirts','guess']:null;
+  const k=z==='prog'?[...Array(PL.length)].map((_,i)=>'p'+i):z==='circ'?CL.map((L,i)=>L.chk?'c'+i:null).filter(Boolean):z==='mech'?mechKeys():z==='sens'?sensKeys():z==='col'?['tubes','shirts','guess']:null;
   if(!k){ let n=0,t=0; for(const c in PARTS) PARTS[c].forEach(([,need])=>{ t++; if(gstars()>=need) n++; }); return `🔓 ${n}/${t}`; }
   return `⭐ ${k.reduce((s,x)=>s+(data.prog[x]||0),0)}/${k.length*3}`;
 }
@@ -7132,24 +7133,45 @@ en:{mech:{lever:['⚖️','The seesaw'],gears:['⚙️','Gears'],bike:['🚲','T
 };
 for(const l in TX2) Object.assign(TX[l],TX2[l]); window.__rbTX=TX;
 
-/* ================= 2. MAȘINI SIMPLE ================= */
-function zoneMech(){ stopAll(); view='mech'; setTop(false); back=home; menu3('mech',{lever,gears,bike,ramp}); }
+/* ================= 2. MAȘINI SIMPLE (v3: hartă de niveluri + scripete + catapultă) ================= */
+const MXT=()=>X().mx||{};
+const MECH={lever:()=>LVL,gears:()=>GL,bike:()=>BK,ramp:()=>RPL,pulley:()=>PUL,cata:()=>CAT};
+const MFN={lever:li=>lever(li),gears:li=>gears(li),bike:li=>bike(li),ramp:li=>ramp(li),pulley:li=>pulley(li),cata:li=>catapult(li)};
+const mechKeys=()=>Object.keys(MECH).flatMap(k=>MECH[k]().map((_,i)=>'m'+k+i));
+function mechGrid(k){ const list=MECH[k](), fn=MFN[k]; stopAll(); view='sg'; setTop(true); back=zoneMech; main.innerHTML=''; lastSG=()=>mechGrid(k); curRestart=lastSG;
+  const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().mech[k][1]; b.onclick=()=>sp(X().mech[k][1]); head.append(b); main.append(head);
+  const kp='m'+k, g=el('div','rb-grid'); const cur=list.findIndex((_,i)=>isOpen(kp,i)&&!(data.prog[kp+i]>0));
+  list.forEach((L,i)=>{ const open=isOpen(kp,i), s=data.prog[kp+i]||0;
+    const c=el('button','rb-card'+(open?'':' lock')+(i===cur?' cur':''),`<span class="ic">${L.ic}</span><span class="n">${X().lvl(i+1)}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`);
+    c.onclick=()=>{ if(!open){ sp(X().locked); return; } blip(); fn(i); }; g.appendChild(c); });
+  main.appendChild(g); }
+function zoneMech(){ stopAll(); view='mech'; setTop(false); back=home; main.innerHTML=''; const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().zoneSay.mech; b.onclick=()=>sp(X().zoneSay.mech); head.append(b); main.append(head);
+  const g=el('div','rb-cards'); g.style.margin='auto';
+  Object.keys(MECH).forEach(k=>{ const L=MECH[k](), n=L.reduce((s,_,i)=>s+(data.prog['m'+k+i]||0),0); const c=el('button','rb-card',`<span class="ic">${X().mech[k][0]}</span><span class="t">${X().mech[k][1]}</span><span class="p">⭐ ${n}/${L.length*3}</span>`);
+    c.onclick=()=>{ blip(); mechGrid(k); }; g.appendChild(c); });
+  main.appendChild(g); }
+const mNext=(k,li)=>li<MECH[k]().length-1?()=>MFN[k](li+1):null;
+const mBack=k=>()=>mechGrid(k);
 function menu3(z,fns){ main.innerHTML=''; const head=el('div','rb-head'); head.append(el('div','rb-face',roboSVG())); const b=el('div','rb-bubble'); b.textContent=X().zoneSay[z]; head.append(b); main.append(head);
   const g=el('div','rb-cards'); g.style.margin='auto';
   Object.keys(fns).forEach(k=>{ const s=data.prog[k]||0; const c=el('button','rb-card',`<span class="ic">${X()[z][k][0]}</span><span class="t">${X()[z][k][1]}</span><span class="p">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span>`); c.onclick=()=>{ blip(); fns[k](); }; g.appendChild(c); });
   main.appendChild(g); }
 
-/* --- balansoar (v2) --- */
+/* --- 1. balansoarul: niveluri + cadoul misterios --- */
 const ANI={1:'🐭',2:'🐰',3:'🐶',4:'🐘'};
-function leverTasks(){
-  const out=[{L:[[2,3]],R:{},tray:[2],ghost:[3,2]},{L:[[3,2]],R:{1:3},tray:[],ghost:[2,3]},{L:[[4,1]],R:{},tray:[1],ghost:null}];
-  while(out.length<5){ const wl=RR(2,4), dl=RR(1,4), T=wl*dl; const alt=[]; for(let w=1;w<=4;w++) for(let d=1;d<=4;d++) if(w*d===T&&w!==wl) alt.push([w,d]);
-    if(!alt.length) continue; const pick=alt[R(alt.length)]; const tray=new Set([pick[0]]); while(tray.size<3) tray.add(RR(1,4)); out.push({L:[[wl,dl]],R:{},tray:[...tray].sort(),ghost:null}); }
-  return out; }
-function lever(){
-  stopAll(); view='lever'; setTop(false); back=zoneMech; curRestart=lever; const myGen=gen;
-  const tasks=leverTasks(); let ti=0, errs=0, right={}, busy=false, tipDone=false, preview=null;
-  const F=frame(X().lv[0],5); F.bub.onclick=()=>sp(F.bub.textContent);
+const LVL=[{ic:'⚖️',tut:true},{ic:'🐰',nL:1,nR:1},{ic:'🐶🐭',nL:2,nR:1},{ic:'🐭🐭',nL:1,nR:2},{ic:'🎁',nL:1,nR:1,mys:true},{ic:'🐘🐰',nL:2,nR:2},{ic:'🎁🐶',nL:2,nR:1,mys:true},{ic:'🏆',nL:3,nR:2}];
+function genLever(nL,nR){ for(let tries=0;tries<800;tries++){ const rp=shuf([1,2,3,4]).slice(0,nR), rw=rp.map(()=>RR(1,4)); const T=rp.reduce((s,d,i)=>s+d*rw[i],0); const lp=shuf([1,2,3,4]).slice(0,nL);
+    const combos=[]; const rec=(i,acc,arr)=>{ if(i===nL){ if(acc===T) combos.push(arr.slice()); return; } for(let w=1;w<=4;w++){ arr.push(w); rec(i+1,acc+w*lp[i],arr); arr.pop(); } }; rec(0,0,[]);
+    if(!combos.length) continue; const lw=combos[R(combos.length)]; if(nL===1&&nR===1&&lw[0]===rw[0]) continue;
+    const tray=new Set(rw); while(tray.size<Math.min(4,rw.length+2)) tray.add(RR(1,4)); return {L:lp.map((d,i)=>[lw[i],d]),R:{},tray:[...tray].sort(),ghost:null}; }
+  return {L:[[2,3]],R:{},tray:[2,3],ghost:null}; }
+function leverTasks(li){ const Lv=LVL[li||0]; if(Lv.tut) return [{L:[[2,3]],R:{},tray:[2],ghost:[3,2]},{L:[[3,2]],R:{1:3},tray:[],ghost:[2,3]},{L:[[4,1]],R:{},tray:[1],ghost:null}];
+  return [0,1,2].map(()=>Object.assign(genLever(Lv.nL,Lv.nR),{mys:!!Lv.mys})); }
+function lever(li){ li=li||0;
+  stopAll(); view='lever'; setTop(false); back=mBack('lever'); curRestart=()=>lever(li); const myGen=gen;
+  const Lv=LVL[li], tasks=leverTasks(li); let ti=0, errs=0, right={}, busy=false, tipDone=false, preview=null;
+  const txt=i=>Lv.tut?X().lv[i]:Lv.mys?MXT().lvMys:LVL[li].nR>1?X().lv[4]:X().lv[3];
+  const F=frame(txt(0),tasks.length); F.bub.onclick=()=>sp(F.bub.textContent);
   const PX=d=>450+d*90, PY=316;
   const tq=()=>{ const t=tasks[ti]; const Lt=t.L.reduce((s,[w,d])=>s+w*d,0); const RM=Object.assign({},right); if(preview){ if(preview.from!=null) delete RM[preview.from]; if(preview.to!=null) RM[preview.to]=preview.w; }
     return {Lt,Rt:Object.entries(RM).reduce((s,[d,w])=>s+d*w,0),RM}; };
@@ -7161,21 +7183,19 @@ function lever(){
     s+=`<path d="M450 ${PY+16} L405 402 L495 402 Z" fill="#7A4A22"/><circle cx="450" cy="${PY+16}" r="8" fill="#FFC83D"/><text id="rb-meter" x="450" y="392" font-size="34" text-anchor="middle"></text></svg>`;
     F.stage.innerHTML=s; svg=F.stage.firstChild;
     svg.onpointerdown=e=>{ const g=e.target.closest('.rb-placed'); if(!g||busy) return; e.preventDefault(); const d=+g.dataset.d; startDrag(e,right[d],d); };
-    draw();
-  }
-  function tower(sideX,n,col){ let s=''; for(let i=0;i<n;i++) s+=`<rect x="${sideX-16}" y="${380-i*17}" width="32" height="14" rx="4" fill="${col}" stroke="rgba(0,0,0,.2)"/>`; return s+`<text x="${sideX}" y="${372-n*17}" font-size="22" font-weight="800" text-anchor="middle" fill="#24325F">${n}</text>`; }
+    draw(); }
+  function tower(sideX,n,col,hide){ let s=''; for(let i=0;i<n;i++) s+=`<rect x="${sideX-16}" y="${380-i*17}" width="32" height="14" rx="4" fill="${col}" stroke="rgba(0,0,0,.2)"/>`; return s+`<text x="${sideX}" y="${372-n*17}" font-size="22" font-weight="800" text-anchor="middle" fill="#24325F">${hide?'?':n}</text>`; }
   function draw(){ const t=tasks[ti], {Lt,Rt,RM}=tq(); const deg=clamp((Rt-Lt)*2,-13,13);
     let s=`<rect x="50" y="${PY}" width="800" height="22" rx="10" fill="#C98A4E" stroke="#8F5427" stroke-width="3"/>`;
     for(let d=1;d<=4;d++){ s+=`<circle cx="${PX(-d)}" cy="${PY+11}" r="9" fill="#8F5427"/><text x="${PX(-d)}" y="${PY+16}" font-size="13" font-weight="800" text-anchor="middle" fill="#fff">${d}</text><circle cx="${PX(d)}" cy="${PY+11}" r="9" fill="#8F5427"/><text x="${PX(d)}" y="${PY+16}" font-size="13" font-weight="800" text-anchor="middle" fill="#fff">${d}</text>`;
       if(!RM[d]) s+=`<circle class="rb-slotc" data-d="${d}" cx="${PX(d)}" cy="${PY-30}" r="26" fill="rgba(255,255,255,.55)" stroke="#8F5427" stroke-width="2" stroke-dasharray="6 5"/>`; }
     if(t.ghost&&!right[t.ghost[0]]) s+=`<text class="rb-need" x="${PX(t.ghost[0])}" y="${PY-6}" font-size="${44+t.ghost[1]*6}" text-anchor="middle" opacity=".35">${ANI[t.ghost[1]]}</text>`;
-    const item=(x,w,d,side)=>`<g ${side==='r'?`class="rb-placed" data-d="${d}" style="cursor:grab"`:''} ${preview&&preview.from==d&&side==='r'?'opacity=".3"':''}><text x="${x}" y="${PY-4}" font-size="${44+w*6}" text-anchor="middle">${ANI[w]}</text><circle cx="${x+26}" cy="${PY-40-w*6}" r="13" fill="#24325F"/><text x="${x+26}" y="${PY-34-w*6}" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">${w}</text></g>`;
-    t.L.forEach(([w,d])=>s+=item(PX(-d),w,d,'l')); for(const d in RM) s+=item(PX(+d),RM[d],d,'r');
+    const item=(x,w,d,side,gift)=>`<g ${side==='r'?`class="rb-placed" data-d="${d}" style="cursor:grab"`:''} ${preview&&preview.from==d&&side==='r'?'opacity=".3"':''}><text x="${x}" y="${PY-4}" font-size="${gift?62:44+w*6}" text-anchor="middle">${gift?'🎁':ANI[w]}</text><circle cx="${x+26}" cy="${PY-40-(gift?3:w)*6}" r="13" fill="#24325F"/><text x="${x+26}" y="${PY-34-(gift?3:w)*6}" font-size="16" font-weight="800" fill="#fff" text-anchor="middle">${gift?'?':w}</text></g>`;
+    t.L.forEach(([w,d],i)=>s+=item(PX(-d),w,d,'l',t.mys&&i===0&&!t.solved)); for(const d in RM) s+=item(PX(+d),RM[d],d,'r');
     const pl=svg.querySelector('#rb-plank'); pl.innerHTML=s; pl.style.transform=`rotate(${deg}deg)`;
-    svg.querySelector('#rb-towL').innerHTML=tower(28,Lt,'#4AA8FF'); svg.querySelector('#rb-towR').innerHTML=tower(872,Rt,'#FF8A3D');
+    svg.querySelector('#rb-towL').innerHTML=tower(28,Lt,'#4AA8FF',t.mys&&!t.solved); svg.querySelector('#rb-towR').innerHTML=tower(872,Rt,'#FF8A3D');
     svg.querySelector('#rb-meter').textContent=Rt===Lt&&Rt>0?'😊':Rt<Lt?'⬅':'➡';
-    return {Lt,Rt};
-  }
+    return {Lt,Rt}; }
   function tray(){ F.ctrl.innerHTML=''; const tr=el('div','rb-tray'); tasks[ti].tray.forEach(w=>{ const b=el('button',null,`${ANI[w]}<b>${w}</b>`); b.onpointerdown=e=>startDrag(e,w,null); tr.appendChild(b); });
     F.ctrl.append(tr,btn(X().hint,'',hint)); }
   function slotAt(ev){ const p=pt(svg,ev); if(p.x<470||p.y<150||p.y>430) return null; let best=null,bd=1e9; for(let d=1;d<=4;d++){ const dd=Math.abs(p.x-PX(d)); if(dd<bd){ bd=dd; best=d; } } return bd<70?best:null; }
@@ -7184,17 +7204,23 @@ function lever(){
     const up=ev=>{ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); g.remove();
       const to=slotAt(ev); if(from!=null) delete right[from]; if(to) right[to]=w; else if(from!=null&&!tasks[ti].tray.includes(w)) right[from]=w; preview=null; snd(to?500+w*60:250,.1); check(); };
     document.addEventListener('pointermove',mv); document.addEventListener('pointerup',up); }
+  async function next(){ ti++; if(ti>=tasks.length) return finish('mlever'+li,rate(errs),null,mNext('lever',li)); right=Object.assign({},tasks[ti].R); busy=false; draw(); tray(); F.set(txt(ti)); sp(txt(ti)); }
+  function askGift(){ const t=tasks[ti], gw=t.L[0][0]; F.ctrl.innerHTML=''; const q=MXT().lvMysQ; F.set('🎁 '+q); sp(q); const tr=el('div','rb-tray');
+    [1,2,3,4].forEach(w=>{ const b=el('button',null,`${ANI[w]}<b>${w}</b>`); b.onclick=async()=>{ if(w===gw){ t.solved=true; draw(); chime(); award(); try{ confetti(12); }catch(_){} F.dot(ti+1); await spW(MXT().lvMysOk(gw),1300); if(myGen!==gen) return; next(); } else { errs++; boing(); sp(MXT().lvMysNo); } }; tr.appendChild(b); });
+    F.ctrl.append(tr); }
   async function check(){ const {Lt,Rt}=draw(); if(Rt!==Lt||!Object.keys(right).length){ if(Rt) snd(Rt>Lt?200:260,.15,'sine',.1); return; }
-    busy=true; chime(); award(); F.dot(ti+1); F.set('⚖️ '+X().leverOk); try{ confetti(10); }catch(e){}
-    const lw=tasks[ti].L[0][0], usedLight=Object.values(right).some(w=>w<lw);
-    await spW(X().leverOk+(usedLight&&!tipDone?' '+X().leverTip:'')+(ti===0?' '+X().lvPow:''),1500); if(usedLight) tipDone=true; if(myGen!==gen) return;
-    ti++; if(ti>=5) return finish('lever',rate(errs),null,null); right=Object.assign({},tasks[ti].R); busy=false; draw(); tray(); F.set(X().lv[ti]); sp(X().lv[ti]); }
+    busy=true; chime(); F.set('⚖️ '+X().leverOk); const t=tasks[ti];
+    if(t.mys){ await spW(X().leverOk,700); if(myGen!==gen) return; return askGift(); }
+    award(); F.dot(ti+1); try{ confetti(10); }catch(e){}
+    const lw=t.L[0][0], usedLight=Object.values(right).some(w=>w<lw);
+    await spW(X().leverOk+(usedLight&&!tipDone?' '+X().leverTip:'')+(Lv.tut&&ti===0?' '+X().lvPow:''),1500); if(usedLight) tipDone=true; if(myGen!==gen) return; next(); }
   function hint(){ if(busy) return; errs++; const t=tasks[ti], T=t.L.reduce((s,[w,d])=>s+w*d,0); const pool=t.tray.length?t.tray:Object.values(t.R);
-    for(const w of pool) for(let d=1;d<=4;d++) if(w*d===T){ t.ghost=[d,w]; right=Object.assign({},t.R); if(!t.tray.length) right={}, t.tray=[w]; draw(); tray(); sp(X().leverHint(X().ani[w],d)); return; } }
-  right=Object.assign({},tasks[0].R); build(); tray(); sp(X().leverIntro+' '+X().lv[0]);
+    for(const w of pool) for(let d=1;d<=4;d++) if(w*d===T&&!right[d]){ t.ghost=[d,w]; right=Object.assign({},t.R); if(!t.tray.length) right={}, t.tray=[w]; draw(); tray(); sp(X().leverHint(X().ani[w],d)); return; }
+    sp(X().lv[4]); }
+  right=Object.assign({},tasks[0].R); build(); tray(); sp((li===0?X().leverIntro+' ':'')+txt(0));
 }
 
-/* --- roți dințate (v3): atelier cu mașinării --- */
+/* --- 2. roți dințate: atelier cu 10 mașinării --- */
 function gearPath(r,n){ const td=10; let d=''; for(let i=0;i<n;i++){ const a=k=>(i+k)/n*2*Math.PI, P=(an,rr)=>`${(Math.cos(an)*rr).toFixed(1)},${(Math.sin(an)*rr).toFixed(1)}`;
   d+=(i?'L':'M')+P(a(0),r-td/2)+'L'+P(a(.18),r+td/2)+'L'+P(a(.42),r+td/2)+'L'+P(a(.6),r-td/2); } return d+'Z'; }
 const GSZ={S:30,M:45,L:65}, GCOL={S:'#4AA8FF',M:'#3BC48A',L:'#9B7BFF'}, MOT=45, GY=240, GX0=100;
@@ -7214,161 +7240,176 @@ const GTX={
   why:['Well done! The motor turns the gears, and the gears turn the ship’s propeller.','In a clock, small and big gears push each other and move the hands.','A small gear at the end spins very fast. That’s how the car goes fast! A bicycle works the same way.','The big gear at the end turns slowly, but it is very strong. That’s how a crane lifts heavy things!','Every new gear flips the direction. Now the propeller pushes the ship forwards!'],
   noFit:'It doesn’t fit! Try another size.',gap:'The gears are not touching yet.',noRoom:'No more room!',slow:'The car is too slow. Try a smaller gear at the end.',weak:'It’s too heavy! Try a bigger gear at the end.',back:'The ship is still going backwards.',
   undo:'↩ Remove',sz:{S:'Small',M:'Medium',L:'Big'}}};
+window.__rbGTX=GTX;
 const GL=[
- {m:'ship',fit:{x:GX0+MOT+90+45,r:45},start:[]},
- {m:'clock',fit:{x:GX0+MOT+190+45,r:45},start:[]},
- {m:'car',start:[]},
- {m:'crane',start:[]},
- {m:'ship',start:['M'],dir:true}];
-function gears(){
-  stopAll(); view='gears'; setTop(false); back=zoneMech; curRestart=gears; const myGen=gen; const GT_=()=>TR('rbg',GTX);
-  let ti=0, errs=0, busy=false, chain=[], a0=0, last=performance.now(), svg, mx=0, lift=0, okAt=0, dragM=null, said='';
-  const F=frame(GT_().intro,5); F.bub.onclick=()=>sp(F.bub.textContent);
+ {ic:'🚢',m:'ship',fit:{x:GX0+MOT+90+45,r:45},start:[]},
+ {ic:'🕰️',m:'clock',fit:{x:GX0+MOT+190+45,r:45},start:[]},
+ {ic:'🏎️',m:'car',last:'S',start:[]},
+ {ic:'🏗️',m:'crane',last:'L',start:[]},
+ {ic:'🔄',m:'ship',start:['M'],dir:true},
+ {ic:'🕰️🕰️',m:'clock',fit:{x:GX0+MOT+300+45,r:45},start:[]},
+ {ic:'🏎️➡️',m:'car',last:'S',dir:true,start:[]},
+ {ic:'🏗️⬆️',m:'crane',last:'L',dir:true,start:[]},
+ {ic:'🚢🧩',m:'ship',fit:{x:GX0+MOT+180+45,r:45},dir:true,start:[]},
+ {ic:'🧩🧩',m:'clock',fit:{x:GX0+MOT+260+45,r:45},start:[]}];
+function gears(li){ li=li||0;
+  stopAll(); view='gears'; setTop(false); back=mBack('gears'); curRestart=()=>gears(li); const myGen=gen; const GT_=()=>TR('rbg',GTX);
+  const ti=li, Lv=GL[li]; let errs=0, busy=false, chain=[], a0=0, last=performance.now(), svg, mx=0, lift=0, okAt=0, dragM=null, said='';
+  const TT=()=>GT_().t[ti]||GT_().t[0];
+  const F=frame(TT(),0); F.bub.onclick=()=>sp(F.bub.textContent);
   const nT=r=>Math.max(5,Math.round(2*Math.PI*r/36));
   function layout(){ let x=GX0, r=MOT; return chain.map(s=>{ const rr=GSZ[s]; x=x+r+rr; r=rr; return {s,r:rr,x}; }); }
   function endOf(){ const L=layout(); return L.length?L[L.length-1]:{r:MOT,x:GX0}; }
-  function meshed(){ const T=GL[ti].fit; if(!T) return chain.length>0; const e=endOf(); return Math.abs(T.x-e.x-e.r-T.r)<2; }
+  function meshed(){ const T=Lv.fit; if(!T) return chain.length>0; const e=endOf(); return Math.abs(T.x-e.x-e.r-T.r)<2; }
   function build(){
     let s=`<svg viewBox="0 0 900 470"><rect width="900" height="470" rx="22" fill="#F3F6FC"/><rect x="18" y="18" width="520" height="434" rx="18" fill="#E7ECF6"/>`;
     for(let i=0;i<6;i++) s+=`<circle cx="${40+i*95}" cy="40" r="5" fill="#C9D3E0"/><circle cx="${40+i*95}" cy="430" r="5" fill="#C9D3E0"/>`;
     s+=`<clipPath id="rb-mclip"><rect x="548" y="18" width="334" height="434" rx="18"/></clipPath><g id="rb-mach" clip-path="url(#rb-mclip)"></g><line id="rb-shaft" stroke="#8D99AB" stroke-width="10" stroke-linecap="round"/><g id="rb-chain"></g><g id="rb-tgt"></g>`;
+    if(Lv.dir||Lv.last) s+=`<g transform="translate(715 50)"><rect x="-80" y="-24" width="160" height="44" rx="22" fill="#fff" stroke="#24325F" stroke-width="3"/><text y="9" font-size="26" text-anchor="middle">${Lv.last==='S'?'🚀':Lv.last==='L'?'💪':''}${Lv.dir?(Lv.m==='crane'?' ⬆️':' ➡️'):''}</text></g>`;
     s+=`<g id="rb-mot" style="cursor:grab"><rect x="${GX0-70}" y="${GY+30}" width="70" height="60" rx="10" fill="#5A6070"/><text x="${GX0-35}" y="${GY+70}" font-size="26" text-anchor="middle">⚡</text><g transform="translate(${GX0} ${GY})"><g id="rb-g0"><path d="${gearPath(MOT,nT(MOT))}" fill="#FF5D7A" stroke="rgba(0,0,0,.25)" stroke-width="3"/><circle r="${MOT*.6}" fill="rgba(255,255,255,.28)"/><circle cy="${-MOT*.7}" r="6" fill="#fff" stroke="#24325F" stroke-width="2"/><circle r="9" fill="#24325F"/></g></g></g></svg>`;
     F.stage.innerHTML=s; svg=F.stage.firstChild;
     svg.querySelector('#rb-mot').onpointerdown=e=>{ e.preventDefault(); const p=pt(svg,e); dragM={st:Math.atan2(p.y-GY,p.x-GX0),a:a0}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
     svg.onpointermove=e=>{ if(!dragM) return; const p=pt(svg,e); a0=dragM.a+(Math.atan2(p.y-GY,p.x-GX0)-dragM.st)*180/Math.PI; };
     svg.onpointerup=()=>dragM=null;
-    drawChain(); machine(true); }
+    drawChain(); machine(); }
   function drawChain(){ const L=layout(); let s='';
     L.forEach((g,i)=>{ s+=`<g transform="translate(${g.x} ${GY})"><g id="rb-g${i+1}"><path d="${gearPath(g.r,nT(g.r))}" fill="${GCOL[g.s]}" stroke="rgba(0,0,0,.25)" stroke-width="3"/><circle r="${g.r*.6}" fill="rgba(255,255,255,.28)"/><circle cy="${-g.r*.7}" r="${Math.max(4,g.r*.12)}" fill="#fff" stroke="#24325F" stroke-width="2"/><circle r="8" fill="#24325F"/></g></g>`; });
     svg.querySelector('#rb-chain').innerHTML=s;
-    const T=GL[ti].fit; let t='';
+    const T=Lv.fit; let t='';
     if(T){ const ok=meshed(); t=`<g transform="translate(${T.x} ${GY})"><g id="rb-gT"><path d="${gearPath(T.r,nT(T.r))}" fill="${ok?'#FFC83D':'#C9D3E0'}" stroke="rgba(0,0,0,.25)" stroke-width="3" ${ok?'':'stroke-dasharray="6 5"'}/><circle r="9" fill="#24325F"/></g></g>`;
       if(!ok){ const e=endOf(); const gap=T.x-T.r-(e.x+e.r); if(gap>0) t+=`<line x1="${e.x+e.r+4}" y1="${GY+T.r+26}" x2="${T.x-T.r-4}" y2="${GY+T.r+26}" stroke="#FF5D7A" stroke-width="4" stroke-dasharray="6 5"/><text x="${(e.x+e.r+T.x-T.r)/2}" y="${GY+T.r+56}" font-size="26" text-anchor="middle">↔️</text>`; } }
     svg.querySelector('#rb-tgt').innerHTML=t;
     const sx=T?T.x:endOf().x; const sh=svg.querySelector('#rb-shaft'); sh.setAttribute('x1',sx); sh.setAttribute('y1',GY); sh.setAttribute('x2',548); sh.setAttribute('y2',GY);
-    sh.setAttribute('opacity',(T?meshed():chain.length)?1:.25);
-  }
-  /* viteza și sensul ultimei roți față de motor */
-  function outW(){ if(!meshed()) return 0; const T=GL[ti].fit; const e=endOf(); const n=chain.length+(T?1:0); const r=T?T.r:e.r; return (MOT/r)*(n%2?-1:1); }
-  function machine(init){ const M=GL[ti].m, g=svg.querySelector('#rb-mach'); if(!init&&!g) return;
+    sh.setAttribute('opacity',(T?meshed():chain.length)?1:.25); }
+  function outW(){ if(!meshed()) return 0; const T=Lv.fit; const e=endOf(); const n=chain.length+(T?1:0); const r=T?T.r:e.r; return (MOT/r)*(n%2?-1:1); }
+  function machine(){ const M=Lv.m, g=svg.querySelector('#rb-mach'); if(!g) return;
     let s=`<rect x="548" y="18" width="334" height="434" rx="18" fill="${M==='ship'?'#BFE6FF':M==='clock'?'#FFF6E0':M==='car'?'#DFF3FF':'#EAF2FF'}"/>`;
     if(M==='ship') s+=`<rect x="548" y="300" width="334" height="152" rx="0" fill="#3E9BE0"/><path d="M548 300 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t20 0" stroke="#fff" stroke-width="4" fill="none" opacity=".6"/><text x="840" y="290" font-size="44">🏝️</text><g id="rb-ship"></g>`;
     if(M==='clock') s+=`<circle cx="715" cy="230" r="130" fill="#fff" stroke="#24325F" stroke-width="8"/>`+[...Array(12)].map((_,i)=>{ const a=i*30*Math.PI/180; return `<text x="${715+Math.sin(a)*105}" y="${230-Math.cos(a)*105+9}" font-size="24" font-weight="800" text-anchor="middle" fill="#24325F">${i||12}</text>`; }).join('')+`<line id="rb-hh" x1="715" y1="230" x2="715" y2="165" stroke="#24325F" stroke-width="10" stroke-linecap="round"/><line id="rb-mh" x1="715" y1="230" x2="715" y2="130" stroke="#FF5D7A" stroke-width="6" stroke-linecap="round"/><circle cx="715" cy="230" r="10" fill="#24325F"/>`;
     if(M==='car') s+=`<rect x="548" y="360" width="334" height="92" fill="#6B7280"/>${[0,1,2,3].map(i=>`<rect class="rb-lane" x="${560+i*90}" y="402" width="50" height="8" rx="4" fill="#fff"/>`).join('')}<text x="830" y="350" font-size="44">🏁</text><g id="rb-car"></g>`;
     if(M==='crane') s+=`<rect x="548" y="400" width="334" height="52" fill="#9FDB86"/><rect x="600" y="80" width="22" height="320" fill="#FFB21E" stroke="#B57A00" stroke-width="3"/><rect x="600" y="70" width="250" height="20" fill="#FFB21E" stroke="#B57A00" stroke-width="3"/><g id="rb-drum" transform="translate(611 120)"><g id="rb-drumr"><circle r="18" fill="#5A6070"/><rect x="-2" y="-18" width="4" height="36" fill="#fff"/></g></g><line id="rb-rope" x1="820" y1="90" x2="820" y2="300" stroke="#24325F" stroke-width="4"/><g id="rb-load"></g>`;
     g.innerHTML=s; }
-  function animMachine(dt){ const M=GL[ti].m, w=outW(); const ang=a0*w;
-    if(M==='ship'){ const fwd=w>0; const sp_=Math.abs(w)*70; if(w) mx+=(GL[ti].dir? (fwd?1:-1):1)*sp_*dt*(GL[ti].dir?1:1); if(mx>300) mx=-60; if(mx<-80) mx=280;
+  function animMachine(dt){ const M=Lv.m, w=outW(); const ang=a0*w;
+    if(M==='ship'){ const fwd=w>0; const sp_=Math.abs(w)*70; if(w) mx+=(Lv.dir?(fwd?1:-1):1)*sp_*dt; if(mx>300) mx=-60; if(mx<-80) mx=280;
       const sh=svg.querySelector('#rb-ship'); if(sh) sh.setAttribute('transform',`translate(${575+mx} 0)`);
-      if(sh) sh.innerHTML=`<path d="M0 270 L130 270 L112 312 L14 312 Z" fill="#FF5D7A" stroke="#C93A55" stroke-width="3"/><rect x="40" y="220" width="56" height="50" rx="6" fill="#fff" stroke="#24325F" stroke-width="3"/><rect x="58" y="196" width="16" height="26" fill="#24325F"/><g transform="translate(-6 300) rotate(${(ang*3)%360})"><ellipse rx="5" ry="16" fill="#FFC83D"/><ellipse rx="16" ry="5" fill="#FFC83D"/></g>${w&&GL[ti].dir&&!fwd?'<text x="40" y="190" font-size="30">⬅️</text>':''}${w&&(!GL[ti].dir||fwd)?'<text x="140" y="250" font-size="26">💨</text>':''}`; }
+      if(sh) sh.innerHTML=`<path d="M0 270 L130 270 L112 312 L14 312 Z" fill="#FF5D7A" stroke="#C93A55" stroke-width="3"/><rect x="40" y="220" width="56" height="50" rx="6" fill="#fff" stroke="#24325F" stroke-width="3"/><rect x="58" y="196" width="16" height="26" fill="#24325F"/><g transform="translate(-6 300) rotate(${(ang*3)%360})"><ellipse rx="5" ry="16" fill="#FFC83D"/><ellipse rx="16" ry="5" fill="#FFC83D"/></g>${w&&Lv.dir&&!fwd?'<text x="40" y="190" font-size="30">⬅️</text>':''}${w&&(!Lv.dir||fwd)?'<text x="140" y="250" font-size="26">💨</text>':''}`; }
     if(M==='clock'){ const mh=svg.querySelector('#rb-mh'), hh=svg.querySelector('#rb-hh'); const m=-ang*2; if(mh) mh.setAttribute('transform',`rotate(${m} 715 230)`); if(hh) hh.setAttribute('transform',`rotate(${m/12} 715 230)`); }
-    if(M==='car'){ const sp_=Math.abs(w)*90; if(w) mx+=sp_*dt; if(mx>360) mx=-120; const c=svg.querySelector('#rb-car');
-      if(c) c.innerHTML=`<g transform="translate(${560+mx} 300)"><path d="M0 50 L10 20 L40 4 L90 4 L115 24 L140 30 L140 55 L0 55 Z" fill="#4AA8FF" stroke="#1F6FD1" stroke-width="3"/><rect x="48" y="12" width="34" height="18" rx="4" fill="#E0F3FF"/>${[28,112].map(x=>`<g transform="translate(${x} 56) rotate(${(ang*2)%360})"><circle r="16" fill="#2B2F3A"/><rect x="-2" y="-14" width="4" height="28" fill="#A9B0BF"/></g>`).join('')}${w&&Math.abs(w)>1.2?'<text x="-34" y="44" font-size="26">💨</text>':''}</g>`;
+    if(M==='car'){ const sp_=Math.abs(w)*90, dirS=Lv.dir&&w<0?-1:1; if(w) mx+=dirS*sp_*dt; if(mx>360) mx=-120; if(mx<-160) mx=330; const c=svg.querySelector('#rb-car');
+      if(c) c.innerHTML=`<g transform="translate(${560+mx} 300)"><path d="M0 50 L10 20 L40 4 L90 4 L115 24 L140 30 L140 55 L0 55 Z" fill="#4AA8FF" stroke="#1F6FD1" stroke-width="3"/><rect x="48" y="12" width="34" height="18" rx="4" fill="#E0F3FF"/>${[28,112].map(x=>`<g transform="translate(${x} 56) rotate(${(ang*2)%360})"><circle r="16" fill="#2B2F3A"/><rect x="-2" y="-14" width="4" height="28" fill="#A9B0BF"/></g>`).join('')}${w&&Math.abs(w)>1.2&&dirS>0?'<text x="-34" y="44" font-size="26">💨</text>':''}${dirS<0&&w?'<text x="50" y="-6" font-size="28">⬅️</text>':''}</g>`;
       svg.querySelectorAll('.rb-lane').forEach((l,i)=>l.setAttribute('x',560+((i*90-mx*1.5)%360+360)%360)); }
-    if(M==='crane'){ const strong=Math.abs(w)>0&&Math.abs(w)<1; const d=svg.querySelector('#rb-drumr'); if(d) d.setAttribute('transform',`rotate(${strong?ang:(w?Math.sin(performance.now()/40)*6:0)})`);
-      if(strong) lift=Math.min(170,lift+25*dt); const y=300-lift; const r=svg.querySelector('#rb-rope'); if(r) r.setAttribute('y2',y);
-      const l=svg.querySelector('#rb-load'); if(l) l.innerHTML=`<g transform="translate(820 ${y})"><path d="M-8 0 Q0 14 8 0" stroke="#24325F" stroke-width="4" fill="none"/><rect x="-46" y="14" width="92" height="70" rx="8" fill="#C98A4E" stroke="#8F5427" stroke-width="3"/><text x="0" y="66" font-size="44" text-anchor="middle">🐘</text>${w&&!strong?'<text x="40" y="0" font-size="28">💦</text>':''}</g>`; }
-  }
+    if(M==='crane'){ const strong=Math.abs(w)>0&&Math.abs(w)<1, up=!Lv.dir||w>0; const d=svg.querySelector('#rb-drumr'); if(d) d.setAttribute('transform',`rotate(${strong?ang:(w?Math.sin(performance.now()/40)*6:0)})`);
+      if(strong&&up) lift=Math.min(170,lift+25*dt); const y=300-lift; const r=svg.querySelector('#rb-rope'); if(r) r.setAttribute('y2',y);
+      const l=svg.querySelector('#rb-load'); if(l) l.innerHTML=`<g transform="translate(820 ${y})"><path d="M-8 0 Q0 14 8 0" stroke="#24325F" stroke-width="4" fill="none"/><rect x="-46" y="14" width="92" height="70" rx="8" fill="#C98A4E" stroke="#8F5427" stroke-width="3"/><text x="0" y="66" font-size="44" text-anchor="middle">🐘</text>${w&&!strong?'<text x="40" y="0" font-size="28">💦</text>':''}${strong&&!up?'<text x="-80" y="40" font-size="30">⬇️</text>':''}</g>`; } }
   function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-last)/1000); last=now; if(!dragM) a0+=60*dt;
     const g0=svg&&svg.querySelector('#rb-g0'); if(g0) g0.setAttribute('transform',`rotate(${a0.toFixed(1)})`);
-    const L=layout(); let r=MOT, sign=1, ok=true;
+    const L=layout(); let sign=1;
     L.forEach((g,i)=>{ sign=-sign; const e=svg.querySelector('#rb-g'+(i+1)); if(e) e.setAttribute('transform',`rotate(${(a0*MOT/g.r*sign+(i%2?0:180/nT(g.r))).toFixed(1)})`); });
-    const T=GL[ti].fit; const gT=svg&&svg.querySelector('#rb-gT'); if(gT&&meshed()) gT.setAttribute('transform',`rotate(${(a0*MOT/T.r*(-sign)).toFixed(1)})`);
+    const T=Lv.fit; const gT=svg&&svg.querySelector('#rb-gT'); if(gT&&meshed()) gT.setAttribute('transform',`rotate(${(a0*MOT/T.r*(-sign)).toFixed(1)})`);
     if(svg) animMachine(dt);
     if(!busy&&okAt&&now>okAt){ okAt=0; win(); }
     raf=requestAnimationFrame(loop); }
-  function evaluate(){ const Lv=GL[ti], w=outW(), e=endOf(); okAt=0; F.set(GT_().t[ti]);
-    if(Lv.fit){ if(meshed()){ okAt=performance.now()+1600; F.set('⚙️ '+GT_().t[ti]); } else if(chain.length) say1('gap',GT_().gap); return; }
+  function evaluate(){ const w=outW(), e=endOf(); okAt=0; F.set(TT());
+    if(Lv.fit&&!meshed()){ if(chain.length) say1('gap',GT_().gap); return; }
     if(!chain.length) return;
-    if(Lv.m==='car'){ if(e.s==='S') okAt=performance.now()+2000; else say1('slow'+e.s,GT_().slow); }
-    if(Lv.m==='crane'){ if(e.s==='L') okAt=performance.now()+2600; else say1('weak'+e.s,GT_().weak); }
-    if(Lv.dir){ if(w>0) okAt=performance.now()+2000; else say1('back'+chain.length,GT_().back); }
-  }
+    if(Lv.last==='S'&&e.s!=='S'){ say1('slow'+e.s,GT_().slow); return; }
+    if(Lv.last==='L'&&e.s!=='L'){ say1('weak'+e.s,GT_().weak); return; }
+    if(Lv.dir&&w<=0){ say1('back'+chain.length,Lv.m==='ship'?GT_().back:MXT().gBack); return; }
+    okAt=performance.now()+(Lv.m==='crane'?2600:Lv.m==='car'?2000:1600); F.set('⚙️ '+TT()); }
   function say1(k,t){ F.set('🤔 '+t); if(said===k) return; said=k; sp(t); }
-  function add(sz){ if(busy) return; const Lv=GL[ti], e=endOf(), r=GSZ[sz], nx=e.x+e.r+r;
+  function add(sz){ if(busy) return; const e=endOf(), r=GSZ[sz], nx=e.x+e.r+r;
     if(Lv.fit){ if(meshed()||nx+r>Lv.fit.x-Lv.fit.r+1){ errs++; boing(); shakeSt(); sp(GT_().noFit); return; } }
     else if(nx+r>530){ boing(); sp(GT_().noRoom); return; }
     chain.push(sz); snd(500+r*4,.08); said=''; drawChain(); evaluate(); }
   function undo(){ if(busy||!chain.length) return; chain.pop(); snd(300,.06); said=''; drawChain(); evaluate(); }
   function shakeSt(){ const s=F.stage; s.classList.remove('sa-shake'); void s.offsetWidth; s.classList.add('sa-shake'); }
-  async function win(){ busy=true; chime(); award(); F.dot(ti+1); try{ confetti(12); }catch(e){} const w=GT_().why[ti]; F.set('✅ '+w); await spW(w,2400); if(myGen!==gen) return;
-    ti++; if(ti>=GL.length){ cancelAnimationFrame(raf); return finish('gears',rate(errs),null,null); } setupTask(); }
-  function setupTask(){ chain=[...GL[ti].start]; mx=0; lift=0; said=''; busy=false; okAt=0; build(); F.set(GT_().t[ti]); sp((ti===0?GT_().intro+' ':'')+GT_().t[ti]);
-    F.ctrl.innerHTML=''; ['S','M','L'].forEach(sz=>{ const b=el('button','rb-b',`<svg viewBox="-40 -40 80 80" style="width:${sz==='S'?30:sz==='M'?40:52}px;height:${sz==='S'?30:sz==='M'?40:52}px;vertical-align:middle"><path d="${gearPath(GSZ[sz]*.5,nT(GSZ[sz]))}" transform="scale(${sz==='L'?1:sz==='M'?1.3:1.8})" fill="${GCOL[sz]}"/></svg> ${GT_().sz[sz]}`); b.onclick=()=>add(sz); F.ctrl.appendChild(b); });
-    F.ctrl.appendChild(btn(GT_().undo,'',undo)); evaluate(); }
-  setupTask(); raf=requestAnimationFrame(loop);
+  async function win(){ busy=true; chime(); award(); try{ confetti(12); }catch(e){} const w=GT_().why[ti]||GT_().why[0]; F.set('✅ '+w); await spW(w,2400); if(myGen!==gen) return;
+    cancelAnimationFrame(raf); finish('mgears'+li,rate(errs),null,mNext('gears',li)); }
+  chain=[...Lv.start]; build(); sp((li===0?GT_().intro+' ':'')+TT());
+  ['S','M','L'].forEach(sz=>{ const b=el('button','rb-b',`<svg viewBox="-40 -40 80 80" style="width:${sz==='S'?30:sz==='M'?40:52}px;height:${sz==='S'?30:sz==='M'?40:52}px;vertical-align:middle"><path d="${gearPath(GSZ[sz]*.5,nT(GSZ[sz]))}" transform="scale(${sz==='L'?1:sz==='M'?1.3:1.8})" fill="${GCOL[sz]}"/></svg> ${GT_().sz[sz]}`); b.onclick=()=>add(sz); F.ctrl.appendChild(b); });
+  F.ctrl.appendChild(btn(GT_().undo,'',undo)); evaluate(); raf=requestAnimationFrame(loop);
 }
 
-/* --- bicicleta --- */
-function bike(){
-  stopAll(); view='bike'; setTop(false); back=zoneMech; curRestart=bike; const myGen=gen;
-  let ti=0, errs=0, busy=false, ratio=2, pedaling=false, th=0, ph=0, dist=0, goal=1600, rival=0, slope=0, saidHard=false, oneTurn=null, rearTurns=0;
-  const F=frame(X().bike[0],5); F.bub.onclick=()=>sp(F.bub.textContent);
+/* --- 3. bicicleta: număr aleator de ture, traseu cu deal --- */
+const BK=[{ic:'🚲',t:'ride'},{ic:'🔢',t:'count'},{ic:'🐌',t:'race'},{ic:'⛰️',t:'hill'},{ic:'❓',t:'quiz'},{ic:'🔢🔢',t:'count2'},{ic:'🗺️',t:'tour'},{ic:'🔢🎲',t:'count3'}];
+function bike(li){ li=li||0;
+  stopAll(); view='bike'; setTop(false); back=mBack('bike'); curRestart=()=>bike(li); const myGen=gen;
+  const T=BK[li].t; let errs=0, busy=false, ratio=2, pedaling=false, th=0, ph=0, dist=0, goal=1600, rival=0, slope=0, saidHard=false, oneTurn=null, turns=1;
+  const TX_=()=>X().bike[li]||X().bike[0];
+  const F=frame(TX_(),0); F.bub.onclick=()=>sp(F.bub.textContent);
   const CR=34, cogR=()=>CR/ratio, WR=70;
   let svg, last=performance.now();
+  const HILL=[900,1500];
   function build(){
     let s=`<svg viewBox="0 0 900 470"><defs><linearGradient id="rb-sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE6FF"/><stop offset="1" stop-color="#EAF7FF"/></linearGradient></defs><rect width="900" height="470" rx="22" fill="url(#rb-sky2)"/>`;
     s+=`<g id="rb-bg"></g><g id="rb-world"><rect x="-200" y="${400}" width="1300" height="200" fill="#8FD07A"/><g id="rb-road"></g><g id="rb-flag"></g><g id="rb-riv"></g><g id="rb-bk" transform="translate(300 330)"></g></g>`;
-    s+=`<rect x="250" y="18" width="400" height="16" rx="8" fill="#fff" stroke="#24325F" stroke-width="2"/><rect id="rb-prog" x="252" y="20" width="0" height="12" rx="6" fill="#3BC48A"/><text x="664" y="34" font-size="22">🏁</text><text id="rb-sweat" x="560" y="140" font-size="40"></text><text id="rb-cnt" x="450" y="80" font-size="26" font-weight="800" text-anchor="middle" fill="#24325F"></text></svg>`;
+    s+=`<rect x="250" y="18" width="400" height="16" rx="8" fill="#fff" stroke="#24325F" stroke-width="2"/>${T==='tour'?`<rect x="${252+396*HILL[0]/2400}" y="20" width="${396*(HILL[1]-HILL[0])/2400}" height="12" fill="#C98A4E" opacity=".5"/><text x="${252+396*(HILL[0]+HILL[1])/4800}" y="58" font-size="22" text-anchor="middle">⛰️</text>`:''}<rect id="rb-prog" x="252" y="20" width="0" height="12" rx="6" fill="#3BC48A"/><text x="664" y="34" font-size="22">🏁</text><text id="rb-sweat" x="560" y="140" font-size="40"></text><text id="rb-cnt" x="450" y="92" font-size="30" font-weight="800" text-anchor="middle" fill="#24325F"></text><text id="rb-rc" x="760" y="120" font-size="44" font-weight="800" text-anchor="middle" fill="#FF5D7A"></text></svg>`;
     F.stage.innerHTML=s; svg=F.stage.firstChild;
-    svg.onpointerdown=e=>{ if(e.target.closest('button')) return; pedaling=true; }; svg.onpointerup=()=>pedaling=false; svg.onpointerleave=()=>pedaling=false;
-  }
+    svg.onpointerdown=e=>{ if(e.target.closest('button')) return; if(T!=='count'&&T!=='count2'&&T!=='count3') pedaling=true; }; svg.onpointerup=()=>pedaling=false; svg.onpointerleave=()=>pedaling=false; }
+  const isCount=()=>T==='count'||T==='count2'||T==='count3';
   function bikeSVG(){ const rc=cogR();
     const sp_=(cx,a)=>{ let s=''; for(let k=0;k<6;k++){ const an=(a+k*30)*Math.PI/180; s+=`<line x1="${cx-Math.cos(an)*WR}" y1="${-Math.sin(an)*WR}" x2="${cx+Math.cos(an)*WR}" y2="${Math.sin(an)*WR}" stroke="#9AA5B8" stroke-width="2"/>`; } return s; };
-    let s=`<circle cx="0" cy="0" r="${WR}" fill="none" stroke="#2B2F3A" stroke-width="10"/>${sp_(0,ph)}<circle cx="${Math.cos(ph*Math.PI/180)*(WR-14)}" cy="${Math.sin(ph*Math.PI/180)*(WR-14)}" r="7" fill="#FF5D7A"/>`;
+    let s=`<circle cx="0" cy="0" r="${WR}" fill="none" stroke="#2B2F3A" stroke-width="10"/>${sp_(0,ph)}<circle cx="${Math.cos(ph*Math.PI/180)*(WR-14)}" cy="${Math.sin(ph*Math.PI/180)*(WR-14)}" r="9" fill="#FF5D7A" stroke="#fff" stroke-width="2"/>`;
     s+=`<circle cx="300" cy="0" r="${WR}" fill="none" stroke="#2B2F3A" stroke-width="10"/>${sp_(300,ph)}`;
     s+=`<path d="M0 0 L130 0 L110 -110 Z M110 -110 L265 -110 L130 0 M265 -110 L300 0 M265 -110 L272 -140" stroke="#FF5D7A" stroke-width="9" fill="none" stroke-linejoin="round" stroke-linecap="round"/><path d="M255 -146 L292 -140" stroke="#2B2F3A" stroke-width="8" stroke-linecap="round"/><rect x="90" y="-124" width="44" height="12" rx="6" fill="#2B2F3A"/>`;
-    const L=Math.hypot(130,0); const chainOff=(th*Math.PI/180*CR)%14;
+    const chainOff=(th*Math.PI/180*CR)%14;
     s+=`<path d="M0 ${-rc} L130 ${-CR} A${CR} ${CR} 0 0 1 130 ${CR} L0 ${rc} A${rc} ${rc} 0 0 1 0 ${-rc}" stroke="#5A6070" stroke-width="5" fill="none" stroke-dasharray="8 6" stroke-dashoffset="${(-chainOff).toFixed(1)}"/>`;
     s+=`<g transform="translate(0 0) rotate(${ph})"><path d="${gearPath(rc,Math.max(6,Math.round(18/ratio)))}" fill="#4AA8FF" stroke="#1F6FD1" stroke-width="2"/></g><g transform="translate(130 0) rotate(${th})"><path d="${gearPath(CR,18)}" fill="#FFC83D" stroke="#C99400" stroke-width="2"/><circle r="6" fill="#24325F"/></g>`;
+    if(isCount()) s+=`<text x="130" y="${CR+34}" font-size="18" font-weight="800" text-anchor="middle" fill="#7A5A00">${X().teeth(36)}</text><text x="0" y="${-rc-14}" font-size="18" font-weight="800" text-anchor="middle" fill="#1F6FD1">${X().teeth(36/ratio)}</text>`;
     const ca=th*Math.PI/180; [0,Math.PI].forEach(o=>{ const x=130+Math.cos(ca+o)*40, y=Math.sin(ca+o)*40; s+=`<line x1="130" y1="0" x2="${x}" y2="${y}" stroke="#24325F" stroke-width="7" stroke-linecap="round"/><rect x="${x-13}" y="${y-5}" width="26" height="10" rx="3" fill="#2B2F3A"/>`; });
     s+=`<g transform="translate(118 -150) scale(.72)">${robo()}</g>`;
     return s; }
-  function scene(){ const bk=svg.querySelector('#rb-bk'); bk.innerHTML=bikeSVG();
+  const onHill=()=>T==='hill'||(T==='tour'&&dist>=HILL[0]&&dist<HILL[1]);
+  function scene(){ slope=onHill()?1:0; const bk=svg.querySelector('#rb-bk'); bk.innerHTML=bikeSVG();
     const road=svg.querySelector('#rb-road'); let r=''; const off=dist%120; for(let i=-2;i<10;i++) r+=`<rect x="${i*120-off}" y="412" width="60" height="8" rx="4" fill="#fff" opacity=".7"/>`;
     const toff=(dist*.5)%300; for(let i=-1;i<5;i++) r+=`<text x="${i*300-toff+60}" y="400" font-size="70">${i%2?'🌳':'🌲'}</text>`; road.innerHTML=r;
     svg.querySelector('#rb-world').setAttribute('transform',slope?'rotate(-9 450 330)':'');
-    const fx=300+(goal-dist); svg.querySelector('#rb-flag').innerHTML=fx<1000?`<text x="${fx}" y="400" font-size="60">🏁</text>`:'';
-    svg.querySelector('#rb-riv').innerHTML=(GT[ti]==='race')?`<text x="${300+(rival-dist)}" y="398" font-size="64">🐌</text>`:'';
-    svg.querySelector('#rb-prog').setAttribute('width',Math.min(396,396*dist/goal));
-  }
-  const GT=['ride','count','race','hill','quiz'];
+    const fx=300+(goal-dist); svg.querySelector('#rb-flag').innerHTML=fx<1000&&!isCount()?`<text x="${fx}" y="400" font-size="60">🏁</text>`:'';
+    svg.querySelector('#rb-riv').innerHTML=(T==='race'||T==='tour')?`<text x="${300+(rival-dist)}" y="398" font-size="64">🐌</text>`:'';
+    svg.querySelector('#rb-prog').setAttribute('width',isCount()?0:Math.min(396,396*dist/goal)); }
   function cad(){ if(!slope) return 1; return [0,.9,.25,.07][ratio]; }
   function gearBtns(){ const box=el('div','rb-ctrl'); [[1,X().gEasy],[2,X().gMid],[3,X().gFast]].forEach(([r,t])=>{ const b=btn(t,ratio===r?'on':'',()=>{ ratio=r; snd(700,.05,'square',.06); [...box.children].forEach((c,i)=>c.classList.toggle('on',i+1===r)); }); box.appendChild(b); }); return box; }
   function pedalBtn(){ const b=btn(X().pedal,'go',()=>{}); b.style.minWidth='170px'; b.onpointerdown=e=>{ e.preventDefault(); pedaling=true; }; b.onpointerup=b.onpointerleave=b.onpointercancel=()=>pedaling=false; return b; }
-  function setupTask(){ const t=GT[ti]; dist=0; rival=0; th=0; ph=0; saidHard=false; pedaling=false; slope=t==='hill'?1:0; goal=t==='race'?2400:t==='hill'?1100:1600;
-    ratio=t==='ride'||t==='count'?2:t==='race'?1:t==='hill'?3:2; F.set(X().bike[ti]); F.ctrl.innerHTML='';
-    svg.querySelector('#rb-cnt').textContent='';
-    if(t==='ride') F.ctrl.append(pedalBtn());
-    else if(t==='count'){ rearTurns=0; F.ctrl.append(btn(X().oneTurn,'go',()=>{ if(oneTurn==null&&!busy){ oneTurn=0; } })); }
-    else if(t==='race'||t==='hill') F.ctrl.append(gearBtns(),pedalBtn());
-    else if(t==='quiz'){ F.ctrl.append(btn(X().bigCog,'',()=>quiz(true)),btn(X().smallCog,'',()=>quiz(false))); }
-    scene(); sp(X().bike[ti]); }
-  function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-last)/1000); last=now; const t=GT[ti];
+  let rearStart=0;
+  function setupTask(){ dist=0; rival=0; th=0; ph=0; saidHard=false; pedaling=false; oneTurn=null; goal=T==='race'||T==='tour'?2400:T==='hill'?1100:1600;
+    ratio=T==='ride'?2:T==='race'?1:T==='hill'?3:T==='tour'?2:T==='count'?[2,3][R(2)]:T==='count2'?[1,2,3][R(3)]:[2,3][R(2)];
+    turns=T==='count2'?2:T==='count3'?[2,3][R(2)]:1;
+    F.set(TX_()); F.ctrl.innerHTML=''; svg.querySelector('#rb-cnt').textContent=''; svg.querySelector('#rb-rc').textContent='';
+    if(T==='ride') F.ctrl.append(pedalBtn());
+    else if(isCount()){ F.ctrl.append(btn(turns===1?X().oneTurn:'↻ '+'🦶'.repeat(turns),'go',()=>{ if(oneTurn==null&&!busy){ oneTurn=0; rearStart=ph; } })); }
+    else if(T==='race'||T==='hill'||T==='tour') F.ctrl.append(gearBtns(),pedalBtn());
+    else if(T==='quiz'){ F.ctrl.append(btn(X().bigCog,'',()=>quiz(true)),btn(X().smallCog,'',()=>quiz(false))); }
+    scene(); sp(TX_()); }
+  function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-last)/1000); last=now;
     if(svg&&!busy){
-      if(t==='count'&&oneTurn!=null){ const d=Math.min(160*dt,360-oneTurn); oneTurn+=d; th+=d; ph+=d*ratio; svg.querySelector('#rb-cnt').textContent=`🦶 ${Math.floor(oneTurn/359.9)}`; if(oneTurn>=360){ oneTurn=null; count(); } }
-      else if(pedaling&&t!=='quiz'){ const c=cad(), dth=230*c*dt; th+=dth; const dph=dth*ratio; ph+=dph; dist+=dph*Math.PI/180*WR*1.1; if(Math.random()<.15) step();
+      if(isCount()&&oneTurn!=null){ const d=Math.min(150*dt,360*turns-oneTurn); oneTurn+=d; th+=d; ph+=d*ratio; svg.querySelector('#rb-cnt').textContent=`🦶 ${Math.floor(oneTurn/359.9)}`;
+        const rt=Math.floor((ph-rearStart)/359.9); const rc=svg.querySelector('#rb-rc'); if(rc.dataset.n!=rt){ rc.dataset.n=rt; if(rt>0) snd(900+rt*80,.06,'sine',.08); } rc.textContent=''; if(oneTurn>=360*turns){ oneTurn=null; count(); } }
+      else if(pedaling&&T!=='quiz'&&!isCount()){ const c=cad(), dth=230*c*dt; th+=dth; const dph=dth*ratio; ph+=dph; dist+=dph*Math.PI/180*WR*1.1; if(Math.random()<.15) step();
         const sw=svg.querySelector('#rb-sweat'); sw.textContent=c<.3?'💦':''; if(c<.3&&!saidHard){ saidHard=true; errs++; sp(X().hard); } }
-      if(t==='race') rival+=700*dt*(pedaling||dist>0?1:0);
-      if(t!=='count'&&t!=='quiz'&&dist>=goal){ done(); }
-      else if(t==='race'&&rival>=goal){ lost(); }
+      if(T==='race') rival+=700*dt*(pedaling||dist>0?1:0);
+      if(T==='tour') rival+=460*dt*(pedaling||dist>0?1:0);
+      if(!isCount()&&T!=='quiz'&&dist>=goal) ok();
+      else if((T==='race'||T==='tour')&&rival>=goal) lost();
       scene(); }
     raf=requestAnimationFrame(loop); }
-  async function ok(i){ busy=true; pedaling=false; chime(); award(); F.dot(ti+1); try{ confetti(12); }catch(e){} react(svg.querySelector('#rb-bk'),'happy'); F.set('✅ '+X().bikeWhy[i]); await spW(X().bikeWhy[i],2000); if(myGen!==gen) return; ti++; busy=false; if(ti>=5){ cancelAnimationFrame(raf); return finish('bike',rate(errs),null,null); } setupTask(); }
-  function done(){ ok(ti); }
-  async function lost(){ busy=true; pedaling=false; errs++; boing(); F.set(X().lost); await spW(X().lost,1200); if(myGen!==gen) return; busy=false; setupTask(); }
-  function count(){ F.ctrl.innerHTML=''; F.set(X().countQ); sp(X().countQ); [1,2,3].forEach(n=>F.ctrl.append(btn(String(n),'',()=>{ if(busy) return; if(n===2) ok(1); else { errs++; boing(); oneTurn=0; th=0; ph=0; F.set(X().bike[1]); } }))); }
-  function quiz(big){ if(busy) return; if(big) ok(4); else { errs++; boing(); sp(X().hard); } }
+  async function ok(){ busy=true; pedaling=false; chime(); award(); try{ confetti(12); }catch(e){} react(svg.querySelector('#rb-bk'),'happy'); const w=X().bikeWhy[li]||''; const msg=isCount()?MXT().bkCount(ratio*turns,turns):w; F.set('✅ '+msg); await spW(msg,2000); if(myGen!==gen) return; cancelAnimationFrame(raf); finish('mbike'+li,rate(errs),null,mNext('bike',li)); }
+  async function lost(){ busy=true; pedaling=false; errs++; boing(); const m=T==='tour'?MXT().bkTourLost:X().lost; F.set(m); await spW(m,1200); if(myGen!==gen) return; busy=false; setupTask(); }
+  function count(){ F.ctrl.innerHTML=''; F.set(X().countQ); sp(X().countQ); const ans=ratio*turns; const opts=new Set([ans]); while(opts.size<3){ const o=ans+RR(-2,2); if(o>0&&o<=9) opts.add(o); }
+    [...opts].sort((a,b)=>a-b).forEach(n=>F.ctrl.append(btn(String(n),'',()=>{ if(busy) return; if(n===ans) ok(); else { errs++; boing(); sp(MXT().bkAgain); oneTurn=null; th=0; ph=0; F.ctrl.innerHTML=''; F.ctrl.append(btn(turns===1?X().oneTurn:'↻ '+'🦶'.repeat(turns),'go',()=>{ if(oneTurn==null&&!busy){ oneTurn=0; rearStart=ph; } })); scene(); } }))); }
+  function quiz(big){ if(busy) return; if(big) ok(); else { errs++; boing(); sp(X().hard); } }
   build(); setupTask(); raf=requestAnimationFrame(loop);
 }
 
-/* --- rampa (v2) --- */
-function ramp(){
-  stopAll(); view='ramp'; setTop(false); back=zoneMech; curRestart=ramp; const myGen=gen;
-  let ti=0, errs=0, h=120, busy=false, tx=0, marks=[], tipDone=false; const F=frame(X().rampIntro,5); F.bub.onclick=()=>sp(F.bub.textContent);
-  const FL=380, BR=16, X0=70, X1=310, dist=hh=>(hh-30)*2.3; let svg;
-  const newT=()=>{ tx=RR(440,820); marks=[]; };
-  function build(){ let s=`<svg viewBox="0 0 900 430"><rect width="900" height="430" rx="22" fill="#EAF6FF"/><rect x="0" y="${FL}" width="900" height="50" fill="#9FDB86"/>`;
+/* --- 4. rampa: gheață, nisip, coș --- */
+const RPL=[{ic:'🛝',n:3,w:38},{ic:'🎯',n:3,w:26},{ic:'❄️',n:3,w:32,surf:'ice'},{ic:'🏖️',n:3,w:32,surf:'sand'},{ic:'❄️🏖️',n:4,w:30,mix:true},{ic:'🧺',n:3,w:20,basket:true},{ic:'🏆',n:4,w:22,mix:true,basket:true}];
+const SURF={grass:{f:1,c:'#9FDB86',ic:'🌱'},ice:{f:1.45,c:'#CDEFFF',ic:'❄️'},sand:{f:.6,c:'#F2D38B',ic:'🏖️'}};
+function ramp(li){ li=li||0;
+  stopAll(); view='ramp'; setTop(false); back=mBack('ramp'); curRestart=()=>ramp(li); const myGen=gen;
+  const Lv=RPL[li]; let ti=0, errs=0, h=120, busy=false, tx=0, marks=[], tipDone=false, surf=Lv.surf||'grass', lastSurf='';
+  const intro=()=>X().rampIntro+(surf==='ice'?' '+MXT().rIce:surf==='sand'?' '+MXT().rSand:'')+(Lv.basket?' '+MXT().rBasket:'');
+  const F=frame(intro(),Lv.n); F.bub.onclick=()=>sp(F.bub.textContent);
+  const FL=380, BR=16, X0=70, X1=310, dist=hh=>(hh-30)*2.3*SURF[surf].f; let svg;
+  const newT=()=>{ if(Lv.mix){ const o=['grass','ice','sand'].filter(s=>s!==surf); surf=o[R(o.length)]; } const lo=X1+dist(60)+20, hi=Math.min(850,X1+dist(255)); tx=RR(Math.round(lo),Math.round(hi)); marks=[]; };
+  function build(){ let s=`<svg viewBox="0 0 900 430"><rect width="900" height="430" rx="22" fill="#EAF6FF"/><rect id="rb-floor" x="0" y="${FL}" width="900" height="50"/><g id="rb-fdec"></g>`;
     s+=`<g id="rb-tgt"></g><g id="rb-marks"></g>`;
     for(let k=1;k<=10;k++) s+=`<line x1="${X0-28}" y1="${FL-k*26}" x2="${X0-14}" y2="${FL-k*26}" stroke="#8F5427" stroke-width="2"/><text x="${X0-34}" y="${FL-k*26+5}" font-size="12" text-anchor="end" fill="#8F5427">${k}</text>`;
     s+=`<path id="rb-rp" fill="#C98A4E" stroke="#8F5427" stroke-width="3"/><line id="rb-pole" stroke="#8F5427" stroke-width="7"/>`;
@@ -7381,23 +7422,104 @@ function ramp(){
   let drag=false;
   function setH(v){ const nh=clamp(Math.round(v),40,260); if(nh!==h){ if(Math.abs(nh-h)>=13) snd(300+nh,.03,'sine',.05); h=nh; upd(); } }
   function upd(){ svg.querySelector('#rb-rp').setAttribute('d',`M${X0} ${FL} L${X1} ${FL} L${X0} ${FL-h} Z`);
+    const S=SURF[surf]; svg.querySelector('#rb-floor').setAttribute('fill',S.c); svg.querySelector('#rb-fdec').innerHTML=surf==='grass'?'':[...Array(8)].map((_,i)=>`<text x="${X1+40+i*72}" y="${FL+38}" font-size="22" opacity=".7">${surf==='ice'?'❄️':'·'}</text>`).join('')+`<text x="860" y="${FL-12}" font-size="34" text-anchor="middle">${S.ic}</text>`;
     const pole=svg.querySelector('#rb-pole'); pole.setAttribute('x1',X0); pole.setAttribute('x2',X0); pole.setAttribute('y1',FL); pole.setAttribute('y2',FL-h);
     svg.querySelector('#rb-hd').setAttribute('transform',`translate(${X0} ${FL-h})`);
-    svg.querySelector('#rb-tgt').innerHTML=`<rect x="${tx-38}" y="${FL-4}" width="76" height="8" rx="4" fill="#3BC48A"/><text x="${tx+6}" y="${FL-8}" font-size="46" text-anchor="middle">🚩</text>`;
+    svg.querySelector('#rb-tgt').innerHTML=Lv.basket?`<rect x="${tx-Lv.w}" y="${FL-4}" width="${Lv.w*2}" height="8" rx="4" fill="#3BC48A"/><text x="${tx}" y="${FL+4}" font-size="54" text-anchor="middle">🧺</text>`:`<rect x="${tx-Lv.w}" y="${FL-4}" width="${Lv.w*2}" height="8" rx="4" fill="#3BC48A"/><text x="${tx+6}" y="${FL-8}" font-size="46" text-anchor="middle">🚩</text>`;
     svg.querySelector('#rb-marks').innerHTML=marks.map(x=>`<text x="${x}" y="${FL+34}" font-size="24" text-anchor="middle" fill="#FF5D7A">✖</text>`).join('');
     ballAt(0); }
   function ballAt(s,fx){ const b=svg.querySelector('#rb-ball'); let x,y;
     if(fx==null){ const dx=X1-X0, dy=h, L=Math.hypot(dx,dy), nx=dy/L*BR, ny=-dx/L*BR; x=X0+18+(dx-18)*s+nx; y=FL-h+dy*(18/dx)+(dy-dy*18/dx)*s+ny; }
     else { x=fx; y=FL-BR; } b.setAttribute('cx',x); b.setAttribute('cy',y); }
-  function drop(){ if(busy) return; busy=true; const D=dist(h), stopX=X1+D, t1=.45+.6*Math.sqrt(h/260), t2=.4+D/420; const st=performance.now();
+  function drop(){ if(busy) return; busy=true; const D=dist(h), stopX=Math.min(890,X1+D), t1=.45+.6*Math.sqrt(h/260), t2=.4+D/420; const st=performance.now();
     const fr=now=>{ if(myGen!==gen) return; const t=(now-st)/1000;
-      if(t<t1){ ballAt((t/t1)**2); } else if(t<t1+t2){ const u=(t-t1)/t2; ballAt(null,X1+D*(1-(1-u)**2)); } else { ballAt(null,stopX); return judge(stopX); }
+      if(t<t1){ ballAt((t/t1)**2); } else if(t<t1+t2){ const u=(t-t1)/t2; ballAt(null,X1+(stopX-X1)*(1-(1-u)**2)); } else { ballAt(null,stopX); return judge(stopX); }
       raf=requestAnimationFrame(fr); }; snd(300,.1); raf=requestAnimationFrame(fr); }
-  async function judge(x){ if(Math.abs(x-tx)<=38){ chime(); award(); F.dot(ti+1); F.set('🎯 '+X().rampOk); try{ confetti(10); }catch(e){} await spW(X().rampOk+(!tipDone?' '+X().rampTip:''),1600); tipDone=true; if(myGen!==gen) return;
-      ti++; busy=false; if(ti>=5) return finish('ramp',rate(errs),null,null); newT(); upd(); F.set(X().rampIntro); return; }
+  async function judge(x){ if(Math.abs(x-tx)<=Lv.w){ chime(); award(); F.dot(ti+1); F.set('🎯 '+X().rampOk); try{ confetti(10); }catch(e){}
+      const tip=surf!=='grass'&&lastSurf!==surf?' '+(surf==='ice'?MXT().rIceWhy:MXT().rSandWhy):(!tipDone?' '+X().rampTip:''); lastSurf=surf; await spW(X().rampOk+tip,1600); tipDone=true; if(myGen!==gen) return;
+      ti++; busy=false; if(ti>=Lv.n) return finish('mramp'+li,rate(errs),null,mNext('ramp',li)); newT(); upd(); F.set(intro()); if(Lv.mix) sp(surf==='ice'?MXT().rIce:surf==='sand'?MXT().rSand:MXT().rGrass); return; }
     errs++; boing(); marks.push(Math.round(x)); const m=x>tx?X().far:X().near; F.set(m); await spW(m,600); busy=false; upd(); }
   newT(); build();
-  F.ctrl.append(btn(X().rampDown,'',()=>{ if(!busy) setH(h-13); }),btn(X().rampUp,'',()=>{ if(!busy) setH(h+13); }),btn(X().drop,'go',drop)); sp(X().rampIntro);
+  F.ctrl.append(btn(X().rampDown,'',()=>{ if(!busy) setH(h-13); }),btn(X().rampUp,'',()=>{ if(!busy) setH(h+13); }),btn(X().drop,'go',drop)); sp(intro());
+}
+
+/* --- 5. scripetele: împarte greutatea --- */
+const PUL=[{ic:'🐱',loads:[['🐱',2]]},{ic:'🐶',loads:[['🐶',5]]},{ic:'🐘',loads:[['🐘',11]]},{ic:'🐱🐴🐘',loads:[['🐱',2],['🐴',7],['🐘',11]]},{ic:'🎹',loads:[['🎹',6],['🐄',10],['🪨',3]],fast:true}];
+function pulley(li){ li=li||0;
+  stopAll(); view='pulley'; setTop(false); back=mBack('pulley'); curRestart=()=>pulley(li); const myGen=gen;
+  const Lv=PUL[li], STR=3, TOP=70, GROUND=430, GOAL=170; let k=0, n=1, y=0, rope=0, pulling=false, busy=false, errs=0, last=0, svg, saidH=false;
+  const F=frame(MXT().pIntro,Lv.loads.length); F.bub.onclick=()=>sp(F.bub.textContent);
+  const W=()=>Lv.loads[k][1], force=()=>W()/n, can=()=>force()<=STR;
+  function draw(){ const L=Lv.loads[k], ly=GROUND-90-y, by=ly-30; const tops=n===1?1:n/2, bots=n===1?0:n/2;
+    let s=`<svg viewBox="0 0 900 520"><rect width="900" height="520" rx="24" fill="#EAF6FF"/><rect y="${GROUND}" width="900" height="90" fill="#9FDB86"/>`;
+    s+=`<rect x="380" y="${TOP-40}" width="400" height="22" rx="6" fill="#8F5427"/><rect x="760" y="${TOP-40}" width="22" height="${GROUND-TOP+40}" fill="#8F5427"/>`;
+    s+=`<rect x="590" y="${GOAL-6}" width="160" height="6" fill="#3BC48A" opacity=".7"/><text x="770" y="${GOAL+4}" font-size="30">🏁</text>`;
+    const tx=i=>560+i*44, bx=i=>582+i*44;
+    for(let i=0;i<tops;i++) s+=`<line x1="${tx(i)}" y1="${TOP-18}" x2="${tx(i)}" y2="${TOP}" stroke="#5A6070" stroke-width="5"/><circle cx="${tx(i)}" cy="${TOP+16}" r="20" fill="#C9D3E0" stroke="#5A6070" stroke-width="4"/><circle cx="${tx(i)}" cy="${TOP+16}" r="5" fill="#24325F"/>`;
+    const segs=[]; if(n===1){ segs.push([tx(0)+20,TOP+16,tx(0)+20,by]); }
+    else { for(let i=0;i<tops;i++){ segs.push([tx(i)-20,TOP+16,bx(i)-20,by]); segs.push([tx(i)+20,TOP+16,bx(i)+20,by]); } }
+    segs.forEach(([a,b,c,d])=>s+=`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="#C98A4E" stroke-width="5"/>`);
+    for(let i=0;i<bots;i++) s+=`<circle cx="${bx(i)}" cy="${by}" r="20" fill="#FFD34A" stroke="#B57A00" stroke-width="4"/><circle cx="${bx(i)}" cy="${by}" r="5" fill="#24325F"/>`;
+    const cx=n===1?tx(0)+20:(bx(0)+bx(bots-1))/2;
+    s+=`<line x1="${cx}" y1="${by+(n===1?0:20)}" x2="${cx}" y2="${ly}" stroke="#5A6070" stroke-width="5"/><rect x="${cx-60}" y="${ly}" width="120" height="90" rx="12" fill="#fff" stroke="#24325F" stroke-width="3"/><text x="${cx}" y="${ly+70}" font-size="62" text-anchor="middle">${L[0]}</text>`;
+    s+=`<g transform="translate(${cx+70} ${ly+10})"><circle r="18" fill="#24325F"/><text y="7" font-size="18" font-weight="800" fill="#fff" text-anchor="middle">${W()}</text></g>`;
+    const px=tx(0)-20; s+=`<line x1="${px}" y1="${TOP+16}" x2="${px-150}" y2="${GROUND-120}" stroke="#C98A4E" stroke-width="5"/>`;
+    s+=`<g transform="translate(${px-170} ${GROUND-40}) scale(.8)"><g class="${pulling&&!can()?'rb-strain':''}"><g class="rb-fc">${robo()}</g></g></g>`;
+    s+=`<g transform="translate(60 ${GROUND+30})">${[...Array(Math.min(14,Math.floor(rope/40)))].map((_,i)=>`<ellipse cx="${i*12}" cy="0" rx="14" ry="6" fill="none" stroke="#C98A4E" stroke-width="4"/>`).join('')}</g><text x="60" y="${GROUND+70}" font-size="20" font-weight="800" fill="#24325F">🧵 ${Math.round(rope/40)}</text>`;
+    const fw=clamp(force()/STR,0,2); s+=`<g transform="translate(60 40)"><rect width="220" height="26" rx="13" fill="#fff" stroke="#24325F" stroke-width="3"/><rect x="3" y="3" width="${Math.min(214,214*fw/2)}" height="20" rx="10" fill="${can()?'#3BC48A':'#FF5D7A'}"/><line x1="110" y1="-4" x2="110" y2="30" stroke="#24325F" stroke-width="3" stroke-dasharray="4 3"/><text x="-26" y="22" font-size="26" text-anchor="middle">💪</text></g>`;
+    if(pulling&&!can()) s+=`<text x="${px-150}" y="${GROUND-150}" font-size="40">💦</text>`;
+    s+='</svg>'; F.stage.innerHTML=s; svg=F.stage.firstChild; }
+  function ctrl(){ F.ctrl.innerHTML=''; const box=el('div','rb-ctrl'); [1,2,4].forEach(v=>{ const b=btn('⚙️'.repeat(v===1?1:v===2?2:4)+` ×${v}`,n===v?'on':'',()=>{ if(busy||y>0) return; n=v; saidH=false; snd(600+v*80,.06,'square',.06); ctrl(); draw(); sp(MXT().pN(v)); }); box.appendChild(b); });
+    const pb=btn('💪','go',()=>{}); pb.style.minWidth='150px'; pb.style.fontSize='2rem'; pb.onpointerdown=e=>{ e.preventDefault(); pulling=true; }; pb.onpointerup=pb.onpointerleave=pb.onpointercancel=()=>{ pulling=false; };
+    F.ctrl.append(box,pb); }
+  function loop(now){ if(myGen!==gen) return; const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+    if(!busy&&pulling){ if(can()){ const sp_=(Lv.fast?110:80)/n; y=Math.min(GROUND-90-GOAL,y+sp_*dt); rope+=sp_*n*dt; if(Math.random()<.2) snd(500+y,.03,'triangle',.03); if(y>=GROUND-90-GOAL) win(); }
+      else if(!saidH){ saidH=true; errs++; boing(); sp(MXT().pHeavy); F.set('💦 '+MXT().pHeavy); } }
+    if(!busy&&!pulling&&y>0&&!can()) y=Math.max(0,y-200*dt);
+    const key=[k,n,Math.round(y),Math.round(rope/40),pulling,saidH].join(); if(key!==lastKey){ lastKey=key; draw(); } raf=requestAnimationFrame(loop); }
+  let lastKey='';
+  async function win(){ busy=true; pulling=false; chime(); award(); try{ confetti(12); }catch(_){} F.dot(k+1); const m=MXT().pOk(n); F.set('✅ '+m); await spW(m,1600); if(myGen!==gen) return;
+    k++; if(k>=Lv.loads.length){ cancelAnimationFrame(raf); return finish('mpulley'+li,rate(errs),null,mNext('pulley',li)); } y=0; rope=0; n=1; saidH=false; busy=false; ctrl(); F.set(MXT().pNext); sp(MXT().pNext); }
+  draw(); ctrl(); sp(MXT().pIntro); raf=requestAnimationFrame(loop);
+}
+
+/* --- 6. catapulta: unghi și forță --- */
+const CAT=[{ic:'🏰',t:[['c',600]],shots:5},{ic:'🏰🏰',t:[['c',800]],shots:5},{ic:'🎈',t:[['b',520,200]],shots:5},{ic:'🧱',t:[['c',720]],walls:[[440,230,40,210]],shots:5},
+ {ic:'🎈🎈',t:[['b',450,170],['b',720,290]],shots:6},{ic:'🎈🧱🏰',t:[['b',380,150],['c',790],['b',640,300]],walls:[[560,300,36,140]],shots:7},{ic:'🎯',t:[['b',820,120],['b',300,330],['c',560]],walls:[[420,200,36,240]],shots:7}];
+function catapult(li){ li=li||0;
+  stopAll(); view='cata'; setTop(false); back=mBack('cata'); curRestart=()=>catapult(li); const myGen=gen;
+  const Lv=CAT[li], G=600, VMAX=720, CX=120, CY=380, GROUND=440; let shots=Lv.shots, errs=0, busy=false, drag=null, proj=null, trail=[], prevTrail=[], last=0, svg;
+  const tg=Lv.t.map(([k,x,y])=>({k,x,y:k==='c'?392:y,r:k==='c'?60:30,hit:false}));
+  const intro=li===0?MXT().cIntro:Lv.walls?MXT().cWall:tg.some(t=>t.k==='b')&&tg.length===1?MXT().cBalloon:tg.length>1?MXT().cMulti:MXT().cFar;
+  const F=frame(intro,tg.length); F.bub.onclick=()=>sp(intro);
+  function build(){ let s=`<svg viewBox="0 0 900 520"><defs><linearGradient id="rb-ck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD3FF"/><stop offset="1" stop-color="#E9F7FF"/></linearGradient></defs><rect width="900" height="520" rx="24" fill="url(#rb-ck)"/><text x="620" y="90" font-size="50" opacity=".8">☁️</text><text x="260" y="70" font-size="40" opacity=".7">☁️</text><rect y="${GROUND}" width="900" height="80" fill="#8FD07A"/>`;
+    (Lv.walls||[]).forEach(([x,y,w,h])=>s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="#B5543A" stroke="#7A2E1C" stroke-width="3"/>${[...Array(Math.floor(h/24))].map((_,i)=>`<line x1="${x}" y1="${y+i*24}" x2="${x+w}" y2="${y+i*24}" stroke="#7A2E1C" stroke-width="2"/>`).join('')}`);
+    s+=`<rect x="${CX-50}" y="${CY+30}" width="100" height="22" rx="8" fill="#8F5427"/>${[CX-34,CX+34].map(x=>`<circle cx="${x}" cy="${CY+56}" r="14" fill="#5A3416"/>`).join('')}<path d="M${CX-14} ${CY+32} L${CX} ${CY-6} L${CX+14} ${CY+32}" fill="#A86B36"/>`;
+    s+=`<g transform="translate(${CX-70} ${GROUND-24}) scale(.5)"><g class="rb-fc">${robo()}</g></g><g id="rb-dyn"></g></svg>`;
+    F.stage.innerHTML=s; svg=F.stage.firstChild;
+    svg.onpointerdown=e=>{ if(busy||proj) return; const p=pt(svg,e); if(Math.hypot(p.x-CX,p.y-CY)>130) return; e.preventDefault(); drag={x:p.x,y:p.y}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} };
+    svg.onpointermove=e=>{ if(!drag) return; const p=pt(svg,e); drag={x:p.x,y:p.y}; };
+    svg.onpointerup=svg.onpointercancel=e=>{ if(!drag) return; const dx=CX-drag.x, dy=CY-drag.y, L=Math.min(150,Math.hypot(dx,dy)); drag=null; if(L<20) return; const v=VMAX*L/150, a=Math.atan2(dy,dx); fire(Math.cos(a)*v,Math.sin(a)*v); }; }
+  function draw(){ let s='';
+    tg.forEach(t=>{ if(t.k==='c') s+=`<text x="${t.x}" y="${GROUND+6}" font-size="110" text-anchor="middle" opacity="${t.hit?.45:1}">${t.hit?'💥':'🏰'}</text>`; else if(!t.hit) s+=`<line x1="${t.x}" y1="${t.y+26}" x2="${t.x}" y2="${t.y+70}" stroke="#5A6070" stroke-width="2"/><text x="${t.x}" y="${t.y+20}" font-size="60" text-anchor="middle">🎈</text>`; else s+=`<text x="${t.x}" y="${t.y+20}" font-size="50" text-anchor="middle">✨</text>`; });
+    s+=prevTrail.map(([x,y])=>`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="3" fill="#24325F" opacity=".25"/>`).join('')+trail.map(([x,y])=>`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="4" fill="#FF8A3D" opacity=".6"/>`).join('');
+    const arm=drag?Math.atan2(drag.y-CY,drag.x-CX):-2.4;
+    s+=`<line x1="${CX}" y1="${CY}" x2="${CX+Math.cos(arm)*70}" y2="${CY+Math.sin(arm)*70}" stroke="#C98A4E" stroke-width="10" stroke-linecap="round"/>`;
+    if(drag){ const dx=CX-drag.x, dy=CY-drag.y, L=Math.min(150,Math.hypot(dx,dy)), a=Math.atan2(dy,dx); s+=`<line x1="${CX}" y1="${CY}" x2="${CX+Math.cos(a)*L*.7}" y2="${CY+Math.sin(a)*L*.7}" stroke="#FF5D7A" stroke-width="6" stroke-dasharray="10 8" stroke-linecap="round"/><text x="${CX}" y="${CY-96}" font-size="24" font-weight="800" text-anchor="middle" fill="#24325F">${Math.round(a*-180/Math.PI)}°</text><rect x="${CX-50}" y="${CY-86}" width="100" height="12" rx="6" fill="#fff" stroke="#24325F" stroke-width="2"/><rect x="${CX-49}" y="${CY-85}" width="${98*L/150}" height="10" rx="5" fill="${L>120?'#FF5D7A':L>70?'#FFD34A':'#3BC48A'}"/>`; }
+    if(proj) s+=`<text x="${proj.x.toFixed(0)}" y="${(proj.y+12).toFixed(0)}" font-size="34" text-anchor="middle">🪨</text>`; else if(!busy) s+=`<circle cx="${CX}" cy="${CY}" r="70" fill="rgba(255,255,255,.01)" class="rb-goal" stroke="rgba(255,255,255,.7)" stroke-width="3" stroke-dasharray="8 8"/><text x="${(drag?drag.x:CX+Math.cos(arm)*70).toFixed(0)}" y="${((drag?drag.y:CY+Math.sin(arm)*70)+12).toFixed(0)}" font-size="34" text-anchor="middle">🪨</text>`;
+    s+=`<text x="860" y="40" font-size="26" text-anchor="end">${'🪨'.repeat(Math.max(0,shots))}</text>`;
+    svg.querySelector('#rb-dyn').innerHTML=s; }
+  function fire(vx,vy){ shots--; prevTrail=trail; trail=[]; proj={x:CX,y:CY,vx,vy}; snd(220,.18,'sawtooth',.06); setTimeout(()=>snd(520,.1,'triangle',.06),60); }
+  async function landed(){ proj=null; const left=tg.filter(t=>!t.hit).length; if(!left){ busy=true; chime(); award(); try{ confetti(18); }catch(_){} const m=MXT().cWhy[li]||MXT().cWhy[0]; F.set('✅ '+m); await spW(m,1800); if(myGen!==gen) return; cancelAnimationFrame(raf); return finish('mcata'+li,rate(errs),null,mNext('cata',li)); }
+    if(shots<=0){ busy=true; errs++; boing(); F.set('🔁 '+MXT().cOut); await spW(MXT().cOut,1000); if(myGen!==gen) return; catapult(li); return; } }
+  function loop(now){ if(myGen!==gen) return; const dt=Math.min(.033,(now-(last||now))/1000); last=now;
+    if(proj){ for(let k=0;k<3;k++){ const h=dt/3; proj.vy+=G*h; proj.x+=proj.vx*h; proj.y+=proj.vy*h;
+        tg.forEach(t=>{ if(!t.hit&&Math.hypot(proj.x-t.x,proj.y-(t.k==='c'?GROUND-50:t.y))<t.r){ t.hit=true; F.dot(tg.filter(q=>q.hit).length); award(); if(t.k==='b'){ snd(1400,.08,'square',.08); setTimeout(()=>snd(700,.12,'square',.06),60); } else { [180,120,90].forEach((f,i)=>setTimeout(()=>snd(f,.15,'sawtooth',.08),i*60)); } try{ confetti(6); }catch(_){} } });
+        const wl=(Lv.walls||[]).some(([x,y,w,h])=>proj.x>x-8&&proj.x<x+w+8&&proj.y>y-8&&proj.y<y+h); if(wl){ snd(140,.15,'triangle',.08); landed(); break; }
+        if(proj.y>=GROUND-10||proj.x>900||proj.x<0){ if(proj.y>=GROUND-10) snd(100,.12,'triangle',.08); landed(); break; } }
+      if(proj&&(trail.length===0||Math.hypot(proj.x-trail[trail.length-1][0],proj.y-trail[trail.length-1][1])>18)) trail.push([proj.x,proj.y]); }
+    draw(); raf=requestAnimationFrame(loop); }
+  build(); draw(); sp(intro); raf=requestAnimationFrame(loop);
 }
 
 /* ================= 3. CIRCUITE (v2: calcul real al curentului) ================= */
@@ -12823,6 +12945,163 @@ window.__gate=(mod,key)=>{ if(!isLocked(mod,key)) return false; paywall(); retur
 /* starea vine de la aplicația nativă; la schimbare reafișăm ecranele */
 window.__setPremium=v=>{ const was=window.__premium; window.__premium=!!v; paint(); if(was!==window.__premium) (window.__LR||[]).forEach(f=>{ try{ f(); }catch(e){} }); };
 paint();
+})();
+</script>
+<script>
+/* Robotică › Mașini simple v3: cadoul misterios, roți dințate 6–10, bicicletă (ture aleatoare, traseu), rampă (gheață/nisip/coș), scripete, catapultă — 12 limbi */
+(function(){
+const M={
+ro:{menu:{pulley:['🏗️','Scripetele'],cata:['🏹','Catapulta']},
+ bike:[,,,,,'Fă două ture de pedală și numără: de câte ori se învârte roata din spate? Urmărește bulina roșie!','Traseu cu deal! Întrece melcul: viteză rapidă pe drum drept, ușoară la deal. Schimbă la timp!','Acum pedalele fac mai multe ture. Numără cu atenție turele roții din spate!'],
+ bikeWhy:[,,,,,'','Campion! Cicliștii schimbă vitezele tot timpul: ușor la deal, rapid pe drum drept.',''],
+ g:{t:[,,,,,'Ceasul mare are un gol lung! Umple-l cu roți dințate de orice mărime.','Mașina de curse trebuie să meargă repede și înainte! Gândește-te la mărime și la sens.','Macaraua trebuie să ridice elefantul în sus! Ai nevoie de putere și de sensul bun.','Umple golul, iar vaporul trebuie să meargă înainte! Câte roți îți trebuie?','Ultimul ceas e greu: ce roți umplu exact golul?'],
+  why:[,,,,,'Super! Poți umple același gol în mai multe feluri: cu multe roți mici sau cu mai puține roți mari.','Roata mică dă viteză, iar numărul de roți hotărăște sensul. Ai rezolvat amândouă!','Roata mare dă putere, iar sensul bun ridică încărcătura. Ca o macara adevărată!','Fiecare roată schimbă sensul. Cu numărul potrivit de roți, vaporul merge înainte!','Doar două roți mari se potrivesc! Inginerii calculează exact mărimea roților.']},
+ mx:{lvMys:'Un cadou misterios! Echilibrează balansoarul, apoi ghicește cât cântărește cadoul.',lvMysQ:'Cadoul cântărește cât…?',lvMysOk:w=>`Da! Cadoul cântărește cât ${['','un șoricel','un iepuraș','un cățel','un elefant'][w]}.`,lvMysNo:'Nu chiar. Gândește-te: ce animal pus în locul cadoului ar ține balansoarul drept?',
+  gBack:'Merge în sensul greșit! Adaugă sau scoate o roată ca să schimbi sensul.',bkCount:(n,t)=>`Exact, de ${n} ori! Cu cât roata dințată din spate e mai mică, cu atât roata se învârte de mai multe ori.`,bkAgain:'Nu chiar. Hai să mai numărăm o dată!',bkTourLost:'Melcul a câștigat! Schimbă viteza: rapid pe drept, ușor la deal.',
+  rIce:'Pe gheață bila alunecă mult mai departe!',rSand:'În nisip bila se oprește repede!',rGrass:'Acum e iarbă.',rBasket:'Bila trebuie să intre în coș!',rIceWhy:'Gheața e alunecoasă și aproape nu frânează bila: frecare mică!',rSandWhy:'Nisipul frânează bila puternic: frecare mare!',
+  pIntro:'Scripetele! RoboPufi trebuie să ridice greutatea până la steag. Alege câți scripeți folosește, apoi ține apăsat 💪 ca să tragă.',pHeavy:'E prea greu! RoboPufi nu poate. Adaugă scripeți!',pN:v=>v===1?'Un scripete.':`${v} scripeți.`,
+  pOk:n=>n===1?'Sus! Un scripete schimbă doar direcția: tragi în jos și greutatea urcă.':`Sus! Cu ${n} scripeți greutatea pare de ${n} ori mai ușoară, dar tragi de ${n} ori mai multă sfoară.`,pNext:'Acum altă greutate! Alege scripeții potriviți.',
+  cIntro:'Catapulta! Trage piatra înapoi cu degetul, ca la praștie, și dă drumul. Lovește castelul!',cFar:'Castelul e departe! Trage mai tare.',cBalloon:'Sparge balonul din aer!',cWall:'Un zid! Aruncă piatra pe sus, peste zid.',cMulti:'Lovește toate țintele!',cOut:'Gata pietrele! Hai de la capăt.',
+  cWhy:['Ai lovit! Cu cât tragi mai tare, cu atât piatra zboară mai departe.','Super! Ca să ajungi departe, țintește pe la jumătatea cerului, cam 45 de grade.','Bravo! Piatra zboară pe o curbă, pentru că gravitația o trage în jos.','Peste zid! Un unghi mare aruncă piatra sus.','Două baloane! Fiecare țintă are nevoie de altă forță și de alt unghi.','Campion! Ai folosit unghiuri și forțe diferite pentru fiecare țintă.','Maestru al catapultei! Așa calculau inginerii de demult.']}},
+de:{menu:{pulley:['🏗️','Der Flaschenzug'],cata:['🏹','Das Katapult']},
+ bike:[,,,,,'Tritt zwei Pedalrunden und zähl: Wie oft dreht sich das Hinterrad? Schau auf den roten Punkt!','Strecke mit Hügel! Schlag die Schnecke: schneller Gang auf gerader Strecke, leichter Gang am Hügel. Schalte rechtzeitig!','Jetzt drehen sich die Pedale öfter. Zähl die Runden des Hinterrads genau!'],
+ bikeWhy:[,,,,,'','Champion! Radfahrer schalten ständig: leicht am Hügel, schnell auf gerader Strecke.',''],
+ g:{t:[,,,,,'Die große Uhr hat eine lange Lücke! Füll sie mit Zahnrädern in beliebiger Größe.','Der Rennwagen soll schnell und vorwärts fahren! Denk an die Größe und an die Richtung.','Der Kran soll den Elefanten nach oben heben! Du brauchst Kraft und die richtige Richtung.','Füll die Lücke, und das Schiff soll vorwärts fahren! Wie viele Zahnräder brauchst du?','Die letzte Uhr ist schwer: Welche Zahnräder füllen die Lücke genau?'],
+  why:[,,,,,'Super! Dieselbe Lücke kannst du auf viele Arten füllen: mit vielen kleinen oder wenigen großen Zahnrädern.','Das kleine Zahnrad bringt Tempo, die Anzahl der Zahnräder bestimmt die Richtung. Du hast beides geschafft!','Das große Zahnrad bringt Kraft, die richtige Richtung hebt die Last. Wie ein echter Kran!','Jedes Zahnrad dreht die Richtung um. Mit der richtigen Anzahl fährt das Schiff vorwärts!','Nur zwei große Zahnräder passen! Ingenieure berechnen die Größe der Zahnräder genau.']},
+ mx:{lvMys:'Ein geheimnisvolles Geschenk! Bring die Wippe ins Gleichgewicht und rate dann, wie schwer das Geschenk ist.',lvMysQ:'Das Geschenk ist so schwer wie…?',lvMysOk:w=>`Ja! Das Geschenk ist so schwer wie ${['','eine Maus','ein Hase','ein Hund','ein Elefant'][w]}.`,lvMysNo:'Nicht ganz. Überleg mal: Welches Tier an der Stelle des Geschenks würde die Wippe gerade halten?',
+  gBack:'Das geht in die falsche Richtung! Füg ein Zahnrad hinzu oder nimm eins weg, um die Richtung zu ändern.',bkCount:(n,t)=>`Genau, ${n} Mal! Je kleiner das hintere Zahnrad, desto öfter dreht sich das Rad.`,bkAgain:'Nicht ganz. Zählen wir nochmal!',bkTourLost:'Die Schnecke hat gewonnen! Schalte um: schnell auf gerader Strecke, leicht am Hügel.',
+  rIce:'Auf Eis rutscht die Kugel viel weiter!',rSand:'Im Sand bleibt die Kugel schnell stehen!',rGrass:'Jetzt ist es Gras.',rBasket:'Die Kugel soll in den Korb!',rIceWhy:'Eis ist rutschig und bremst die Kugel kaum: wenig Reibung!',rSandWhy:'Sand bremst die Kugel stark: viel Reibung!',
+  pIntro:'Der Flaschenzug! RoboPufi soll das Gewicht bis zur Fahne heben. Wähle, wie viele Rollen er benutzt, und halte dann 💪 gedrückt, damit er zieht.',pHeavy:'Das ist zu schwer! RoboPufi schafft es nicht. Nimm mehr Rollen!',pN:v=>v===1?'Eine Rolle.':`${v} Rollen.`,
+  pOk:n=>n===1?'Oben! Eine Rolle ändert nur die Richtung: Du ziehst nach unten, und das Gewicht geht hoch.':`Oben! Mit ${n} Rollen fühlt sich das Gewicht ${n}-mal leichter an, aber du ziehst ${n}-mal mehr Seil.`,pNext:'Jetzt ein anderes Gewicht! Wähle die passenden Rollen.',
+  cIntro:'Das Katapult! Zieh den Stein mit dem Finger zurück wie bei einer Schleuder und lass los. Triff die Burg!',cFar:'Die Burg ist weit weg! Zieh stärker.',cBalloon:'Lass den Ballon in der Luft platzen!',cWall:'Eine Mauer! Wirf den Stein hoch über die Mauer.',cMulti:'Triff alle Ziele!',cOut:'Keine Steine mehr! Nochmal von vorn.',
+  cWhy:['Treffer! Je stärker du ziehst, desto weiter fliegt der Stein.','Super! Für weite Würfe zielst du halb in den Himmel, etwa 45 Grad.','Toll! Der Stein fliegt in einem Bogen, weil die Schwerkraft ihn nach unten zieht.','Über die Mauer! Ein großer Winkel wirft den Stein hoch.','Zwei Ballons! Jedes Ziel braucht eine andere Kraft und einen anderen Winkel.','Champion! Du hast für jedes Ziel andere Winkel und Kräfte benutzt.','Katapult-Meister! So haben Ingenieure früher gerechnet.']}},
+en:{menu:{pulley:['🏗️','The pulley'],cata:['🏹','The catapult']},
+ bike:[,,,,,'Do two pedal turns and count: how many times does the back wheel turn? Watch the red dot!','A route with a hill! Beat the snail: fast gear on the flat, easy gear on the hill. Change in time!','Now the pedals turn more times. Count the back wheel’s turns carefully!'],
+ bikeWhy:[,,,,,'','Champion! Cyclists change gear all the time: easy on hills, fast on the flat.',''],
+ g:{t:[,,,,,'The big clock has a long gap! Fill it with gears of any size.','The race car must go fast and forwards! Think about size and direction.','The crane must lift the elephant up! You need strength and the right direction.','Fill the gap, and the ship must go forwards! How many gears do you need?','The last clock is tricky: which gears fill the gap exactly?'],
+  why:[,,,,,'Great! You can fill the same gap in many ways: with lots of small gears or fewer big ones.','The small gear gives speed, and the number of gears decides the direction. You solved both!','The big gear gives strength, and the right direction lifts the load. Like a real crane!','Every gear flips the direction. With the right number of gears, the ship goes forwards!','Only two big gears fit! Engineers work out the size of gears exactly.']},
+ mx:{lvMys:'A mystery present! Balance the seesaw, then guess how heavy the present is.',lvMysQ:'The present is as heavy as…?',lvMysOk:w=>`Yes! The present is as heavy as ${['','a mouse','a bunny','a dog','an elephant'][w]}.`,lvMysNo:'Not quite. Think: which animal in the present’s place would keep the seesaw level?',
+  gBack:'It is going the wrong way! Add or remove a gear to change the direction.',bkCount:(n,t)=>`Exactly, ${n} times! The smaller the back gear, the more times the wheel turns.`,bkAgain:'Not quite. Let’s count again!',bkTourLost:'The snail won! Change gear: fast on the flat, easy on the hill.',
+  rIce:'On ice the ball slides much further!',rSand:'In sand the ball stops quickly!',rGrass:'Now it is grass.',rBasket:'The ball must land in the basket!',rIceWhy:'Ice is slippery and hardly slows the ball down: low friction!',rSandWhy:'Sand slows the ball down a lot: high friction!',
+  pIntro:'The pulley! RoboPufi must lift the weight up to the flag. Choose how many pulleys he uses, then hold 💪 so he pulls.',pHeavy:'It is too heavy! RoboPufi can’t do it. Add pulleys!',pN:v=>v===1?'One pulley.':`${v} pulleys.`,
+  pOk:n=>n===1?'Up! One pulley only changes the direction: you pull down and the weight goes up.':`Up! With ${n} pulleys the weight feels ${n} times lighter, but you pull ${n} times more rope.`,pNext:'Now another weight! Choose the right pulleys.',
+  cIntro:'The catapult! Pull the stone back with your finger, like a slingshot, and let go. Hit the castle!',cFar:'The castle is far away! Pull harder.',cBalloon:'Pop the balloon in the air!',cWall:'A wall! Throw the stone high, over the wall.',cMulti:'Hit all the targets!',cOut:'No stones left! Let’s start again.',
+  cWhy:['A hit! The harder you pull, the further the stone flies.','Great! To go far, aim halfway up the sky, about 45 degrees.','Well done! The stone flies in a curve because gravity pulls it down.','Over the wall! A big angle throws the stone high.','Two balloons! Each target needs a different strength and angle.','Champion! You used different angles and strengths for each target.','Catapult master! That is how engineers worked it out long ago.']}},
+fr:{menu:{pulley:['🏗️','La poulie'],cata:['🏹','La catapulte']},
+ bike:[,,,,,'Fais deux tours de pédale et compte : combien de fois la roue arrière tourne-t-elle ? Regarde le point rouge !','Un parcours avec une colline ! Bats l’escargot : vitesse rapide sur le plat, facile dans la côte. Change à temps !','Maintenant les pédales font plus de tours. Compte bien les tours de la roue arrière !'],
+ bikeWhy:[,,,,,'','Champion ! Les cyclistes changent de vitesse tout le temps : facile en côte, rapide sur le plat.',''],
+ g:{t:[,,,,,'La grande horloge a un long trou ! Remplis-le avec des engrenages de n’importe quelle taille.','La voiture de course doit aller vite et en avant ! Pense à la taille et au sens.','La grue doit soulever l’éléphant vers le haut ! Il faut de la force et le bon sens.','Remplis le trou, et le bateau doit avancer ! Combien d’engrenages te faut-il ?','La dernière horloge est difficile : quels engrenages remplissent exactement le trou ?'],
+  why:[,,,,,'Super ! On peut remplir le même trou de plusieurs façons : beaucoup de petits engrenages ou moins de grands.','Le petit engrenage donne la vitesse, et le nombre d’engrenages décide du sens. Tu as réussi les deux !','Le grand engrenage donne la force, et le bon sens soulève la charge. Comme une vraie grue !','Chaque engrenage inverse le sens. Avec le bon nombre, le bateau avance !','Seuls deux grands engrenages vont ! Les ingénieurs calculent exactement la taille des engrenages.']},
+ mx:{lvMys:'Un cadeau mystère ! Équilibre la balançoire, puis devine combien pèse le cadeau.',lvMysQ:'Le cadeau pèse autant que… ?',lvMysOk:w=>`Oui ! Le cadeau pèse autant ${['','qu’une souris','qu’un lapin','qu’un chien','qu’un éléphant'][w]}.`,lvMysNo:'Pas tout à fait. Réfléchis : quel animal à la place du cadeau garderait la balançoire droite ?',
+  gBack:'Ça tourne dans le mauvais sens ! Ajoute ou enlève un engrenage pour changer le sens.',bkCount:(n,t)=>`Exactement, ${n} fois ! Plus l’engrenage arrière est petit, plus la roue tourne de fois.`,bkAgain:'Pas tout à fait. Comptons encore !',bkTourLost:'L’escargot a gagné ! Change de vitesse : rapide sur le plat, facile dans la côte.',
+  rIce:'Sur la glace, la bille glisse beaucoup plus loin !',rSand:'Dans le sable, la bille s’arrête vite !',rGrass:'Maintenant c’est de l’herbe.',rBasket:'La bille doit tomber dans le panier !',rIceWhy:'La glace est glissante et freine à peine la bille : peu de frottement !',rSandWhy:'Le sable freine beaucoup la bille : beaucoup de frottement !',
+  pIntro:'La poulie ! RoboPufi doit monter le poids jusqu’au drapeau. Choisis combien de poulies il utilise, puis garde le doigt sur 💪 pour qu’il tire.',pHeavy:'C’est trop lourd ! RoboPufi n’y arrive pas. Ajoute des poulies !',pN:v=>v===1?'Une poulie.':`${v} poulies.`,
+  pOk:n=>n===1?'En haut ! Une poulie change seulement le sens : tu tires vers le bas et le poids monte.':`En haut ! Avec ${n} poulies le poids semble ${n} fois plus léger, mais tu tires ${n} fois plus de corde.`,pNext:'Maintenant un autre poids ! Choisis les bonnes poulies.',
+  cIntro:'La catapulte ! Tire la pierre en arrière avec ton doigt, comme un lance-pierre, et lâche. Touche le château !',cFar:'Le château est loin ! Tire plus fort.',cBalloon:'Éclate le ballon dans les airs !',cWall:'Un mur ! Lance la pierre haut, par-dessus le mur.',cMulti:'Touche toutes les cibles !',cOut:'Plus de pierres ! On recommence.',
+  cWhy:['Touché ! Plus tu tires fort, plus la pierre vole loin.','Super ! Pour aller loin, vise à mi-hauteur du ciel, environ 45 degrés.','Bravo ! La pierre vole en courbe, car la gravité la tire vers le bas.','Par-dessus le mur ! Un grand angle lance la pierre haut.','Deux ballons ! Chaque cible demande une autre force et un autre angle.','Champion ! Tu as utilisé des angles et des forces différents pour chaque cible.','Maître de la catapulte ! C’est ainsi que calculaient les ingénieurs d’autrefois.']}},
+es:{menu:{pulley:['🏗️','La polea'],cata:['🏹','La catapulta']},
+ bike:[,,,,,'Da dos vueltas de pedal y cuenta: ¿cuántas veces gira la rueda de atrás? ¡Mira el punto rojo!','¡Un recorrido con cuesta! Gana al caracol: marcha rápida en llano, fácil en la cuesta. ¡Cambia a tiempo!','Ahora los pedales dan más vueltas. ¡Cuenta bien las vueltas de la rueda de atrás!'],
+ bikeWhy:[,,,,,'','¡Campeón! Los ciclistas cambian de marcha todo el rato: fácil en las cuestas, rápida en llano.',''],
+ g:{t:[,,,,,'¡El reloj grande tiene un hueco largo! Llénalo con engranajes de cualquier tamaño.','¡El coche de carreras debe ir rápido y hacia delante! Piensa en el tamaño y en el sentido.','¡La grúa debe subir al elefante! Necesitas fuerza y el sentido correcto.','¡Llena el hueco y el barco debe ir hacia delante! ¿Cuántos engranajes necesitas?','El último reloj es difícil: ¿qué engranajes llenan justo el hueco?'],
+  why:[,,,,,'¡Genial! Puedes llenar el mismo hueco de muchas maneras: con muchos engranajes pequeños o con menos grandes.','El engranaje pequeño da velocidad y el número de engranajes decide el sentido. ¡Has resuelto las dos cosas!','El engranaje grande da fuerza y el sentido correcto sube la carga. ¡Como una grúa de verdad!','Cada engranaje cambia el sentido. ¡Con el número justo, el barco va hacia delante!','¡Solo caben dos engranajes grandes! Los ingenieros calculan exactamente el tamaño de los engranajes.']},
+ mx:{lvMys:'¡Un regalo misterioso! Equilibra el balancín y luego adivina cuánto pesa el regalo.',lvMysQ:'El regalo pesa como…?',lvMysOk:w=>`¡Sí! El regalo pesa como ${['','un ratón','un conejo','un perro','un elefante'][w]}.`,lvMysNo:'No exactamente. Piensa: ¿qué animal en el lugar del regalo mantendría recto el balancín?',
+  gBack:'¡Va en sentido contrario! Añade o quita un engranaje para cambiar el sentido.',bkCount:(n,t)=>`¡Exacto, ${n} veces! Cuanto más pequeño es el engranaje de atrás, más vueltas da la rueda.`,bkAgain:'No exactamente. ¡Contemos otra vez!',bkTourLost:'¡Ganó el caracol! Cambia de marcha: rápida en llano, fácil en la cuesta.',
+  rIce:'¡En el hielo la bola resbala mucho más lejos!',rSand:'¡En la arena la bola se para enseguida!',rGrass:'Ahora es hierba.',rBasket:'¡La bola debe entrar en la cesta!',rIceWhy:'El hielo resbala y casi no frena la bola: ¡poco rozamiento!',rSandWhy:'La arena frena mucho la bola: ¡mucho rozamiento!',
+  pIntro:'¡La polea! RoboPufi debe subir el peso hasta la bandera. Elige cuántas poleas usa y mantén pulsado 💪 para que tire.',pHeavy:'¡Pesa demasiado! RoboPufi no puede. ¡Añade poleas!',pN:v=>v===1?'Una polea.':`${v} poleas.`,
+  pOk:n=>n===1?'¡Arriba! Una polea solo cambia la dirección: tiras hacia abajo y el peso sube.':`¡Arriba! Con ${n} poleas el peso parece ${n} veces más ligero, pero tiras ${n} veces más cuerda.`,pNext:'¡Ahora otro peso! Elige las poleas adecuadas.',
+  cIntro:'¡La catapulta! Tira de la piedra hacia atrás con el dedo, como un tirachinas, y suelta. ¡Dale al castillo!',cFar:'¡El castillo está lejos! Tira más fuerte.',cBalloon:'¡Explota el globo en el aire!',cWall:'¡Un muro! Lanza la piedra alto, por encima del muro.',cMulti:'¡Dale a todos los blancos!',cOut:'¡No quedan piedras! Empezamos de nuevo.',
+  cWhy:['¡Diana! Cuanto más fuerte tiras, más lejos vuela la piedra.','¡Genial! Para llegar lejos, apunta a media altura del cielo, unos 45 grados.','¡Bravo! La piedra vuela en curva porque la gravedad la tira hacia abajo.','¡Por encima del muro! Un ángulo grande lanza la piedra alto.','¡Dos globos! Cada blanco necesita otra fuerza y otro ángulo.','¡Campeón! Usaste ángulos y fuerzas distintos para cada blanco.','¡Maestro de la catapulta! Así calculaban los ingenieros de antes.']}},
+it:{menu:{pulley:['🏗️','La carrucola'],cata:['🏹','La catapulta']},
+ bike:[,,,,,'Fai due giri di pedale e conta: quante volte gira la ruota dietro? Guarda il puntino rosso!','Un percorso con la salita! Batti la lumaca: marcia veloce in pianura, facile in salita. Cambia in tempo!','Ora i pedali fanno più giri. Conta bene i giri della ruota dietro!'],
+ bikeWhy:[,,,,,'','Campione! I ciclisti cambiano marcia di continuo: facile in salita, veloce in pianura.',''],
+ g:{t:[,,,,,'Il grande orologio ha un buco lungo! Riempilo con ingranaggi di qualsiasi misura.','L’auto da corsa deve andare veloce e in avanti! Pensa alla misura e al verso.','La gru deve sollevare l’elefante verso l’alto! Servono forza e il verso giusto.','Riempi il buco, e la nave deve andare avanti! Quanti ingranaggi ti servono?','L’ultimo orologio è difficile: quali ingranaggi riempiono esattamente il buco?'],
+  why:[,,,,,'Super! Puoi riempire lo stesso buco in tanti modi: con tanti ingranaggi piccoli o con meno grandi.','L’ingranaggio piccolo dà velocità e il numero di ingranaggi decide il verso. Hai risolto tutte e due le cose!','L’ingranaggio grande dà forza e il verso giusto solleva il carico. Come una vera gru!','Ogni ingranaggio inverte il verso. Con il numero giusto, la nave va avanti!','Entrano solo due ingranaggi grandi! Gli ingegneri calcolano esattamente la misura degli ingranaggi.']},
+ mx:{lvMys:'Un regalo misterioso! Metti in equilibrio l’altalena, poi indovina quanto pesa il regalo.',lvMysQ:'Il regalo pesa come…?',lvMysOk:w=>`Sì! Il regalo pesa come ${['','un topolino','un coniglio','un cane','un elefante'][w]}.`,lvMysNo:'Non proprio. Pensa: quale animale al posto del regalo terrebbe dritta l’altalena?',
+  gBack:'Va nel verso sbagliato! Aggiungi o togli un ingranaggio per cambiare verso.',bkCount:(n,t)=>`Esatto, ${n} volte! Più piccolo è l’ingranaggio dietro, più giri fa la ruota.`,bkAgain:'Non proprio. Contiamo di nuovo!',bkTourLost:'Ha vinto la lumaca! Cambia marcia: veloce in pianura, facile in salita.',
+  rIce:'Sul ghiaccio la pallina scivola molto più lontano!',rSand:'Nella sabbia la pallina si ferma presto!',rGrass:'Ora c’è l’erba.',rBasket:'La pallina deve entrare nel cestino!',rIceWhy:'Il ghiaccio è scivoloso e frena pochissimo la pallina: poco attrito!',rSandWhy:'La sabbia frena molto la pallina: tanto attrito!',
+  pIntro:'La carrucola! RoboPufi deve sollevare il peso fino alla bandierina. Scegli quante carrucole usa, poi tieni premuto 💪 perché tiri.',pHeavy:'È troppo pesante! RoboPufi non ce la fa. Aggiungi carrucole!',pN:v=>v===1?'Una carrucola.':`${v} carrucole.`,
+  pOk:n=>n===1?'Su! Una carrucola cambia solo la direzione: tiri giù e il peso sale.':`Su! Con ${n} carrucole il peso sembra ${n} volte più leggero, ma tiri ${n} volte più corda.`,pNext:'Ora un altro peso! Scegli le carrucole giuste.',
+  cIntro:'La catapulta! Tira indietro la pietra con il dito, come una fionda, e lascia andare. Colpisci il castello!',cFar:'Il castello è lontano! Tira più forte.',cBalloon:'Fai scoppiare il palloncino in aria!',cWall:'Un muro! Lancia la pietra in alto, sopra il muro.',cMulti:'Colpisci tutti i bersagli!',cOut:'Pietre finite! Ricominciamo.',
+  cWhy:['Colpito! Più tiri forte, più lontano vola la pietra.','Super! Per arrivare lontano, mira a metà cielo, circa 45 gradi.','Bravo! La pietra vola facendo una curva, perché la gravità la tira giù.','Sopra il muro! Un angolo grande lancia la pietra in alto.','Due palloncini! Ogni bersaglio vuole un’altra forza e un altro angolo.','Campione! Hai usato angoli e forze diversi per ogni bersaglio.','Maestro della catapulta! Così calcolavano gli ingegneri di una volta.']}},
+pt:{menu:{pulley:['🏗️','A roldana'],cata:['🏹','A catapulta']},
+ bike:[,,,,,'Dá duas voltas de pedal e conta: quantas vezes gira a roda de trás? Olha para a bolinha vermelha!','Um percurso com subida! Vence o caracol: mudança rápida no plano, fácil na subida. Muda a tempo!','Agora os pedais dão mais voltas. Conta bem as voltas da roda de trás!'],
+ bikeWhy:[,,,,,'','Campeão! Os ciclistas mudam de mudança a toda a hora: fácil nas subidas, rápida no plano.',''],
+ g:{t:[,,,,,'O relógio grande tem um espaço comprido! Enche-o com rodas dentadas de qualquer tamanho.','O carro de corrida tem de ir depressa e para a frente! Pensa no tamanho e no sentido.','A grua tem de levantar o elefante! Precisas de força e do sentido certo.','Enche o espaço, e o barco tem de andar para a frente! Quantas rodas precisas?','O último relógio é difícil: que rodas enchem exatamente o espaço?'],
+  why:[,,,,,'Boa! Podes encher o mesmo espaço de muitas maneiras: com muitas rodas pequenas ou com menos grandes.','A roda pequena dá velocidade e o número de rodas decide o sentido. Resolveste as duas coisas!','A roda grande dá força e o sentido certo levanta a carga. Como uma grua a sério!','Cada roda muda o sentido. Com o número certo, o barco anda para a frente!','Só cabem duas rodas grandes! Os engenheiros calculam exatamente o tamanho das rodas.']},
+ mx:{lvMys:'Um presente misterioso! Equilibra o baloiço e depois adivinha quanto pesa o presente.',lvMysQ:'O presente pesa tanto como…?',lvMysOk:w=>`Sim! O presente pesa tanto como ${['','um rato','um coelho','um cão','um elefante'][w]}.`,lvMysNo:'Não bem. Pensa: que animal no lugar do presente deixaria o baloiço direito?',
+  gBack:'Está a andar no sentido errado! Junta ou tira uma roda para mudar o sentido.',bkCount:(n,t)=>`Exato, ${n} vezes! Quanto mais pequena a roda dentada de trás, mais voltas dá a roda.`,bkAgain:'Não bem. Vamos contar outra vez!',bkTourLost:'O caracol ganhou! Muda de mudança: rápida no plano, fácil na subida.',
+  rIce:'No gelo a bola escorrega muito mais longe!',rSand:'Na areia a bola para depressa!',rGrass:'Agora é relva.',rBasket:'A bola tem de cair no cesto!',rIceWhy:'O gelo escorrega e quase não trava a bola: pouco atrito!',rSandWhy:'A areia trava muito a bola: muito atrito!',
+  pIntro:'A roldana! O RoboPufi tem de levantar o peso até à bandeira. Escolhe quantas roldanas ele usa e mantém carregado 💪 para ele puxar.',pHeavy:'É pesado demais! O RoboPufi não consegue. Junta roldanas!',pN:v=>v===1?'Uma roldana.':`${v} roldanas.`,
+  pOk:n=>n===1?'Para cima! Uma roldana só muda a direção: puxas para baixo e o peso sobe.':`Para cima! Com ${n} roldanas o peso parece ${n} vezes mais leve, mas puxas ${n} vezes mais corda.`,pNext:'Agora outro peso! Escolhe as roldanas certas.',
+  cIntro:'A catapulta! Puxa a pedra para trás com o dedo, como uma fisga, e larga. Acerta no castelo!',cFar:'O castelo está longe! Puxa com mais força.',cBalloon:'Rebenta o balão no ar!',cWall:'Um muro! Atira a pedra alto, por cima do muro.',cMulti:'Acerta em todos os alvos!',cOut:'Acabaram as pedras! Vamos recomeçar.',
+  cWhy:['Acertaste! Quanto mais forte puxas, mais longe voa a pedra.','Boa! Para ir longe, aponta a meio do céu, uns 45 graus.','Muito bem! A pedra voa em curva porque a gravidade a puxa para baixo.','Por cima do muro! Um ângulo grande atira a pedra alto.','Dois balões! Cada alvo precisa de outra força e de outro ângulo.','Campeão! Usaste ângulos e forças diferentes para cada alvo.','Mestre da catapulta! Era assim que calculavam os engenheiros antigos.']}},
+nl:{menu:{pulley:['🏗️','De katrol'],cata:['🏹','De katapult']},
+ bike:[,,,,,'Trap twee rondjes en tel: hoe vaak draait het achterwiel? Let op het rode stipje!','Een route met een heuvel! Versla de slak: snelle versnelling op het vlakke stuk, makkelijke op de heuvel. Schakel op tijd!','Nu draaien de trappers vaker rond. Tel de rondjes van het achterwiel goed!'],
+ bikeWhy:[,,,,,'','Kampioen! Fietsers schakelen steeds: makkelijk op heuvels, snel op het vlakke stuk.',''],
+ g:{t:[,,,,,'De grote klok heeft een lang gat! Vul het met tandwielen van elke maat.','De raceauto moet snel en vooruit rijden! Denk aan de maat en aan de richting.','De kraan moet de olifant omhoog tillen! Je hebt kracht en de goede richting nodig.','Vul het gat, en het schip moet vooruit varen! Hoeveel tandwielen heb je nodig?','De laatste klok is lastig: welke tandwielen vullen het gat precies?'],
+  why:[,,,,,'Super! Je kunt hetzelfde gat op veel manieren vullen: met veel kleine of minder grote tandwielen.','Het kleine tandwiel geeft snelheid, het aantal tandwielen bepaalt de richting. Je hebt allebei opgelost!','Het grote tandwiel geeft kracht, de goede richting tilt de last op. Net een echte kraan!','Elk tandwiel draait de richting om. Met het goede aantal vaart het schip vooruit!','Er passen maar twee grote tandwielen! Ingenieurs rekenen de maat van tandwielen precies uit.']},
+ mx:{lvMys:'Een geheimzinnig cadeau! Breng de wip in evenwicht en raad dan hoe zwaar het cadeau is.',lvMysQ:'Het cadeau is zo zwaar als…?',lvMysOk:w=>`Ja! Het cadeau is zo zwaar als ${['','een muis','een konijn','een hond','een olifant'][w]}.`,lvMysNo:'Niet helemaal. Denk na: welk dier op de plek van het cadeau houdt de wip recht?',
+  gBack:'Hij draait de verkeerde kant op! Voeg een tandwiel toe of haal er een weg om de richting te veranderen.',bkCount:(n,t)=>`Precies, ${n} keer! Hoe kleiner het achterste tandwiel, hoe vaker het wiel draait.`,bkAgain:'Niet helemaal. We tellen nog een keer!',bkTourLost:'De slak heeft gewonnen! Schakel: snel op het vlakke stuk, makkelijk op de heuvel.',
+  rIce:'Op ijs glijdt de bal veel verder!',rSand:'In zand stopt de bal snel!',rGrass:'Nu is het gras.',rBasket:'De bal moet in de mand!',rIceWhy:'IJs is glad en remt de bal bijna niet af: weinig wrijving!',rSandWhy:'Zand remt de bal flink af: veel wrijving!',
+  pIntro:'De katrol! RoboPufi moet het gewicht tot aan het vlaggetje optillen. Kies hoeveel katrollen hij gebruikt en houd dan 💪 ingedrukt zodat hij trekt.',pHeavy:'Het is te zwaar! RoboPufi kan het niet. Neem meer katrollen!',pN:v=>v===1?'Eén katrol.':`${v} katrollen.`,
+  pOk:n=>n===1?'Omhoog! Eén katrol verandert alleen de richting: jij trekt naar beneden en het gewicht gaat omhoog.':`Omhoog! Met ${n} katrollen voelt het gewicht ${n} keer lichter, maar je trekt ${n} keer meer touw.`,pNext:'Nu een ander gewicht! Kies de goede katrollen.',
+  cIntro:'De katapult! Trek de steen met je vinger naar achteren, net als een katapult, en laat los. Raak het kasteel!',cFar:'Het kasteel is ver weg! Trek harder.',cBalloon:'Laat de ballon in de lucht knappen!',cWall:'Een muur! Gooi de steen hoog, over de muur.',cMulti:'Raak alle doelen!',cOut:'Geen stenen meer! We beginnen opnieuw.',
+  cWhy:['Raak! Hoe harder je trekt, hoe verder de steen vliegt.','Super! Om ver te komen mik je halverwege de lucht, ongeveer 45 graden.','Goed zo! De steen vliegt in een boog, omdat de zwaartekracht hem naar beneden trekt.','Over de muur! Een grote hoek gooit de steen hoog.','Twee ballonnen! Elk doel heeft een andere kracht en een andere hoek nodig.','Kampioen! Je gebruikte voor elk doel andere hoeken en krachten.','Katapultmeester! Zo rekenden ingenieurs vroeger.']}},
+pl:{menu:{pulley:['🏗️','Bloczek'],cata:['🏹','Katapulta']},
+ bike:[,,,,,'Zrób dwa obroty pedałami i policz: ile razy obróci się tylne koło? Patrz na czerwoną kropkę!','Trasa z górką! Pokonaj ślimaka: szybki bieg na płaskim, łatwy na górce. Zmień w porę!','Teraz pedały robią więcej obrotów. Policz dokładnie obroty tylnego koła!'],
+ bikeWhy:[,,,,,'','Mistrz! Rowerzyści cały czas zmieniają biegi: łatwy pod górkę, szybki na płaskim.',''],
+ g:{t:[,,,,,'Duży zegar ma długą dziurę! Wypełnij ją zębatkami dowolnej wielkości.','Wyścigówka ma jechać szybko i do przodu! Pomyśl o wielkości i o kierunku.','Dźwig ma podnieść słonia do góry! Potrzebujesz siły i dobrego kierunku.','Wypełnij dziurę, a statek ma płynąć do przodu! Ile zębatek potrzebujesz?','Ostatni zegar jest trudny: które zębatki dokładnie wypełnią dziurę?'],
+  why:[,,,,,'Super! Tę samą dziurę można wypełnić na wiele sposobów: wieloma małymi zębatkami albo mniejszą liczbą dużych.','Mała zębatka daje szybkość, a liczba zębatek decyduje o kierunku. Udało ci się jedno i drugie!','Duża zębatka daje siłę, a dobry kierunek podnosi ładunek. Jak prawdziwy dźwig!','Każda zębatka zmienia kierunek. Z dobrą liczbą zębatek statek płynie do przodu!','Pasują tylko dwie duże zębatki! Inżynierowie dokładnie obliczają wielkość zębatek.']},
+ mx:{lvMys:'Tajemniczy prezent! Zrównoważ huśtawkę, a potem zgadnij, ile waży prezent.',lvMysQ:'Prezent waży tyle co…?',lvMysOk:w=>`Tak! Prezent waży tyle co ${['','myszka','królik','piesek','słoń'][w]}.`,lvMysNo:'Nie całkiem. Pomyśl: które zwierzątko w miejscu prezentu utrzymałoby huśtawkę prosto?',
+  gBack:'Kręci się w złą stronę! Dodaj albo zabierz zębatkę, żeby zmienić kierunek.',bkCount:(n,t)=>`Dokładnie, ${n} razy! Im mniejsza tylna zębatka, tym więcej obrotów robi koło.`,bkAgain:'Nie całkiem. Policzmy jeszcze raz!',bkTourLost:'Ślimak wygrał! Zmień bieg: szybki na płaskim, łatwy pod górkę.',
+  rIce:'Na lodzie kulka jedzie dużo dalej!',rSand:'W piasku kulka szybko się zatrzymuje!',rGrass:'Teraz jest trawa.',rBasket:'Kulka ma wpaść do koszyka!',rIceWhy:'Lód jest śliski i prawie nie hamuje kulki: małe tarcie!',rSandWhy:'Piasek mocno hamuje kulkę: duże tarcie!',
+  pIntro:'Bloczek! RoboPufi ma podnieść ciężar aż do flagi. Wybierz, ile bloczków użyje, a potem przytrzymaj 💪, żeby ciągnął.',pHeavy:'Za ciężkie! RoboPufi nie da rady. Dodaj bloczki!',pN:v=>v===1?'Jeden bloczek.':`Bloczki: ${v}.`,
+  pOk:n=>n===1?'Do góry! Jeden bloczek zmienia tylko kierunek: ciągniesz w dół, a ciężar idzie w górę.':`Do góry! Z ${n} bloczkami ciężar wydaje się ${n} razy lżejszy, ale ciągniesz ${n} razy więcej liny.`,pNext:'Teraz inny ciężar! Wybierz odpowiednie bloczki.',
+  cIntro:'Katapulta! Odciągnij kamień palcem do tyłu, jak w procy, i puść. Traf w zamek!',cFar:'Zamek jest daleko! Pociągnij mocniej.',cBalloon:'Przebij balonik w powietrzu!',cWall:'Mur! Rzuć kamień wysoko, nad murem.',cMulti:'Traf we wszystkie cele!',cOut:'Koniec kamieni! Zaczynamy od nowa.',
+  cWhy:['Trafiony! Im mocniej ciągniesz, tym dalej leci kamień.','Super! Żeby rzucić daleko, celuj w połowę nieba, mniej więcej 45 stopni.','Brawo! Kamień leci po łuku, bo grawitacja ciągnie go w dół.','Nad murem! Duży kąt rzuca kamień wysoko.','Dwa baloniki! Każdy cel potrzebuje innej siły i innego kąta.','Mistrz! Do każdego celu użyłeś innego kąta i innej siły.','Mistrz katapulty! Tak liczyli dawni inżynierowie.']}},
+uk:{menu:{pulley:['🏗️','Блок'],cata:['🏹','Катапульта']},
+ bike:[,,,,,'Зроби два оберти педалями й порахуй: скільки разів обернеться заднє колесо? Стеж за червоною цяткою!','Траса з гіркою! Обжени равлика: швидка передача на рівній дорозі, легка на гірці. Перемикай вчасно!','Тепер педалі роблять більше обертів. Уважно порахуй оберти заднього колеса!'],
+ bikeWhy:[,,,,,'','Чемпіон! Велосипедисти весь час перемикають передачі: легка на гірці, швидка на рівному.',''],
+ g:{t:[,,,,,'Великий годинник має довгу щілину! Заповни її шестернями будь-якого розміру.','Гоночна машина має їхати швидко й уперед! Подумай про розмір і напрям.','Кран має підняти слона вгору! Потрібні сила й правильний напрям.','Заповни щілину, і корабель має пливти вперед! Скільки шестерень тобі потрібно?','Останній годинник складний: які шестерні точно заповнять щілину?'],
+  why:[,,,,,'Чудово! Ту саму щілину можна заповнити по-різному: багатьма маленькими шестернями або меншою кількістю великих.','Маленька шестерня дає швидкість, а кількість шестерень визначає напрям. Ти впорався з обома!','Велика шестерня дає силу, а правильний напрям піднімає вантаж. Як справжній кран!','Кожна шестерня змінює напрям. З правильною кількістю корабель пливе вперед!','Підходять лише дві великі шестерні! Інженери точно розраховують розмір шестерень.']},
+ mx:{lvMys:'Таємничий подарунок! Зрівноваж гойдалку, а потім вгадай, скільки важить подарунок.',lvMysQ:'Подарунок важить як…?',lvMysOk:w=>`Так! Подарунок важить як ${['','мишка','зайчик','собачка','слон'][w]}.`,lvMysNo:'Не зовсім. Подумай: яка тваринка на місці подарунка тримала б гойдалку рівно?',
+  gBack:'Крутиться не в той бік! Додай або прибери шестерню, щоб змінити напрям.',bkCount:(n,t)=>`Точно, ${n}! Що менша задня зірочка, то більше обертів робить колесо.`,bkAgain:'Не зовсім. Порахуймо ще раз!',bkTourLost:'Равлик переміг! Перемикай передачу: швидка на рівному, легка на гірці.',
+  rIce:'На льоду кулька котиться набагато далі!',rSand:'У піску кулька швидко зупиняється!',rGrass:'Тепер трава.',rBasket:'Кулька має потрапити в кошик!',rIceWhy:'Лід слизький і майже не гальмує кульку: мале тертя!',rSandWhy:'Пісок сильно гальмує кульку: велике тертя!',
+  pIntro:'Блок! РобоПуфі має підняти вантаж до прапорця. Обери, скільки блоків він використає, а потім тримай 💪, щоб він тягнув.',pHeavy:'Надто важко! РобоПуфі не може. Додай блоки!',pN:v=>v===1?'Один блок.':`Блоків: ${v}.`,
+  pOk:n=>n===1?'Угору! Один блок лише змінює напрям: ти тягнеш униз, а вантаж іде вгору.':`Угору! З ${n} блоками вантаж здається в ${n} рази легшим, але ти тягнеш у ${n} рази більше мотузки.`,pNext:'Тепер інший вантаж! Обери потрібні блоки.',
+  cIntro:'Катапульта! Відтягни камінь пальцем назад, як рогатку, і відпусти. Влуч у замок!',cFar:'Замок далеко! Тягни сильніше.',cBalloon:'Лусни кульку в повітрі!',cWall:'Стіна! Кинь камінь високо, через стіну.',cMulti:'Влуч у всі цілі!',cOut:'Каміння скінчилося! Почнімо знову.',
+  cWhy:['Влучив! Що сильніше тягнеш, то далі летить камінь.','Чудово! Щоб кинути далеко, цілься на половину неба, приблизно 45 градусів.','Молодець! Камінь летить дугою, бо сила тяжіння тягне його вниз.','Через стіну! Великий кут кидає камінь високо.','Дві кульки! Кожна ціль потребує іншої сили й іншого кута.','Чемпіон! Ти використав різні кути й сили для кожної цілі.','Майстер катапульти! Так розраховували давні інженери.']}},
+ru:{menu:{pulley:['🏗️','Блок'],cata:['🏹','Катапульта']},
+ bike:[,,,,,'Сделай два оборота педалями и посчитай: сколько раз повернётся заднее колесо? Следи за красной точкой!','Трасса с горкой! Обгони улитку: быстрая передача на ровной дороге, лёгкая на горке. Переключай вовремя!','Теперь педали делают больше оборотов. Внимательно посчитай обороты заднего колеса!'],
+ bikeWhy:[,,,,,'','Чемпион! Велосипедисты всё время переключают передачи: лёгкая на горке, быстрая на ровном.',''],
+ g:{t:[,,,,,'У большого часов длинная щель! Заполни её шестерёнками любого размера.','Гоночная машина должна ехать быстро и вперёд! Подумай о размере и о направлении.','Кран должен поднять слона вверх! Нужны сила и правильное направление.','Заполни щель, и корабль должен плыть вперёд! Сколько шестерёнок тебе нужно?','Последние часы сложные: какие шестерёнки точно заполнят щель?'],
+  why:[,,,,,'Отлично! Одну и ту же щель можно заполнить по-разному: многими маленькими шестерёнками или несколькими большими.','Маленькая шестерёнка даёт скорость, а количество шестерёнок решает направление. Ты справился с обоим!','Большая шестерёнка даёт силу, а правильное направление поднимает груз. Как настоящий кран!','Каждая шестерёнка меняет направление. С правильным количеством корабль плывёт вперёд!','Подходят только две большие шестерёнки! Инженеры точно рассчитывают размер шестерёнок.']},
+ mx:{lvMys:'Таинственный подарок! Уравновесь качели, а потом угадай, сколько весит подарок.',lvMysQ:'Подарок весит как…?',lvMysOk:w=>`Да! Подарок весит как ${['','мышка','зайчик','собачка','слон'][w]}.`,lvMysNo:'Не совсем. Подумай: какой зверёк на месте подарка держал бы качели ровно?',
+  gBack:'Крутится не в ту сторону! Добавь или убери шестерёнку, чтобы поменять направление.',bkCount:(n,t)=>`Точно, ${n}! Чем меньше задняя звёздочка, тем больше оборотов делает колесо.`,bkAgain:'Не совсем. Посчитаем ещё раз!',bkTourLost:'Улитка победила! Переключай передачу: быстрая на ровном, лёгкая на горке.',
+  rIce:'На льду шарик катится намного дальше!',rSand:'В песке шарик быстро останавливается!',rGrass:'Теперь трава.',rBasket:'Шарик должен попасть в корзинку!',rIceWhy:'Лёд скользкий и почти не тормозит шарик: маленькое трение!',rSandWhy:'Песок сильно тормозит шарик: большое трение!',
+  pIntro:'Блок! РобоПуфи должен поднять груз до флажка. Выбери, сколько блоков он возьмёт, а потом держи 💪, чтобы он тянул.',pHeavy:'Слишком тяжело! РобоПуфи не может. Добавь блоки!',pN:v=>v===1?'Один блок.':`Блоков: ${v}.`,
+  pOk:n=>n===1?'Вверх! Один блок только меняет направление: ты тянешь вниз, а груз идёт вверх.':`Вверх! С ${n} блоками груз кажется в ${n} раза легче, но ты тянешь в ${n} раза больше верёвки.`,pNext:'Теперь другой груз! Выбери подходящие блоки.',
+  cIntro:'Катапульта! Оттяни камень пальцем назад, как рогатку, и отпусти. Попади в замок!',cFar:'Замок далеко! Тяни сильнее.',cBalloon:'Лопни шарик в воздухе!',cWall:'Стена! Брось камень высоко, через стену.',cMulti:'Попади во все цели!',cOut:'Камни закончились! Начнём заново.',
+  cWhy:['Попал! Чем сильнее тянешь, тем дальше летит камень.','Отлично! Чтобы бросить далеко, целься в середину неба, примерно 45 градусов.','Молодец! Камень летит дугой, потому что сила тяжести тянет его вниз.','Через стену! Большой угол бросает камень высоко.','Два шарика! Каждой цели нужны своя сила и свой угол.','Чемпион! Ты использовал разные углы и силы для каждой цели.','Мастер катапульты! Так рассчитывали древние инженеры.']}},
+hu:{menu:{pulley:['🏗️','A csiga'],cata:['🏹','A katapult']},
+ bike:[,,,,,'Tekerj két kört, és számold meg: hányszor fordul a hátsó kerék? Figyeld a piros pöttyöt!','Útvonal dombbal! Győzd le a csigát: gyors sebesség sík úton, könnyű a dombon. Válts időben!','Most többször fordul a pedál. Számold meg pontosan a hátsó kerék köreit!'],
+ bikeWhy:[,,,,,'','Bajnok! A biciklisek folyton váltanak: könnyűre a dombon, gyorsra sík úton.',''],
+ g:{t:[,,,,,'A nagy órán hosszú rés van! Töltsd ki bármilyen méretű fogaskerekekkel.','A versenyautónak gyorsan és előre kell mennie! Gondolj a méretre és az irányra.','A darunak fel kell emelnie az elefántot! Erő és jó irány kell hozzá.','Töltsd ki a rést, és a hajónak előre kell mennie! Hány fogaskerék kell?','Az utolsó óra nehéz: mely fogaskerekek töltik ki pontosan a rést?'],
+  why:[,,,,,'Szuper! Ugyanazt a rést sokféleképpen kitöltheted: sok kicsi vagy kevesebb nagy fogaskerékkel.','A kis fogaskerék gyorsaságot ad, a fogaskerekek száma pedig eldönti az irányt. Mindkettőt megoldottad!','A nagy fogaskerék erőt ad, a jó irány pedig felemeli a terhet. Mint egy igazi daru!','Minden fogaskerék megfordítja az irányt. A jó számmal a hajó előre megy!','Csak két nagy fogaskerék fér be! A mérnökök pontosan kiszámolják a fogaskerekek méretét.']},
+ mx:{lvMys:'Egy titokzatos ajándék! Hozd egyensúlyba a mérleghintát, aztán találd ki, mennyit nyom az ajándék.',lvMysQ:'Az ajándék annyit nyom, mint…?',lvMysOk:w=>`Igen! Az ajándék annyit nyom, mint ${['','egy egér','egy nyuszi','egy kutya','egy elefánt'][w]}.`,lvMysNo:'Nem egészen. Gondold végig: melyik állat tartaná egyenesen a hintát az ajándék helyén?',
+  gBack:'Rossz irányba megy! Tegyél hozzá vagy vegyél el egy fogaskereket, hogy megforduljon.',bkCount:(n,t)=>`Pontosan, ${n}-szer! Minél kisebb a hátsó fogaskerék, annál többször fordul a kerék.`,bkAgain:'Nem egészen. Számoljuk meg újra!',bkTourLost:'A csiga nyert! Válts: gyorsra sík úton, könnyűre a dombon.',
+  rIce:'A jégen a golyó sokkal messzebbre csúszik!',rSand:'A homokban a golyó hamar megáll!',rGrass:'Most fű van.',rBasket:'A golyónak a kosárba kell gurulnia!',rIceWhy:'A jég csúszós, alig fékezi a golyót: kicsi a súrlódás!',rSandWhy:'A homok erősen fékezi a golyót: nagy a súrlódás!',
+  pIntro:'A csiga! RoboPufinak fel kell emelnie a terhet a zászlóig. Válaszd ki, hány csigát használ, aztán tartsd nyomva a 💪 gombot, hogy húzzon.',pHeavy:'Túl nehéz! RoboPufi nem bírja. Tegyél hozzá csigákat!',pN:v=>v===1?'Egy csiga.':`${v} csiga.`,
+  pOk:n=>n===1?'Fent! Egy csiga csak az irányt változtatja meg: lefelé húzod, és a teher felmegy.':`Fent! ${n} csigával a teher ${n}-szer könnyebbnek tűnik, de ${n}-szer több kötelet húzol.`,pNext:'Most egy másik teher! Válaszd ki a megfelelő csigákat.',
+  cIntro:'A katapult! Húzd hátra az ujjaddal a követ, mint a csúzlinál, és engedd el. Találd el a várat!',cFar:'A vár messze van! Húzd erősebben.',cBalloon:'Pukkaszd ki a lufit a levegőben!',cWall:'Egy fal! Dobd a követ magasra, a fal fölött.',cMulti:'Találd el az összes célt!',cOut:'Elfogytak a kövek! Kezdjük újra.',
+  cWhy:['Talált! Minél erősebben húzod, annál messzebbre repül a kő.','Szuper! Ha messzire akarsz dobni, célozz az ég közepére, körülbelül 45 fokra.','Ügyes! A kő ívben repül, mert a gravitáció lefelé húzza.','A fal fölött! A nagy szög magasra dobja a követ.','Két lufi! Minden célhoz más erő és más szög kell.','Bajnok! Minden célhoz más szöget és erőt használtál.','A katapult mestere! Így számoltak régen a mérnökök.']}}
+};
+const R=(window.L10N&&L10N.rb)||{}, T=window.__rbTX||{}, RG=(window.L10N&&L10N.rbg)||{}, G=window.__rbGTX||{};
+const BN={fr:'Le vélo',es:'La bicicleta',it:'La bicicletta',pt:'A bicicleta',nl:'De fiets',pl:'Rower',uk:'Велосипед',ru:'Велосипед',hu:'A bicikli'};
+const mergeArr=(dst,src)=>{ if(!dst||!src) return; src.forEach((v,i)=>{ if(v!=null&&v!=='') dst[i]=v; else if(v===''&&dst[i]==null) dst[i]=''; }); };
+for(const l in M){ const o=T[l]||R[l], m=M[l]; if(o){ o.mech=Object.assign({},o.mech||{},m.menu); if(!o.mech.bike) o.mech.bike=['🚲',BN[l]||'Bike'];
+    if(Array.isArray(o.bike)) mergeArr(o.bike,m.bike); if(Array.isArray(o.bikeWhy)) mergeArr(o.bikeWhy,m.bikeWhy); o.mx=m.mx; }
+  const g=G[l]||RG[l]; if(g){ mergeArr(g.t,m.g.t); mergeArr(g.why,m.g.why); } }
 })();
 </script>
 <style>
