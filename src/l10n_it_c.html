@@ -77,7 +77,7 @@ S('mw',{title:'🔢 Il mondo dei numeri',back:'⬅ Indietro',allOn:'🔓 Tutti: 
  ordUp:'Metti i pinguini in ordine crescente: dal più piccolo al più grande. Fai una scala che sale!',ordDown:'Metti i pinguini in ordine decrescente: dal più grande al più piccolo. Fai uno scivolo!',
  ordOk:'Perfetto! L’ordine è giusto!',ordNo:'Ops, qui l’ordine non è giusto. Riprova!',up:'🪜 Crescente',down:'🛝 Decrescente',
  boxQ:'Quante mele ci sono nella scatola segreta? Metti mele nella scatola finché la bilancia è dritta!',boxQ100:'Che numero c’è nella scatola segreta? Aggiungi mele finché la bilancia è dritta!',boxOk:(e)=>`La bilancia è dritta! ${e}`,heavyL:'Il lato sinistro è più pesante.',heavyR:'Il lato destro è più pesante.'});
-S('hm',{title:'Pufi – La scuola dei giochi ⭐',q:'A che cosa giochiamo oggi?',math:'Matematica',world:'Il mondo',read:'Leggere',time:'Il tempo',bday:'🎂 Compleanno del bambino',shapes:'Forme',robo:'RoboPufi',chess:'Scacchi',pufi:'Pufi',par:'Genitori',home:'🏠 Home',voice:'Voce',on:'🔊 Voce: sì',off:'🔇 Voce: no',close:'✖ Chiudi',hello:'A che cosa giochiamo oggi? Scegli una carta!'});
+S('hm',{title:'Pufi – La scuola dei giochi ⭐',q:'A che cosa giochiamo oggi?',math:'Matematica',world:'Il mondo',read:'Leggere',time:'Il tempo',shapes:'Forme',robo:'RoboPufi',chess:'Scacchi',pufi:'Pufi',par:'Genitori',home:'🏠 Home',voice:'Voce',on:'🔊 Voce: sì',off:'🔇 Voce: no',close:'✖ Chiudi',hello:'A che cosa giochiamo oggi? Scegli una carta!'});
 const IT_H=['dodici','una','due','tre','quattro','cinque','sei','sette','otto','nove','dieci','undici'];
 const hr=h=>{ const k=h%12; return k===0?'mezzogiorno':k===1?'l’una':`le ${IT_H[k]}`; };
 const itIs=t=>(t.startsWith('le ')?`Sono ${t}.`:`È ${t}.`);
@@ -121,7 +121,6 @@ S('tm',{title:'⏳ Il tempo di Pufi',back:'⬅ Indietro',allOn:'🔓 Tutti: sì'
  ytmD:(k,d)=>[`Oggi è ${d}. Che giorno era ieri?`,`Oggi è ${d}. Che giorno sarà domani?`][k],
  weekTask:'Metti i vagoni in ordine: comincia da lunedì!', weekAfter:d=>`Che giorno viene dopo ${d}?`, weekBefore:d=>`Che giorno viene prima di ${d}?`, weekend:'Sabato e domenica è il fine settimana: niente asilo!',
  calToday:'Tocca oggi!', calTom:'Tocca domani!', calYes:'Tocca ieri!', calWd:n=>`Che giorno della settimana è il ${n}?`, calCount:n=>`Quanti giorni mancano al ${n}? Tocca i giorni uno alla volta, cominciando da domani!`, calHow:'Quanti giorni hai contato?',
- bday:n=>n===0?'🎂 Oggi è il tuo compleanno! Tanti auguri!':`🎂 Al tuo compleanno mancano: ${n===1?'un giorno':n+' giorni'}`,
  moOrder:'Tocca i mesi in ordine, cominciando da gennaio!', moAfter:m=>`Che mese viene dopo ${m}?`, moSeas:m=>`In che stagione è ${m}?`,
  treeHi:['In primavera l’albero fiorisce. Tocca i boccioli!','In estate l’albero è pieno di frutti. Raccogli le ciliegie!','In autunno le foglie ingialliscono e cadono. Scuoti l’albero!','In inverno l’albero dorme sotto la neve. Fai un pupazzo di neve!'],
  dressTask:s=>`È ${s}! Che cosa si mette Pufi? Scegli tre cose adatte.`, dressNo:['Mmm, questo adesso non va bene.','Uff, d’estate fa troppo caldo per questo!','Mmm, questo adesso non va bene.','Brrr! D’inverno fa troppo freddo per questo!'],

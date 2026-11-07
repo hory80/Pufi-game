@@ -78,7 +78,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  ordUp:'Állítsd sorba a pingvineket a legkisebbtől a legnagyobbig. Építs felfelé menő lépcsőt!',ordDown:'Állítsd sorba a pingvineket a legnagyobbtól a legkisebbig. Építs csúszdát!',
  ordOk:'Tökéletes! Jó a sorrend!',ordNo:'Hoppá, itt nem jó a sorrend. Próbáld újra!',up:'🪜 Növekvő',down:'🛝 Csökkenő',
  boxQ:'Hány alma van a titkos dobozban? Tegyél almát a dobozba, amíg a mérleg egyenes nem lesz!',boxQ100:'Milyen szám van a titkos dobozban? Tegyél hozzá almát, amíg a mérleg egyenes nem lesz!',boxOk:(e)=>`A mérleg egyenes! ${e}`,heavyL:'A bal oldal nehezebb.',heavyR:'A jobb oldal nehezebb.'});
-S('hm',{title:'Pufi – A játékiskola ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',bday:'🎂 A gyerek születésnapja',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
+S('hm',{title:'Pufi – A játékiskola ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
 const HU=['tizenkettő','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
 const HA=['tizenkét','egy','két','három','négy','öt','hat','hét','nyolc','kilenc','tíz','tizenegy'];
 const hr=h=>`${HA[h%12]} óra`;
@@ -123,7 +123,6 @@ S('tm',{title:'⏳ Pufi ideje',back:'⬅ Vissza',allOn:'🔓 Mind: be',allOff:'�
  ytmD:(k,d)=>[`Ma ${d} van. Milyen nap volt tegnap?`,`Ma ${d} van. Milyen nap lesz holnap?`][k],
  weekTask:'Tedd sorba a vagonokat: hétfővel kezdd!', weekAfter:d=>`Melyik nap jön ez után: ${d}?`, weekBefore:d=>`Melyik nap van ez előtt: ${d}?`, weekend:'A szombat és a vasárnap a hétvége: nincs ovi!',
  calToday:'Koppints a mai napra!', calTom:'Koppints a holnapra!', calYes:'Koppints a tegnapra!', calWd:n=>`A hét melyik napjára esik a hónap ${n}. napja?`, calCount:n=>`Hány nap van még a hónap ${n}. napjáig? Koppints a napokra egyenként, holnaptól kezdve!`, calHow:'Hány napot számoltál?',
- bday:n=>n===0?'🎂 Ma van a születésnapod! Boldog születésnapot!':`🎂 A születésnapodig még ${n===1?'egy':n} nap van`,
  moOrder:'Koppints a hónapokra sorban, januárral kezdve!', moAfter:m=>`Melyik hónap jön ez után: ${m}?`, moSeas:m=>`Melyik évszakban van: ${m}?`,
  treeHi:['Tavasszal virágzik a fa. Koppints a rügyekre!','Nyáron tele van gyümölccsel a fa. Szedd le a cseresznyét!','Ősszel a levelek megsárgulnak és lehullanak. Rázd meg a fát!','Télen a fa alszik a hó alatt. Építs hóembert!'],
  dressTask:s=>`Most ${s} van! Mit vegyen fel Pufi? Válassz három illő dolgot.`, dressNo:['Hmm, ez most nem illik.','Uff, nyáron ehhez túl meleg van!','Hmm, ez most nem illik.','Brrr! Télen ehhez túl hideg van!'],

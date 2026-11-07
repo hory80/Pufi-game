@@ -33,9 +33,9 @@ ultima citire în `lastReading.caf`, recunoaștere Apple pe dispozitiv când est
 disponibilă sau pe server altfel, verificarea tranzacției și indicator Keychain.
 Contextul exercițiului este transmis recognizerului, nu doar fluxul audio.
 
-RevenueCat nu este configurat (`appl_REPLACE_ME`). Actualizează politica și
-declarațiile App Store **înainte** de activarea lui ori a altui serviciu care
-primește date. Ștergerea aplicației nu garantează eliminarea Keychain/copii backup.
+Cumpărăturile folosesc direct Apple StoreKit 2, fără SDK terț. Actualizează
+politica și declarațiile App Store **înainte** de activarea unui serviciu terț
+care primește date. Ștergerea aplicației nu garantează eliminarea Keychain/copii backup.
 
 De făcut separat de Claude în `parents()` sau `window.__parentsExtra`: acces
 ușor la politica de confidențialitate și disclaimer, ideal ca text local/offline,

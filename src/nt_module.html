@@ -8,6 +8,25 @@
 .nt-rec button.on{background:#FF5D7A;color:#fff;animation:rdPulse 1s infinite}
 .rd-w.ok{background:#D7F5E6}.rd-w.ok .sy{color:#24935F!important;opacity:1!important}
 .hm-par>div{max-height:92vh;overflow:auto}
+/* Setări pentru adulți: card IAP distinct, secțiuni restrânse și derulare proprie. */
+.hm-par.pa-overlay{position:fixed;inset:0;z-index:99998;height:100dvh;box-sizing:border-box;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#24325f}
+.hm-par.pa-overlay>.pa-panel{width:min(680px,100%);height:min(840px,100%);max-width:none;max-height:100%;padding:0;gap:0;align-items:stretch;overflow:hidden;box-sizing:border-box;border-radius:24px;background:#f4f6fa;box-shadow:0 20px 80px #17234455;display:flex;flex-direction:column;font-size:16px;line-height:1.4}
+.pa-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#fff;border-bottom:1px solid #dce2ed}
+.pa-header h2{margin:0;font-family:var(--display);font-size:22px;line-height:1.2}
+.pa-panel .pa-button{font:inherit;font-size:15px;font-weight:700;color:#24325f;border:1px solid #cbd4e4;border-radius:12px;background:#fff;padding:10px 14px;min-height:44px;box-shadow:none;cursor:pointer;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+.pa-panel .pa-button:disabled{opacity:.55;cursor:default}.pa-panel .pa-button:focus-visible,.pa-panel summary:focus-visible,.pa-panel select:focus-visible,.pa-panel input:focus-visible{outline:3px solid #437be0;outline-offset:3px}
+.pa-panel .pa-close{flex:none;background:#eef2f8;padding:8px 12px;font-size:14px}
+.pa-content{position:relative;flex:1;min-height:0;display:flex}.pa-body{flex:1;min-width:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:16px 24px 18px 16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#8ea0bb transparent}
+.pa-body>*{flex-shrink:0;box-sizing:border-box}.pa-scroll-track{position:absolute;right:7px;top:10px;bottom:10px;width:4px;border-radius:9px;background:#dce3ef;pointer-events:none}.pa-scroll-track>div{width:100%;background:#7287aa;border-radius:9px}
+.pa-scroll-hint{flex:none;min-height:30px;box-sizing:border-box;text-align:center;padding:5px 12px;background:#fff;border-top:1px solid #dce2ed;font-size:12px;font-weight:600;color:#586982}
+.pa-purchase,.pa-section,.pa-info{border:1px solid #dce2ed;border-radius:17px;background:#fff;overflow:hidden}
+.pa-purchase{padding:18px;background:linear-gradient(125deg,#fff8e4,#fff);border-color:#e5c56b;box-shadow:0 3px 12px #7e61200c}.pa-purchase.pa-owned{background:linear-gradient(125deg,#eaf8f0,#fff);border-color:#a6d7bd}
+.pa-purchase-head{display:flex;align-items:center;gap:12px}.pa-diamond{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:13px;background:#fff0bf;font-size:26px}.pa-owned .pa-diamond{background:#d6f0e2}
+.pa-panel h3{margin:0;font-size:18px;line-height:1.25}.pa-panel p{margin:8px 0 0;font-size:14px;line-height:1.45}.pa-muted{color:#64718a}.pa-purchase-actions{display:grid;gap:9px;margin-top:14px}.pa-panel .pa-primary{background:#246d50;color:white;border-color:#246d50;min-height:48px;font-size:16px}.pa-panel .pa-restore{background:transparent;font-size:14px}.pa-status{min-height:0;color:#52627b}.pa-status:empty{display:none}
+.pa-section summary{position:relative;display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 38px 12px 14px;box-sizing:border-box;cursor:pointer;list-style:none;font-weight:700;font-size:16px}.pa-section summary::-webkit-details-marker{display:none}.pa-section summary:after{content:'⌄';position:absolute;right:16px;font-size:22px;color:#73829a}.pa-section[open] summary:after{content:'⌃'}.pa-section[open] summary{border-bottom:1px solid #e7ebf2}.pa-section-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:#eff3fa;flex:none;font-size:21px}
+.pa-section-body{padding:14px;display:flex;flex-direction:column;gap:12px}.pa-field{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:600}.pa-panel select,.pa-panel input{font:inherit;min-width:0;max-width:100%;width:100%;min-height:46px;box-sizing:border-box;border:1px solid #cbd4e4;border-radius:10px;background:#fff;color:#24325f;padding:10px;font-size:16px}
+.pa-record-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pa-record-actions .pa-record{grid-column:1/-1}.pa-panel .pa-record.on{background:#bd3152;color:#fff;border-color:#bd3152}.pa-panel .pa-delete{color:#a33049}.pa-section-body>p:first-child{margin-top:0}.pa-info{padding:14px}.pa-info h3{font-size:14px;color:#64718a;margin-bottom:10px}.pa-info .pa-button{width:100%;text-align:left}
+@media(max-width:560px){.hm-par.pa-overlay{padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))}.hm-par.pa-overlay>.pa-panel{height:100%;border-radius:20px}.pa-header{padding:12px}.pa-header h2{font-size:21px}.pa-body{padding:12px 20px 14px 12px;gap:10px}.pa-purchase{padding:15px}.pa-purchase-head{gap:10px}}
 .rd-w.help{animation:ntHelp .7s ease-in-out infinite alternate;outline:3px dashed var(--plum);outline-offset:2px}
 @keyframes ntHelp{to{transform:scale(1.12)}}
 .nt-mic{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:1.2rem}
@@ -85,32 +104,51 @@ window.__micRead=({spans,row,task,alive,onDone})=>{ const W=spans.map(o=>norm(o.
 
 /* --- panoul părinților: poartă + vocea părintelui + cumpărare --- */
 window.__parentsGate=()=>N.call('gate',{lang});
-window.__parentsExtra=async box=>{ const s=document.createElement('div'); s.className='nt-sec'; s.innerHTML=`<h4>${Y().recT}</h4><div style="font-size:.95rem;text-align:center;max-width:420px">${Y().recH}</div>`;
-  await refreshRecs();
-  for(let k=1;k<=5;k++){ const key='praise'+k, r=document.createElement('div'); r.className='nt-rec'; const lab=document.createElement('span'); lab.textContent=Y().slot(k)+(recs.includes(key)?' ✅':'');
-    const rb=document.createElement('button'), pb=document.createElement('button'), db=document.createElement('button'); rb.textContent=Y().rec; pb.textContent=Y().play; db.textContent=Y().del; let on=false;
-    let watch=null;
-    const stopRec=async()=>{ clearInterval(watch); watch=null; if(!on) return; on=false; await N.call('rec.stop'); rb.textContent=Y().rec; rb.classList.remove('on'); await refreshRecs(); lab.textContent=Y().slot(k)+(recs.includes(key)?' ✅':''); };
-    rb.onclick=async()=>{ if(!on&&window.__gate&&window.__gate('nt','rec')) return; if(!on){ if(await N.call('rec.start',{key})){ on=true; rb.textContent=Y().stop; rb.classList.add('on'); const t0=Date.now();
-        /* aplicația oprește singură înregistrarea după 12 s; la fel și când se închide panoul */
-        watch=setInterval(()=>{ if(!box.isConnected||Date.now()-t0>12300) stopRec(); },300); } } else stopRec(); };
-    pb.onclick=()=>N.call('rec.play',{key}); db.onclick=async()=>{ await N.call('rec.delete',{key}); await refreshRecs(); lab.textContent=Y().slot(k); };
-    r.append(lab,rb,pb,db); s.appendChild(r); }
-  box.insertBefore(s,box.lastChild);
-  const v=await N.call('voiceInfo',{lang}); if(v&&v.name){ const d=document.createElement('div'); d.style.cssText='font-size:.9rem;opacity:.8'; d.textContent=Y().voice(`${v.name} (${v.quality})`); s.appendChild(d); }
-  const b=document.createElement('div'); b.className='nt-sec'; b.innerHTML=`<h4>${Y().buyT}</h4>`; box.insertBefore(b,box.lastChild);
-  const paint=async()=>{ b.querySelectorAll('button,div.m').forEach(x=>x.remove());
-    if(window.__premium){ const m=document.createElement('div'); m.className='m'; m.textContent=Y().owned; b.appendChild(m); return; }
-    const price=await N.call('iap.price'); const bb=document.createElement('button'); bb.className='rb-b go'; bb.textContent=Y().buy(price); bb.onclick=async()=>{ const v=!!await N.call('iap.buy'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); };
-    const rs=document.createElement('button'); rs.className='rb-b'; rs.textContent=Y().restore; rs.onclick=async()=>{ const v=!!await N.call('iap.restore'); window.__setPremium?window.__setPremium(v):(window.__premium=v); paint(); }; b.append(bb,rs); };
-  paint(); };
+window.__parentsExtra=async box=>{
+  const t=window.__parentsText();
+  const card=document.createElement('section'); card.className='pa-purchase'; card.setAttribute('aria-labelledby','pa-iap-title');
+  const header=document.createElement('div'); header.className='pa-purchase-head'; const diamond=document.createElement('span'); diamond.className='pa-diamond'; diamond.setAttribute('aria-hidden','true'); diamond.textContent='💎';
+  const title=document.createElement('h3'); title.id='pa-iap-title'; title.textContent=Y().buyT.replace(/^💎\s*/u,''); header.append(diamond,title);
+  const message=document.createElement('p'), actions=document.createElement('div'); actions.className='pa-purchase-actions';
+  const status=document.createElement('p'); status.className='pa-status'; status.setAttribute('role','status'); status.setAttribute('aria-live','polite'); card.append(header,message,actions,status); box.prepend(card);
+  let purchaseBusy=false;
+  const paint=async(note='')=>{ if(!box.isConnected) return; actions.replaceChildren(); card.classList.toggle('pa-owned',!!window.__premium); message.textContent=window.__premium?Y().owned:t.once; status.textContent=note;
+    if(!window.__premium){
+      const buy=document.createElement('button'); buy.className='pa-button pa-primary'; buy.disabled=true; buy.textContent=t.busy; actions.appendChild(buy);
+      let price=''; try{ price=await N.call('iap.price'); }catch(e){} if(!box.isConnected) return;
+      buy.textContent=price?Y().buy(price):t.retry; buy.disabled=false; if(!price) status.textContent=t.noPrice;
+      buy.onclick=async()=>{ if(purchaseBusy) return; if(!price){ paint(); return; } purchaseBusy=true; actions.querySelectorAll('button').forEach(b=>b.disabled=true); status.textContent=t.busy; let ok=false; try{ ok=!!await N.call('iap.buy'); }catch(e){} purchaseBusy=false; window.__setPremium?window.__setPremium(ok):window.__premium=ok; paint(ok?'':t.notBought); };
+    }
+    const restore=document.createElement('button'); restore.className='pa-button pa-restore'; restore.textContent=Y().restore;
+    restore.onclick=async()=>{ if(purchaseBusy) return; purchaseBusy=true; actions.querySelectorAll('button').forEach(b=>b.disabled=true); status.textContent=t.busy; let ok=false; try{ ok=!!await N.call('iap.restore'); }catch(e){} purchaseBusy=false; window.__setPremium?window.__setPremium(ok):window.__premium=ok; paint(ok?t.checked:t.notRestored); }; actions.appendChild(restore);
+  };
+  paint();
+  const d=document.createElement('details'); d.className='pa-section pa-recordings'; const summary=document.createElement('summary'); const icon=document.createElement('span'); icon.className='pa-section-icon'; icon.textContent='🎙️'; const label=document.createElement('span'); label.textContent=Y().recT.replace(/^🎙️\s*/u,''); summary.append(icon,label);
+  const content=document.createElement('div'); content.className='pa-section-body'; const hint=document.createElement('p'); hint.className='pa-muted'; hint.textContent=Y().recH; content.appendChild(hint);
+  const select=document.createElement('select'); select.setAttribute('aria-label',Y().recT); for(let k=1;k<=5;k++){ const o=document.createElement('option'); o.value=String(k); select.appendChild(o); } content.appendChild(select);
+  const buttons=document.createElement('div'); buttons.className='pa-record-actions'; const record=document.createElement('button'), play=document.createElement('button'), del=document.createElement('button'); record.className='pa-button pa-record'; play.className='pa-button'; del.className='pa-button pa-delete'; play.textContent='▶ '+t.play; del.textContent='🗑 '+t.delete; buttons.append(record,play,del); content.appendChild(buttons);
+  const feedback=document.createElement('p'); feedback.className='pa-status'; feedback.setAttribute('role','status'); content.appendChild(feedback); d.append(summary,content); { const snd=box.querySelector('.pa-sound'); box.insertBefore(d,snd?snd.nextSibling:null); }
+  let on=false, busy=false, timer=null;
+  const key=()=> 'praise'+select.value;
+  const update=()=>{ for(let k=1;k<=5;k++) select.options[k-1].textContent=Y().slot(k)+' · '+(recs.includes('praise'+k)?t.recorded:t.empty); record.textContent=on?Y().stop:Y().rec; record.classList.toggle('on',on); select.disabled=on||busy; record.disabled=busy; play.disabled=on||busy||!recs.includes(key()); del.disabled=on||busy||!recs.includes(key()); };
+  const stop=async()=>{ clearTimeout(timer); timer=null; if(!on) return; on=false; busy=true; update(); try{ await N.call('rec.stop'); await refreshRecs(); }finally{ busy=false; update(); } };
+  record.onclick=async()=>{ if(busy) return; if(on){ await stop(); return; } if(window.__gate&&window.__gate('nt','rec')) return; busy=true; feedback.textContent=''; update(); let ok=false; try{ ok=!!await N.call('rec.start',{key:key()}); }catch(e){} busy=false; if(!box.isConnected){ if(ok) N.call('rec.stop'); return; } on=ok; update(); if(ok) timer=setTimeout(stop,12000); else feedback.textContent=t.recordError; };
+  select.onchange=()=>{ feedback.textContent=''; update(); };
+  play.onclick=()=>N.call('rec.play',{key:key()}); del.onclick=async()=>{ busy=true; update(); try{ await N.call('rec.delete',{key:key()}); await refreshRecs(); }finally{ busy=false; update(); } };
+  box.addEventListener('parents:close',()=>{ clearTimeout(timer); if(on){ on=false; N.call('rec.stop'); } });
+  update(); await refreshRecs(); if(!box.isConnected) return; update();
+  const voice=await N.call('voiceInfo',{lang}); if(voice&&voice.name){ const node=box.querySelector('.pa-voice-info'); if(node) node.textContent=Y().voice(voice.name); }
+};
 
 /* --- copie de siguranță a progresului --- */
-const snapObj=()=>{ const o={}; try{ for(let k=0;k<localStorage.length;k++){ const key=localStorage.key(k); o[key]=localStorage.getItem(key); } }catch(e){} return o; };
+/* chei care nu se salvează și nu se restaurează niciodată (ex. data de naștere, eliminată) */
+const NOSNAP=new Set(['tm_bday']);
+try{ NOSNAP.forEach(k=>localStorage.removeItem(k)); }catch(e){}
+const snapObj=()=>{ const o={}; try{ for(let k=0;k<localStorage.length;k++){ const key=localStorage.key(k); if(NOSNAP.has(key)) continue; o[key]=localStorage.getItem(key); } }catch(e){} return o; };
 let restored=false;
 const save=()=>{ if(!restored) return; const o=snapObj(); if(Object.keys(o).length) N.call('store.set',{snapshot:JSON.stringify(o)}); };
 /* la pornire: completează doar cheile care lipsesc din localStorage (nu suprascrie nimic) */
-N.call('store.get').then(s=>{ let added=0; try{ if(s){ const o=JSON.parse(s)||{}; for(const k of Object.keys(o)){ if(localStorage.getItem(k)===null){ localStorage.setItem(k,o[k]); added++; } } } }catch(e){}
+N.call('store.get').then(s=>{ let added=0; try{ if(s){ const o=JSON.parse(s)||{}; for(const k of Object.keys(o)){ if(NOSNAP.has(k)) continue; if(localStorage.getItem(k)===null){ localStorage.setItem(k,o[k]); added++; } } } }catch(e){}
   restored=true; let again=false; try{ again=sessionStorage.getItem('nt-restored')==='1'; }catch(e){}
   if(added&&!again){ try{ sessionStorage.setItem('nt-restored','1'); }catch(e){} location.reload(); return; } save(); });
 /* salvare la fiecare progres (cu mică întârziere), la ieșire și periodic */

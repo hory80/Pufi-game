@@ -49,12 +49,10 @@
 .tm-cal button.we{background:#FFF4F6}
 .tm-cal button.today{outline:4px solid var(--sun);background:#FFF6C9}
 .tm-cal button.today::after{content:"⭐";position:absolute;top:-8px;right:-4px;font-size:1rem}
-.tm-cal button.bd::before{content:"🎂";position:absolute;top:-8px;left:-4px;font-size:1rem}
 .tm-cal button.mark{background:#D7F5E6;box-shadow:0 4px 0 #3BC48A}
 .tm-cal button.no{background:#FFE1E7}
 .tm-cal button .c{position:absolute;bottom:1px;right:4px;font-size:.6em;color:#24935F}
 .tm-calTop{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:clamp(1.2rem,3.2vw,1.8rem)}
-.tm-bday{background:#FFF1C2;border-radius:999px;padding:4px 14px;font-weight:800;text-align:center;align-self:center;font-size:clamp(.95rem,2.4vw,1.2rem)}
 .tm-sky{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:900px}
 .tm-sky button{font:inherit;border:none;border-radius:20px;min-height:clamp(110px,24vh,200px);color:#fff;font-weight:800;font-size:clamp(.9rem,2.3vw,1.2rem);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
 .tm-sky button .e{font-size:clamp(2.2rem,6vh,3.4rem);text-shadow:none}
@@ -170,7 +168,6 @@ ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff
  ytmD:(k,d)=>[`Azi este ${d}. Ce zi a fost ieri?`,`Azi este ${d}. Ce zi va fi mâine?`][k],
  weekTask:'Pune vagoanele în ordine: începe cu luni!', weekAfter:d=>`Ce zi vine după ${d}?`, weekBefore:d=>`Ce zi este înainte de ${d}?`, weekend:'Sâmbăta și duminica sunt weekend: nu mergem la grădiniță!',
  calToday:'Atinge ziua de azi!', calTom:'Atinge ziua de mâine!', calYes:'Atinge ziua de ieri!', calWd:n=>`În ce zi a săptămânii este ${n}?`, calCount:n=>`Câte zile mai sunt până pe ${n}? Atinge zilele, una câte una, începând de mâine!`, calHow:'Câte zile ai numărat?',
- bday:n=>n===0?'🎂 Azi este ziua ta! La mulți ani!':`🎂 Până la ziua ta: ${n===1?'o zi':n<20?n+' zile':n+' de zile'}`,
  moOrder:'Atinge lunile în ordine, de la ianuarie!', moAfter:m=>`Ce lună vine după ${m}?`, moSeas:m=>`În ce anotimp este ${m}?`,
  treeHi:['Primăvara copacul înflorește. Atinge mugurii!','Vara copacul e plin de fructe. Culege cireșele!','Toamna frunzele se îngălbenesc și cad. Scutură copacul!','Iarna copacul doarme sub zăpadă. Fă un om de zăpadă!'],
  dressTask:s=>`E ${s}! Ce îmbracă Pufi? Alege trei lucruri potrivite.`, dressNo:['Hmm, asta nu se potrivește acum.','Uff, vara e prea cald pentru asta!','Hmm, asta nu se potrivește acum.','Brrr! Iarna e prea frig pentru asta!'],
@@ -214,7 +211,6 @@ de:{title:'⏳ Pufis Zeit',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓
  ytmD:(k,d)=>[`Heute ist ${d}. Welcher Tag war gestern?`,`Heute ist ${d}. Welcher Tag ist morgen?`][k],
  weekTask:'Bring die Wagen in die richtige Reihenfolge: fang mit Montag an!', weekAfter:d=>`Welcher Tag kommt nach ${d}?`, weekBefore:d=>`Welcher Tag kommt vor ${d}?`, weekend:'Samstag und Sonntag sind Wochenende: kein Kindergarten!',
  calToday:'Tippe auf heute!', calTom:'Tippe auf morgen!', calYes:'Tippe auf gestern!', calWd:n=>`Welcher Wochentag ist der ${n}.?`, calCount:n=>`Wie viele Tage sind es noch bis zum ${n}.? Tippe die Tage einzeln an, fang bei morgen an!`, calHow:'Wie viele Tage hast du gezählt?',
- bday:n=>n===0?'🎂 Heute ist dein Geburtstag! Alles Gute!':`🎂 Bis zu deinem Geburtstag: ${n===1?'ein Tag':n+' Tage'}`,
  moOrder:'Tippe die Monate der Reihe nach an, fang mit Januar an!', moAfter:m=>`Welcher Monat kommt nach ${m}?`, moSeas:m=>`In welcher Jahreszeit ist der ${m}?`,
  treeHi:['Im Frühling blüht der Baum. Tippe auf die Knospen!','Im Sommer hängen viele Früchte am Baum. Pflück die Kirschen!','Im Herbst werden die Blätter bunt und fallen. Schüttel den Baum!','Im Winter schläft der Baum unter dem Schnee. Bau einen Schneemann!'],
  dressTask:s=>`Es ist ${s}! Was zieht Pufi an? Such drei passende Sachen aus.`, dressNo:['Hmm, das passt gerade nicht.','Puh, im Sommer ist es dafür zu warm!','Hmm, das passt gerade nicht.','Brrr! Im Winter ist es dafür zu kalt!'],
@@ -257,7 +253,6 @@ en:{title:'⏳ Pufi’s Time',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 
  ytmD:(k,d)=>[`Today is ${d}. What day was yesterday?`,`Today is ${d}. What day will it be tomorrow?`][k],
  weekTask:'Put the wagons in order: start with Monday!', weekAfter:d=>`Which day comes after ${d}?`, weekBefore:d=>`Which day comes before ${d}?`, weekend:'Saturday and Sunday are the weekend: no nursery!',
  calToday:'Tap today!', calTom:'Tap tomorrow!', calYes:'Tap yesterday!', calWd:n=>`Which day of the week is the ${n}${ord(n)}?`, calCount:n=>`How many days until the ${n}${ord(n)}? Tap the days one by one, starting with tomorrow!`, calHow:'How many days did you count?',
- bday:n=>n===0?'🎂 It’s your birthday today! Happy birthday!':`🎂 Days until your birthday: ${n}`,
  moOrder:'Tap the months in order, starting with January!', moAfter:m=>`Which month comes after ${m}?`, moSeas:m=>`Which season is ${m} in?`,
  treeHi:['In spring the tree blossoms. Tap the buds!','In summer the tree is full of fruit. Pick the cherries!','In autumn the leaves turn yellow and fall. Shake the tree!','In winter the tree sleeps under the snow. Build a snowman!'],
  dressTask:s=>`It is ${s}! What does Pufi wear? Choose three things that fit.`, dressNo:['Hmm, that doesn’t fit right now.','Phew, it’s too hot in summer for that!','Hmm, that doesn’t fit right now.','Brrr! It’s too cold in winter for that!'],
@@ -573,14 +568,11 @@ function gWeek(li){ let ti=0, errs=0, busy=false; const N=li===0?2:PER; const F=
   show(); }
 
 /* ---------- 12. calendarul meu ---------- */
-function bdayDays(){ let s=null; try{ s=localStorage.getItem('tm_bday'); }catch(e){} if(!s) return null; const p=s.split('-').map(Number); const mo=p.length===3?p[1]-1:p[0]-1, d=p.length===3?p[2]:p[1]; if(isNaN(mo)||isNaN(d)) return null;
-  const now=new Date(); now.setHours(0,0,0,0); let b=new Date(now.getFullYear(),mo,d); if(b<now) b=new Date(now.getFullYear()+1,mo,d); return {n:Math.round((b-now)/864e5),mo,d}; }
-function calGrid(y,mo,today,onTap){ const D=X().days, first=(new Date(y,mo,1).getDay()+6)%7, last=new Date(y,mo+1,0).getDate(), g=el('div','tm-cal'), bd=bdayDays();
+function calGrid(y,mo,today,onTap){ const D=X().days, first=(new Date(y,mo,1).getDay()+6)%7, last=new Date(y,mo+1,0).getDate(), g=el('div','tm-cal');
   D.forEach((n,i)=>g.appendChild(el('div','hd'+(i>=5?' we':''),n.slice(0,lang==='de'?2:3).toUpperCase()))); for(let i=0;i<first;i++) g.appendChild(el('div'));
-  const bt={}; for(let d=1;d<=last;d++){ const wd=(first+d-1)%7, b=el('button',(wd>=5?'we':'')+(d===today?' today':'')+(bd&&bd.mo===mo&&bd.d===d?' bd':''),String(d)); b.onclick=()=>onTap(d,b); g.appendChild(b); bt[d]=b; } return {g,bt,last,first}; }
+  const bt={}; for(let d=1;d<=last;d++){ const wd=(first+d-1)%7, b=el('button',(wd>=5?'we':'')+(d===today?' today':''),String(d)); b.onclick=()=>onTap(d,b); g.appendChild(b); bt[d]=b; } return {g,bt,last,first}; }
 function gCal(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📅'); const myGen=gen; const now=new Date(), y=now.getFullYear(), mo=now.getMonth();
   function show(){ F.stage.innerHTML=''; F.ctrl.innerHTML=''; const wrap=el('div',null); wrap.style.cssText='display:flex;flex-direction:column;gap:8px;width:100%;max-width:760px;margin:auto';
-    const bd=bdayDays(); if(bd) wrap.appendChild(el('div','tm-bday',X().bday(bd.n)));
     wrap.appendChild(el('div','tm-calTop',`${['⛄','❄️','🌷','🐣','🌸','🍓','☀️','🏖️','🎒','🎃','🍂','🎄'][mo]} ${X().months[mo]} ${y}`));
     let today=now.getDate(); const last=new Date(y,mo+1,0).getDate();
     if(li===2){ today=RR(1,Math.max(1,last-10)); }
@@ -600,12 +592,12 @@ function gCal(li){ let ti=0, errs=0, busy=false; const F=frame('',PER,'📅'); c
 
 /* ---------- 13. roata lunilor ---------- */
 const MEM=['⛄','❄️','🌷','🐣','🌸','🍓','☀️','🏖️','🎒','🎃','🍂','🎄'], SCOL=['#A8E6A1','#FFE07A','#FFB27A','#9AD0FF'], SEM=['🌷','☀️','🍂','❄️'];
-function wheelSVG(){ let s=`<svg viewBox="0 0 620 620"><circle cx="310" cy="310" r="300" fill="#fff" stroke="#24325F" stroke-width="6"/>`; const bd=bdayDays(), cm=new Date().getMonth();
+function wheelSVG(){ let s=`<svg viewBox="0 0 620 620"><circle cx="310" cy="310" r="300" fill="#fff" stroke="#24325F" stroke-width="6"/>`; const cm=new Date().getMonth();
   for(let i=0;i<12;i++){ const a0=(i*30-15)*Math.PI/180, a1=(i*30+15)*Math.PI/180, P=(r,a)=>`${310+Math.sin(a)*r} ${310-Math.cos(a)*r}`;
     s+=`<path id="tm-wm${i}" d="M310 310L${P(292,a0)}A292 292 0 0 1 ${P(292,a1)}Z" fill="${SCOL[seasonOf(i)]}" stroke="#fff" stroke-width="4" style="cursor:pointer"/>`;
     const am=i*30*Math.PI/180; s+=`<text x="${310+Math.sin(am)*248}" y="${310-Math.cos(am)*248+16}" font-size="42" text-anchor="middle" pointer-events="none">${MEM[i]}</text><text x="${310+Math.sin(am)*178}" y="${310-Math.cos(am)*178+7}" font-size="19" font-weight="800" text-anchor="middle" fill="#24325F" pointer-events="none">${X().months[i]}</text>`;
     if(i===cm) s+=`<text x="${310+Math.sin(am)*210}" y="${310-Math.cos(am)*210-18}" font-size="26" text-anchor="middle" pointer-events="none">⭐</text>`;
-    if(bd&&bd.mo===i) s+=`<text x="${310+Math.sin(am)*120}" y="${310-Math.cos(am)*120+10}" font-size="30" text-anchor="middle" pointer-events="none">🎂</text>`; }
+    }
   return s+`<circle cx="310" cy="310" r="78" fill="#fff" stroke="#24325F" stroke-width="5"/><text id="tm-wc" x="310" y="335" font-size="70" text-anchor="middle">🎡</text></svg>`; }
 function gMonths(li){ let ti=0, errs=0, busy=false, k=0; const N=li===0?1:PER; const F=frame('',N,'🎡'); const myGen=gen; const M=X().months;
   F.stage.innerHTML=wheelSVG(); const svg=F.stage.firstChild, wc=svg.querySelector('#tm-wc'); let tg=0;
@@ -725,7 +717,7 @@ const gotStars=k=>[...Array(nLv(k))].reduce((s,_,i)=>s+(data.prog[k+i]||0),0);
 function head(ic,txt){ const h=el('div','rb-head'); h.append(el('div','rb-face',`<div style="font-size:clamp(40px,7vh,58px);line-height:1">${ic}</div>`)); const b=el('div','rb-bubble'); b.textContent=txt; b.onclick=()=>sp(txt); h.append(b); return h; }
 function todayText(){ const n=new Date(); const wd=X().days[(n.getDay()+6)%7], mo=X().months[n.getMonth()], s=X().seas[seasonOf(n.getMonth())]; return X().today(wd,n.getDate(),mo,s); }
 function home(){ stopAll(); back=null; curLevels=null; $('title').textContent=X().title; $('back').textContent=X().back; $('all').hidden=true; pill(); main.innerHTML='';
-  const tt=todayText(); main.append(head('🦊',tt)); const bd=bdayDays(); if(bd) main.appendChild(el('div','tm-bday',X().bday(bd.n)));
+  const tt=todayText(); main.append(head('🦊',tt));
   const lad=el('div','tm-ladder'); X().ladder.forEach((t,i)=>{ lad.appendChild(el('span',null,t)); if(i<3) lad.appendChild(el('span',null,'→')); }); main.appendChild(lad);
   const g=el('div','tm-worlds'); Object.keys(WORLDS).forEach(w=>{ const tot=WORLDS[w].reduce((s,k)=>s+nLv(k)*3,0), got=WORLDS[w].reduce((s,k)=>s+gotStars(k),0);
     const c=el('button','tm-world',`<span class="ic">${X().worlds[w][0]}</span><span class="t">${X().worlds[w][1]}</span><span class="p">⭐ ${got}/${tot}</span>`); c.style.background=WBG[w]; c.onclick=()=>{ blip(); world(w); }; g.appendChild(c); });

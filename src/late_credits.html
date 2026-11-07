@@ -41,6 +41,6 @@ window.openCredits=open;
   try{ if(typeof PHOTOS!=='undefined') [...PHOTOS].forEach(k=>{ if(bad('foto/'+k+'.jpg')) PHOTOS.delete(k); }); }catch(e){}
   try{ if(typeof FB_PHOTOS!=='undefined') [...FB_PHOTOS].forEach(k=>{ if(bad('fotbal/'+k+'.jpg')) FB_PHOTOS.delete(k); }); }catch(e){}
   try{ if(typeof ANTHEMS!=='undefined') [...ANTHEMS].forEach(c=>{ if(!A['imn/'+c+'.mp3']||A['imn/'+c+'.mp3'].status!=='VERIFICAT') ANTHEMS.delete(c); }); }catch(e){} })();
-const prev=window.__parentsExtra; window.__parentsExtra=async box=>{ if(prev) try{ await prev(box); }catch(e){} const b=document.createElement('button'); b.className='rb-b'; b.style.cssText='margin-top:8px'; b.textContent=X().btn; b.onclick=open; box.appendChild(b); };
+const prev=window.__parentsExtra; window.__parentsExtra=async box=>{ if(prev) try{ await prev(box); }catch(e){} if(!box.isConnected) return; const t=window.__parentsText(); const section=document.createElement('section'); section.className='pa-info'; const h=document.createElement('h3'); h.textContent=t.info; const b=document.createElement('button'); b.className='pa-button'; b.textContent='📜 '+t.credits; b.onclick=open; section.append(h,b); box.appendChild(section); };
 })();
 </script>

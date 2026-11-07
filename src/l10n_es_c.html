@@ -77,7 +77,7 @@ S('mw',{title:'🔢 El mundo de los números',back:'⬅ Atrás',allOn:'🔓 Todo
  ordUp:'Pon los pingüinos de menor a mayor: del más pequeño al más grande. ¡Haz una escalera que sube!',ordDown:'Pon los pingüinos de mayor a menor: del más grande al más pequeño. ¡Haz un tobogán!',
  ordOk:'¡Perfecto! ¡El orden es correcto!',ordNo:'¡Uy! Aquí el orden no está bien. ¡Inténtalo otra vez!',up:'🪜 De menor a mayor',down:'🛝 De mayor a menor',
  boxQ:'¿Cuántas manzanas hay en la caja secreta? ¡Pon manzanas en la caja hasta que la balanza esté recta!',boxQ100:'¿Qué número hay en la caja secreta? ¡Añade manzanas hasta que la balanza esté recta!',boxOk:(e)=>`¡La balanza está recta! ${e}`,heavyL:'El lado izquierdo pesa más.',heavyR:'El lado derecho pesa más.'});
-S('hm',{title:'Pufi – La escuela de juegos ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',bday:'🎂 Cumpleaños del niño',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
+S('hm',{title:'Pufi – La escuela de juegos ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
 const ES_H=['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once'];
 const hr=h=>{ const k=h%12; return k===1?'la una':`las ${ES_H[k]}`; };
 const itIs=t=>(t.startsWith('la una')?`Es ${t}.`:`Son ${t}.`);
@@ -120,7 +120,6 @@ S('tm',{title:'⏳ El tiempo de Pufi',back:'⬅ Atrás',allOn:'🔓 Todos: sí',
  ytmD:(k,d)=>[`Hoy es ${d}. ¿Qué día fue ayer?`,`Hoy es ${d}. ¿Qué día será mañana?`][k],
  weekTask:'Pon los vagones en orden: ¡empieza por el lunes!', weekAfter:d=>`¿Qué día viene después del ${d}?`, weekBefore:d=>`¿Qué día viene antes del ${d}?`, weekend:'El sábado y el domingo son el fin de semana: ¡no hay guardería!',
  calToday:'¡Toca hoy!', calTom:'¡Toca mañana!', calYes:'¡Toca ayer!', calWd:n=>`¿Qué día de la semana es el ${n}?`, calCount:n=>`¿Cuántos días faltan para el ${n}? ¡Toca los días uno a uno, empezando por mañana!`, calHow:'¿Cuántos días has contado?',
- bday:n=>n===0?'🎂 ¡Hoy es tu cumpleaños! ¡Feliz cumpleaños!':`🎂 Para tu cumpleaños faltan: ${n===1?'un día':n+' días'}`,
  moOrder:'¡Toca los meses en orden, empezando por enero!', moAfter:m=>`¿Qué mes viene después de ${m}?`, moSeas:m=>`¿En qué estación está ${m}?`,
  treeHi:['En primavera el árbol florece. ¡Toca los capullos!','En verano el árbol está lleno de fruta. ¡Recoge las cerezas!','En otoño las hojas se vuelven amarillas y caen. ¡Sacude el árbol!','En invierno el árbol duerme bajo la nieve. ¡Haz un muñeco de nieve!'],
  dressTask:s=>`¡Es ${s}! ¿Qué se pone Pufi? Elige tres cosas que vayan bien.`, dressNo:['Mmm, esto ahora no va bien.','¡Uf, en verano hace demasiado calor para esto!','Mmm, esto ahora no va bien.','¡Brrr! En invierno hace demasiado frío para esto.'],

@@ -160,3 +160,85 @@ in App Store Connect. See `ios/store/README.md` for exact URLs and maintenance.
 Web follow-up for Claude: add readily accessible offline privacy/disclaimer text
 in `parents()` or `window.__parentsExtra`, keeping external navigation blocked.
 Wikimedia content-rights verification remains separate.
+
+## StoreKit 2, Sandbox și meniul Părinți — 6 noiembrie 2026
+
+Branch `ios/storekit-unlock`, PR #11, baza main `837d01f`.
+Secțiunile datate anterior descriu implementările istorice; starea actuală este aici.
+
+### Implementare
+
+- `PurchaseService.swift` folosește direct StoreKit 2 pentru achiziția permanentă
+  `unlock_all`: preț Apple localizat, cumpărare, restaurare, tranzacții verificate,
+  actualizări, aprobare ulterioară și rambursare. SDK-ul RevenueCat neactivat a
+  fost eliminat. Contractul `iap.status/price/buy/restore` rămâne identic.
+- Accesul gratuit până la **15 decembrie 2026, 00:00 Europe/Zurich** și eligibilitatea
+  permanentă verificată a primilor utilizatori rămân. Bundle ID
+  `com.horace.pufistars`, product ID `unlock_all`, fără analytics sau tracking.
+- Catalogul StoreKit local și scenariile izolate sunt exclusiv pentru dezvoltare;
+  catalogul nu este inclus în aplicația Release. Configurația reală Sandbox a fost
+  testată fără catalog local selectat, cu schema PufiStars.
+- La solicitarea lui Hory și cu **excepția explicit autorizată pentru index.html**,
+  meniul Părinți a fost refăcut: card IAP distinct primul, restaurare disponibilă
+  și când există acces complet; stări de verificare/eroare și reîncercarea prețului.
+- Titlu/Închide fixate în panou, derulare internă cu indicator și mesaj când
+  există setări mai jos; fundal inert și gestionarea focusului/tastaturii.
+- Carduri restrânse pentru sunet, vocea părintelui și aniversare. Cele cinci laude
+  se aleg dintr-o singură listă, cu un singur set Înregistrează/Ascultă/Șterge;
+  comenzile indisponibile sunt dezactivate, înregistrarea se oprește la închidere.
+- „Datele copilului” a fost înlocuit cu **„Ziua de naștere — opțional”**: se cer
+  numai ziua și luna pentru Calendar, se salvează local ca MM-DD, există Șterge.
+  Valorile vechi YYYY-MM-DD sunt citite compatibil, fără modificare la deschidere.
+  Textele meniului sunt traduse în toate cele 12 limbi.
+- `ParentsMenuTests.swift` verifică geometria celor 12 limbi, secțiunile, focusul,
+  derularea și închiderea, selectarea unui slot/opritul înregistrării prin bridge
+  simulat, restaurarea cardului owned și compatibilitatea/ștergerea aniversării.
+- Capturi originale actualizate pentru iPhone/iPad în `store/iap-review/`.
+  Nu se comit proiectul Xcode, WebContent generat sau DerivedData.
+
+### Rezultate
+
+- **iPhone 17 Pro, iOS 26.1: 18 teste PASS**, zero eșecuri: 8 politică/Keychain,
+  5 meniu, 4 StoreKit și 1 UI cu poarta nativă și captura originală.
+- **iPad Pro 13-inch (M5), iPadOS 26.1: aceleași 18 teste PASS**.
+- Debug build/rulare pe ambele simulatoare și Release build simulator: **PASS**.
+- StoreKit local: preț, cumpărare/restaurare într-un serviciu nou, anulare,
+  Ask to Buy/aprobare, refund. Problemele Apple pe runtime 26.5/27.0 nu sunt
+  raportate ca reușite; suita finală folosește 26.1.
+- **Sandbox real pe iPhone 16 HR: PASS, confirmat de Hory** — produsul încarcă un
+  preț, fereastra Apple indică Sandbox, cumpărarea de test deblochează aplicația.
+  După instalarea noului meniu, accesul persistă și „Restaurează cumpărăturile”
+  afișează „Accesul a fost verificat”. Moneda/prețul exact de pe telefon nu au fost
+  transcrise; prețul de bază configurat în App Store Connect este 3 USD.
+- Build semnat și instalarea noului meniu pe telefon: **PASS**. Ultima schimbare
+  exclusiv pentru aniversare nu este încă instalată: telefonul a devenit
+  indisponibil înaintea acelei instalări. Nu a fost dezinstalată aplicația.
+- **iPad HR fizic: build semnat, instalare și lansare PASS**, inclusiv ultima
+  ajustare a aniversării. Actualizare fără dezinstalare. Hory a confirmat:
+  „Se aude corect, meniul este în regulă” după înregistrarea și redarea unei
+  laude prin noile comenzi și verificarea meniului/butonului Închide.
+  Aceasta este o probă audio reală asistată de utilizator, separată de testele
+  automate cu bridge simulat.
+
+Jurnale: `/tmp/pufi-parents-phone-birthday.log`,
+`/tmp/pufi-parents-pad-birthday.log`, `/tmp/pufi-parents-release-build.log`,
+`/tmp/pufi-parents-physical-build.log`,
+`/tmp/pufi-parents-ipad-physical-build.log`.
+Rezultate: `/tmp/PufiParentsPhoneBirthday.xcresult`,
+`/tmp/PufiParentsPadBirthday.xcresult`.
+Build/test în `/tmp/PufiIAPBuild`, publicare din clona curată `/tmp/PufiIAPPublish`
+deoarece iCloud blochează citirea Git în copia Documents.
+
+### App Store și limite
+
+IAP **Pufi Full Access**, `unlock_all`, Apple ID `6831593303`, are prețul de bază
+3 USD și 12 localizări. Notele și vechea captură sunt salvate; starea rămâne
+Prepare for Submission, fără Add for Review/Submit. Captura nouă iPad din acest
+PR trebuie încă încărcată în locul celei vechi. Sesiunea browserului nu mai este
+disponibilă la finalul acestei verificări.
+
+Pentru Claude: în ecranul separat al unui joc blocat, `paywall()` citește greșit
+`window.L10N.nt`, astfel titlul/prețul nu sunt afișate corect. Acest ecran este în
+afara excepției autorizate pentru meniul Părinți și nu a fost schimbat.
+Licențierea materialelor rămâne o verificare separată înainte de lansare.
+PR fără merge automat.

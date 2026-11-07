@@ -77,7 +77,7 @@ S('mw',{title:'🔢 O mundo dos números',back:'⬅ Voltar',allOn:'🔓 Todos: s
  ordUp:'Coloque os pinguins do menor para o maior. Faça uma escada que sobe!',ordDown:'Coloque os pinguins do maior para o menor. Faça um escorregador!',
  ordOk:'Perfeito! A ordem está certa!',ordNo:'Opa, aqui a ordem não está certa. Tente de novo!',up:'🪜 Do menor ao maior',down:'🛝 Do maior ao menor',
  boxQ:'Quantas maçãs tem na caixa secreta? Coloque maçãs na caixa até a balança ficar reta!',boxQ100:'Que número está na caixa secreta? Coloque maçãs até a balança ficar reta!',boxOk:(e)=>`A balança está reta! ${e}`,heavyL:'O lado esquerdo está mais pesado.',heavyR:'O lado direito está mais pesado.'});
-S('hm',{title:'Pufi – A escola dos jogos ⭐',q:'Do que vamos brincar hoje?',math:'Matemática',world:'O mundo',read:'Ler',time:'O tempo',bday:'🎂 Aniversário da criança',shapes:'Formas',robo:'RoboPufi',chess:'Xadrez',pufi:'Pufi',par:'Pais',home:'🏠 Início',voice:'Voz',on:'🔊 Voz: sim',off:'🔇 Voz: não',close:'✖ Fechar',hello:'Do que vamos brincar hoje? Escolha uma carta!'});
+S('hm',{title:'Pufi – A escola dos jogos ⭐',q:'Do que vamos brincar hoje?',math:'Matemática',world:'O mundo',read:'Ler',time:'O tempo',shapes:'Formas',robo:'RoboPufi',chess:'Xadrez',pufi:'Pufi',par:'Pais',home:'🏠 Início',voice:'Voz',on:'🔊 Voz: sim',off:'🔇 Voz: não',close:'✖ Fechar',hello:'Do que vamos brincar hoje? Escolha uma carta!'});
 const PT_H=['doze','uma','duas','três','quatro','cinco','seis','sete','oito','nove','dez','onze'];
 const hr=h=>{ const k=h%12; return k===1?'uma hora':`${PT_H[k]} horas`; };
 const hb=h=>PT_H[h%12];
@@ -122,7 +122,6 @@ S('tm',{title:'⏳ O tempo de Pufi',back:'⬅ Voltar',allOn:'🔓 Todos: sim',al
  ytmD:(k,d)=>[`Hoje é ${d}. Que dia foi ontem?`,`Hoje é ${d}. Que dia vai ser amanhã?`][k],
  weekTask:'Coloque os vagões em ordem: comece pela segunda-feira!', weekAfter:d=>`Que dia vem depois de ${d}?`, weekBefore:d=>`Que dia vem antes de ${d}?`, weekend:'Sábado e domingo são o fim de semana: não tem escolinha!',
  calToday:'Toque em hoje!', calTom:'Toque em amanhã!', calYes:'Toque em ontem!', calWd:n=>`Que dia da semana é o dia ${n}?`, calCount:n=>`Quantos dias faltam para o dia ${n}? Toque nos dias um por um, começando por amanhã!`, calHow:'Quantos dias você contou?',
- bday:n=>n===0?'🎂 Hoje é o seu aniversário! Parabéns!':`🎂 Faltam para o seu aniversário: ${n===1?'um dia':n+' dias'}`,
  moOrder:'Toque nos meses em ordem, começando por janeiro!', moAfter:m=>`Que mês vem depois de ${m}?`, moSeas:m=>`Em que estação fica ${m}?`,
  treeHi:['Na primavera a árvore floresce. Toque nos botões!','No verão a árvore fica cheia de frutas. Colha as cerejas!','No outono as folhas ficam amarelas e caem. Sacuda a árvore!','No inverno a árvore dorme debaixo da neve. Faça um boneco de neve!'],
  dressTask:s=>`É ${s}! O que o Pufi vai vestir? Escolha três coisas certas.`, dressNo:['Hum, isso agora não combina.','Ufa, no verão está quente demais para isso!','Hum, isso agora não combina.','Brrr! No inverno está frio demais para isso!'],

@@ -77,7 +77,7 @@ S('mw',{title:'🔢 De getallenwereld',back:'⬅ Terug',allOn:'🔓 Alles: aan',
  ordUp:'Zet de pinguïns van klein naar groot. Maak een trap omhoog!',ordDown:'Zet de pinguïns van groot naar klein. Maak een glijbaan!',
  ordOk:'Perfect! De volgorde klopt!',ordNo:'Oei, hier klopt de volgorde niet. Probeer het nog eens!',up:'🪜 Van klein naar groot',down:'🛝 Van groot naar klein',
  boxQ:'Hoeveel appels zitten er in de geheime doos? Leg appels in de doos tot de weegschaal recht hangt!',boxQ100:'Welk getal zit er in de geheime doos? Leg appels erbij tot de weegschaal recht hangt!',boxOk:(e)=>`De weegschaal hangt recht! ${e}`,heavyL:'De linkerkant is zwaarder.',heavyR:'De rechterkant is zwaarder.'});
-S('hm',{title:'Pufi – De spelletjesschool ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',bday:'🎂 Verjaardag van het kind',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
+S('hm',{title:'Pufi – De spelletjesschool ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
 const NL_H=['twaalf','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf'];
 const H=h=>NL_H[h%12];
 const hr=h=>`${H(h)} uur`;
@@ -122,7 +122,6 @@ S('tm',{title:'⏳ De tijd van Pufi',back:'⬅ Terug',allOn:'🔓 Alles: aan',al
  ytmD:(k,d)=>[`Vandaag is het ${d}. Welke dag was het gisteren?`,`Vandaag is het ${d}. Welke dag is het morgen?`][k],
  weekTask:'Zet de wagons op volgorde: begin bij maandag!', weekAfter:d=>`Welke dag komt na ${d}?`, weekBefore:d=>`Welke dag komt voor ${d}?`, weekend:'Zaterdag en zondag is het weekend: geen school!',
  calToday:'Tik op vandaag!', calTom:'Tik op morgen!', calYes:'Tik op gisteren!', calWd:n=>`Welke dag van de week is het op de ${n}e?`, calCount:n=>`Hoeveel dagen is het nog tot de ${n}e? Tik de dagen een voor een aan, begin bij morgen!`, calHow:'Hoeveel dagen heb je geteld?',
- bday:n=>n===0?'🎂 Vandaag ben je jarig! Gefeliciteerd!':`🎂 Nog ${n===1?'één dag':n+' dagen'} tot je verjaardag`,
  moOrder:'Tik de maanden op volgorde aan, begin bij januari!', moAfter:m=>`Welke maand komt na ${m}?`, moSeas:m=>`In welk seizoen valt ${m}?`,
  treeHi:['In de lente gaat de boom bloeien. Tik op de knopjes!','In de zomer hangt de boom vol fruit. Pluk de kersen!','In de herfst worden de bladeren geel en vallen ze. Schud aan de boom!','In de winter slaapt de boom onder de sneeuw. Maak een sneeuwpop!'],
  dressTask:s=>`Het is ${s}! Wat trekt Pufi aan? Kies drie dingen die passen.`, dressNo:['Hm, dat past nu niet.','Pff, in de zomer is het daar veel te warm voor!','Hm, dat past nu niet.','Brrr! In de winter is het daar veel te koud voor!'],
