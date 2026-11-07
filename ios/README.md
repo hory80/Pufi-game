@@ -93,3 +93,21 @@ RevenueCat sau modificarea Keychain-ului real. `PufiPremium` simulează un
 entitlement activ; nu efectuează o cumpărătură. Toate argumentele sunt excluse din
 Release. Data-limită este strictă: o achiziție exact la limită nu califică pentru
 acces permanent gratuit.
+
+## Diagnostic microfon
+
+`asr.start` răspunde `true` la pornire sau `{ "ok": false, "reason": "…" }`
+la eșec. Același cod apare în consola dispozitivului cu prefixul `Pufi ASR:`.
+`asr.perm` citește, fără dialoguri, stările `speech` și `mic`;
+`openSettings` deschide pagina Pufi din Setări, după poarta gestionată de joc.
+
+Intrarea audio este verificată după activarea sesiunii. Dacă un model local
+anunțat ca disponibil eșuează în primele 3 secunde, înainte de orice text,
+recunoașterea este reluată o singură dată cu rețeaua permisă. În acel caz,
+audio poate fi prelucrat de serviciul Apple; reluarea este consemnată în log.
+Nu se înregistrează în log textul dictat sau citit.
+
+Pe dispozitiv, verificați separat permisiunile refuzate și acceptate, în română
+și engleză: citirea „Pufi și mingea”, dictarea unei povești și deschiderea Setărilor.
+Testele automate care necesită permisiuni deja refuzate sau un microfon fizic
+se omit explicit când mediul nu îndeplinește aceste condiții.

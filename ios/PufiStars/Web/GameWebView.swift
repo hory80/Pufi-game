@@ -58,7 +58,7 @@ struct GameWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         func webView(_ webView: WKWebView,
                      decidePolicyFor navigationAction: WKNavigationAction,
-                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                     decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
             let scheme = navigationAction.request.url?.scheme ?? ""
             decisionHandler(scheme == "file" || scheme == "about" || scheme == "data" || scheme == "blob" ? .allow : .cancel)
         }

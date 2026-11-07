@@ -1,3 +1,97 @@
+# Task 04 — diagnostic microfon pe iPad
+
+Data: 3 noiembrie 2026. Branch: `ios/microfon-diagnostic`. Bază web: `3a9c561`.
+Sarcină: `ios/tasks/04-microfon-ipad.md`, inclusiv secțiunea 1b.
+
+## Cauza și modificările
+
+Cauza exactă a eșecului inițial de pe iPad nu a fost reprodusă: pe dispozitivul
+conectat permisiunile sunt deja acceptate, iar noua versiune pornește motorul
+în română și engleză. Versiunea anterioară pierdea motivul oricărui eșec,
+întorcând numai `false`. Au fost corectate și riscurile identificate în pornirea audio.
+
+- `RecognitionService.swift`: starea permisiunilor fără dialoguri; motivele exacte
+  cerute de sarcină; activarea sesiunii înainte de citirea formatului, o încercare
+  cu `inputFormat` dacă `outputFormat` este invalid și refuzul formatului invalid
+  înainte de `installTap`; callback audio fără acces la MainActor; o singură
+  reluare cu rețeaua permisă dacă recunoașterea locală eșuează în primele 3 secunde
+  fără text. `stop()` elimină tap-ul și restabilește `.playback` după ascultare.
+- `Bridge.swift`: `asr.start` păstrează `true` la succes, întoarce `{ok:false,reason}`
+  și `NSLog("Pufi ASR: …")` la eșec; `asr.perm` și `openSettings`; oprirea ASR
+  înainte de TTS; cererile de autorizare întârziate nu mai pot reporni o ascultare
+  anulată. Erorile apărute după pornire sunt logate și însoțesc `asr.end`.
+- `RecorderService.swift`, `GameWebView.swift`: izolarea explicită a callback-urilor
+  de autorizare și navigare, pentru verificarea strictă a concurenței. Blocarea
+  navigării externe rămâne verificată de testul existent.
+- `BridgeTests.swift`, `RecognitionServiceTests.swift`: teste pentru permisiuni,
+  refuz, format, reluare și pornirea reală urmată de TTS pe dispozitiv.
+- `README.md`: contractul comenzilor și comportamentul reluării prin rețea.
+
+Descrierile `NSMicrophoneUsageDescription` și `NSSpeechRecognitionUsageDescription`
+există în configurație și în aplicația compilată. Bundle ID păstrat:
+`com.horace.pufistars`. Niciun fișier web nu a fost modificat.
+
+## Rezultate confirmate
+
+| Verificare | Rezultat |
+|---|---|
+| Build iPad (A16), iOS 26.5 Simulator | PASS |
+| Build iPhone 17 Pro, iOS 26.5 Simulator | PASS; și `SWIFT_STRICT_CONCURRENCY=complete`, fără avertismente de concurență în aplicație |
+| Suită nativă iPad Simulator | 18 teste, 0 eșecuri, 2 omise explicit: refuzul nu era setat, microfonul fizic lipsește |
+| Suită nativă iPhone Simulator cu microfon refuzat în sistem | 18 teste, 0 eșecuri, 1 omis explicit: microfonul fizic lipsește |
+| Refuz microfon în simulator | `{ok:false,reason:"mic-denied"}`; log `Pufi ASR: mic-denied`; starea inițială a permisiunii a fost restabilită după probă |
+| Build, semnare și instalare pe iPad HR, iPad Pro 11-inch generația 4, iPadOS 26.6.1 | PASS; echipa deja configurată local, fără ștergerea aplicației/progresului |
+| `asr.perm` pe iPad fizic | PASS: `speech=authorized`, `mic=granted`; interogarea nu a schimbat starea |
+| `asr.available` pe iPad fizic | `available=true`, `onDevice=true` atât pentru `ro-RO`, cât și pentru `en-GB` |
+| `asr.start` pe iPad fizic, `words:[]`, română și engleză | PASS: `true`; 3 secunde de ascultare în fiecare limbă, fără erori sau reluare prin rețea |
+| TTS în timpul ascultării pe iPad fizic | PASS: oprire ASR înainte de TTS, sesiunea finală `.playback` |
+| `openSettings` pe iPad fizic | PASS: răspuns `true` la deschiderea URL-ului oficial al paginii aplicației |
+
+## Probe cu voce reală pe iPad, împreună cu Hory
+
+După autorizarea automatizării, o sesiune Xcode/runner a rămas blocată la
+lansare. Au fost oprite sesiunea de depanare și serviciul de test, apoi Pufi a
+fost redeschis normal din iconiță. Hory a confirmat că jocul se afișează normal;
+ecranul negru „Automation Running” aparținea sesiunii de test. Nu a fost nevoie
+de modificarea jocului pentru a reveni la lansarea normală.
+
+Testele vocale de mai jos sunt probe manuale pe iPad-ul fizic, confirmate de
+Hory în această sesiune; nu sunt prezentate drept teste UI automate:
+
+| Probă, cu permisiuni acceptate | Rezultat |
+|---|---|
+| Română → Povești → „Pufi și mingea” → „Citesc cu voce” | PASS: textul auzit apare și rama avansează pe cuvinte |
+| Română → „Poveste nouă” → „Dictează” | PASS: textul rostit apare în câmp |
+| English → Stories → „Pufi and the Ball” → „I read aloud” | PASS: textul auzit apare și cuvintele avansează |
+| English → „New story” → „Dictate” | PASS: textul rostit apare în câmp |
+
+Proba cu microfonul refuzat și revenirea prin Setări sunt în curs.
+Starea „Activează dictarea” din Setări → General → Tastatură urmează să fie notată.
+
+Probele native inițiale au fost fără voce (`partialCount=0`); cele patru probe
+manuale de mai sus confirmă acum transcrierea și comportamentul în joc.
+Reluarea prin rețea nu a fost necesară în proba nativă și nu este declarată
+verificată pe iPad; condițiile/limita sunt acoperite de teste. Când este folosită,
+audio poate fi prelucrat de serviciul Apple; logul consemnează reluarea, fără
+textul copilului.
+
+Automatizarea UI rămâne limitată de instalarea/lansarea runner-ului: Xcode a
+raportat și `Developer App Certificate is not trusted`, deși Pufi și runner-ul
+folosesc același certificat și Hory a confirmat autorizarea lui. Device Hub a
+clarificat separat că partajarea ecranului necesită iPadOS 27 sau mai nou;
+iPad-ul fizic rulează 26.6.1. Aceste limitări nu au fost confundate cu rezultatele
+probelor vocale efectuate direct în Pufi.
+
+## Observație pentru partea web (fără modificare în acest PR)
+
+În `index.html`, `window.__micEnsure` apelează întotdeauna
+`window.__micFail('speech-denied')` când detectează orice permisiune refuzată,
+inclusiv `mic=denied` și `speech=restricted`. Pentru diagnosticul exact, Claude
+ar trebui să păstreze motivul real (`mic-denied` / `speech-restricted` /
+`speech-denied`). Bridge-ul întoarce separat stările corecte și codurile corecte.
+
+---
+
 # Pufi — free-launch entitlement implementation report
 
 Date: 2026-11-02. Branch: `codex/free-launch-entitlements`; tested web base: `main` at `59a4e71` (including Pufi’s Island).

@@ -1,6 +1,7 @@
 import XCTest
 import SwiftUI
 import WebKit
+import AVFoundation
 @testable import PufiStars
 
 @MainActor
@@ -92,6 +93,52 @@ final class BridgeTests: XCTestCase {
         XCTAssertEqual(result, true)
         let recordings = try await call("rec.list") as? [String]
         XCTAssertNotNil(recordings)
+    }
+
+    func testASRPermissionQueryDoesNotRequestAuthorization() async throws {
+        let before = RecognitionService.permissions()
+        let response = try await call("asr.perm") as? [String: String]
+        XCTAssertEqual(response, before)
+        XCTAssertEqual(RecognitionService.permissions(), before)
+        print("PUFI_ASR_PERMISSIONS: \(response ?? [:])")
+        for language in ["ro", "en"] {
+            let availability = try await call("asr.available", args: "{\"lang\":\"\(language)\"}")
+            print("PUFI_ASR_AVAILABLE \(language): \(availability ?? "nil")")
+        }
+    }
+
+    func testASRDenialHasReasonWhenPermissionIsAlreadyDenied() async throws {
+        let state = RecognitionService.permissions()
+        guard state["speech"] == "denied" || state["speech"] == "restricted" || state["mic"] == "denied" else {
+            throw XCTSkip("Requires an actual denied permission; never prompts during the unit suite")
+        }
+        let response = try await call("asr.start", args: #"{"lang":"ro","words":[]}"#) as? [String: Any]
+        XCTAssertEqual(response?["ok"] as? Bool, false)
+        XCTAssertEqual(response?["reason"] as? String,
+                       RecognitionService.permissionFailure(speech: state["speech"]!, mic: state["mic"]!)?.reason)
+        print("PUFI_ASR_DENIAL: \(response ?? [:])")
+    }
+
+    func testASRStartsAndTTSStopsRecordingOnAuthorizedDevice() async throws {
+        #if targetEnvironment(simulator)
+        throw XCTSkip("Requires a physical microphone")
+        #else
+        guard RecognitionService.permissions() == ["speech": "authorized", "mic": "granted"] else {
+            throw XCTSkip("Authorize both permissions before this device test")
+        }
+        for language in ["ro", "en"] {
+            _ = try await js("window.asrEnds=[]; window.asrTexts=[]; native.on('asr.end',e=>asrEnds.push(e)); native.on('asr.partial',e=>asrTexts.push(e))")
+            let result = try await call("asr.start", args: "{\"lang\":\"\(language)\",\"words\":[]}")
+            print("PUFI_ASR_START \(language): \(result ?? "nil")")
+            XCTAssertEqual(result as? Bool, true)
+            try await Task.sleep(nanoseconds: 3_000_000_000)
+            let diagnostic = try await js("JSON.stringify({ends:asrEnds,partialCount:asrTexts.length})")
+            print("PUFI_ASR_OBSERVATION \(language): \(diagnostic ?? "nil")")
+            _ = try await call("speak", args: "{\"lang\":\"\(language)\",\"text\":\"Pufi\"}")
+            XCTAssertEqual(AVAudioSession.sharedInstance().category, .playback)
+            _ = try await call("asr.stop")
+        }
+        #endif
     }
 
     func testNativeSpeechEmitsWordEvents() async throws {
