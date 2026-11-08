@@ -11716,6 +11716,7 @@ for(const l in M){ const o=T[l]||R[l]; if(o) o.gx=M[l]; }
 @keyframes grTok{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .gr-tok{animation:grTok 1.2s ease-in-out infinite;transform-box:fill-box}
 .gr-rep{font:inherit;font-size:1.6rem;width:52px;height:52px;border-radius:16px;border:none;background:var(--card);box-shadow:0 4px 0 #B8C8EC;cursor:pointer;flex:none}
+.gr-help.gr-pulse{animation:grHint 1.2s ease-in-out infinite;box-shadow:0 0 0 4px #FFC83D}
 .gr-tip{display:none;align-items:center;justify-content:center;gap:10px;background:#FFF7D6;border-radius:16px;padding:6px 12px;font-weight:800;font-size:clamp(.95rem,2.4vw,1.25rem);min-height:2em;text-align:center}
 .gr-tip.on{display:flex}.gr-tip span{cursor:pointer}
 .gr-next{font-size:1.6rem!important;padding:6px 26px!important;animation:grHint 1s ease-in-out infinite}
@@ -11941,6 +11942,7 @@ const T4={ro:{ok:'Perfect! Avem echilibru între producție și consum.',exact:'
 for(const l in T4) if(TXT[l]){ const o=T4[l]; TXT[l].ok=o.ok; TXT[l].exact=o.exact; TXT[l].makes=o.makes; TXT[l].uses=o.uses; TXT[l].story=TXT[l].story.slice(); TXT[l].story[3]=o.lake; }
 const RL={ro:n=>`Mai trebuie ${ro2(n)}: lasă apa din lac să curgă!`,de:n=>n===1?'Es fehlt noch ein Blitz: lass das Wasser aus dem See fließen!':`Es fehlen noch ${n} Blitze: lass das Wasser aus dem See fließen!`,en:n=>`We still need ${n1(n,'one',n)}: let the lake water flow!`,fr:n=>`Il en manque encore ${n1(n,'un',n)} : laisse couler l’eau du lac !`,es:n=>`Faltan ${n1(n,'uno',n)}: ¡deja correr el agua del lago!`,it:n=>`Ne mancano ancora ${n1(n,'uno',n)}: lascia scendere l’acqua del lago!`,pt:n=>`Ainda faltam ${n1(n,'um',n)}: deixe a água do lago descer!`,nl:n=>`We hebben nog ${n1(n,'één',n)} nodig: laat het water uit het meer stromen!`,pl:n=>`Brakuje jeszcze: ${n}. Wypuść wodę z jeziora!`,uk:n=>`Бракує ще: ${n}. Відпусти воду з озера!`,ru:n=>`Не хватает ещё: ${n}. Отпусти воду из озера!`,hu:n=>`Még ${n1(n,'egy',n)} kell: engedd le a vizet a tóból!`};
 for(const l in RL) if(TXT[l]) TXT[l].restLake=RL[l];
+const GOAL={ro:'Fă producția egală cu consumul!',de:'Mach Erzeugung und Verbrauch gleich!',en:'Make production equal to consumption!',fr:'Rends la production égale à la consommation !',es:'¡Haz que la producción sea igual al consumo!',it:'Rendi la produzione uguale al consumo!',pt:'Deixe a produção igual ao consumo!',nl:'Maak productie en verbruik gelijk!',pl:'Wyrównaj produkcję i zużycie!',uk:'Зрівняй виробництво і споживання!',ru:'Сделай производство равным потреблению!',hu:'Legyen egyforma a termelés és a fogyasztás!'}; for(const l in GOAL) if(TXT[l]) TXT[l].goal=GOAL[l];
 /* ---------------- model (v2: pe ture) ---------------- */
 /* Fiecare nivel = câteva momente ale zilei. În fiecare moment orașul are nevoie de un număr de fulgere ⚡.
    Copilul potrivește: „Facem” (centrale) = „Folosim” (becuri 💡 + apă urcată în lac 💧 + mașini la încărcat 🔋). Timpul nu curge singur. */
@@ -11987,20 +11989,24 @@ function used(){ const u=usedParts(); return u.bulbs+u.pump+u.cars; }
 function play(li){ stop(); const L=LV[li]; const my=gen;
   G={li,L,mi:0,lv:{coal:0,gas:0},hy:0,lake:L.lake||0,cars:[...Array(L.cars||0)].map(()=>({c:0,on:false})),smoke:0,lock:true,idle:0,hintEl:null,said:''};
   main.innerHTML='';
-  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const rep=el('button','gr-rep','🔊'); const tl=el('div','gr-tl'); const tipEl=el('div','gr-tip'); h.append(face,bub,rep); main.append(h,tl,tipEl);
+  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const rep=el('button','gr-rep','🔊'); const help=el('button','gr-rep gr-help','❓'); const tl=el('div','gr-tl'); const tipEl=el('div','gr-tip'); h.append(face,bub,rep,help); main.append(h,tl,tipEl);
   const eq=el('div','gr-eq'); main.append(eq);
   const stg=el('div','gr-stage'); main.append(stg); const pan=el('div','gr-panel'); main.append(pan);
-  Object.assign(G,{bub,tl,eq,stg,pan,tipEl}); const again=()=>{ G.idle=Math.min(G.idle,0); sp(G.momT||bub.textContent.replace(/^[^\p{L}]+/u,'')); }; bub.onclick=again; rep.onclick=again; face.onclick=()=>{ sp(X().f.scale); };
+  Object.assign(G,{bub,tl,eq,stg,pan,tipEl,helpB:help}); help.onclick=()=>askHelp(); const again=()=>{ G.idle=Math.min(G.idle,0); sp(G.momT||bub.textContent.replace(/^[^\p{L}]+/u,'')); }; bub.onclick=again; rep.onclick=again; face.onclick=()=>{ sp(X().f.scale); };
   scene(); panel(); timeline(); equation();
   /* povestea nivelului: o carte mare, cu ▶ */
   const card=el('div','gr-story',`<div class="pics">${L.ic} ${L.pl.map(k=>PL[k].ic).join(' ')}${L.cars?' 🚗':''}${L.factory?' 🏭':''}</div><div class="tx">${X().story[li]}</div>`);
   const go=el('button','rb-b go big',X().go); card.append(go); stg.append(card); msg('📖 '+X().story[li]); G.momT=X().story[li]; sp(X().story[li]);
   go.onclick=()=>{ card.remove(); snd(660,.1); startMoment(); };
-  if(!G.tick){ const loop=()=>{ if(gen!==my||!G) return; G.idle+=.5; if(!G.lock&&G.idle>=(window.__grFast?1:(G.L.tut&&G.mi===0?6:15))&&!G.hintEl) hint(); later(loop,500); }; later(loop,500); } }
+  if(!G.tick){ const loop=()=>{ if(gen!==my||!G) return; G.idle+=.5; if(!G.lock&&G.idle>=(window.__grFast?1:20)&&G.helpB) G.helpB.classList.add('gr-pulse'); later(loop,500); }; later(loop,500); } }
 
 function msg(t){ if(G) G.bub.textContent=t; }
 function tip(t,btnTxt,fn){ if(!G) return; G.tipEl.innerHTML=''; if(!t&&!btnTxt){ G.tipEl.classList.remove('on'); return; } G.tipEl.classList.add('on'); if(t){ const sEl=el('span','',t); sEl.onclick=()=>sp(t.replace(/^[^\p{L}\d]+/u,'')); G.tipEl.append(sEl); } if(btnTxt){ const b=el('button','rb-b go gr-next',btnTxt); b.onclick=fn; G.tipEl.append(b); } }
 const SUF={ro:['Trimite curentul în lac!','Trimite curentul în mașini!'],de:['Schick den Strom in den See!','Schick den Strom in die Autos!'],en:['Send the power to the lake!','Send the power to the cars!'],fr:['Envoie l’électricité dans le lac !','Envoie l’électricité dans les voitures !'],es:['¡Manda la electricidad al lago!','¡Manda la electricidad a los coches!'],it:['Manda la corrente nel lago!','Manda la corrente nelle auto!'],pt:['Mande a energia para o lago!','Mande a energia para os carros!'],nl:['Stuur de stroom naar het meer!','Stuur de stroom naar de auto’s!'],pl:['Wyślij prąd do jeziora!','Wyślij prąd do samochodów!'],uk:['Спрямуй струм в озеро!','Спрямуй струм у машини!'],ru:['Направь ток в озеро!','Направь ток в машины!'],hu:['Küldd az áramot a tóba!','Küldd az áramot az autókba!']};
+function why(){ const L=G.L, m=curM(), x=X(); let t=''; if(L.pl.includes('solar')&&!m.sun) t+=x.noSun+' '; if(L.pl.includes('wind')&&!m.wind) t+=x.noWind+' '; return t; }
+/* ajutorul, doar când îl cere copilul: prima dată explică, a doua oară arată butonul */
+function askHelp(){ if(!G||G.lock) { if(G&&G.momT) sp(G.momT); return; } G.idle=0; G.helpB.classList.remove('gr-pulse'); G.help=(G.help||0)+1;
+  if(G.help===1){ const t=explain(); tip('❓ '+t); sp(t); } else hint(); }
 /* de unde vine curentul acum și ce trebuie făcut */
 function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
   if(L.pl.includes('nuc')&&G.mi===0) parts.push(x.nucN(L.nuc));
@@ -12013,15 +12019,15 @@ function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
   else if(P>U){ if(!store) parts.push(x.lessPl(P-U)); else { const both=L.pl.includes('hydro')&&G.cars.length; const e=x.extra(P-U); parts.push(both?e:e.split('. ')[0]+'. '+SUF[(typeof lang!=='undefined'&&SUF[lang])?lang:'en'][L.pl.includes('hydro')?0:1]); } }
   else parts.push(x.exact);
   return parts.join(' '); }
-function startMoment(){ const m=G.L.mo[G.mi]; G.idle=0; clearHint(); timeline(); scene(); panel(); equation();
-  const t=`${X().mom[m.m]}. ${X().ev2[m.e]} ${X().need(m.need)} ${explain()}`; msg(MIC[m.m]+' '+t); G.momT=t; tip(''); G.lock=true; snd(880,.1); later(()=>snd(1100,.12),130);
+function startMoment(){ const m=G.L.mo[G.mi]; G.idle=0; G.help=0; if(G.helpB) G.helpB.classList.remove('gr-pulse'); clearHint(); timeline(); scene(); panel(); equation();
+  const t=`${X().mom[m.m]}. ${X().ev2[m.e]} ${why()}${X().goal}`; msg(MIC[m.m]+' '+t); G.momT=t; tip(''); G.lock=true; snd(880,.1); later(()=>snd(1100,.12),130);
   sp(t).then(()=>{ if(G){ G.lock=false; G.idle=0; check(true); } }); later(()=>{ if(G&&G.lock&&!G.waitNext){ G.lock=false; } },20000); }
 
-function changed(){ if(!G) return; G.idle=0; clearHint(); scene(); panel(); equation(); clearTimeout(G.fbT); G.fbT=setTimeout(()=>check(false),1200); }
+function changed(){ if(!G) return; G.idle=0; G.help=0; if(G.helpB) G.helpB.classList.remove('gr-pulse'); clearHint(); scene(); panel(); equation(); clearTimeout(G.fbT); G.fbT=setTimeout(()=>check(false),1200); }
 function check(quiet){ if(!G||G.lock) return; const P=made(), U=used();
   if(P===U){ G.lock=true; G.waitNext=true; clearHint(); G.eq.classList.add('ok'); [523,659,784].forEach((f,i)=>later(()=>snd(f,.15),i*110));
     tip('✅ '+X().ok,G.mi<G.L.mo.length-1?'▶':'🏁',()=>{ G.waitNext=false; tip(''); snd(660,.08); next(); }); sp(X().ok); return; }
-  if(quiet) return; const d=U-P; const t=d>0?X().more(d):X().less(-d); G.said=t; tip((d>0?'🕯️ ':'🔥 ')+t); sp(t); }
+  if(quiet) return; tip(''); }
 function next(){ if(!G) return; const L=G.L; G.eq.classList.remove('ok');
   /* se aplică momentul: lacul, mașinile, fumul */
   G.lake=Math.max(0,Math.min(CAP,G.lake-G.hy)); G.cars.forEach(c=>{ if(c.on) c.c=Math.min(CARCAP,c.c+1); if(c.c>=CARCAP) c.on=false; });
@@ -12041,7 +12047,7 @@ function hint(){ if(!G) return; const P=made(), U=used(); if(P===U) return; cons
     if(G.hy>0){ b=q('[data-hy="up"]'); t=X().hintUp; }
     else if(k){ b=q(`[data-k="${k}"][data-d="dn"]`); t=X().hintDown; }
     else { const car=G.cars.findIndex(c=>!c.on&&c.c<CARCAP); if(car>=0){ b=q(`[data-car="${car}"]`); t=X().carTip; } else if(G.L.pl.includes('hydro')&&G.lake-G.hy<CAP){ b=q('[data-hy="up"]'); t=X().pumpTip; } } }
-  if(b){ G.hintEl=b; b.classList.add('gr-hint'); tip('👆 '+t); sp(t); } G.idle=-15; }
+  if(b){ G.hintEl=b; b.classList.add('gr-hint'); tip('👆 '+t); sp(t); } }
 
 /* ---------------- linia de timp și „ecuația” ---------------- */
 function timeline(){ const L=G.L; G.tl.innerHTML=L.mo.map((m,i)=>`<span class="${i<G.mi?'done':i===G.mi?'cur':''}">${i<G.mi?'✔️':MIC[m.m]}</span>`).join('<i></i>'); }
