@@ -242,3 +242,53 @@ Pentru Claude: în ecranul separat al unui joc blocat, `paywall()` citește gre�
 afara excepției autorizate pentru meniul Părinți și nu a fost schimbat.
 Licențierea materialelor rămâne o verificare separată înainte de lansare.
 PR fără merge automat.
+
+## 8 noiembrie 2026 — pregătire build App Store (250b108)
+
+Sursa web este `main` la `250b108`. Am rulat `ios/sync_web.sh` din proiectul
+din Documents / IOS Apps / Pufi-game. Am comparat byte cu byte pagina din
+arhiva Release cu `index.html` din checkout. Include Rețeaua electrică,
+biletul de debut Pufi, pinguinii și corecțiile pentru ceas și rotirea Insulei.
+Fișierele web, inclusiv `src/late_lock.html`, nu fac parte din diff.
+
+- **Voce.** IPA `ˈora` rămâne activ la rostirea obișnuită. În proba inițială cu
+  text atribuit, evenimentul pentru al treilea cuvânt din „La ora două” selecta
+  „ă.”. Pentru solicitările cu `onWord`, enunțul folosește text simplu și
+  păstrează intervalele UTF-16 ale textului original. Testul confirmă separat
+  finalizarea rostirii IPA și cuvintele emise de bridge. API-urile IPA și
+  initializerul atribuit sunt disponibile din iOS 10 conform SDK-ului. Buildul
+  are deployment target iOS 17.0. Testele au rulat pe iOS/iPadOS 26.1.
+  Sunetul exact și comportamentul tuturor vocilor instalabile rămân probe
+  auditive. [Documentație Apple](https://developer.apple.com/documentation/avfaudio/avspeechsynthesisipanotationattribute)
+- **Pufi și RoboPufi.** Testele în WKWebView verifică biletul inițial, refuzul
+  accesului fără bilet, consumul a 15 din 30 credite de test, cardurile
+  `rb:grid` și `rb:circ` după identificator, nivelurile 1 și 4 cu balonul,
+  ▶ Hai!, explicația și mânuța, apoi selectarea și tăierea firului prin
+  `#rb-cut`. Geometria ferestrei de final RoboPufi rămâne verificare vizuală.
+- **Teste existente.** Așteptarea reîncărcării la ștergerea aniversării,
+  deschiderea secțiunii Vocea părintelui, selectarea limbii și propagarea
+  tranzacției înainte de refund au fost actualizate. Testele de cumpărare
+  utilizează catalogul de test.
+- **Comercial.** Limita rămâne 15 decembrie 2026, 00:00 Europe/Zurich.
+  `EntitlementUITests` acoperă accesul gratuit, utilizatorul eligibil anterior,
+  utilizatorul cu achiziție și blocarea pentru utilizatorul nou cu poartă
+  parentală. Produsul este `unlock_all`.
+- **Release.** Arhiva locală `PufiStars-250b108.xcarchive` a fost creată în
+  Xcode Archives, cu semnătură Apple Development validă, bundle
+  `com.horace.pufistars`, versiunea 1.0 (1), `MinimumOSVersion=17.0`,
+  `ITSAppUsesNonExemptEncryption=false` (Boolean) și fără catalog StoreKit
+  de test. Exportul/validarea pentru distribuție în Organizer rămân înainte
+  de încărcare. Nu s-a încărcat sau trimis buildul la review.
+- **Dispozitive fizice.** Pe iPhone 16 HR, buildul Debug cu jocul `250b108`
+  a fost instalat și pornit. Hory a confirmat că probele disponibile
+  funcționează, fără rezultate individuale pentru fiecare pas. Aplicația din
+  arhiva Release a fost ulterior instalată și lansată pe ambele dispozitive.
+  Probele interactive pe iPad nu au fost confirmate. Confirmarea punctuală
+  a pronunției „ora două”, a biletului pe progres nou, a nivelului 4 unde
+  e blocat și a rotirii fără blocaj rămâne manuală acolo unde lipsește.
+
+Suita finală a trecut pe ambele simulatoare (iPhone 17 Pro și iPad Pro 13″
+M5, runtime 26.1), cu **24 teste unitare și 8 teste UI** pe fiecare.
+Rezultate locale: `/tmp/PufiStoreFinalPhone.xcresult` și
+`/tmp/PufiStoreFinalPad.xcresult`. Jurnalul arhivei:
+`/tmp/pufi-store-archive.log`.

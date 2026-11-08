@@ -61,8 +61,10 @@ final class EntitlementUITests: XCTestCase {
         let language = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "▾")).firstMatch
         XCTAssertTrue(language.waitForExistence(timeout: 20))
         if !language.label.contains("Română") {
-            language.tap()
-            app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Română")).firstMatch.tap()
+            language.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            let romanian = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Română")).firstMatch
+            XCTAssertTrue(romanian.waitForExistence(timeout: 5))
+            romanian.tap()
         }
         return app
     }

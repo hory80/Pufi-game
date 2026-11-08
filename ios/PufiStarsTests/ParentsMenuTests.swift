@@ -110,9 +110,9 @@ final class ParentsMenuTests: XCTestCase {
     }
 
     func testBirthdayIsRemovedAndLegacyValueIsDeleted() async throws {
-        _ = try await js("localStorage.setItem('tm_bday','2019-07-14'); true")
+        _ = try await js("localStorage.setItem('tm_bday','2019-07-14'); window.__beforeBirthdayReload=true; true")
         web.reload()
-        try await waitFor("document.readyState === 'complete' && !!window.__parentsText")
+        try await waitFor("!window.__beforeBirthdayReload && document.readyState === 'complete' && !!window.__parentsText")
         try await open("ro")
         let removed = try await js("localStorage.getItem('tm_bday')===null && !document.querySelector('.pa-personal,.pa-birthday,.pa-birthday-day,.pa-birthday-month') && !('personal' in window.__parentsText())") as? Bool
         XCTAssertEqual(removed, true)
