@@ -655,8 +655,10 @@ const SAYFIX={
 const DE_N=['null','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf','zwölf','dreizehn','vierzehn','fünfzehn','sechzehn','siebzehn','achtzehn','neunzehn'];
 const DE_T=['','','zwanzig','dreißig','vierzig','fünfzig','sechzig','siebzig','achtzig','neunzig'];
 function deNum(n){ if(n<20) return DE_N[n]; const t=Math.floor(n/10),u=n%10; return u?(u===1?'ein':DE_N[u])+'und'+DE_T[t]:DE_T[t]; }
-function fixRoFem(t){ return t.replace(/\b(\d+) (?:de )?(stele|stea|mutări|silabe|bile|litere|cifre|zeci|unități|sute|ture|steluțe|perle|greșeli|ore|minute|zile|luni|săptămâni|ori|dăți|felii)\b/g,(m,n,w)=>{ n=+n;
-  const f=n===1?'o':n===2?'două':n===12?'douăsprezece':(n>20&&n%10===2)?(n-2)+' și două':(n>20&&n%10===1)?(n-1)+' și una':String(n); if(n===1&&w==='stele') w='stea'; return f+(n>=20?' de ':' ')+w; }); }
+function fixRoFem(t){ const SG={stele:'stea',mutări:'mutare',silabe:'silabă',bile:'bilă',litere:'literă',cifre:'cifră',zeci:'zece',unități:'unitate',sute:'sută',ture:'tură',steluțe:'steluță',perle:'perlă',greșeli:'greșeală',ore:'oră',minute:'minut',zile:'zi',luni:'lună',săptămâni:'săptămână',ori:'dată',dăți:'dată',felii:'felie'}, PL={}; for(const k in SG) PL[SG[k]]=k; PL['dată']='ori';
+  return t.replace(/\b(\d+) (?:de )?(stele|stea|mutări|mutare|silabe|silabă|bile|bilă|litere|literă|cifre|cifră|zeci|zece|unități|unitate|sute|sută|ture|tură|steluțe|steluță|perle|perlă|greșeli|greșeală|ore|oră|minute|minut|zile|zi|luni|lună|săptămâni|săptămână|ori|dăți|felii|felie)(?![\p{L}\d])/gu,(m,n,w)=>{ n=+n; if(PL[w]&&!SG[w]) w=PL[w];
+  const neu=w==='minute'; if(n===1) return (neu?'un ':'o ')+SG[w];
+  const f=n===2?'două':n===12?'douăsprezece':(n>20&&n%10===2)?(n-2)+' și două':(n>20&&n%10===1)?(n-1)+(neu?' și unu':' și una'):String(n); const r=n%100; return f+((r>=20||(r===0&&n>0))?' de ':' ')+w; }); }
 function fixSpeech(t){ const f=SAYFIX[lang]||{}; for(const k in f) t=t.split(k).join(f[k]); if(lang==='ro') t=fixRoFem(t);
   if(lang==='de') t=t.replace(/\b\d{1,2}\b/g,m=>deNum(+m));
   return t; }

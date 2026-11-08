@@ -147,7 +147,7 @@ ro:{title:'⏳ Timpul lui Pufi',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOff
  parts:['dimineața','la prânz','după-amiaza','seara','noaptea'],
  today:(wd,d,mo,s)=>`Azi este ${wd}, ${d===1?'întâi':d} ${mo}. E ${s}!`,
  time:(h,m)=>{ const H=RO_H[h%12], H1=RO_H[(h+1)%12]; if(m===0) return `ora ${H}`; if(m===15) return `ora ${H} și un sfert`; if(m===30) return `ora ${H} și jumătate`; if(m===45) return `ora ${H1} fără un sfert`; return m<30?`ora ${H} și ${roMin(m)}`:`ora ${H1} fără ${roMin(60-m)}`; },
- short:(h,m)=>{ const H=RO_H[h%12], H1=RO_H[(h+1)%12]; if(m===0) return `ora ${H}`; if(m===15) return `${H} și un sfert`; if(m===30) return `${H} și jumătate`; if(m===45) return `${H1} fără un sfert`; return m<30?`${H} și ${m}`:`${H1} fără ${60-m}`; },
+ short:(h,m)=>{ const H=RO_H[h%12], H1=RO_H[(h+1)%12]; if(m===0) return `ora ${H}`; if(m===15) return `ora ${H} și un sfert`; if(m===30) return `ora ${H} și jumătate`; if(m===45) return `ora ${H1} fără un sfert`; return m<30?`ora ${H} și ${m}`:`ora ${H1} fără ${60-m}`; },
  itIs:t=>`Este ${t}.`, hourOnly:h=>`ora ${RO_H[h%12]}`,
  hands:'Minutarul cel lung arată minutele. Orarul cel scurt arată ora.',
  exHi:'Trage acele ceasului cu degetul și vezi cum trece ziua!', now:'⏰ Acum', gears:'⚙️ Rotițe', pz:'🍕 Pizza',
@@ -262,6 +262,7 @@ function ord(n){ return (n%100>=11&&n%100<=13)?'th':['th','st','nd','rd'][n%10]|
 const X=()=>TR('tm',TX);
 const tSay=(h,m)=>X().time(h,m);
 const tShort=(h,m)=>(X().short||X().time)(h,m);
+const tLbl=(h,m)=>{ const t=tShort(h,m); return m?t.replace(/^ora /,''):t; }; /* etichetă scurtă pe ecran; vocea citește tShort, cu „ora” */
 const digi=(t,h24)=>{ const h=Math.floor(t/60)%24, m=t%60; return `${h24?h:h12(h)}:${String(m).padStart(2,'0')}`; };
 const partOf=t=>{ const h=Math.floor(t/60)%24; return h>=5&&h<11?0:h>=11&&h<14?1:h>=14&&h<18?2:h>=18&&h<22?3:4; };
 const seasonOf=mo=>mo>=2&&mo<=4?0:mo>=5&&mo<=7?1:mo>=8&&mo<=10?2:3;
@@ -426,7 +427,7 @@ function gPizza(li){ let ti=0, errs=0, busy=false, tg=0; const F=frame('',PER,'�
   const tip=()=>X()[tg%60===30?'pzHalf':'pzQuar'];
   async function show(){ F.ctrl.innerHTML=''; const [h,m]=fresh('pz'+li,()=>[RR(1,12),pick(ms)],9); tg=h*60+m; const [H,M]=[h,m];
     if(read){ await c.set(tg,true); if(myGen!==gen) return; const qq=F.say(X().pzRead);
-      const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>{ const v=((a%12)*60+b)%720; return {t:tShort(a,b),say:tShort(a,b),v,html:`<span class="dg">${digi(v||720)}</span><small>${tShort(a,b)}</small>`}; });
+      const cand=[[H,M],[H+1,M],[H-1||12,M],[H,M===30?15:M===15?45:30],[H+1,M===45?15:30]].map(([a,b])=>{ const v=((a%12)*60+b)%720; return {t:tShort(a,b),say:tShort(a,b),v,html:`<span class="dg">${digi(v||720)}</span><small>${tLbl(a,b)}</small>`}; });
       const uniq=[]; cand.forEach(o=>{ if(!uniq.some(u=>u.t===o.t)) uniq.push(o); }); opts(F.ctrl,shuf(uniq.slice(0,4)),answer,'tm-wide',qq); }
     else { c.locked=false; await c.set(h*60); F.say(X().pzSet(tSay(H,M))); F.ctrl.appendChild(btn(X().ok,'go',()=>answer({v:m12(c.total)},null))); } }
   async function answer(o,b){ if(busy) return; if(o.v!==tg%720){ errs++; if(b) b.classList.add('no'); boing(); F.say(tip()); return; }
@@ -460,7 +461,7 @@ function gMemo(li){ const F=frame(X().memoTask,0,'🧩'); const myGen=gen; const
   const cards=shuf(times.flatMap((t,i)=>[{i,t,k:'a'},{i,t,k:'d'}])); const g=el('div','tm-cards'); g.style.gridTemplateColumns=`repeat(${n===5?5:4},1fr)`; g.style.maxWidth=n===6?'640px':'820px'; F.stage.appendChild(g);
   let open=[], lockB=false, found=0, wrong=0;
   cards.forEach((cd,j)=>{ const b=el('button','tm-mc','❓'); b.id='tm-mc'+j;
-    const face=()=>{ const [h,m]=hmOf(cd.t); return cd.k==='a'?`<svg viewBox="0 0 120 120">${staticClock(cd.t,'mc'+j,50)}</svg>`:(li===1?tShort(h,m):digi(cd.t)); };
+    const face=()=>{ const [h,m]=hmOf(cd.t); return cd.k==='a'?`<svg viewBox="0 0 120 120">${staticClock(cd.t,'mc'+j,50)}</svg>`:(li===1?tLbl(h,m):digi(cd.t)); };
     b.onclick=()=>{ if(lockB||b.classList.contains('up')||b.classList.contains('done')) return; b.classList.add('up'); b.innerHTML=face(); blip(); if(cd.k==='d'){ const [h,m]=hmOf(cd.t); sp(tSay(h,m)); }
       open.push([b,cd]); if(open.length<2) return; const [[b1,c1],[b2,c2]]=open; open=[];
       if(c1.i===c2.i){ setTimeout(()=>{ b1.classList.add('done'); b2.classList.add('done'); chime(); },300); found++; if(found===n){ setTimeout(()=>{ if(myGen!==gen) return; award(); finish('memo'+li,wrong<=n?3:wrong<=2*n?2:1,li<2?()=>play('memo',li+1):null); },900); } }
