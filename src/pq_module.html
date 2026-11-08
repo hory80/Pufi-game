@@ -394,8 +394,10 @@ const earnSet=v=>{ try{ localStorage.setItem('pq_earn',String(Math.max(0,Math.ro
 const paidGet=()=>{ try{ return localStorage.getItem('pq_paid')==='1'; }catch(e){ return false; } };
 const paidSet=b=>{ try{ b?localStorage.setItem('pq_paid','1'):localStorage.removeItem('pq_paid'); }catch(e){} };
 const COST=()=>window.PQ_COST||15;
-const canPlay=()=>paidGet()||earnGet()>=COST();
-const tickets=()=>Math.floor(earnGet()/COST())+(paidGet()?1:0);
+const canPlay=()=>paidGet()||earnGet()>=COST()||giftLeft();
+/* primul nivel Pufi e cadou: copilul vede ce câștigă, apoi regula cu 15 niveluri */
+const giftLeft=()=>{ try{ return localStorage.getItem('pq_gift')!=='1'; }catch(e){ return false; } };
+const tickets=()=>Math.floor(earnGet()/COST())+(paidGet()?1:0)+(giftLeft()&&!paidGet()?1:0);
 function earnUI(){ let bar=$('earn'); if(!bar){ bar=document.createElement('div'); bar.id='pq-earn'; bar.className='pq-earn'; $('map').before(bar);
     bar.onclick=()=>sp(canPlay()?EX().ready:EX().need(Math.ceil(COST()-earnGet()))); }
   const t=tickets(); if(t>0){ bar.innerHTML=`<span class="tk">${'🎟️'.repeat(Math.min(t,5))}${t>5?' ×'+t:''}</span>`; bar.classList.add('ok'); }
@@ -403,7 +405,7 @@ function earnUI(){ let bar=$('earn'); if(!bar){ bar=document.createElement('div'
   $('map').classList.toggle('wait',t<=0); }
 showMap=(f=>(...a)=>{ const r=f(...a); try{ earnUI(); const t=tickets(), seen=+(sessionStorage.getItem('pq_seenT')||-1);
     if(!root.hidden){ if(t<=0) setTimeout(()=>sp(EX().need(Math.ceil(COST()-earnGet()))),400); else if(t!==seen) setTimeout(()=>sp(t>1&&seen>0?EX().more:EX().ready),400); try{ sessionStorage.setItem('pq_seenT',String(t)); }catch(e){} } }catch(e){} return r; })(showMap);
-startLevel=(f=>(i,...a)=>{ if(!paidGet()){ if(earnGet()<COST()){ showMap(); return; } earnSet(earnGet()-COST()); paidSet(true); } return f(i,...a); })(startLevel);
+startLevel=(f=>(i,...a)=>{ if(!paidGet()){ if(giftLeft()){ try{ localStorage.setItem('pq_gift','1'); }catch(e){} paidSet(true); } else { if(earnGet()<COST()){ showMap(); return; } earnSet(earnGet()-COST()); paidSet(true); } } return f(i,...a); })(startLevel);
 showWin=(f=>(...a)=>{ if(state==='won'&&!root.hidden) paidSet(false); return f(...a); })(showWin);
 startLevel=(f=>(i,...a)=>{ if(window.__gate&&window.__gate('pq',i)){ showMap(); return; } return f(i,...a); })(startLevel);
 window.openPufi=lg=>{ root.hidden=false; resize(); $('mute').textContent=muted?'🔇':'🔊'; showMap(); };
