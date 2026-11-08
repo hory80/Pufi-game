@@ -61,6 +61,10 @@
 .gr-spin{animation:grSpin 1.2s linear infinite;transform-box:fill-box;transform-origin:center}
 @keyframes grTok{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .gr-tok{animation:grTok 1.2s ease-in-out infinite;transform-box:fill-box}
+.gr-rep{font:inherit;font-size:1.6rem;width:52px;height:52px;border-radius:16px;border:none;background:var(--card);box-shadow:0 4px 0 #B8C8EC;cursor:pointer;flex:none}
+.gr-tip{display:none;align-items:center;justify-content:center;gap:10px;background:#FFF7D6;border-radius:16px;padding:6px 12px;font-weight:800;font-size:clamp(.95rem,2.4vw,1.25rem);min-height:2em;text-align:center}
+.gr-tip.on{display:flex}.gr-tip span{cursor:pointer}
+.gr-next{font-size:1.6rem!important;padding:6px 26px!important;animation:grHint 1s ease-in-out infinite}
 @keyframes grSpin{to{transform:rotate(360deg)}}
 @keyframes grPuff{0%{transform:translateY(0) scale(.6);opacity:.8}100%{transform:translateY(-60px) scale(1.6);opacity:0}}
 .gr-puff{animation:grPuff 2.4s linear infinite;transform-box:fill-box;transform-origin:center}
@@ -279,6 +283,10 @@ hu:{ev2:{wake:'Az emberek felkelnek: villany, kávé és pirítós.',work:'A gy�
 };
 for(const l in T3) if(TXT[l]){ Object.assign(TXT[l].ev2,T3[l].ev2); const o=Object.assign({},T3[l]); delete o.ev2; Object.assign(TXT[l],o); }
 
+const T4={ro:{ok:'Perfect! Avem echilibru între producție și consum.',exact:'Producția și consumul sunt deja în echilibru.',makes:'Producție',uses:'Consum',lake:'Lacul de acumulare e ca o baterie uriașă. Îl umplem la prânz, când soarele face prea mult curent, și noaptea, când centrala atomică nu se poate opri. Dimineața și seara, când oamenii folosesc mult curent, lăsăm apa să curgă și face curent.'},de:{ok:'Perfekt! Erzeugung und Verbrauch sind im Gleichgewicht.',exact:'Erzeugung und Verbrauch sind schon im Gleichgewicht.',makes:'Erzeugung',uses:'Verbrauch',lake:'Der Stausee ist wie eine riesige Batterie. Wir füllen ihn mittags, wenn die Sonne zu viel Strom macht, und nachts, wenn das Atomkraftwerk nicht anhalten kann. Morgens und abends, wenn die Leute viel Strom brauchen, lassen wir das Wasser fließen und es macht Strom.'},en:{ok:'Perfect! Production and consumption are in balance.',exact:'Production and consumption are already in balance.',makes:'Production',uses:'Consumption',lake:'The reservoir is like a giant battery. We fill it at noon, when the sun makes too much power, and at night, when the nuclear plant cannot stop. In the morning and in the evening, when people use lots of power, we let the water flow and it makes power.'},fr:{ok:'Parfait ! La production et la consommation sont en équilibre.',exact:'La production et la consommation sont déjà en équilibre.',makes:'Production',uses:'Consommation',lake:'Le lac de barrage est comme une pile géante. On le remplit à midi, quand le soleil fait trop d’électricité, et la nuit, quand la centrale nucléaire ne peut pas s’arrêter. Le matin et le soir, quand les gens utilisent beaucoup d’électricité, on laisse couler l’eau et elle fait de l’électricité.'},es:{ok:'¡Perfecto! La producción y el consumo están en equilibrio.',exact:'La producción y el consumo ya están en equilibrio.',makes:'Producción',uses:'Consumo',lake:'El embalse es como una pila gigante. Lo llenamos a mediodía, cuando el sol hace demasiada electricidad, y por la noche, cuando la central nuclear no puede pararse. Por la mañana y al anochecer, cuando la gente usa mucha electricidad, dejamos correr el agua y hace electricidad.'},it:{ok:'Perfetto! Produzione e consumo sono in equilibrio.',exact:'Produzione e consumo sono già in equilibrio.',makes:'Produzione',uses:'Consumo',lake:'Il lago della diga è come una pila gigante. Lo riempiamo a mezzogiorno, quando il sole fa troppa corrente, e di notte, quando la centrale nucleare non può fermarsi. La mattina e la sera, quando la gente usa tanta corrente, lasciamo scendere l’acqua e fa corrente.'},pt:{ok:'Perfeito! A produção e o consumo estão em equilíbrio.',exact:'A produção e o consumo já estão em equilíbrio.',makes:'Produção',uses:'Consumo',lake:'A represa é como uma pilha gigante. Enchemos ao meio-dia, quando o sol faz energia demais, e à noite, quando a usina nuclear não pode parar. De manhã e no fim da tarde, quando as pessoas usam muita energia, deixamos a água descer e ela faz energia.'},nl:{ok:'Perfect! Productie en verbruik zijn in evenwicht.',exact:'Productie en verbruik zijn al in evenwicht.',makes:'Productie',uses:'Verbruik',lake:'Het stuwmeer is als een reuzenbatterij. We vullen het om twaalf uur, als de zon te veel stroom maakt, en ’s nachts, als de kerncentrale niet kan stoppen. ’s Ochtends en ’s avonds, als de mensen veel stroom gebruiken, laten we het water stromen en maakt het stroom.'},pl:{ok:'Świetnie! Produkcja i zużycie są w równowadze.',exact:'Produkcja i zużycie już są w równowadze.',makes:'Produkcja',uses:'Zużycie',lake:'Zbiornik wodny jest jak wielka bateria. Napełniamy go w południe, gdy słońce robi za dużo prądu, i w nocy, gdy elektrownia atomowa nie może się zatrzymać. Rano i wieczorem, gdy ludzie zużywają dużo prądu, wypuszczamy wodę i ona robi prąd.'},uk:{ok:'Чудово! Виробництво і споживання в рівновазі.',exact:'Виробництво і споживання вже в рівновазі.',makes:'Виробництво',uses:'Споживання',lake:'Водосховище — як величезна батарейка. Ми наповнюємо його опівдні, коли сонце робить забагато струму, і вночі, коли атомна станція не може зупинитися. Вранці й увечері, коли люди споживають багато струму, ми відпускаємо воду, і вона робить струм.'},ru:{ok:'Отлично! Производство и потребление в равновесии.',exact:'Производство и потребление уже в равновесии.',makes:'Производство',uses:'Потребление',lake:'Водохранилище — как огромная батарейка. Мы наполняем его в полдень, когда солнце делает слишком много тока, и ночью, когда атомная станция не может остановиться. Утром и вечером, когда люди тратят много тока, мы отпускаем воду, и она делает ток.'},hu:{ok:'Tökéletes! A termelés és a fogyasztás egyensúlyban van.',exact:'A termelés és a fogyasztás már egyensúlyban van.',makes:'Termelés',uses:'Fogyasztás',lake:'A víztározó olyan, mint egy óriási elem. Délben töltjük fel, amikor a nap túl sok áramot csinál, és éjjel, amikor az atomerőmű nem tud leállni. Reggel és este, amikor az emberek sok áramot használnak, leengedjük a vizet, és az áramot csinál.'}};
+for(const l in T4) if(TXT[l]){ const o=T4[l]; TXT[l].ok=o.ok; TXT[l].exact=o.exact; TXT[l].makes=o.makes; TXT[l].uses=o.uses; TXT[l].story=TXT[l].story.slice(); TXT[l].story[3]=o.lake; }
+const RL={ro:n=>`Mai trebuie ${ro2(n)}: lasă apa din lac să curgă!`,de:n=>n===1?'Es fehlt noch ein Blitz: lass das Wasser aus dem See fließen!':`Es fehlen noch ${n} Blitze: lass das Wasser aus dem See fließen!`,en:n=>`We still need ${n1(n,'one',n)}: let the lake water flow!`,fr:n=>`Il en manque encore ${n1(n,'un',n)} : laisse couler l’eau du lac !`,es:n=>`Faltan ${n1(n,'uno',n)}: ¡deja correr el agua del lago!`,it:n=>`Ne mancano ancora ${n1(n,'uno',n)}: lascia scendere l’acqua del lago!`,pt:n=>`Ainda faltam ${n1(n,'um',n)}: deixe a água do lago descer!`,nl:n=>`We hebben nog ${n1(n,'één',n)} nodig: laat het water uit het meer stromen!`,pl:n=>`Brakuje jeszcze: ${n}. Wypuść wodę z jeziora!`,uk:n=>`Бракує ще: ${n}. Відпусти воду з озера!`,ru:n=>`Не хватает ещё: ${n}. Отпусти воду из озера!`,hu:n=>`Még ${n1(n,'egy',n)} kell: engedd le a vizet a tóból!`};
+for(const l in RL) if(TXT[l]) TXT[l].restLake=RL[l];
 /* ---------------- model (v2: pe ture) ---------------- */
 /* Fiecare nivel = câteva momente ale zilei. În fiecare moment orașul are nevoie de un număr de fulgere ⚡.
    Copilul potrivește: „Facem” (centrale) = „Folosim” (becuri 💡 + apă urcată în lac 💧 + mașini la încărcat 🔋). Timpul nu curge singur. */
@@ -289,7 +297,7 @@ const LV=[
  {ic:'🌆',pl:['coal'],cap:{coal:6},mo:[M('evening','sunset',2),M('evening','dinner',4),M('night','sleep',1)],tut:1},
  {ic:'☀️',pl:['solar','gas'],mo:[M('morning','wake',3,{sun:1}),M('noon','sunny',3,{sun:3}),M('afternoon','cloudy',3,{sun:1}),M('evening','sunset',4,{sun:0})]},
  {ic:'🌬️',pl:['wind','gas'],mo:[M('morning','windy',3,{wind:3}),M('noon','calm',3,{wind:0}),M('afternoon','windy',4,{wind:2}),M('evening','dinner',4,{wind:1})]},
- {ic:'💧',pl:['solar','hydro'],lake:0,mo:[M('morning','wake',2,{sun:3}),M('noon','sunny',3,{sun:6}),M('afternoon','quiet',3,{sun:4}),M('evening','dinner',4,{sun:0}),M('night','sleep',1,{sun:0})]},
+ {ic:'💧',pl:['nuc','solar','hydro'],nuc:2,lake:0,mo:[M('night','sleep',1,{sun:0}),M('morning','wake',4,{sun:1}),M('noon','sunny',3,{sun:4}),M('afternoon','quiet',3,{sun:3}),M('evening','dinner',5,{sun:0})]},
  {ic:'🚗',pl:['nuc'],nuc:4,cars:3,mo:[M('evening','dinner',4),M('night','carsHome',1),M('late','quiet',1),M('morning','carsGo',4)]},
  {ic:'🏗️',pl:['nuc','coal','gas'],nuc:2,factory:1,mo:[M('morning','wake',3),M('morning','work',7),M('noon','lunch',5),M('afternoon','work',7),M('evening','dinner',5),M('night','sleep',2)]},
  {ic:'⛈️',pl:['wind','solar','gas','hydro'],lake:3,mo:[M('morning','windy',3,{wind:2,sun:2}),M('noon','sunny',3,{wind:2,sun:3}),M('afternoon','storm',4,{wind:0,sun:0}),M('evening','dinner',5,{wind:0,sun:0}),M('night','quiet',2,{wind:1,sun:0})]},
@@ -325,18 +333,19 @@ function used(){ const u=usedParts(); return u.bulbs+u.pump+u.cars; }
 function play(li){ stop(); const L=LV[li]; const my=gen;
   G={li,L,mi:0,lv:{coal:0,gas:0},hy:0,lake:L.lake||0,cars:[...Array(L.cars||0)].map(()=>({c:0,on:false})),smoke:0,lock:true,idle:0,hintEl:null,said:''};
   main.innerHTML='';
-  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const tl=el('div','gr-tl'); h.append(face,bub); main.append(h,tl);
+  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const rep=el('button','gr-rep','🔊'); const tl=el('div','gr-tl'); const tipEl=el('div','gr-tip'); h.append(face,bub,rep); main.append(h,tl,tipEl);
   const eq=el('div','gr-eq'); main.append(eq);
   const stg=el('div','gr-stage'); main.append(stg); const pan=el('div','gr-panel'); main.append(pan);
-  Object.assign(G,{bub,tl,eq,stg,pan}); bub.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}]+/u,'')); face.onclick=()=>{ sp(X().f.scale); };
+  Object.assign(G,{bub,tl,eq,stg,pan,tipEl}); const again=()=>{ G.idle=Math.min(G.idle,0); sp(G.momT||bub.textContent.replace(/^[^\p{L}]+/u,'')); }; bub.onclick=again; rep.onclick=again; face.onclick=()=>{ sp(X().f.scale); };
   scene(); panel(); timeline(); equation();
   /* povestea nivelului: o carte mare, cu ▶ */
   const card=el('div','gr-story',`<div class="pics">${L.ic} ${L.pl.map(k=>PL[k].ic).join(' ')}${L.cars?' 🚗':''}${L.factory?' 🏭':''}</div><div class="tx">${X().story[li]}</div>`);
-  const go=el('button','rb-b go big',X().go); card.append(go); stg.append(card); msg('📖 '+X().story[li]); sp(X().story[li]);
+  const go=el('button','rb-b go big',X().go); card.append(go); stg.append(card); msg('📖 '+X().story[li]); G.momT=X().story[li]; sp(X().story[li]);
   go.onclick=()=>{ card.remove(); snd(660,.1); startMoment(); };
-  if(!G.tick){ const loop=()=>{ if(gen!==my||!G) return; G.idle+=.5; if(!G.lock&&G.idle>=(window.__grFast?1:(G.L.tut&&G.mi===0?2:8))&&!G.hintEl) hint(); later(loop,500); }; later(loop,500); } }
+  if(!G.tick){ const loop=()=>{ if(gen!==my||!G) return; G.idle+=.5; if(!G.lock&&G.idle>=(window.__grFast?1:(G.L.tut&&G.mi===0?6:15))&&!G.hintEl) hint(); later(loop,500); }; later(loop,500); } }
 
 function msg(t){ if(G) G.bub.textContent=t; }
+function tip(t,btnTxt,fn){ if(!G) return; G.tipEl.innerHTML=''; if(!t&&!btnTxt){ G.tipEl.classList.remove('on'); return; } G.tipEl.classList.add('on'); if(t){ const sEl=el('span','',t); sEl.onclick=()=>sp(t.replace(/^[^\p{L}\d]+/u,'')); G.tipEl.append(sEl); } if(btnTxt){ const b=el('button','rb-b go gr-next',btnTxt); b.onclick=fn; G.tipEl.append(b); } }
 const SUF={ro:['Trimite curentul în lac!','Trimite curentul în mașini!'],de:['Schick den Strom in den See!','Schick den Strom in die Autos!'],en:['Send the power to the lake!','Send the power to the cars!'],fr:['Envoie l’électricité dans le lac !','Envoie l’électricité dans les voitures !'],es:['¡Manda la electricidad al lago!','¡Manda la electricidad a los coches!'],it:['Manda la corrente nel lago!','Manda la corrente nelle auto!'],pt:['Mande a energia para o lago!','Mande a energia para os carros!'],nl:['Stuur de stroom naar het meer!','Stuur de stroom naar de auto’s!'],pl:['Wyślij prąd do jeziora!','Wyślij prąd do samochodów!'],uk:['Спрямуй струм в озеро!','Спрямуй струм у машини!'],ru:['Направь ток в озеро!','Направь ток в машины!'],hu:['Küldd az áramot a tóba!','Küldd az áramot az autókba!']};
 /* de unde vine curentul acum și ce trebuie făcut */
 function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
@@ -351,14 +360,14 @@ function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
   else parts.push(x.exact);
   return parts.join(' '); }
 function startMoment(){ const m=G.L.mo[G.mi]; G.idle=0; clearHint(); timeline(); scene(); panel(); equation();
-  const t=`${X().mom[m.m]}. ${X().ev2[m.e]} ${X().need(m.need)} ${explain()}`; msg(MIC[m.m]+' '+t); G.lock=true; snd(880,.1); later(()=>snd(1100,.12),130);
-  sp(t).then(()=>{ if(G){ G.lock=false; G.idle=0; check(true); } }); later(()=>{ if(G&&G.lock){ G.lock=false; } },9000); }
+  const t=`${X().mom[m.m]}. ${X().ev2[m.e]} ${X().need(m.need)} ${explain()}`; msg(MIC[m.m]+' '+t); G.momT=t; tip(''); G.lock=true; snd(880,.1); later(()=>snd(1100,.12),130);
+  sp(t).then(()=>{ if(G){ G.lock=false; G.idle=0; check(true); } }); later(()=>{ if(G&&G.lock&&!G.waitNext){ G.lock=false; } },20000); }
 
-function changed(){ if(!G) return; G.idle=0; clearHint(); scene(); panel(); equation(); clearTimeout(G.fbT); G.fbT=setTimeout(()=>check(false),650); }
+function changed(){ if(!G) return; G.idle=0; clearHint(); scene(); panel(); equation(); clearTimeout(G.fbT); G.fbT=setTimeout(()=>check(false),1200); }
 function check(quiet){ if(!G||G.lock) return; const P=made(), U=used();
-  if(P===U){ G.lock=true; clearHint(); msg('✅ '+X().ok); G.eq.classList.add('ok'); [523,659,784].forEach((f,i)=>later(()=>snd(f,.15),i*110));
-    sp(X().ok).then(()=>later(next,500)); return; }
-  if(quiet) return; const d=U-P; const t=d>0?X().more(d):X().less(-d); if(t!==G.said||true){ G.said=t; msg((d>0?'🕯️ ':'🔥 ')+t); sp(t); } }
+  if(P===U){ G.lock=true; G.waitNext=true; clearHint(); G.eq.classList.add('ok'); [523,659,784].forEach((f,i)=>later(()=>snd(f,.15),i*110));
+    tip('✅ '+X().ok,G.mi<G.L.mo.length-1?'▶':'🏁',()=>{ G.waitNext=false; tip(''); snd(660,.08); next(); }); sp(X().ok); return; }
+  if(quiet) return; const d=U-P; const t=d>0?X().more(d):X().less(-d); G.said=t; tip((d>0?'🕯️ ':'🔥 ')+t); sp(t); }
 function next(){ if(!G) return; const L=G.L; G.eq.classList.remove('ok');
   /* se aplică momentul: lacul, mașinile, fumul */
   G.lake=Math.max(0,Math.min(CAP,G.lake-G.hy)); G.cars.forEach(c=>{ if(c.on) c.c=Math.min(CARCAP,c.c+1); if(c.c>=CARCAP) c.on=false; });
@@ -378,7 +387,7 @@ function hint(){ if(!G) return; const P=made(), U=used(); if(P===U) return; cons
     if(G.hy>0){ b=q('[data-hy="up"]'); t=X().hintUp; }
     else if(k){ b=q(`[data-k="${k}"][data-d="dn"]`); t=X().hintDown; }
     else { const car=G.cars.findIndex(c=>!c.on&&c.c<CARCAP); if(car>=0){ b=q(`[data-car="${car}"]`); t=X().carTip; } else if(G.L.pl.includes('hydro')&&G.lake-G.hy<CAP){ b=q('[data-hy="up"]'); t=X().pumpTip; } } }
-  if(b){ G.hintEl=b; b.classList.add('gr-hint'); msg('👆 '+t); sp(t); } G.idle=-6; }
+  if(b){ G.hintEl=b; b.classList.add('gr-hint'); tip('👆 '+t); sp(t); } G.idle=-15; }
 
 /* ---------------- linia de timp și „ecuația” ---------------- */
 function timeline(){ const L=G.L; G.tl.innerHTML=L.mo.map((m,i)=>`<span class="${i<G.mi?'done':i===G.mi?'cur':''}">${i<G.mi?'✔️':MIC[m.m]}</span>`).join('<i></i>'); }
@@ -418,8 +427,8 @@ function scene(){ const L=G.L, m=curM(), n=L.pl.length, por=innerWidth<innerHeig
   if(L.factory){ const on=G.facOn>0; s+=`<g class="gr-cn" data-k="factory" style="cursor:pointer" transform="translate(${town.fx} ${town.fy})"><rect x="-70" y="-50" width="140" height="50" fill="#9AA5B8" stroke="#24325F" stroke-width="2.5"/><path d="M-70 -50 L-45 -68 L-45 -50 L-20 -68 L-20 -50 L5 -68 L5 -50 Z" fill="#7D8799" stroke="#24325F" stroke-width="2"/><rect x="40" y="-90" width="14" height="40" fill="#7D8799"/><text x="-10" y="-14" font-size="30" text-anchor="middle" class="${on?'gr-spin':''}" opacity="${on?1:.4}">⚙️</text>${[...Array(5)].map((_,j)=>`<rect x="${-62+j*20}" y="-44" width="14" height="10" fill="${j<Math.round(G.facOn*5)?'#FFE45C':'#5B6578'}"/>`).join('')}<text x="30" y="-14" font-size="24">🏭</text></g>`; }
   G.cars.forEach((c,i)=>{ const x=town.cx+i*80; s+=`<g class="gr-car" data-i="${i}" style="cursor:pointer" transform="translate(${x} ${town.cy})"><rect x="-6" y="-58" width="12" height="40" rx="4" fill="${c.on?'#2FB06A':'#9AA5B8'}" stroke="#24325F" stroke-width="2"/><text x="0" y="-26" font-size="14" text-anchor="middle">🔌</text><text x="22" y="-2" font-size="42" text-anchor="middle">🚙</text>${[0,1].map(j=>`<rect x="${4+j*22}" y="6" width="20" height="12" rx="4" fill="${j<c.c?'#2FB06A':'#fff'}" stroke="#24325F" stroke-width="2"/>`).join('')}${c.on?`<path d="M0 -18 Q0 -4 12 -10" stroke="#24325F" stroke-width="3" fill="none"/><text x="34" y="-40" font-size="20" class="gr-tok">⚡</text>`:''}</g>`; });
   s+=`</svg>`; G.stg.querySelectorAll('svg').forEach(x=>x.remove()); G.stg.insertAdjacentHTML('afterbegin',s); const svg=G.stg.querySelector('svg'); G.svg=svg;
-  svg.querySelectorAll('.gr-pl').forEach(g=>g.onclick=()=>{ const k=g.dataset.k; sp(X().f[k]); msg(PL[k].ic+' '+X().f[k]); });
-  svg.querySelectorAll('.gr-cn').forEach(g=>g.onclick=()=>{ const k=g.dataset.k; sp(X().f[k]); msg(X().f[k]); });
+  svg.querySelectorAll('.gr-pl').forEach(g=>g.onclick=()=>{ const k=g.dataset.k; sp(X().f[k]); tip(PL[k].ic+' '+X().f[k]); });
+  svg.querySelectorAll('.gr-cn').forEach(g=>g.onclick=()=>{ const k=g.dataset.k; sp(X().f[k]); tip(X().f[k]); });
   svg.querySelectorAll('.gr-car').forEach(g=>g.onclick=()=>toggleCar(+g.dataset.i)); }
 
 function plantSVG(k,o){ switch(k){
@@ -433,7 +442,7 @@ function plantSVG(k,o){ switch(k){
 
 /* ---------------- panoul cu săgeți mari ---------------- */
 function panel(){ if(!G) return; const pan=G.pan; pan.innerHTML=''; const L=G.L;
-  L.pl.forEach(k=>{ const p=PL[k]; const c=el('div','gr-pc'); const o=outOf(k); const ic=el('span','ic',p.ic); ic.onclick=()=>{ sp(X().f[k]); msg(p.ic+' '+X().f[k]); }; c.append(ic);
+  L.pl.forEach(k=>{ const p=PL[k]; const c=el('div','gr-pc'); const o=outOf(k); const ic=el('span','ic',p.ic); ic.onclick=()=>{ sp(X().f[k]); tip(p.ic+' '+X().f[k]); }; c.append(ic);
     if(k==='hydro'){ const up=el('button','',`⬆️`), dn=el('button','',`⬇️`); up.dataset.hy='up'; dn.dataset.hy='dn';
       up.onclick=()=>{ if(G.lock) return; if(G.lake-G.hy>=CAP){ snd(200,.1,'square',.05); return; } G.hy--; snd(600,.08); changed(); };
       dn.onclick=()=>{ if(G.lock) return; if(G.hy>=G.lake){ snd(200,.1,'square',.05); return; } G.hy++; snd(800,.08); changed(); };
@@ -445,14 +454,14 @@ function panel(){ if(!G) return; const pan=G.pan; pan.innerHTML=''; const L=G.L;
       else if(p.ctl==='fixed') c.append(el('span','lock','🔒'));
       else c.append(el('span','lock',k==='solar'?'🌤️':'🍃')); }
     pan.append(c); });
-  if(G.cars.length){ const c=el('div','gr-pc'); const ic=el('span','ic','🔌'); ic.onclick=()=>{ sp(X().f.ev); msg(X().f.ev); }; c.append(ic);
+  if(G.cars.length){ const c=el('div','gr-pc'); const ic=el('span','ic','🔌'); ic.onclick=()=>{ sp(X().f.ev); tip(X().f.ev); }; c.append(ic);
     G.cars.forEach((car,i)=>{ const b=el('button',car.on?'sel':'',`🚙<small>${'▮'.repeat(car.c)}${'▯'.repeat(CARCAP-car.c)}</small>`); b.dataset.car=i; b.style.width='64px'; b.onclick=()=>toggleCar(i); c.append(b); }); pan.append(c); } }
-function toggleCar(i){ if(!G||G.lock) return; const c=G.cars[i]; if(!c.on&&c.c>=CARCAP){ msg('🔋 '+X().carFull); sp(X().carFull); return; } c.on=!c.on; snd(c.on?900:450,.1); changed(); }
+function toggleCar(i){ if(!G||G.lock) return; const c=G.cars[i]; if(!c.on&&c.c>=CARCAP){ tip('🔋 '+X().carFull); sp(X().carFull); return; } c.on=!c.on; snd(c.on?900:450,.1); changed(); }
 
 function finish(){ const L=G.L, li=G.li; let s=3; const extra=[]; G.lock=true; timeline();
   if(L.smoke){ const n=Math.round(G.smoke); s=n<=4?3:n<=8?2:1; extra.push(X().smokeN(n)); if(s<3) extra.push(X().smoke); }
   const p=prog(); p[li]=Math.max(p[li]||0,s); LS.set('grid_prog',p); award(s); try{ window.__lvDone&&window.__lvDone(1); }catch(e){} try{ confetti(24); }catch(e){}
-  const t=X().done[s]+(extra.length?' '+extra.join(' '):''); msg('🎉 '+t);
+  const t=X().done[s]+(extra.length?' '+extra.join(' '):''); msg('🎉 '+t); G.momT=t; tip('');
   const r=el('div','gr-res',`<div class="st">${'★'.repeat(s)}${'☆'.repeat(3-s)}</div>`); const row=el('div','row');
   if(li<LV.length-1){ const n=el('button','rb-b go',X().next); n.onclick=()=>play(li+1); row.append(n); }
   const a=el('button','rb-b',X().again); a.onclick=()=>play(li); const b=el('button','rb-b',X().levels); b.onclick=()=>levels(); row.append(a,b); r.append(row); main.append(r);
