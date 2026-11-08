@@ -43,7 +43,8 @@ final class GameUITests: XCTestCase {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launch()
-        let parents = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "⚙️")).firstMatch
+        chooseEnglish(in: app)
+        let parents = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Parents")).firstMatch
         XCTAssertTrue(parents.waitForExistence(timeout: 20))
         for _ in 0..<5 {
             if parents.isHittable { break }
@@ -59,7 +60,10 @@ final class GameUITests: XCTestCase {
         let numbers = question.replacingOccurrences(of: "?", with: "").split(separator: " ").compactMap { values[String($0)] }
         guard numbers.count == 2 else { return XCTFail("Could not read gate question") }
         app.buttons[String(numbers[0] * numbers[1])].tap()
-        let record = app.buttons.matching(NSPredicate(format: "label IN %@", ["⏺ Înregistrează", "⏺ Aufnehmen", "⏺ Record"])).firstMatch
+        let voice = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] %@", "parent’s voice")).firstMatch
+        XCTAssertTrue(voice.waitForExistence(timeout: 10))
+        voice.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        let record = app.buttons["⏺ Record"]
         XCTAssertTrue(record.waitForExistence(timeout: 10))
         // A taller home page can leave the first recording row beneath the status bar.
         for _ in 0..<5 {
@@ -76,13 +80,16 @@ final class GameUITests: XCTestCase {
         let stop = app.buttons.matching(NSPredicate(format: "label IN %@", ["⏹ Gata", "⏹ Fertig", "⏹ Done"])).firstMatch
         XCTAssertTrue(stop.waitForExistence(timeout: 10))
         stop.tap()
-        let recorded = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "1 ✅")).firstMatch
-        XCTAssertTrue(recorded.waitForExistence(timeout: 5))
-        app.buttons["▶"].firstMatch.tap()
-        app.buttons["🗑"].firstMatch.tap()
-        let gone = NSPredicate(format: "exists == false")
-        expectation(for: gone, evaluatedWith: recorded)
-        waitForExpectations(timeout: 5)
+        let play = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Play")).firstMatch
+        let delete = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Delete")).firstMatch
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "enabled == true"), object: play
+        )], timeout: 5), .completed)
+        play.tap()
+        delete.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "enabled == false"), object: play
+        )], timeout: 5), .completed)
     }
 
     @MainActor
@@ -121,8 +128,10 @@ final class GameUITests: XCTestCase {
         let language = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "▾")).firstMatch
         XCTAssertTrue(language.waitForExistence(timeout: 10))
         if !language.label.contains("English") {
-            language.tap()
-            app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "English")).firstMatch.tap()
+            language.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            let english = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "English")).firstMatch
+            XCTAssertTrue(english.waitForExistence(timeout: 5))
+            english.tap()
         }
     }
 

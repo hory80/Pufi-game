@@ -57,7 +57,13 @@ final class SpeechService: NSObject, @preconcurrency AVSpeechSynthesizerDelegate
         if synth.isSpeaking || synth.isPaused { synth.stopSpeaking(at: .immediate) }
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { completion(true); return }
         let u: AVSpeechUtterance
-        if let attr = Self.withPronunciation(text, lang: lang) { u = AVSpeechUtterance(attributedString: attr) } else { u = AVSpeechUtterance(string: text) }
+        // On some voices IPA changes delegate offsets after the annotated word.
+        // Karaoke uses UTF-16 ranges in the original text, so keep that utterance plain.
+        if onWord == nil, let attributed = Self.withPronunciation(text, lang: lang) {
+            u = AVSpeechUtterance(attributedString: attributed)
+        } else {
+            u = AVSpeechUtterance(string: text)
+        }
         u.voice = voice(for: lang)
         u.rate = AVSpeechUtteranceDefaultSpeechRate * max(0.5, min(1.3, rate))
         u.preUtteranceDelay = 0.02

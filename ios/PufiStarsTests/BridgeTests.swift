@@ -101,4 +101,114 @@ final class BridgeTests: XCTestCase {
         let count = try await js("window.testWords.length") as? Int ?? 0
         XCTAssertGreaterThan(count, 0)
     }
+
+    func testRomanianIPAPlaybackAndOriginalWordRanges() async throws {
+        let text = "La ora două."
+        let attributed = try XCTUnwrap(SpeechService.withPronunciation(text, lang: "ro"))
+        XCTAssertEqual(attributed.string, text)
+        XCTAssertNil(SpeechService.withPronunciation("O oră, o orășel.", lang: "ro"))
+        XCTAssertNil(SpeechService.withPronunciation(text, lang: "en"))
+
+        let playback = try await call("speak", args: #"{"text":"La ora două.","lang":"ro","words":false}"#) as? Bool
+        XCTAssertEqual(playback, true)
+
+        _ = try await js("window.testIPA=[]; native.on('speak.word',e=>window.testIPA.push(e)); true")
+        let result = try await call("speak", args: #"{"text":"La ora două.","lang":"ro","words":true}"#) as? Bool
+        XCTAssertEqual(result, true)
+        let events = try await js("window.testIPA") as? [[String: Int]] ?? []
+        let original = text as NSString
+        let words = try events.map { event -> String in
+            let location = try XCTUnwrap(event["loc"])
+            let length = try XCTUnwrap(event["len"])
+            guard location >= 0, length > 0, location <= original.length,
+                  length <= original.length - location else {
+                XCTFail("Invalid speech range: \(event)")
+                return ""
+            }
+            return original.substring(with: NSRange(location: location, length: length))
+                .trimmingCharacters(in: .punctuationCharacters)
+        }
+        XCTAssertEqual(words, ["La", "ora", "două"])
+    }
+
+    func testPufiGiftAndEarnedTicket() async throws {
+        let result = try await js("""
+        (() => {
+          const keys = ['pq_gift', 'pq_earn', 'pq_paid'];
+          const old = keys.map(k => localStorage.getItem(k));
+          try {
+            keys.forEach(k => localStorage.removeItem(k));
+            window.openPufi();
+            const gift = document.querySelector('#pq-earn.ok')?.textContent.includes('🎟️');
+            document.querySelector('[data-lk="pq:0"]').click();
+            const started = window.__pq.state !== 'map' && localStorage.getItem('pq_gift') === '1';
+            // Finishing a level clears pq_paid. Model that boundary without playing the platformer.
+            localStorage.removeItem('pq_paid');
+            window.openPufi();
+            document.querySelector('[data-lk="pq:0"]').click();
+            const blocked = window.__pq.state === 'map';
+            localStorage.setItem('pq_earn', '30');
+            window.openPufi();
+            document.querySelector('[data-lk="pq:0"]').click();
+            return {gift, started, blocked, paid: localStorage.getItem('pq_paid') === '1',
+                    remaining: Number(localStorage.getItem('pq_earn'))};
+          } finally {
+            keys.forEach((k,i) => old[i] === null ? localStorage.removeItem(k) : localStorage.setItem(k,old[i]));
+          }
+        })()
+        """) as? [String: Any]
+        let state = try XCTUnwrap(result)
+        for key in ["gift", "started", "blocked", "paid"] {
+            XCTAssertEqual(state[key] as? Bool, true, key)
+        }
+        XCTAssertEqual(state["remaining"] as? Int, 15)
+    }
+
+    func testRoboGridHelpAndCircuitWireRemoval() async throws {
+        let result = try await js("""
+        (() => {
+          const old = localStorage.getItem('grid_prog');
+          const outcomes = [];
+          const click = selector => document.querySelector(selector).click();
+          try {
+            localStorage.setItem('grid_prog', '{"0":1,"1":1,"2":1}');
+            window.openRobo();
+            click('[data-lk="rb:grid"]');
+            for (const index of [0,3]) {
+              document.querySelectorAll('.gr-card')[index].click();
+              const story = document.querySelector('.gr-bub').textContent.startsWith('📖');
+              click('.gr-next');
+              click('.gr-help');
+              const explains = document.querySelector('.gr-tip').textContent.startsWith('❓');
+              click('.gr-help');
+              const points = document.querySelector('.gr-tip').textContent.startsWith('👆');
+              outcomes.push(story && explains && points);
+              click('#gr-back');
+            }
+            click('#gr-back');
+            click('[data-lk="rb:circ"]');
+            click('.rb-grid .rb-card');
+            const from = document.querySelector('.rb-term[data-t="bat.b"]');
+            const to = document.querySelector('.rb-term[data-t="L1.b"]');
+            const r = to.getBoundingClientRect();
+            const svg = from.ownerSVGElement;
+            from.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true}));
+            svg.dispatchEvent(new PointerEvent('pointerup', {clientX:r.x+r.width/2,clientY:r.y+r.height/2}));
+            const wire = document.querySelector('.rb-wire');
+            wire?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+            const cut = document.querySelector('#rb-cut');
+            const selected = !!cut && !!document.querySelector('.rb-wire');
+            cut?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+            return {outcomes, selected, removed: !document.querySelector('.rb-wire')};
+          } finally {
+            if (old === null) localStorage.removeItem('grid_prog'); else localStorage.setItem('grid_prog',old);
+          }
+        })()
+        """) as? [String: Any]
+        let state = try XCTUnwrap(result)
+        XCTAssertEqual(state["outcomes"] as? [Bool], [true, true])
+        XCTAssertEqual(state["selected"] as? Bool, true)
+        XCTAssertEqual(state["removed"] as? Bool, true)
+    }
+
 }

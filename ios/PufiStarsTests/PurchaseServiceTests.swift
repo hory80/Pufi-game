@@ -68,7 +68,7 @@ final class PurchaseServiceTests: XCTestCase {
 
     func testRefundRemovesPurchasedAccess() async throws {
         let transaction = try await session.buyProduct(identifier: "unlock_all")
-        let owned = await refresh()
+        let owned = await waitForAccess(true)
         XCTAssertTrue(owned)
         try session.refundTransaction(identifier: UInt(transaction.id))
         let afterRefund = await waitForAccess(false)
