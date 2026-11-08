@@ -56,7 +56,8 @@ final class SpeechService: NSObject, @preconcurrency AVSpeechSynthesizerDelegate
     func speak(_ text: String, lang: String, rate: Float, onWord: ((NSRange) -> Void)?, completion: @escaping (Bool) -> Void) {
         if synth.isSpeaking || synth.isPaused { synth.stopSpeaking(at: .immediate) }
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { completion(true); return }
-        let u = AVSpeechUtterance(string: text)
+        let u: AVSpeechUtterance
+        if let attr = Self.withPronunciation(text, lang: lang) { u = AVSpeechUtterance(attributedString: attr) } else { u = AVSpeechUtterance(string: text) }
         u.voice = voice(for: lang)
         u.rate = AVSpeechUtteranceDefaultSpeechRate * max(0.5, min(1.3, rate))
         u.preUtteranceDelay = 0.02
@@ -65,6 +66,26 @@ final class SpeechService: NSObject, @preconcurrency AVSpeechSynthesizerDelegate
         if let onWord { wordHandlers[key] = onWord }
         Self.usePlaybackSession()
         synth.speak(u)
+    }
+
+    /// Pronunții fixate cu IPA: vocea română citea „ora” (ora două) ca „oră”.
+    static let ipaFixes: [String: [String: String]] = [
+        "ro": ["ora": "ˈora", "Ora": "ˈora"]
+    ]
+
+    static func withPronunciation(_ text: String, lang: String) -> NSAttributedString? {
+        guard let fixes = ipaFixes[lang] else { return nil }
+        let attr = NSMutableAttributedString(string: text)
+        let ns = text as NSString
+        var changed = false
+        for (word, ipa) in fixes {
+            guard let re = try? NSRegularExpression(pattern: "(?<![\\p{L}])" + NSRegularExpression.escapedPattern(for: word) + "(?![\\p{L}])") else { continue }
+            for m in re.matches(in: text, range: NSRange(location: 0, length: ns.length)) {
+                attr.addAttribute(NSAttributedString.Key(AVSpeechSynthesisIPANotationAttribute), value: ipa, range: m.range)
+                changed = true
+            }
+        }
+        return changed ? attr : nil
     }
 
     func stop() {

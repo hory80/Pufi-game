@@ -10484,7 +10484,7 @@ function gBalloon(li){ let ti=0, errs=0, busy=false, tg=0; const N=6; const F=fr
   function round(again){ if(myGen!==gen) return; sky.querySelectorAll('[data-t]').forEach(x=>x.remove()); const set=new Set(); if(!again){ const [h,m]=fresh('bl'+li,()=>[RR(1,12),pick(ms)],8); tg=h*60+m; }
     set.add(tg); while(set.size<5){ const v=RR(1,12)*60+pick(ms); if(v%720!==tg%720) set.add(v); } shuf([...set]).forEach((t,i)=>spawn(t,i,i*.35+Math.random()*.4));
     const [h,m]=hmOf(tg); lab.innerHTML=`🎯 <b>${tShort(h,m)}</b>`; if(!again) F.say(X().balTask(tSay(h,m))); }
-  async function pop(b){ if(busy) return; const t=+b.dataset.t; if(t%720!==tg%720){ errs++; boing(); b.firstChild.style.animation='tmShake .4s'; setTimeout(()=>{ if(b.firstChild) b.firstChild.style.animation=''; },450); const [h,m]=hmOf(t); sp(tSay(h,m)); return; }
+  async function pop(b){ if(busy) return; const t=+b.dataset.t; if(t%720!==tg%720){ errs++; boing(); b.firstChild.style.animation='tmShake .4s'; setTimeout(()=>{ if(b.firstChild) b.firstChild.style.animation=''; },450); const [h,m]=hmOf(tg); sp(X().balTask(tSay(h,m))); return; }
     busy=true; snd(220,.08,'square',.12); b.style.animationPlayState='paused'; b.firstChild.style.animation='tmPop .35s forwards'; chime(); award(); F.dot(ti+1); const [h,m]=hmOf(tg); await spW(X().itIs(tSay(h,m)),1000); if(myGen!==gen) return;
     ti++; busy=false; if(ti>=N) return levelDone('balloon',li,errs); round(false); }
   F.ctrl.appendChild(btn(X().listen,'',()=>{ const [h,m]=hmOf(tg); sp(X().balTask(tSay(h,m))); }));
