@@ -11704,7 +11704,7 @@ for(const l in M){ const o=T[l]||R[l]; if(o) o.gx=M[l]; }
 .gr-story .tx{font-weight:800;font-size:clamp(1rem,2.6vw,1.4rem);line-height:1.3;max-width:640px}
 .gr-story .big{font-size:1.4rem;padding:12px 30px}
 .gr-pc .cnt{display:flex;flex-direction:column;align-items:center;font-weight:900;font-size:clamp(.9rem,2.4vw,1.15rem);line-height:1.15;min-width:2.6em}
-@media (max-width:600px){.gr-eq .lb{min-width:0}.gr-eq .lb .t{display:none}.gr-eq b{width:clamp(16px,4.6vw,30px);height:clamp(16px,4.6vw,30px);font-size:.8rem;border-radius:6px}.gr-tl span{font-size:1.1rem;padding:1px 3px}.gr-tl i{width:8px}.gr-eq{padding-right:44px}.gr-eq .mood{font-size:1.8rem}}
+@media (max-width:600px){.gr-bub{font-size:.95rem;max-height:26vh;overflow:auto;align-items:flex-start}.gr-rep{width:44px;height:44px;font-size:1.3rem}.gr-head{gap:6px}.gr-face{font-size:34px}.gr-tip{font-size:.95rem;padding:4px 8px}.gr-eq .lb{min-width:0}.gr-eq .lb .t{display:none}.gr-eq b{width:clamp(16px,4.6vw,30px);height:clamp(16px,4.6vw,30px);font-size:.8rem;border-radius:6px}.gr-tl span{font-size:1.1rem;padding:1px 3px}.gr-tl i{width:8px}.gr-eq{padding-right:44px}.gr-eq .mood{font-size:1.8rem}}
 .gr-pc button small{display:block;font-size:.7rem;letter-spacing:1px;color:#fff}
 .gr-hint{position:relative;animation:grHint 1s ease-in-out infinite;box-shadow:0 0 0 5px #FFC83D!important}
 .gr-hint::after{content:'👇';position:absolute;left:50%;bottom:100%;transform:translateX(-50%);font-size:2.2rem;pointer-events:none;animation:grPoint 1s ease-in-out infinite;z-index:3}
@@ -11716,6 +11716,8 @@ for(const l in M){ const o=T[l]||R[l]; if(o) o.gx=M[l]; }
 @keyframes grTok{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .gr-tok{animation:grTok 1.2s ease-in-out infinite;transform-box:fill-box}
 .gr-rep{font:inherit;font-size:1.6rem;width:52px;height:52px;border-radius:16px;border:none;background:var(--card);box-shadow:0 4px 0 #B8C8EC;cursor:pointer;flex:none}
+.gr-btns{display:flex;gap:6px;flex:none}
+@media (max-width:600px){.gr-btns{flex-direction:column}}
 .gr-help.gr-pulse{animation:grHint 1.2s ease-in-out infinite;box-shadow:0 0 0 4px #FFC83D}
 .gr-tip{display:none;align-items:center;justify-content:center;gap:10px;background:#FFF7D6;border-radius:16px;padding:6px 12px;font-weight:800;font-size:clamp(.95rem,2.4vw,1.25rem);min-height:2em;text-align:center}
 .gr-tip.on{display:flex}.gr-tip span{cursor:pointer}
@@ -11989,15 +11991,13 @@ function used(){ const u=usedParts(); return u.bulbs+u.pump+u.cars; }
 function play(li){ stop(); const L=LV[li]; const my=gen;
   G={li,L,mi:0,lv:{coal:0,gas:0},hy:0,lake:L.lake||0,cars:[...Array(L.cars||0)].map(()=>({c:0,on:false})),smoke:0,lock:true,idle:0,hintEl:null,said:''};
   main.innerHTML='';
-  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const rep=el('button','gr-rep','🔊'); const help=el('button','gr-rep gr-help','❓'); const tl=el('div','gr-tl'); const tipEl=el('div','gr-tip'); h.append(face,bub,rep,help); main.append(h,tl,tipEl);
+  const h=el('div','gr-head'); const face=el('div','gr-face','🤖'); const bub=el('div','gr-bub'); const rep=el('button','gr-rep','🔊'); const help=el('button','gr-rep gr-help','❓'); const tl=el('div','gr-tl'); const tipEl=el('div','gr-tip'); const bx=el('div','gr-btns'); bx.append(rep,help); h.append(face,bub,bx); main.append(h,tl,tipEl);
   const eq=el('div','gr-eq'); main.append(eq);
   const stg=el('div','gr-stage'); main.append(stg); const pan=el('div','gr-panel'); main.append(pan);
   Object.assign(G,{bub,tl,eq,stg,pan,tipEl,helpB:help}); help.onclick=()=>askHelp(); const again=()=>{ G.idle=Math.min(G.idle,0); sp(G.momT||bub.textContent.replace(/^[^\p{L}]+/u,'')); }; bub.onclick=again; rep.onclick=again; face.onclick=()=>{ sp(X().f.scale); };
   scene(); panel(); timeline(); equation();
-  /* povestea nivelului: o carte mare, cu ▶ */
-  const card=el('div','gr-story',`<div class="pics">${L.ic} ${L.pl.map(k=>PL[k].ic).join(' ')}${L.cars?' 🚗':''}${L.factory?' 🏭':''}</div><div class="tx">${X().story[li]}</div>`);
-  const go=el('button','rb-b go big',X().go); card.append(go); stg.append(card); msg('📖 '+X().story[li]); G.momT=X().story[li]; sp(X().story[li]);
-  go.onclick=()=>{ card.remove(); snd(660,.1); startMoment(); };
+  /* povestea nivelului stă în balonul de sus; jocul pornește cu ▶ Hai! */
+  msg('📖 '+X().story[li]); G.momT=X().story[li]; sp(X().story[li]); tip('',X().go,()=>{ tip(''); snd(660,.1); startMoment(); });
   if(!G.tick){ const loop=()=>{ if(gen!==my||!G) return; G.idle+=.5; if(!G.lock&&G.idle>=(window.__grFast?1:20)&&G.helpB) G.helpB.classList.add('gr-pulse'); later(loop,500); }; later(loop,500); } }
 
 function msg(t){ if(G) G.bub.textContent=t; }
