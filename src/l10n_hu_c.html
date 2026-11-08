@@ -66,7 +66,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  lvAdd:['Összeadás 5-ig','Összeadás 10-ig','Kivonás 10-ig','Összeadás 20-ig','Kivonás 20-ig','Vegyes 20-ig','Kerek tízesek','100-ig'],
  lvCmp:['Hasonlítsd össze a kupacokat','A < > = jelek','Számok 20-ig','Számok 100-ig','Hasonlítsd össze a műveleteket'],
  lvNb:['A jobb oldali szomszéd','A bal oldali szomszéd','Mindkét szomszéd 20-ig','Mindkét szomszéd 100-ig','A középső szám'],
- lvOrd:['Három szám, növekvő sorrendben','Négy szám, csökkenő sorrendben','20-ig, vegyesen','100-ig, növekvő','100-ig, vegyesen'],
+ lvOrd:['Három pingvin, növekvő','Négy pingvin, csökkenő','20-ig, növekvő','A hiányzó pingvin','20-ig, vegyesen','100-ig, növekvő','Hiányzó pingvin 100-ig','Hat pingvin 100-ig'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Vegyes 20-ig','Vegyes 100-ig'],
  plus:'meg',minus:'mínusz',make:'az',addQ:(a,o,b)=>`Mennyi ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} az ${c}!`,
  addStory:(a,b,e)=>`Van ${a} (${e}). Jön még ${b}. Hány van most?`,subStory:(a,b)=>`Van ${a}. Elmegy ${b}. Hány marad?`,
@@ -75,7 +75,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  gt:(a,b)=>`${a} nagyobb, mint ${b}.`,lt:(a,b)=>`${a} kisebb, mint ${b}.`,eq:(a,b)=>`${a} egyenlő ezzel: ${b}.`,chomp:'Hamm!',
  nbR:n=>`Ki lakik jobbra ettől: ${n}? A jobb oldali szomszéd eggyel több.`,nbL:n=>`Ki lakik balra ettől: ${n}? A bal oldali szomszéd eggyel kevesebb.`,nbLR:n=>`Keresd meg mindkét szomszédját ennek: ${n}!`,nbB:(a,b)=>`Melyik szám lakik ${a} és ${b} között?`,
  nbOk:s=>`${s}. Ügyes, a szomszédok a helyükön vannak!`,nbNo:'Ez nem itt lakik. Próbáld újra!',
- ordUp:'Állítsd sorba a pingvineket a legkisebbtől a legnagyobbig. Építs felfelé menő lépcsőt!',ordDown:'Állítsd sorba a pingvineket a legnagyobbtól a legkisebbig. Építs csúszdát!',
+ ordUp:'Állítsd a pingvineket növekvő sorrendbe!',ordDown:'Állítsd a pingvineket csökkenő sorrendbe!',ordGap:'Melyik pingvin hiányzik a sorból?',
  ordOk:'Tökéletes! Jó a sorrend!',ordNo:'Hoppá, itt nem jó a sorrend. Próbáld újra!',up:'🪜 Növekvő',down:'🛝 Csökkenő',
  boxQ:'Hány alma van a titkos dobozban? Tegyél almát a dobozba, amíg a mérleg egyenes nem lesz!',boxQ100:'Milyen szám van a titkos dobozban? Tegyél hozzá almát, amíg a mérleg egyenes nem lesz!',boxOk:(e)=>`A mérleg egyenes! ${e}`,heavyL:'A bal oldal nehezebb.',heavyR:'A jobb oldal nehezebb.'});
 S('hm',{title:'Pufi – A játékiskola ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});

@@ -3345,7 +3345,7 @@ S('mw',{title:'🔢 El mundo de los números',back:'⬅ Atrás',allOn:'🔓 Todo
  lvAdd:['Sumas hasta 5','Sumas hasta 10','Restas hasta 10','Sumas hasta 20','Restas hasta 20','Mezcla hasta 20','Decenas enteras','Hasta 100'],
  lvCmp:['Compara los montones','Los signos < > =','Números hasta 20','Números hasta 100','Compara las sumas'],
  lvNb:['El vecino de la derecha','El vecino de la izquierda','Los dos vecinos hasta 20','Los dos vecinos hasta 100','El número del medio'],
- lvOrd:['Tres números, de menor a mayor','Cuatro números, de mayor a menor','Hasta 20, mezcla','Hasta 100, de menor a mayor','Hasta 100, mezcla'],
+ lvOrd:['Tres pingüinos, de menor a mayor','Cuatro pingüinos, de mayor a menor','Hasta 20, de menor a mayor','El pingüino que falta','Hasta 20, mezcla','Hasta 100, de menor a mayor','Falta un pingüino hasta 100','Seis pingüinos hasta 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mezcla hasta 20','Mezcla hasta 100'],
  plus:'más',minus:'menos',make:'son',addQ:(a,o,b)=>`¿Cuánto es ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`¡${a} ${o} ${b} son ${c}!`,
  addStory:(a,b,e)=>`Tienes ${a} ${e}. Llegan ${b} más. ¿Cuántos hay ahora?`,subStory:(a,b)=>`Hay ${a}. ${b} se van. ¿Cuántos quedan?`,
@@ -3354,7 +3354,7 @@ S('mw',{title:'🔢 El mundo de los números',back:'⬅ Atrás',allOn:'🔓 Todo
  gt:(a,b)=>`${a} es mayor que ${b}.`,lt:(a,b)=>`${a} es menor que ${b}.`,eq:(a,b)=>`${a} es igual a ${b}.`,chomp:'¡Ñam!',
  nbR:n=>`¿Quién vive a la derecha del ${n}? El vecino de la derecha es uno más.`,nbL:n=>`¿Quién vive a la izquierda del ${n}? El vecino de la izquierda es uno menos.`,nbLR:n=>`¡Busca los dos vecinos del ${n}!`,nbB:(a,b)=>`¿Qué número vive entre ${a} y ${b}?`,
  nbOk:s=>`${s}. ¡Muy bien, los vecinos están en su sitio!`,nbNo:'Ese no vive aquí. ¡Inténtalo otra vez!',
- ordUp:'Pon los pingüinos de menor a mayor: del más pequeño al más grande. ¡Haz una escalera que sube!',ordDown:'Pon los pingüinos de mayor a menor: del más grande al más pequeño. ¡Haz un tobogán!',
+ ordUp:'¡Ordena los pingüinos de menor a mayor!',ordDown:'¡Ordena los pingüinos de mayor a menor!',ordGap:'¿Qué pingüino falta en la fila?',
  ordOk:'¡Perfecto! ¡El orden es correcto!',ordNo:'¡Uy! Aquí el orden no está bien. ¡Inténtalo otra vez!',up:'🪜 De menor a mayor',down:'🛝 De mayor a menor',
  boxQ:'¿Cuántas manzanas hay en la caja secreta? ¡Pon manzanas en la caja hasta que la balanza esté recta!',boxQ100:'¿Qué número hay en la caja secreta? ¡Añade manzanas hasta que la balanza esté recta!',boxOk:(e)=>`¡La balanza está recta! ${e}`,heavyL:'El lado izquierdo pesa más.',heavyR:'El lado derecho pesa más.'});
 S('hm',{title:'Pufi – La escuela de juegos ⭐',q:'¿A qué jugamos hoy?',math:'Matemáticas',world:'El mundo',read:'Leer',time:'El tiempo',shapes:'Formas',robo:'RoboPufi',chess:'Ajedrez',pufi:'Pufi',par:'Padres',home:'🏠 Inicio',voice:'Voz',on:'🔊 Voz: sí',off:'🔇 Voz: no',close:'✖ Cerrar',hello:'¿A qué jugamos hoy? ¡Elige una carta!'});
@@ -3731,7 +3731,7 @@ S('mw',{title:'🔢 Le monde des nombres',back:'⬅ Retour',allOn:'🔓 Tout : o
  lvAdd:['Additions jusqu’à 5','Additions jusqu’à 10','Soustractions jusqu’à 10','Additions jusqu’à 20','Soustractions jusqu’à 20','Mélange jusqu’à 20','Dizaines entières','Jusqu’à 100'],
  lvCmp:['Compare les tas','Les signes < > =','Nombres jusqu’à 20','Nombres jusqu’à 100','Compare des sommes'],
  lvNb:['Le voisin de droite','Le voisin de gauche','Les deux voisins jusqu’à 20','Les deux voisins jusqu’à 100','Le nombre du milieu'],
- lvOrd:['Trois nombres, ordre croissant','Quatre nombres, ordre décroissant','Jusqu’à 20, mélangé','Jusqu’à 100, croissant','Jusqu’à 100, mélangé'],
+ lvOrd:['Trois pingouins, croissant','Quatre pingouins, décroissant','Jusqu’à 20, croissant','Le pingouin qui manque','Jusqu’à 20, mélangé','Jusqu’à 100, croissant','Pingouin manquant jusqu’à 100','Six pingouins jusqu’à 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mélange jusqu’à 20','Mélange jusqu’à 100'],
  plus:'plus',minus:'moins',make:'font',addQ:(a,o,b)=>`Combien font ${a} ${o} ${b} ?`,addA:(a,o,b,c)=>`${a} ${o} ${b} font ${c} !`,
  addStory:(a,b,e)=>`Tu as ${a} ${e}. Il en arrive ${b}. Combien y en a-t-il ?`,subStory:(a,b)=>`Il y en a ${a}. ${b} s’en vont. Combien en reste-t-il ?`,
@@ -3740,7 +3740,7 @@ S('mw',{title:'🔢 Le monde des nombres',back:'⬅ Retour',allOn:'🔓 Tout : o
  gt:(a,b)=>`${a} est plus grand que ${b}.`,lt:(a,b)=>`${a} est plus petit que ${b}.`,eq:(a,b)=>`${a} est égal à ${b}.`,chomp:'Miam !',
  nbR:n=>`Qui habite à droite de ${n} ? Le voisin de droite, c’est un de plus.`,nbL:n=>`Qui habite à gauche de ${n} ? Le voisin de gauche, c’est un de moins.`,nbLR:n=>`Trouve les deux voisins de ${n} !`,nbB:(a,b)=>`Quel nombre habite entre ${a} et ${b} ?`,
  nbOk:s=>`${s}. Bravo, les voisins sont à leur place !`,nbNo:'Celui-là n’habite pas ici. Essaie encore !',
- ordUp:'Range les pingouins dans l’ordre croissant : du plus petit au plus grand. Fais un escalier qui monte !',ordDown:'Range les pingouins dans l’ordre décroissant : du plus grand au plus petit. Fais un toboggan !',
+ ordUp:'Range les pingouins dans l’ordre croissant !',ordDown:'Range les pingouins dans l’ordre décroissant !',ordGap:'Quel pingouin manque dans la file ?',
  ordOk:'Parfait ! L’ordre est juste !',ordNo:'Oups, l’ordre n’est pas juste ici. Essaie encore !',up:'🪜 Croissant',down:'🛝 Décroissant',
  boxQ:'Combien de pommes y a-t-il dans la boîte secrète ? Mets des pommes dans la boîte jusqu’à ce que la balance soit droite !',boxQ100:'Quel nombre est dans la boîte secrète ? Ajoute des pommes jusqu’à ce que la balance soit droite !',boxOk:(e)=>`La balance est droite ! ${e}`,heavyL:'Le côté gauche est plus lourd.',heavyR:'Le côté droit est plus lourd.'});
 S('hm',{title:'Pufi – L’école des jeux ⭐',q:'À quoi on joue aujourd’hui ?',math:'Maths',world:'Le monde',read:'Lire',time:'Le temps',shapes:'Formes',robo:'RoboPufi',chess:'Échecs',pufi:'Pufi',par:'Parents',home:'🏠 Accueil',voice:'Voix',on:'🔊 Voix : oui',off:'🔇 Voix : non',close:'✖ Fermer',hello:'À quoi on joue aujourd’hui ? Choisis une carte !'});
@@ -4114,7 +4114,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  lvAdd:['Összeadás 5-ig','Összeadás 10-ig','Kivonás 10-ig','Összeadás 20-ig','Kivonás 20-ig','Vegyes 20-ig','Kerek tízesek','100-ig'],
  lvCmp:['Hasonlítsd össze a kupacokat','A < > = jelek','Számok 20-ig','Számok 100-ig','Hasonlítsd össze a műveleteket'],
  lvNb:['A jobb oldali szomszéd','A bal oldali szomszéd','Mindkét szomszéd 20-ig','Mindkét szomszéd 100-ig','A középső szám'],
- lvOrd:['Három szám, növekvő sorrendben','Négy szám, csökkenő sorrendben','20-ig, vegyesen','100-ig, növekvő','100-ig, vegyesen'],
+ lvOrd:['Három pingvin, növekvő','Négy pingvin, csökkenő','20-ig, növekvő','A hiányzó pingvin','20-ig, vegyesen','100-ig, növekvő','Hiányzó pingvin 100-ig','Hat pingvin 100-ig'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Vegyes 20-ig','Vegyes 100-ig'],
  plus:'meg',minus:'mínusz',make:'az',addQ:(a,o,b)=>`Mennyi ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} az ${c}!`,
  addStory:(a,b,e)=>`Van ${a} (${e}). Jön még ${b}. Hány van most?`,subStory:(a,b)=>`Van ${a}. Elmegy ${b}. Hány marad?`,
@@ -4123,7 +4123,7 @@ S('mw',{title:'🔢 A számok világa',back:'⬅ Vissza',allOn:'🔓 Mind: be',a
  gt:(a,b)=>`${a} nagyobb, mint ${b}.`,lt:(a,b)=>`${a} kisebb, mint ${b}.`,eq:(a,b)=>`${a} egyenlő ezzel: ${b}.`,chomp:'Hamm!',
  nbR:n=>`Ki lakik jobbra ettől: ${n}? A jobb oldali szomszéd eggyel több.`,nbL:n=>`Ki lakik balra ettől: ${n}? A bal oldali szomszéd eggyel kevesebb.`,nbLR:n=>`Keresd meg mindkét szomszédját ennek: ${n}!`,nbB:(a,b)=>`Melyik szám lakik ${a} és ${b} között?`,
  nbOk:s=>`${s}. Ügyes, a szomszédok a helyükön vannak!`,nbNo:'Ez nem itt lakik. Próbáld újra!',
- ordUp:'Állítsd sorba a pingvineket a legkisebbtől a legnagyobbig. Építs felfelé menő lépcsőt!',ordDown:'Állítsd sorba a pingvineket a legnagyobbtól a legkisebbig. Építs csúszdát!',
+ ordUp:'Állítsd a pingvineket növekvő sorrendbe!',ordDown:'Állítsd a pingvineket csökkenő sorrendbe!',ordGap:'Melyik pingvin hiányzik a sorból?',
  ordOk:'Tökéletes! Jó a sorrend!',ordNo:'Hoppá, itt nem jó a sorrend. Próbáld újra!',up:'🪜 Növekvő',down:'🛝 Csökkenő',
  boxQ:'Hány alma van a titkos dobozban? Tegyél almát a dobozba, amíg a mérleg egyenes nem lesz!',boxQ100:'Milyen szám van a titkos dobozban? Tegyél hozzá almát, amíg a mérleg egyenes nem lesz!',boxOk:(e)=>`A mérleg egyenes! ${e}`,heavyL:'A bal oldal nehezebb.',heavyR:'A jobb oldal nehezebb.'});
 S('hm',{title:'Pufi – A játékiskola ⭐',q:'Mit játsszunk ma?',math:'Matek',world:'A világ',read:'Olvasás',time:'Az idő',shapes:'Formák',robo:'RoboPufi',chess:'Sakk',pufi:'Pufi',par:'Szülők',home:'🏠 Kezdőlap',voice:'Hang',on:'🔊 Hang: be',off:'🔇 Hang: ki',close:'✖ Bezárás',hello:'Mit játsszunk ma? Válassz egy kártyát!'});
@@ -4499,7 +4499,7 @@ S('mw',{title:'🔢 Il mondo dei numeri',back:'⬅ Indietro',allOn:'🔓 Tutti: 
  lvAdd:['Addizioni fino a 5','Addizioni fino a 10','Sottrazioni fino a 10','Addizioni fino a 20','Sottrazioni fino a 20','Misto fino a 20','Decine intere','Fino a 100'],
  lvCmp:['Confronta i mucchi','I segni < > =','Numeri fino a 20','Numeri fino a 100','Confronta le somme'],
  lvNb:['Il vicino di destra','Il vicino di sinistra','I due vicini fino a 20','I due vicini fino a 100','Il numero in mezzo'],
- lvOrd:['Tre numeri, in ordine crescente','Quattro numeri, in ordine decrescente','Fino a 20, misto','Fino a 100, crescente','Fino a 100, misto'],
+ lvOrd:['Tre pinguini, crescente','Quattro pinguini, decrescente','Fino a 20, crescente','Il pinguino che manca','Fino a 20, misto','Fino a 100, crescente','Pinguino mancante fino a 100','Sei pinguini fino a 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Misto fino a 20','Misto fino a 100'],
  plus:'più',minus:'meno',make:'fa',addQ:(a,o,b)=>`Quanto fa ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} fa ${c}!`,
  addStory:(a,b,e)=>`Hai ${a} ${e}. Ne arrivano altri ${b}. Quanti sono adesso?`,subStory:(a,b)=>`Ce ne sono ${a}. ${b} se ne vanno. Quanti ne restano?`,
@@ -4508,7 +4508,7 @@ S('mw',{title:'🔢 Il mondo dei numeri',back:'⬅ Indietro',allOn:'🔓 Tutti: 
  gt:(a,b)=>`${a} è maggiore di ${b}.`,lt:(a,b)=>`${a} è minore di ${b}.`,eq:(a,b)=>`${a} è uguale a ${b}.`,chomp:'Gnam!',
  nbR:n=>`Chi abita a destra del ${n}? Il vicino di destra è uno in più.`,nbL:n=>`Chi abita a sinistra del ${n}? Il vicino di sinistra è uno in meno.`,nbLR:n=>`Trova i due vicini del ${n}!`,nbB:(a,b)=>`Quale numero abita tra ${a} e ${b}?`,
  nbOk:s=>`${s}. Bravo, i vicini sono al loro posto!`,nbNo:'Quello non abita qui. Riprova!',
- ordUp:'Metti i pinguini in ordine crescente: dal più piccolo al più grande. Fai una scala che sale!',ordDown:'Metti i pinguini in ordine decrescente: dal più grande al più piccolo. Fai uno scivolo!',
+ ordUp:'Metti i pinguini in ordine crescente!',ordDown:'Metti i pinguini in ordine decrescente!',ordGap:'Quale pinguino manca nella fila?',
  ordOk:'Perfetto! L’ordine è giusto!',ordNo:'Ops, qui l’ordine non è giusto. Riprova!',up:'🪜 Crescente',down:'🛝 Decrescente',
  boxQ:'Quante mele ci sono nella scatola segreta? Metti mele nella scatola finché la bilancia è dritta!',boxQ100:'Che numero c’è nella scatola segreta? Aggiungi mele finché la bilancia è dritta!',boxOk:(e)=>`La bilancia è dritta! ${e}`,heavyL:'Il lato sinistro è più pesante.',heavyR:'Il lato destro è più pesante.'});
 S('hm',{title:'Pufi – La scuola dei giochi ⭐',q:'A che cosa giochiamo oggi?',math:'Matematica',world:'Il mondo',read:'Leggere',time:'Il tempo',shapes:'Forme',robo:'RoboPufi',chess:'Scacchi',pufi:'Pufi',par:'Genitori',home:'🏠 Home',voice:'Voce',on:'🔊 Voce: sì',off:'🔇 Voce: no',close:'✖ Chiudi',hello:'A che cosa giochiamo oggi? Scegli una carta!'});
@@ -4882,7 +4882,7 @@ S('mw',{title:'🔢 De getallenwereld',back:'⬅ Terug',allOn:'🔓 Alles: aan',
  lvAdd:['Plussommen tot 5','Plussommen tot 10','Minsommen tot 10','Plussommen tot 20','Minsommen tot 20','Gemengd tot 20','Hele tientallen','Tot 100'],
  lvCmp:['Vergelijk de stapels','De tekens < > =','Getallen tot 20','Getallen tot 100','Vergelijk de sommen'],
  lvNb:['De rechterbuur','De linkerbuur','Beide buren tot 20','Beide buren tot 100','Het getal in het midden'],
- lvOrd:['Drie getallen, van klein naar groot','Vier getallen, van groot naar klein','Tot 20, gemengd','Tot 100, van klein naar groot','Tot 100, gemengd'],
+ lvOrd:['Drie pinguïns, van klein naar groot','Vier pinguïns, van groot naar klein','Tot 20, van klein naar groot','De ontbrekende pinguïn','Tot 20, gemengd','Tot 100, van klein naar groot','Ontbrekende pinguïn tot 100','Zes pinguïns tot 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Gemengd tot 20','Gemengd tot 100'],
  plus:'plus',minus:'min',make:'is',addQ:(a,o,b)=>`Hoeveel is ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} is ${c}!`,
  addStory:(a,b,e)=>`Je hebt ${a} ${e}. Er komen er ${b} bij. Hoeveel zijn het er nu?`,subStory:(a,b)=>`Er zijn er ${a}. Er gaan er ${b} weg. Hoeveel blijven er over?`,
@@ -4891,7 +4891,7 @@ S('mw',{title:'🔢 De getallenwereld',back:'⬅ Terug',allOn:'🔓 Alles: aan',
  gt:(a,b)=>`${a} is groter dan ${b}.`,lt:(a,b)=>`${a} is kleiner dan ${b}.`,eq:(a,b)=>`${a} is gelijk aan ${b}.`,chomp:'Hap!',
  nbR:n=>`Wie woont er rechts van ${n}? De rechterbuur is één meer.`,nbL:n=>`Wie woont er links van ${n}? De linkerbuur is één minder.`,nbLR:n=>`Zoek beide buren van ${n}!`,nbB:(a,b)=>`Welk getal woont er tussen ${a} en ${b}?`,
  nbOk:s=>`${s}. Goed zo, de buren staan op hun plek!`,nbNo:'Die woont hier niet. Probeer het nog eens!',
- ordUp:'Zet de pinguïns van klein naar groot. Maak een trap omhoog!',ordDown:'Zet de pinguïns van groot naar klein. Maak een glijbaan!',
+ ordUp:'Zet de pinguïns op volgorde, van klein naar groot!',ordDown:'Zet de pinguïns op volgorde, van groot naar klein!',ordGap:'Welke pinguïn ontbreekt in de rij?',
  ordOk:'Perfect! De volgorde klopt!',ordNo:'Oei, hier klopt de volgorde niet. Probeer het nog eens!',up:'🪜 Van klein naar groot',down:'🛝 Van groot naar klein',
  boxQ:'Hoeveel appels zitten er in de geheime doos? Leg appels in de doos tot de weegschaal recht hangt!',boxQ100:'Welk getal zit er in de geheime doos? Leg appels erbij tot de weegschaal recht hangt!',boxOk:(e)=>`De weegschaal hangt recht! ${e}`,heavyL:'De linkerkant is zwaarder.',heavyR:'De rechterkant is zwaarder.'});
 S('hm',{title:'Pufi – De spelletjesschool ⭐',q:'Wat gaan we vandaag spelen?',math:'Rekenen',world:'De wereld',read:'Lezen',time:'De tijd',shapes:'Vormen',robo:'RoboPufi',chess:'Schaken',pufi:'Pufi',par:'Ouders',home:'🏠 Start',voice:'Stem',on:'🔊 Stem: aan',off:'🔇 Stem: uit',close:'✖ Sluiten',hello:'Wat gaan we vandaag spelen? Kies een kaart!'});
@@ -5268,7 +5268,7 @@ S('mw',{title:'🔢 Świat liczb',back:'⬅ Wstecz',allOn:'🔓 Wszystkie: wł.'
  lvAdd:['Dodawanie do 5','Dodawanie do 10','Odejmowanie do 10','Dodawanie do 20','Odejmowanie do 20','Mieszane do 20','Pełne dziesiątki','Do 100'],
  lvCmp:['Porównaj kupki','Znaki < > =','Liczby do 20','Liczby do 100','Porównaj działania'],
  lvNb:['Sąsiad z prawej','Sąsiad z lewej','Obaj sąsiedzi do 20','Obaj sąsiedzi do 100','Liczba w środku'],
- lvOrd:['Trzy liczby, od najmniejszej','Cztery liczby, od największej','Do 20, mieszane','Do 100, od najmniejszej','Do 100, mieszane'],
+ lvOrd:['Trzy pingwiny, rosnąco','Cztery pingwiny, malejąco','Do 20, rosnąco','Brakujący pingwin','Do 20, mieszane','Do 100, rosnąco','Brakujący pingwin do 100','Sześć pingwinów do 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mieszane do 20','Mieszane do 100'],
  plus:'dodać',minus:'odjąć',make:'to',addQ:(a,o,b)=>`Ile to jest ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} to ${c}!`,
  addStory:(a,b,e)=>`Masz ${a} (${e}). Przychodzi jeszcze ${b}. Ile jest teraz?`,subStory:(a,b)=>`Jest ${a}. ${b} ${P(b,'odchodzi','odchodzą','odchodzi')}. Ile zostało?`,
@@ -5277,7 +5277,7 @@ S('mw',{title:'🔢 Świat liczb',back:'⬅ Wstecz',allOn:'🔓 Wszystkie: wł.'
  gt:(a,b)=>`${a} jest większe od ${b}.`,lt:(a,b)=>`${a} jest mniejsze od ${b}.`,eq:(a,b)=>`${a} jest równe ${b}.`,chomp:'Mniam!',
  nbR:n=>`Kto mieszka na prawo od ${n}? Sąsiad z prawej to o jeden więcej.`,nbL:n=>`Kto mieszka na lewo od ${n}? Sąsiad z lewej to o jeden mniej.`,nbLR:n=>`Znajdź obu sąsiadów liczby ${n}!`,nbB:(a,b)=>`Jaka liczba mieszka między ${a} a ${b}?`,
  nbOk:s=>`${s}. Brawo, sąsiedzi są na swoich miejscach!`,nbNo:'Ta liczba tu nie mieszka. Spróbuj jeszcze raz!',
- ordUp:'Ustaw pingwiny od najmniejszego do największego. Zrób schody w górę!',ordDown:'Ustaw pingwiny od największego do najmniejszego. Zrób zjeżdżalnię!',
+ ordUp:'Ustaw pingwiny rosnąco!',ordDown:'Ustaw pingwiny malejąco!',ordGap:'Którego pingwina brakuje w rzędzie?',
  ordOk:'Doskonale! Kolejność jest dobra!',ordNo:'Ups, tu kolejność się nie zgadza. Spróbuj jeszcze raz!',up:'🪜 Rosnąco',down:'🛝 Malejąco',
  boxQ:'Ile jabłek jest w tajemniczym pudełku? Wkładaj jabłka do pudełka, aż waga będzie prosta!',boxQ100:'Jaka liczba jest w tajemniczym pudełku? Dokładaj jabłka, aż waga będzie prosta!',boxOk:(e)=>`Waga jest prosta! ${e}`,heavyL:'Lewa strona jest cięższa.',heavyR:'Prawa strona jest cięższa.'});
 S('hm',{title:'Pufi – Szkoła zabaw ⭐',q:'W co się dziś bawimy?',math:'Matematyka',world:'Świat',read:'Czytanie',time:'Czas',shapes:'Kształty',robo:'RoboPufi',chess:'Szachy',pufi:'Pufi',par:'Rodzice',home:'🏠 Start',voice:'Głos',on:'🔊 Głos: wł.',off:'🔇 Głos: wył.',close:'✖ Zamknij',hello:'W co się dziś bawimy? Wybierz kartę!'});
@@ -5655,7 +5655,7 @@ S('mw',{title:'🔢 O mundo dos números',back:'⬅ Voltar',allOn:'🔓 Todos: s
  lvAdd:['Somas até 5','Somas até 10','Subtrações até 10','Somas até 20','Subtrações até 20','Misturado até 20','Dezenas inteiras','Até 100'],
  lvCmp:['Compare os montes','Os sinais < > =','Números até 20','Números até 100','Compare as somas'],
  lvNb:['O vizinho da direita','O vizinho da esquerda','Os dois vizinhos até 20','Os dois vizinhos até 100','O número do meio'],
- lvOrd:['Três números, do menor para o maior','Quatro números, do maior para o menor','Até 20, misturado','Até 100, do menor para o maior','Até 100, misturado'],
+ lvOrd:['Três pinguins, do menor para o maior','Quatro pinguins, do maior para o menor','Até 20, do menor para o maior','O pinguim que falta','Até 20, misturado','Até 100, do menor para o maior','Falta um pinguim até 100','Seis pinguins até 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Misturado até 20','Misturado até 100'],
  plus:'mais',minus:'menos',make:'dá',addQ:(a,o,b)=>`Quanto é ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} dá ${c}!`,
  addStory:(a,b,e)=>`Você tem ${a} ${e}. Chegam mais ${b}. Quantos são agora?`,subStory:(a,b)=>`Tem ${a}. ${b} vão embora. Quantos sobram?`,
@@ -5664,7 +5664,7 @@ S('mw',{title:'🔢 O mundo dos números',back:'⬅ Voltar',allOn:'🔓 Todos: s
  gt:(a,b)=>`${a} é maior que ${b}.`,lt:(a,b)=>`${a} é menor que ${b}.`,eq:(a,b)=>`${a} é igual a ${b}.`,chomp:'Nhac!',
  nbR:n=>`Quem mora à direita do ${n}? O vizinho da direita é um a mais.`,nbL:n=>`Quem mora à esquerda do ${n}? O vizinho da esquerda é um a menos.`,nbLR:n=>`Ache os dois vizinhos do ${n}!`,nbB:(a,b)=>`Que número mora entre ${a} e ${b}?`,
  nbOk:s=>`${s}. Muito bem, os vizinhos estão no lugar!`,nbNo:'Esse não mora aqui. Tente de novo!',
- ordUp:'Coloque os pinguins do menor para o maior. Faça uma escada que sobe!',ordDown:'Coloque os pinguins do maior para o menor. Faça um escorregador!',
+ ordUp:'Coloque os pinguins em ordem crescente!',ordDown:'Coloque os pinguins em ordem decrescente!',ordGap:'Qual pinguim está faltando na fila?',
  ordOk:'Perfeito! A ordem está certa!',ordNo:'Opa, aqui a ordem não está certa. Tente de novo!',up:'🪜 Do menor ao maior',down:'🛝 Do maior ao menor',
  boxQ:'Quantas maçãs tem na caixa secreta? Coloque maçãs na caixa até a balança ficar reta!',boxQ100:'Que número está na caixa secreta? Coloque maçãs até a balança ficar reta!',boxOk:(e)=>`A balança está reta! ${e}`,heavyL:'O lado esquerdo está mais pesado.',heavyR:'O lado direito está mais pesado.'});
 S('hm',{title:'Pufi – A escola dos jogos ⭐',q:'Do que vamos brincar hoje?',math:'Matemática',world:'O mundo',read:'Ler',time:'O tempo',shapes:'Formas',robo:'RoboPufi',chess:'Xadrez',pufi:'Pufi',par:'Pais',home:'🏠 Início',voice:'Voz',on:'🔊 Voz: sim',off:'🔇 Voz: não',close:'✖ Fechar',hello:'Do que vamos brincar hoje? Escolha uma carta!'});
@@ -6041,7 +6041,7 @@ S('mw',{title:'🔢 Мир чисел',back:'⬅ Назад',allOn:'🔓 Все:
  lvAdd:['Сложение до 5','Сложение до 10','Вычитание до 10','Сложение до 20','Вычитание до 20','Вперемешку до 20','Круглые десятки','До 100'],
  lvCmp:['Сравни кучки','Знаки < > =','Числа до 20','Числа до 100','Сравни примеры'],
  lvNb:['Сосед справа','Сосед слева','Оба соседа до 20','Оба соседа до 100','Число посередине'],
- lvOrd:['Три числа, от меньшего','Четыре числа, от большего','До 20, вперемешку','До 100, от меньшего','До 100, вперемешку'],
+ lvOrd:['Три пингвина, по возрастанию','Четыре пингвина, по убыванию','До 20, по возрастанию','Пропавший пингвин','До 20, вперемешку','До 100, по возрастанию','Пропавший пингвин до 100','Шесть пингвинов до 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Вперемешку до 20','Вперемешку до 100'],
  plus:'плюс',minus:'минус',make:'равно',addQ:(a,o,b)=>`Сколько будет ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} — это ${c}!`,
  addStory:(a,b,e)=>`У тебя ${a} (${e}). Приходит ещё ${b}. Сколько теперь?`,subStory:(a,b)=>`Было ${a}. Ушло ${b}. Сколько осталось?`,
@@ -6050,7 +6050,7 @@ S('mw',{title:'🔢 Мир чисел',back:'⬅ Назад',allOn:'🔓 Все:
  gt:(a,b)=>`${a} больше, чем ${b}.`,lt:(a,b)=>`${a} меньше, чем ${b}.`,eq:(a,b)=>`${a} равно ${b}.`,chomp:'Ам!',
  nbR:n=>`Кто живёт справа от числа ${n}? Сосед справа на один больше.`,nbL:n=>`Кто живёт слева от числа ${n}? Сосед слева на один меньше.`,nbLR:n=>`Найди обоих соседей числа ${n}!`,nbB:(a,b)=>`Какое число живёт между ${a} и ${b}?`,
  nbOk:s=>`${s}. Молодец, соседи на своих местах!`,nbNo:'Это число здесь не живёт. Попробуй ещё раз!',
- ordUp:'Поставь пингвинов от самого маленького до самого большого. Сделай лесенку вверх!',ordDown:'Поставь пингвинов от самого большого до самого маленького. Сделай горку!',
+ ordUp:'Поставь пингвинов по возрастанию!',ordDown:'Поставь пингвинов по убыванию!',ordGap:'Какого пингвина не хватает в ряду?',
  ordOk:'Отлично! Порядок правильный!',ordNo:'Ой, здесь порядок неправильный. Попробуй ещё раз!',up:'🪜 По возрастанию',down:'🛝 По убыванию',
  boxQ:'Сколько яблок в тайной коробке? Клади яблоки в коробку, пока весы не встанут ровно!',boxQ100:'Какое число в тайной коробке? Добавляй яблоки, пока весы не встанут ровно!',boxOk:(e)=>`Весы стоят ровно! ${e}`,heavyL:'Левая сторона тяжелее.',heavyR:'Правая сторона тяжелее.'});
 S('hm',{title:'Пуфи – Школа игр ⭐',q:'Во что играем сегодня?',math:'Математика',world:'Мир',read:'Чтение',time:'Время',shapes:'Фигуры',robo:'РобоПуфи',chess:'Шахматы',pufi:'Пуфи',par:'Родители',home:'🏠 Главная',voice:'Голос',on:'🔊 Голос: вкл.',off:'🔇 Голос: выкл.',close:'✖ Закрыть',hello:'Во что играем сегодня? Выбери карточку!'});
@@ -6430,7 +6430,7 @@ S('mw',{title:'🔢 Світ чисел',back:'⬅ Назад',allOn:'🔓 Ус�
  lvAdd:['Додавання до 5','Додавання до 10','Віднімання до 10','Додавання до 20','Віднімання до 20','Змішано до 20','Круглі десятки','До 100'],
  lvCmp:['Порівняй купки','Знаки < > =','Числа до 20','Числа до 100','Порівняй приклади'],
  lvNb:['Сусід праворуч','Сусід ліворуч','Обидва сусіди до 20','Обидва сусіди до 100','Число посередині'],
- lvOrd:['Три числа, від найменшого','Чотири числа, від найбільшого','До 20, змішано','До 100, від найменшого','До 100, змішано'],
+ lvOrd:['Три пінгвіни, за зростанням','Чотири пінгвіни, за спаданням','До 20, за зростанням','Пінгвін, якого бракує','До 20, змішано','До 100, за зростанням','Пінгвін, якого бракує, до 100','Шість пінгвінів до 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Змішано до 20','Змішано до 100'],
  plus:'плюс',minus:'мінус',make:'дорівнює',addQ:(a,o,b)=>`Скільки буде ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} — це ${c}!`,
  addStory:(a,b,e)=>`У тебе ${a} (${e}). Приходить ще ${b}. Скільки тепер?`,subStory:(a,b)=>`Було ${a}. Пішло ${b}. Скільки залишилося?`,
@@ -6439,7 +6439,7 @@ S('mw',{title:'🔢 Світ чисел',back:'⬅ Назад',allOn:'🔓 Ус�
  gt:(a,b)=>`${a} більше, ніж ${b}.`,lt:(a,b)=>`${a} менше, ніж ${b}.`,eq:(a,b)=>`${a} дорівнює ${b}.`,chomp:'Ам!',
  nbR:n=>`Хто живе праворуч від числа ${n}? Сусід праворуч на один більший.`,nbL:n=>`Хто живе ліворуч від числа ${n}? Сусід ліворуч на один менший.`,nbLR:n=>`Знайди обох сусідів числа ${n}!`,nbB:(a,b)=>`Яке число живе між ${a} і ${b}?`,
  nbOk:s=>`${s}. Молодець, сусіди на своїх місцях!`,nbNo:'Це число тут не живе. Спробуй ще раз!',
- ordUp:'Постав пінгвінів від найменшого до найбільшого. Зроби сходинки вгору!',ordDown:'Постав пінгвінів від найбільшого до найменшого. Зроби гірку!',
+ ordUp:'Постав пінгвінів за зростанням!',ordDown:'Постав пінгвінів за спаданням!',ordGap:'Якого пінгвіна бракує в ряду?',
  ordOk:'Чудово! Порядок правильний!',ordNo:'Ой, тут порядок неправильний. Спробуй ще раз!',up:'🪜 За зростанням',down:'🛝 За спаданням',
  boxQ:'Скільки яблук у таємній скриньці? Клади яблука в скриньку, доки терези не стануть рівно!',boxQ100:'Яке число в таємній скриньці? Додавай яблука, доки терези не стануть рівно!',boxOk:(e)=>`Терези стоять рівно! ${e}`,heavyL:'Ліва сторона важча.',heavyR:'Права сторона важча.'});
 S('hm',{title:'Пуфі – Школа ігор ⭐',q:'У що граємо сьогодні?',math:'Математика',world:'Світ',read:'Читання',time:'Час',shapes:'Фігури',robo:'РобоПуфі',chess:'Шахи',pufi:'Пуфі',par:'Батьки',home:'🏠 Головна',voice:'Голос',on:'🔊 Голос: увімк.',off:'🔇 Голос: вимк.',close:'✖ Закрити',hello:'У що граємо сьогодні? Вибери картку!'});
@@ -8991,6 +8991,14 @@ window.RDAQ={open,close,add,pool,force,newCount,iconSVG,hungryCount,T:()=>T(),SP
 #mw-root[hidden]{display:none}
 #mw-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto;position:relative}
 .mw-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(44%,190px),1fr));gap:14px;align-content:start;padding:4px}
+.mw-wad .mw-pb{animation:mwWad 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwWad{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.mw-hop .mw-pb{animation:mwHop .45s ease-out;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwHop{0%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-34px) scale(.95,1.06)}70%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
+.mw-shake .mw-pb{animation:mwShk .35s linear 3}
+@keyframes mwShk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.mw-dive .mw-pb{animation:mwDive .9s ease-in forwards;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwDive{0%{transform:none}35%{transform:translateY(-40px) rotate(-12deg)}100%{transform:translateY(60px) rotate(30deg);opacity:0}}
 .mw-stage{flex:1;min-height:0;width:100%;display:flex;justify-content:center;position:relative}
 .mw-stage>svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
 .mw-ans{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -9033,7 +9041,7 @@ ro:{title:'🔢 Lumea numerelor',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOf
  lvAdd:['Adunări până la 5','Adunări până la 10','Scăderi până la 10','Adunări până la 20','Scăderi până la 20','Amestec până la 20','Zeci întregi','Până la 100'],
  lvCmp:['Grămezi de obiecte','Semnele < > =','Numere până la 20','Numere până la 100','Compară sume'],
  lvNb:['Vecinul din dreapta','Vecinul din stânga','Ambii vecini până la 20','Ambii vecini până la 100','Numărul din mijloc'],
- lvOrd:['Trei numere, crescător','Patru numere, descrescător','Până la 20, amestecat','Până la 100, crescător','Până la 100, amestecat'],
+ lvOrd:['Trei pinguini, crescător','Patru pinguini, descrescător','Până la 20, crescător','Pinguinul care lipsește','Până la 20, amestecat','Până la 100, crescător','Pinguinul lipsă, până la 100','Șase pinguini, până la 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Amestec până la 20','Amestec până la 100'],
  plus:'plus',minus:'minus',make:'fac',addQ:(a,o,b)=>`${a} ${o} ${b} cât fac?`,addA:(a,o,b,c)=>`${a} ${o} ${b} fac ${c}!`,
  addStory:(a,b,e)=>`Ai ${a} ${e}. Mai vin ${b}. Câte sunt?`,subStory:(a,b)=>`Sunt ${a}. ${b} pleacă. Câte rămân?`,
@@ -9042,7 +9050,7 @@ ro:{title:'🔢 Lumea numerelor',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOf
  gt:(a,b)=>`${a} este mai mare decât ${b}.`,lt:(a,b)=>`${a} este mai mic decât ${b}.`,eq:(a,b)=>`${a} este egal cu ${b}.`,chomp:'Ham!',
  nbR:n=>`Cine stă în dreapta lui ${n}? Vecinul din dreapta e cu unu mai mare.`,nbL:n=>`Cine stă în stânga lui ${n}? Vecinul din stânga e cu unu mai mic.`,nbLR:n=>`Găsește ambii vecini ai lui ${n}!`,nbB:(a,b)=>`Ce număr stă între ${a} și ${b}?`,
  nbOk:s=>`${s}. Bravo, vecinii sunt la locul lor!`,nbNo:'Nu stă acolo. Mai încearcă!',
- ordUp:'Pune pinguinii în ordine crescătoare: de la cel mai mic la cel mai mare. Fă o scară care urcă!',ordDown:'Pune pinguinii în ordine descrescătoare: de la cel mai mare la cel mai mic. Fă un tobogan!',
+ ordUp:'Pune pinguinii în ordine crescătoare!',ordDown:'Pune pinguinii în ordine descrescătoare!',ordGap:'Ce pinguin lipsește din rând?',
  ordOk:'Perfect! Ordinea e corectă!',ordNo:'Hopa, aici ordinea nu e bună. Mai încearcă!',up:'🪜 Crescător',down:'🛝 Descrescător',
  boxQ:'Câte mere sunt în cutia cu secret? Pune mere în cutie până când balanța stă dreaptă!',boxQ100:'Ce număr e în cutia cu secret? Pune mere până când balanța stă dreaptă!',boxOk:(e)=>`Balanța stă dreaptă! ${e}`,heavyL:'Partea stângă e mai grea.',heavyR:'Partea dreaptă e mai grea.'},
 de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',hint:'💡 Hilfe',lvl:n=>`Level ${n}`,
@@ -9051,7 +9059,7 @@ de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff
  lvAdd:['Plus bis 5','Plus bis 10','Minus bis 10','Plus bis 20','Minus bis 20','Gemischt bis 20','Ganze Zehner','Bis 100'],
  lvCmp:['Haufen vergleichen','Die Zeichen < > =','Zahlen bis 20','Zahlen bis 100','Summen vergleichen'],
  lvNb:['Der rechte Nachbar','Der linke Nachbar','Beide Nachbarn bis 20','Beide Nachbarn bis 100','Die Zahl in der Mitte'],
- lvOrd:['Drei Zahlen, aufsteigend','Vier Zahlen, absteigend','Bis 20, gemischt','Bis 100, aufsteigend','Bis 100, gemischt'],
+ lvOrd:['Drei Pinguine, aufsteigend','Vier Pinguine, absteigend','Bis 20, aufsteigend','Der fehlende Pinguin','Bis 20, gemischt','Bis 100, aufsteigend','Fehlender Pinguin bis 100','Sechs Pinguine bis 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Gemischt bis 20','Gemischt bis 100'],
  plus:'plus',minus:'minus',make:'ist',addQ:(a,o,b)=>`Wie viel ist ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} ist ${c}!`,
  addStory:(a,b,e)=>`Du hast ${a} ${e}. Es kommen ${b} dazu. Wie viele sind es?`,subStory:(a,b)=>`Es sind ${a}. ${b} gehen weg. Wie viele bleiben?`,
@@ -9060,7 +9068,7 @@ de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff
  gt:(a,b)=>`${a} ist größer als ${b}.`,lt:(a,b)=>`${a} ist kleiner als ${b}.`,eq:(a,b)=>`${a} ist gleich ${b}.`,chomp:'Happs!',
  nbR:n=>`Wer wohnt rechts von ${n}? Der rechte Nachbar ist um eins größer.`,nbL:n=>`Wer wohnt links von ${n}? Der linke Nachbar ist um eins kleiner.`,nbLR:n=>`Finde beide Nachbarn von ${n}!`,nbB:(a,b)=>`Welche Zahl wohnt zwischen ${a} und ${b}?`,
  nbOk:s=>`${s}. Super, die Nachbarn sind an ihrem Platz!`,nbNo:'Die wohnt nicht da. Versuch es nochmal!',
- ordUp:'Stell die Pinguine aufsteigend auf: vom kleinsten zum größten. Bau eine Treppe nach oben!',ordDown:'Stell die Pinguine absteigend auf: vom größten zum kleinsten. Bau eine Rutsche!',
+ ordUp:'Stell die Pinguine aufsteigend auf!',ordDown:'Stell die Pinguine absteigend auf!',ordGap:'Welcher Pinguin fehlt in der Reihe?',
  ordOk:'Perfekt! Die Reihenfolge stimmt!',ordNo:'Hoppla, hier stimmt die Reihenfolge nicht. Versuch es nochmal!',up:'🪜 Aufsteigend',down:'🛝 Absteigend',
  boxQ:'Wie viele Äpfel sind in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxQ100:'Welche Zahl steckt in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxOk:(e)=>`Die Waage ist gerade! ${e}`,heavyL:'Die linke Seite ist schwerer.',heavyR:'Die rechte Seite ist schwerer.'},
 en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',hint:'💡 Help',lvl:n=>`Level ${n}`,
@@ -9069,7 +9077,7 @@ en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'�
  lvAdd:['Adding to 5','Adding to 10','Taking away to 10','Adding to 20','Taking away to 20','Mixed to 20','Whole tens','Up to 100'],
  lvCmp:['Compare piles','The signs < > =','Numbers to 20','Numbers to 100','Compare sums'],
  lvNb:['The right neighbour','The left neighbour','Both neighbours to 20','Both neighbours to 100','The number in the middle'],
- lvOrd:['Three numbers, ascending','Four numbers, descending','To 20, mixed','To 100, ascending','To 100, mixed'],
+ lvOrd:['Three penguins, going up','Four penguins, going down','To 20, going up','The missing penguin','To 20, mixed','To 100, going up','Missing penguin to 100','Six penguins to 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mixed to 20','Mixed to 100'],
  plus:'plus',minus:'minus',make:'makes',addQ:(a,o,b)=>`What is ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} makes ${c}!`,
  addStory:(a,b,e)=>`You have ${a} ${e}. ${b} more come. How many now?`,subStory:(a,b)=>`There are ${a}. ${b} go away. How many are left?`,
@@ -9078,7 +9086,7 @@ en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'�
  gt:(a,b)=>`${a} is greater than ${b}.`,lt:(a,b)=>`${a} is less than ${b}.`,eq:(a,b)=>`${a} is equal to ${b}.`,chomp:'Chomp!',
  nbR:n=>`Who lives to the right of ${n}? The right neighbour is one more.`,nbL:n=>`Who lives to the left of ${n}? The left neighbour is one less.`,nbLR:n=>`Find both neighbours of ${n}!`,nbB:(a,b)=>`Which number lives between ${a} and ${b}?`,
  nbOk:s=>`${s}. Well done, the neighbours are in place!`,nbNo:'That one doesn’t live there. Try again!',
- ordUp:'Put the penguins in ascending order: from smallest to biggest. Make stairs that go up!',ordDown:'Put the penguins in descending order: from biggest to smallest. Make a slide!',
+ ordUp:'Put the penguins in order, smallest number first!',ordDown:'Put the penguins in order, biggest number first!',ordGap:'Which penguin is missing from the line?',
  ordOk:'Perfect! The order is right!',ordNo:'Oops, the order is not right here. Try again!',up:'🪜 Ascending',down:'🛝 Descending',
  boxQ:'How many apples are in the secret box? Put apples in the box until the scale is level!',boxQ100:'What number is in the secret box? Put apples in until the scale is level!',boxOk:(e)=>`The scale is level! ${e}`,heavyL:'The left side is heavier.',heavyR:'The right side is heavier.'}};
 const X=()=>TR('mw',TX);
@@ -9215,27 +9223,62 @@ function gNb(li){ const L=NBL[li]; let ti=0, errs=0, busy=false, n=0, slots=[], 
   show(); }
 
 /* ================= 4. PINGUINII ÎN ORDINE ================= */
-const ORDL=[{n:3,max:10,d:'up'},{n:4,max:10,d:'down'},{n:4,max:20,d:'mix'},{n:5,max:100,d:'up'},{n:5,max:100,d:'mix'}];
-function gOrd(li){ const L=ORDL[li]; let ti=0, errs=0, busy=false, nums=[], placed=[], dir='up'; const F=frame('',PER); const myGen=gen;
-  function show(){ const s=new Set(); while(s.size<L.n) s.add(RR(L.max>20?5:1,L.max)); nums=shuf([...s]); placed=[]; dir=L.d==='mix'?(R(2)?'up':'down'):L.d;
-    const q=dir==='up'?X().ordUp:X().ordDown; F.set((dir==='up'?'🪜 ':'🛝 ')+q); sp(q); draw(); F.ctrl.innerHTML=''; F.ctrl.append(btn('↺','',()=>{ if(busy) return; placed=[]; draw(); })); }
-  function draw(bad){ const N=nums.length, mx=Math.max(...nums), mn=Math.min(...nums); let s=`<svg viewBox="0 0 900 420"><rect width="900" height="420" rx="22" fill="#EAF6FF"/><rect y="380" width="900" height="40" fill="#fff"/>`;
-    const H=v=>56+(v-mn)/Math.max(1,mx-mn)*70;
-    /* sloturile (scară sau tobogan) */ const sw=Math.min(150,760/N), sx=450-N*sw/2;
-    for(let i=0;i<N;i++){ const h=dir==='up'?40+i*22:40+(N-1-i)*22; s+=`<rect x="${sx+i*sw+4}" y="${210-h}" width="${sw-8}" height="${h}" rx="6" fill="${bad===i?'#FFB3C0':'#C9D3E0'}" stroke="#9AA5B8" stroke-width="2"/>`;
-      const v=placed[i]; if(v!=null){ const ph=H(v); s+=`<g class="mw-pl" data-i="${i}" style="cursor:pointer"><text x="${sx+i*sw+sw/2}" y="${210-h}" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${sx+i*sw+sw/2}" cy="${210-h-ph*.33}" r="17" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${sx+i*sw+sw/2}" y="${210-h-ph*.33+7}" font-size="18" font-weight="800" text-anchor="middle">${v}</text></g>`; } }
-    s+=`<text x="${dir==='up'?sx-30:sx+N*sw+30}" y="${dir==='up'?200:200}" font-size="34" text-anchor="middle">${dir==='up'?'⬆':'🛝'}</text>`;
-    /* pinguinii de așezat */ const rest=nums.filter(v=>!placed.includes(v)); const rw=Math.min(160,800/Math.max(1,rest.length)), rx=450-rest.length*rw/2;
-    rest.forEach((v,i)=>{ const ph=H(v)+10; s+=`<g class="mw-pg" data-v="${v}" style="cursor:pointer"><text x="${rx+i*rw+rw/2}" y="378" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${rx+i*rw+rw/2}" cy="${378-ph*.33}" r="20" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${rx+i*rw+rw/2}" y="${378-ph*.33+8}" font-size="21" font-weight="800" text-anchor="middle">${v}</text></g>`; });
-    F.stage.innerHTML=s+'</svg>'; const svg=F.stage.firstChild;
-    svg.querySelectorAll('.mw-pg').forEach(g=>g.onclick=()=>{ if(busy) return; placed.push(+g.dataset.v); pop(placed.length); draw(); if(placed.length===nums.length) check(); });
-    svg.querySelectorAll('.mw-pl').forEach(g=>g.onclick=()=>{ if(busy) return; placed=placed.slice(0,+g.dataset.i); snd(300,.06); draw(); }); }
-  async function check(){ const ok=placed.every((v,i)=>i===0||(dir==='up'?v>placed[i-1]:v<placed[i-1]));
-    if(!ok){ errs++; boing(); const bad=placed.findIndex((v,i)=>i>0&&(dir==='up'?v<placed[i-1]:v>placed[i-1])); draw(bad); sp(X().ordNo); busy=true; await wait(1400); if(myGen!==gen) return; placed=placed.slice(0,bad); busy=false; draw(); return; }
-    busy=true; const svg=F.stage.firstChild; const N=nums.length, sw=Math.min(150,760/N), sx=450-N*sw/2;
-    svg.insertAdjacentHTML('beforeend',`<text id="mw-run" x="${dir==='up'?sx:sx+N*sw}" y="150" font-size="40" text-anchor="middle">${dir==='up'?'🧗':'⚽'}</text>`); const r=svg.querySelector('#mw-run');
-    for(let i=0;i<N;i++){ const idx=dir==='up'?i:N-1-i, h=dir==='up'?40+idx*22:40+(N-1-idx)*22; r.setAttribute('x',sx+idx*sw+sw/2); r.setAttribute('y',210-h-80); pop(i+1); await wait(260); if(myGen!==gen) return; }
-    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} const m=X().ordOk+' '+placed.join(', '); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+/* toți pinguinii au aceeași mărime: copilul trebuie să citească numerele de pe burtică */
+const ORDL=[{n:3,max:10,d:'up'},{n:4,max:10,d:'down'},{n:5,max:20,d:'up'},{n:5,max:20,gap:1},{n:4,max:20,d:'mix'},{n:5,max:100,d:'up',tw:1},{n:5,max:100,gap:1,tw:1},{n:6,max:100,d:'mix',tw:1}];
+function peng(x,y,v,cls,extra,dl){ return `<g class="${cls||''}" transform="translate(${x} ${y})" ${extra||''} style="cursor:pointer"><g class="mw-pb"${dl?` style="animation-delay:${dl}s"`:''}>
+  <ellipse cx="-12" cy="-2" rx="11" ry="5" fill="#FF9F1C"/><ellipse cx="12" cy="-2" rx="11" ry="5" fill="#FF9F1C"/>
+  <ellipse cx="-33" cy="-46" rx="9" ry="24" fill="#1B2547" transform="rotate(14 -33 -46)"/><ellipse cx="33" cy="-46" rx="9" ry="24" fill="#1B2547" transform="rotate(-14 33 -46)"/>
+  <ellipse cx="0" cy="-50" rx="34" ry="48" fill="#24325F"/><ellipse cx="0" cy="-40" rx="26" ry="35" fill="#fff"/>
+  <circle cx="-11" cy="-80" r="5.5" fill="#fff"/><circle cx="11" cy="-80" r="5.5" fill="#fff"/><circle cx="-10" cy="-80" r="2.8" fill="#111"/><circle cx="12" cy="-80" r="2.8" fill="#111"/>
+  <path d="M-7 -72 L7 -72 L0 -63 Z" fill="#FF9F1C"/>
+  <text x="0" y="-27" font-size="${String(v).length>1?27:32}" font-weight="900" fill="#24325F" text-anchor="middle" font-family="inherit">${v}</text></g></g>`; }
+let ordRedraw=null; addEventListener('resize',()=>{ try{ ordRedraw&&ordRedraw(); }catch(e){} });
+function gOrd(li){ const L=ORDL[li]; ordRedraw=()=>{ if(myGen===gen&&!busy&&F.stage.isConnected) draw(); }; let ti=0, errs=0, busy=false, nums=[], slots=[], dir='up', lastDir=null, gapAt=-1, cands=[]; const F=frame('',PER); const myGen=gen;
+  const q=()=>L.gap?X().ordGap:(dir==='up'?X().ordUp:X().ordDown);
+  const pick=()=>{ const lo=L.max>20?10:1; const s=new Set(); 
+    if(L.tw){ const a=RR(1,8), b=RR(a+1,9); if(a!==b){ s.add(a*10+b); s.add(b*10+a); } } /* 27 și 72: cifrele contează */
+    while(s.size<L.n) s.add(RR(lo,L.max)); return [...s]; };
+  function show(){ busy=false;
+    if(L.gap){ let srt, g, ok=false; for(let k=0;k<60&&!ok;k++){ srt=pick().sort((a,b)=>a-b); g=RR(1,srt.length-2); ok=srt[g+1]-srt[g-1]>=2; }
+      const ans=srt[g]; nums=srt; gapAt=g; slots=srt.map((v,i)=>i===g?null:v); dir='up';
+      const lo=srt[g-1], hi=srt[g+1], ds=new Set();
+      if(L.tw&&ans>9&&ans%10){ const sw=(ans%10)*10+Math.floor(ans/10); if(sw!==ans&&(sw<lo||sw>hi)&&!srt.includes(sw)) ds.add(sw); }
+      for(let k=0;k<80&&ds.size<2;k++){ const c=RR(L.max>20?10:1,L.max); if((c<lo||c>hi)&&!srt.includes(c)) ds.add(c); }
+      cands=shuf([ans,...ds]); }
+    else { nums=__fresh('ord'+li,pick,8); dir=L.d==='mix'?(R(2)?'up':'down'):L.d; slots=nums.map(()=>null); nums=shuf(nums); }
+    F.set((L.gap?'❓ ':dir==='up'?'⬆️ ':'⬇️ ')+q());
+    if(ti===0||(!L.gap&&dir!==lastDir)) sp(q()); lastDir=dir;
+    F.ctrl.innerHTML=''; const row=el('div'); row.style.cssText='display:flex;gap:10px;justify-content:center';
+    row.append(btn('🔊','',()=>sp(q()))); if(!L.gap) row.append(btn('↺','',()=>{ if(busy) return; slots=slots.map(()=>null); blip(); draw(); })); F.ctrl.append(row); draw(); }
+  function lay(){ const N=slots.length, st=F.stage, por=st.clientHeight>st.clientWidth*1.15;
+    const pool=L.gap?cands.filter(v=>!slots.includes(v)):nums.filter(v=>!slots.includes(v));
+    if(!por){ const sw=Math.min(140,820/N), sx=450-N*sw/2, rw=Math.min(150,820/Math.max(1,pool.length)), rx=450-pool.length*rw/2;
+      return {W:900,H:430,sea:[150,280],arrowY:40,fw:sw,slot:i=>[sx+i*sw+sw/2,238],pool,pp:i=>[rx+i*rw+rw/2,415]}; }
+    const W=520, c=Math.min(N,3), rows=Math.ceil(N/3), cw=W/3-6, y0=250, rh=165, seaB=y0+(rows-1)*rh+50, pc=3, prow=Math.ceil(pool.length/pc)||1, py0=seaB+150;
+    const at=(i,n,cols,y,rH)=>{ const r=Math.floor(i/cols), inRow=Math.min(cols,n-r*cols), w=W/cols; return [W/2-inRow*w/2+(i%cols)*w+w/2,y+r*rH]; };
+    return {W,H:Math.max(py0+(Math.ceil(Math.max(pool.length,1)/pc)-1)*140+30,seaB+60),sea:[140,seaB],arrowY:60,fw:cw,slot:i=>at(i,N,c,y0,rh),pool,pp:i=>at(i,pool.length,pc,py0,140)}; }
+  function draw(shake){ const G=lay(), N=slots.length, up=dir==='up', W=G.W, H=G.H;
+    let s=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="mw-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE6FF"/><stop offset="1" stop-color="#5DB7F0"/></linearGradient></defs>
+      <rect width="${W}" height="${H}" rx="22" fill="#EAF6FF"/><rect y="${G.sea[0]}" width="${W}" height="${G.sea[1]-G.sea[0]}" fill="url(#mw-sea)"/><rect y="${G.sea[1]}" width="${W}" height="${H-G.sea[1]}" fill="#F7FBFF"/>`;
+    if(!L.gap){ /* direcția: buline din ce în ce mai mari (mic → mare), fără scară */ const ax=W/2-150; for(let i=0;i<5;i++){ const r=up?5+i*3:17-i*3; s+=`<circle cx="${ax+i*60}" cy="${G.arrowY}" r="${r}" fill="#FFC83D" stroke="#E0A800" stroke-width="2"/>`; } s+=`<path d="M${ax+290} ${G.arrowY} l-16 -11 v22 z" fill="#E0A800"/>`; }
+    for(let i=0;i<N;i++){ const [cx,cy]=G.slot(i); s+=`<ellipse cx="${cx}" cy="${cy}" rx="${Math.min(70,G.fw/2-6)}" ry="16" fill="#fff" stroke="${shake&&shake.includes(i)?'#FF5D7A':'#9FD3F5'}" stroke-width="3"/>`;
+      if(slots[i]==null) s+=`<text x="${cx}" y="${cy-33}" font-size="40" text-anchor="middle" fill="#9FB6CC" font-weight="900">${L.gap?'?':'·'}</text>`;
+      else s+=peng(cx,cy,slots[i],'mw-pl'+(shake&&shake.includes(i)?' mw-shake':'')+(i===draw.just?' mw-hop':''),`data-i="${i}"`); }
+    G.pool.forEach((v,i)=>{ const [x,y]=G.pp(i); s+=peng(x,y,v,'mw-pg mw-wad',`data-v="${v}"`,(i*.17).toFixed(2)); });
+    F.stage.innerHTML=s+'</svg>'; draw.just=-1; const svg=F.stage.firstChild;
+    svg.querySelectorAll('.mw-pg').forEach(g=>g.onclick=()=>{ if(busy) return; const v=+g.dataset.v; const i=L.gap?gapAt:slots.indexOf(null); if(i<0) return; slots[i]=v; draw.just=i; pop(L.gap?3:slots.filter(x=>x!=null).length); draw(); if(!slots.includes(null)) check(); });
+    svg.querySelectorAll('.mw-pl').forEach(g=>g.onclick=()=>{ if(busy||L.gap) return; slots[+g.dataset.i]=null; snd(300,.06); draw(); }); }
+  async function check(){ busy=true; const want=[...slots].sort((a,b)=>dir==='up'?a-b:b-a);
+    const bad=L.gap?(slots[gapAt]===nums[gapAt]?[]:[gapAt]):slots.map((v,i)=>v===want[i]?-1:i).filter(i=>i>=0);
+    if(bad.length){ errs++; boing(); draw(bad); sp(X().ordNo); await wait(1300); if(myGen!==gen) return; bad.forEach(i=>slots[i]=null); busy=false; draw(); return; }
+    const svg=F.stage.firstChild, P=[...svg.querySelectorAll('.mw-pl')];
+    /* melodie: fiecare pinguin sare pe rând, tonul urcă */
+    const NOTES=[523,587,659,698,784,880,988];
+    for(let k=0;k<P.length;k++){ const g=P[k]; g.classList.remove('mw-hop'); void g.getBBox(); g.classList.add('mw-hop'); snd(NOTES[k%7],.18,'sine',.12); await wait(230); if(myGen!==gen) return; }
+    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){}
+    P.forEach((g,k)=>{ g.firstElementChild.style.animationDelay=(k*.08)+'s'; g.classList.remove('mw-hop'); g.classList.add('mw-dive'); });
+    svg.insertAdjacentHTML('beforeend',`<text x="${svg.viewBox.baseVal.width/2}" y="120" font-size="46" text-anchor="middle">🐟🎉🐟</text>`);
+    F.set('🎉 '+X().ordOk); await spW(X().ordOk,1300); if(myGen!==gen) return;
     ti++; busy=false; if(ti>=PER) return levelDone('ord',li,errs); show(); }
   show(); }
 
@@ -10866,7 +10909,7 @@ const EARN={
  fr:{need:n=>`Pour jouer avec Pufi, termine encore ${n===1?'un niveau':n+' niveaux'} dans les autres jeux !`,ready:'Bravo ! Tu as gagné un niveau avec Pufi. Choisis où aller !',more:'Tu as gagné encore un niveau avec Pufi !'},
  es:{need:n=>`Para jugar con Pufi, termina ${n===1?'un nivel más':n+' niveles más'} en los otros juegos.`,ready:'¡Muy bien! Has ganado un nivel con Pufi. ¡Elige adónde ir!',more:'¡Has ganado otro nivel con Pufi!'},
  it:{need:n=>`Per giocare con Pufi, completa ancora ${n===1?'un livello':n+' livelli'} negli altri giochi!`,ready:'Bravo! Hai guadagnato un livello con Pufi. Scegli dove andare!',more:'Hai guadagnato un altro livello con Pufi!'},
- pt:{need:n=>`Para brincar com o Pufi, termina mais ${n===1?'um nível':n+' níveis'} nos outros jogos!`,ready:'Muito bem! Ganhaste um nível com o Pufi. Escolhe para onde ir!',more:'Ganhaste mais um nível com o Pufi!'},
+ pt:{need:n=>`Para brincar com o Pufi, termine mais ${n===1?'um nível':n+' níveis'} nos outros jogos!`,ready:'Muito bem! Você ganhou um nível com o Pufi. Escolha para onde ir!',more:'Você ganhou mais um nível com o Pufi!'},
  nl:{need:n=>`Om met Pufi te spelen, maak je nog ${n===1?'één level':n+' levels'} af in de andere spelletjes!`,ready:'Goed zo! Je hebt een Pufi-level verdiend. Kies waar je heen gaat!',more:'Je hebt nog een Pufi-level verdiend!'},
  pl:{need:n=>`Żeby zagrać z Pufim, ukończ jeszcze ${n===1?'jeden poziom':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'poziomy':'poziomów')} w innych grach!`,ready:'Brawo! Zdobyłeś poziom z Pufim. Wybierz, dokąd idziesz!',more:'Zdobyłeś jeszcze jeden poziom z Pufim!'},
  uk:{need:n=>`Щоб гратися з Пуфі, пройди ще ${n===1?'один рівень':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'рівні':'рівнів')} в інших іграх!`,ready:'Молодець! Ти заробив рівень із Пуфі. Обирай, куди йти!',more:'Ти заробив ще один рівень із Пуфі!'},

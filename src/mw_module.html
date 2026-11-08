@@ -32,6 +32,14 @@
 #mw-root[hidden]{display:none}
 #mw-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto;position:relative}
 .mw-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(44%,190px),1fr));gap:14px;align-content:start;padding:4px}
+.mw-wad .mw-pb{animation:mwWad 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwWad{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.mw-hop .mw-pb{animation:mwHop .45s ease-out;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwHop{0%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-34px) scale(.95,1.06)}70%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
+.mw-shake .mw-pb{animation:mwShk .35s linear 3}
+@keyframes mwShk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.mw-dive .mw-pb{animation:mwDive .9s ease-in forwards;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes mwDive{0%{transform:none}35%{transform:translateY(-40px) rotate(-12deg)}100%{transform:translateY(60px) rotate(30deg);opacity:0}}
 .mw-stage{flex:1;min-height:0;width:100%;display:flex;justify-content:center;position:relative}
 .mw-stage>svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
 .mw-ans{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -74,7 +82,7 @@ ro:{title:'🔢 Lumea numerelor',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOf
  lvAdd:['Adunări până la 5','Adunări până la 10','Scăderi până la 10','Adunări până la 20','Scăderi până la 20','Amestec până la 20','Zeci întregi','Până la 100'],
  lvCmp:['Grămezi de obiecte','Semnele < > =','Numere până la 20','Numere până la 100','Compară sume'],
  lvNb:['Vecinul din dreapta','Vecinul din stânga','Ambii vecini până la 20','Ambii vecini până la 100','Numărul din mijloc'],
- lvOrd:['Trei numere, crescător','Patru numere, descrescător','Până la 20, amestecat','Până la 100, crescător','Până la 100, amestecat'],
+ lvOrd:['Trei pinguini, crescător','Patru pinguini, descrescător','Până la 20, crescător','Pinguinul care lipsește','Până la 20, amestecat','Până la 100, crescător','Pinguinul lipsă, până la 100','Șase pinguini, până la 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Amestec până la 20','Amestec până la 100'],
  plus:'plus',minus:'minus',make:'fac',addQ:(a,o,b)=>`${a} ${o} ${b} cât fac?`,addA:(a,o,b,c)=>`${a} ${o} ${b} fac ${c}!`,
  addStory:(a,b,e)=>`Ai ${a} ${e}. Mai vin ${b}. Câte sunt?`,subStory:(a,b)=>`Sunt ${a}. ${b} pleacă. Câte rămân?`,
@@ -83,7 +91,7 @@ ro:{title:'🔢 Lumea numerelor',back:'⬅ Înapoi',allOn:'🔓 Toate: DA',allOf
  gt:(a,b)=>`${a} este mai mare decât ${b}.`,lt:(a,b)=>`${a} este mai mic decât ${b}.`,eq:(a,b)=>`${a} este egal cu ${b}.`,chomp:'Ham!',
  nbR:n=>`Cine stă în dreapta lui ${n}? Vecinul din dreapta e cu unu mai mare.`,nbL:n=>`Cine stă în stânga lui ${n}? Vecinul din stânga e cu unu mai mic.`,nbLR:n=>`Găsește ambii vecini ai lui ${n}!`,nbB:(a,b)=>`Ce număr stă între ${a} și ${b}?`,
  nbOk:s=>`${s}. Bravo, vecinii sunt la locul lor!`,nbNo:'Nu stă acolo. Mai încearcă!',
- ordUp:'Pune pinguinii în ordine crescătoare: de la cel mai mic la cel mai mare. Fă o scară care urcă!',ordDown:'Pune pinguinii în ordine descrescătoare: de la cel mai mare la cel mai mic. Fă un tobogan!',
+ ordUp:'Pune pinguinii în ordine crescătoare!',ordDown:'Pune pinguinii în ordine descrescătoare!',ordGap:'Ce pinguin lipsește din rând?',
  ordOk:'Perfect! Ordinea e corectă!',ordNo:'Hopa, aici ordinea nu e bună. Mai încearcă!',up:'🪜 Crescător',down:'🛝 Descrescător',
  boxQ:'Câte mere sunt în cutia cu secret? Pune mere în cutie până când balanța stă dreaptă!',boxQ100:'Ce număr e în cutia cu secret? Pune mere până când balanța stă dreaptă!',boxOk:(e)=>`Balanța stă dreaptă! ${e}`,heavyL:'Partea stângă e mai grea.',heavyR:'Partea dreaptă e mai grea.'},
 de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff:'🔓 Alle: AUS',hint:'💡 Hilfe',lvl:n=>`Level ${n}`,
@@ -92,7 +100,7 @@ de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff
  lvAdd:['Plus bis 5','Plus bis 10','Minus bis 10','Plus bis 20','Minus bis 20','Gemischt bis 20','Ganze Zehner','Bis 100'],
  lvCmp:['Haufen vergleichen','Die Zeichen < > =','Zahlen bis 20','Zahlen bis 100','Summen vergleichen'],
  lvNb:['Der rechte Nachbar','Der linke Nachbar','Beide Nachbarn bis 20','Beide Nachbarn bis 100','Die Zahl in der Mitte'],
- lvOrd:['Drei Zahlen, aufsteigend','Vier Zahlen, absteigend','Bis 20, gemischt','Bis 100, aufsteigend','Bis 100, gemischt'],
+ lvOrd:['Drei Pinguine, aufsteigend','Vier Pinguine, absteigend','Bis 20, aufsteigend','Der fehlende Pinguin','Bis 20, gemischt','Bis 100, aufsteigend','Fehlender Pinguin bis 100','Sechs Pinguine bis 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Gemischt bis 20','Gemischt bis 100'],
  plus:'plus',minus:'minus',make:'ist',addQ:(a,o,b)=>`Wie viel ist ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} ist ${c}!`,
  addStory:(a,b,e)=>`Du hast ${a} ${e}. Es kommen ${b} dazu. Wie viele sind es?`,subStory:(a,b)=>`Es sind ${a}. ${b} gehen weg. Wie viele bleiben?`,
@@ -101,7 +109,7 @@ de:{title:'🔢 Welt der Zahlen',back:'⬅ Zurück',allOn:'🔓 Alle: AN',allOff
  gt:(a,b)=>`${a} ist größer als ${b}.`,lt:(a,b)=>`${a} ist kleiner als ${b}.`,eq:(a,b)=>`${a} ist gleich ${b}.`,chomp:'Happs!',
  nbR:n=>`Wer wohnt rechts von ${n}? Der rechte Nachbar ist um eins größer.`,nbL:n=>`Wer wohnt links von ${n}? Der linke Nachbar ist um eins kleiner.`,nbLR:n=>`Finde beide Nachbarn von ${n}!`,nbB:(a,b)=>`Welche Zahl wohnt zwischen ${a} und ${b}?`,
  nbOk:s=>`${s}. Super, die Nachbarn sind an ihrem Platz!`,nbNo:'Die wohnt nicht da. Versuch es nochmal!',
- ordUp:'Stell die Pinguine aufsteigend auf: vom kleinsten zum größten. Bau eine Treppe nach oben!',ordDown:'Stell die Pinguine absteigend auf: vom größten zum kleinsten. Bau eine Rutsche!',
+ ordUp:'Stell die Pinguine aufsteigend auf!',ordDown:'Stell die Pinguine absteigend auf!',ordGap:'Welcher Pinguin fehlt in der Reihe?',
  ordOk:'Perfekt! Die Reihenfolge stimmt!',ordNo:'Hoppla, hier stimmt die Reihenfolge nicht. Versuch es nochmal!',up:'🪜 Aufsteigend',down:'🛝 Absteigend',
  boxQ:'Wie viele Äpfel sind in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxQ100:'Welche Zahl steckt in der Geheimbox? Leg Äpfel hinein, bis die Waage gerade ist!',boxOk:(e)=>`Die Waage ist gerade! ${e}`,heavyL:'Die linke Seite ist schwerer.',heavyR:'Die rechte Seite ist schwerer.'},
 en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'🔓 All: OFF',hint:'💡 Help',lvl:n=>`Level ${n}`,
@@ -110,7 +118,7 @@ en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'�
  lvAdd:['Adding to 5','Adding to 10','Taking away to 10','Adding to 20','Taking away to 20','Mixed to 20','Whole tens','Up to 100'],
  lvCmp:['Compare piles','The signs < > =','Numbers to 20','Numbers to 100','Compare sums'],
  lvNb:['The right neighbour','The left neighbour','Both neighbours to 20','Both neighbours to 100','The number in the middle'],
- lvOrd:['Three numbers, ascending','Four numbers, descending','To 20, mixed','To 100, ascending','To 100, mixed'],
+ lvOrd:['Three penguins, going up','Four penguins, going down','To 20, going up','The missing penguin','To 20, mixed','To 100, going up','Missing penguin to 100','Six penguins to 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mixed to 20','Mixed to 100'],
  plus:'plus',minus:'minus',make:'makes',addQ:(a,o,b)=>`What is ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} makes ${c}!`,
  addStory:(a,b,e)=>`You have ${a} ${e}. ${b} more come. How many now?`,subStory:(a,b)=>`There are ${a}. ${b} go away. How many are left?`,
@@ -119,7 +127,7 @@ en:{title:'🔢 World of numbers',back:'⬅ Back',allOn:'🔓 All: ON',allOff:'�
  gt:(a,b)=>`${a} is greater than ${b}.`,lt:(a,b)=>`${a} is less than ${b}.`,eq:(a,b)=>`${a} is equal to ${b}.`,chomp:'Chomp!',
  nbR:n=>`Who lives to the right of ${n}? The right neighbour is one more.`,nbL:n=>`Who lives to the left of ${n}? The left neighbour is one less.`,nbLR:n=>`Find both neighbours of ${n}!`,nbB:(a,b)=>`Which number lives between ${a} and ${b}?`,
  nbOk:s=>`${s}. Well done, the neighbours are in place!`,nbNo:'That one doesn’t live there. Try again!',
- ordUp:'Put the penguins in ascending order: from smallest to biggest. Make stairs that go up!',ordDown:'Put the penguins in descending order: from biggest to smallest. Make a slide!',
+ ordUp:'Put the penguins in order, smallest number first!',ordDown:'Put the penguins in order, biggest number first!',ordGap:'Which penguin is missing from the line?',
  ordOk:'Perfect! The order is right!',ordNo:'Oops, the order is not right here. Try again!',up:'🪜 Ascending',down:'🛝 Descending',
  boxQ:'How many apples are in the secret box? Put apples in the box until the scale is level!',boxQ100:'What number is in the secret box? Put apples in until the scale is level!',boxOk:(e)=>`The scale is level! ${e}`,heavyL:'The left side is heavier.',heavyR:'The right side is heavier.'}};
 const X=()=>TR('mw',TX);
@@ -256,27 +264,62 @@ function gNb(li){ const L=NBL[li]; let ti=0, errs=0, busy=false, n=0, slots=[], 
   show(); }
 
 /* ================= 4. PINGUINII ÎN ORDINE ================= */
-const ORDL=[{n:3,max:10,d:'up'},{n:4,max:10,d:'down'},{n:4,max:20,d:'mix'},{n:5,max:100,d:'up'},{n:5,max:100,d:'mix'}];
-function gOrd(li){ const L=ORDL[li]; let ti=0, errs=0, busy=false, nums=[], placed=[], dir='up'; const F=frame('',PER); const myGen=gen;
-  function show(){ const s=new Set(); while(s.size<L.n) s.add(RR(L.max>20?5:1,L.max)); nums=shuf([...s]); placed=[]; dir=L.d==='mix'?(R(2)?'up':'down'):L.d;
-    const q=dir==='up'?X().ordUp:X().ordDown; F.set((dir==='up'?'🪜 ':'🛝 ')+q); sp(q); draw(); F.ctrl.innerHTML=''; F.ctrl.append(btn('↺','',()=>{ if(busy) return; placed=[]; draw(); })); }
-  function draw(bad){ const N=nums.length, mx=Math.max(...nums), mn=Math.min(...nums); let s=`<svg viewBox="0 0 900 420"><rect width="900" height="420" rx="22" fill="#EAF6FF"/><rect y="380" width="900" height="40" fill="#fff"/>`;
-    const H=v=>56+(v-mn)/Math.max(1,mx-mn)*70;
-    /* sloturile (scară sau tobogan) */ const sw=Math.min(150,760/N), sx=450-N*sw/2;
-    for(let i=0;i<N;i++){ const h=dir==='up'?40+i*22:40+(N-1-i)*22; s+=`<rect x="${sx+i*sw+4}" y="${210-h}" width="${sw-8}" height="${h}" rx="6" fill="${bad===i?'#FFB3C0':'#C9D3E0'}" stroke="#9AA5B8" stroke-width="2"/>`;
-      const v=placed[i]; if(v!=null){ const ph=H(v); s+=`<g class="mw-pl" data-i="${i}" style="cursor:pointer"><text x="${sx+i*sw+sw/2}" y="${210-h}" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${sx+i*sw+sw/2}" cy="${210-h-ph*.33}" r="17" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${sx+i*sw+sw/2}" y="${210-h-ph*.33+7}" font-size="18" font-weight="800" text-anchor="middle">${v}</text></g>`; } }
-    s+=`<text x="${dir==='up'?sx-30:sx+N*sw+30}" y="${dir==='up'?200:200}" font-size="34" text-anchor="middle">${dir==='up'?'⬆':'🛝'}</text>`;
-    /* pinguinii de așezat */ const rest=nums.filter(v=>!placed.includes(v)); const rw=Math.min(160,800/Math.max(1,rest.length)), rx=450-rest.length*rw/2;
-    rest.forEach((v,i)=>{ const ph=H(v)+10; s+=`<g class="mw-pg" data-v="${v}" style="cursor:pointer"><text x="${rx+i*rw+rw/2}" y="378" font-size="${ph}" text-anchor="middle">🐧</text><circle cx="${rx+i*rw+rw/2}" cy="${378-ph*.33}" r="20" fill="#fff" stroke="#24325F" stroke-width="2"/><text x="${rx+i*rw+rw/2}" y="${378-ph*.33+8}" font-size="21" font-weight="800" text-anchor="middle">${v}</text></g>`; });
-    F.stage.innerHTML=s+'</svg>'; const svg=F.stage.firstChild;
-    svg.querySelectorAll('.mw-pg').forEach(g=>g.onclick=()=>{ if(busy) return; placed.push(+g.dataset.v); pop(placed.length); draw(); if(placed.length===nums.length) check(); });
-    svg.querySelectorAll('.mw-pl').forEach(g=>g.onclick=()=>{ if(busy) return; placed=placed.slice(0,+g.dataset.i); snd(300,.06); draw(); }); }
-  async function check(){ const ok=placed.every((v,i)=>i===0||(dir==='up'?v>placed[i-1]:v<placed[i-1]));
-    if(!ok){ errs++; boing(); const bad=placed.findIndex((v,i)=>i>0&&(dir==='up'?v<placed[i-1]:v>placed[i-1])); draw(bad); sp(X().ordNo); busy=true; await wait(1400); if(myGen!==gen) return; placed=placed.slice(0,bad); busy=false; draw(); return; }
-    busy=true; const svg=F.stage.firstChild; const N=nums.length, sw=Math.min(150,760/N), sx=450-N*sw/2;
-    svg.insertAdjacentHTML('beforeend',`<text id="mw-run" x="${dir==='up'?sx:sx+N*sw}" y="150" font-size="40" text-anchor="middle">${dir==='up'?'🧗':'⚽'}</text>`); const r=svg.querySelector('#mw-run');
-    for(let i=0;i<N;i++){ const idx=dir==='up'?i:N-1-i, h=dir==='up'?40+idx*22:40+(N-1-idx)*22; r.setAttribute('x',sx+idx*sw+sw/2); r.setAttribute('y',210-h-80); pop(i+1); await wait(260); if(myGen!==gen) return; }
-    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){} const m=X().ordOk+' '+placed.join(', '); F.set('🎉 '+m); await spW(m,1500); if(myGen!==gen) return;
+/* toți pinguinii au aceeași mărime: copilul trebuie să citească numerele de pe burtică */
+const ORDL=[{n:3,max:10,d:'up'},{n:4,max:10,d:'down'},{n:5,max:20,d:'up'},{n:5,max:20,gap:1},{n:4,max:20,d:'mix'},{n:5,max:100,d:'up',tw:1},{n:5,max:100,gap:1,tw:1},{n:6,max:100,d:'mix',tw:1}];
+function peng(x,y,v,cls,extra,dl){ return `<g class="${cls||''}" transform="translate(${x} ${y})" ${extra||''} style="cursor:pointer"><g class="mw-pb"${dl?` style="animation-delay:${dl}s"`:''}>
+  <ellipse cx="-12" cy="-2" rx="11" ry="5" fill="#FF9F1C"/><ellipse cx="12" cy="-2" rx="11" ry="5" fill="#FF9F1C"/>
+  <ellipse cx="-33" cy="-46" rx="9" ry="24" fill="#1B2547" transform="rotate(14 -33 -46)"/><ellipse cx="33" cy="-46" rx="9" ry="24" fill="#1B2547" transform="rotate(-14 33 -46)"/>
+  <ellipse cx="0" cy="-50" rx="34" ry="48" fill="#24325F"/><ellipse cx="0" cy="-40" rx="26" ry="35" fill="#fff"/>
+  <circle cx="-11" cy="-80" r="5.5" fill="#fff"/><circle cx="11" cy="-80" r="5.5" fill="#fff"/><circle cx="-10" cy="-80" r="2.8" fill="#111"/><circle cx="12" cy="-80" r="2.8" fill="#111"/>
+  <path d="M-7 -72 L7 -72 L0 -63 Z" fill="#FF9F1C"/>
+  <text x="0" y="-27" font-size="${String(v).length>1?27:32}" font-weight="900" fill="#24325F" text-anchor="middle" font-family="inherit">${v}</text></g></g>`; }
+let ordRedraw=null; addEventListener('resize',()=>{ try{ ordRedraw&&ordRedraw(); }catch(e){} });
+function gOrd(li){ const L=ORDL[li]; ordRedraw=()=>{ if(myGen===gen&&!busy&&F.stage.isConnected) draw(); }; let ti=0, errs=0, busy=false, nums=[], slots=[], dir='up', lastDir=null, gapAt=-1, cands=[]; const F=frame('',PER); const myGen=gen;
+  const q=()=>L.gap?X().ordGap:(dir==='up'?X().ordUp:X().ordDown);
+  const pick=()=>{ const lo=L.max>20?10:1; const s=new Set(); 
+    if(L.tw){ const a=RR(1,8), b=RR(a+1,9); if(a!==b){ s.add(a*10+b); s.add(b*10+a); } } /* 27 și 72: cifrele contează */
+    while(s.size<L.n) s.add(RR(lo,L.max)); return [...s]; };
+  function show(){ busy=false;
+    if(L.gap){ let srt, g, ok=false; for(let k=0;k<60&&!ok;k++){ srt=pick().sort((a,b)=>a-b); g=RR(1,srt.length-2); ok=srt[g+1]-srt[g-1]>=2; }
+      const ans=srt[g]; nums=srt; gapAt=g; slots=srt.map((v,i)=>i===g?null:v); dir='up';
+      const lo=srt[g-1], hi=srt[g+1], ds=new Set();
+      if(L.tw&&ans>9&&ans%10){ const sw=(ans%10)*10+Math.floor(ans/10); if(sw!==ans&&(sw<lo||sw>hi)&&!srt.includes(sw)) ds.add(sw); }
+      for(let k=0;k<80&&ds.size<2;k++){ const c=RR(L.max>20?10:1,L.max); if((c<lo||c>hi)&&!srt.includes(c)) ds.add(c); }
+      cands=shuf([ans,...ds]); }
+    else { nums=__fresh('ord'+li,pick,8); dir=L.d==='mix'?(R(2)?'up':'down'):L.d; slots=nums.map(()=>null); nums=shuf(nums); }
+    F.set((L.gap?'❓ ':dir==='up'?'⬆️ ':'⬇️ ')+q());
+    if(ti===0||(!L.gap&&dir!==lastDir)) sp(q()); lastDir=dir;
+    F.ctrl.innerHTML=''; const row=el('div'); row.style.cssText='display:flex;gap:10px;justify-content:center';
+    row.append(btn('🔊','',()=>sp(q()))); if(!L.gap) row.append(btn('↺','',()=>{ if(busy) return; slots=slots.map(()=>null); blip(); draw(); })); F.ctrl.append(row); draw(); }
+  function lay(){ const N=slots.length, st=F.stage, por=st.clientHeight>st.clientWidth*1.15;
+    const pool=L.gap?cands.filter(v=>!slots.includes(v)):nums.filter(v=>!slots.includes(v));
+    if(!por){ const sw=Math.min(140,820/N), sx=450-N*sw/2, rw=Math.min(150,820/Math.max(1,pool.length)), rx=450-pool.length*rw/2;
+      return {W:900,H:430,sea:[150,280],arrowY:40,fw:sw,slot:i=>[sx+i*sw+sw/2,238],pool,pp:i=>[rx+i*rw+rw/2,415]}; }
+    const W=520, c=Math.min(N,3), rows=Math.ceil(N/3), cw=W/3-6, y0=250, rh=165, seaB=y0+(rows-1)*rh+50, pc=3, prow=Math.ceil(pool.length/pc)||1, py0=seaB+150;
+    const at=(i,n,cols,y,rH)=>{ const r=Math.floor(i/cols), inRow=Math.min(cols,n-r*cols), w=W/cols; return [W/2-inRow*w/2+(i%cols)*w+w/2,y+r*rH]; };
+    return {W,H:Math.max(py0+(Math.ceil(Math.max(pool.length,1)/pc)-1)*140+30,seaB+60),sea:[140,seaB],arrowY:60,fw:cw,slot:i=>at(i,N,c,y0,rh),pool,pp:i=>at(i,pool.length,pc,py0,140)}; }
+  function draw(shake){ const G=lay(), N=slots.length, up=dir==='up', W=G.W, H=G.H;
+    let s=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="mw-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE6FF"/><stop offset="1" stop-color="#5DB7F0"/></linearGradient></defs>
+      <rect width="${W}" height="${H}" rx="22" fill="#EAF6FF"/><rect y="${G.sea[0]}" width="${W}" height="${G.sea[1]-G.sea[0]}" fill="url(#mw-sea)"/><rect y="${G.sea[1]}" width="${W}" height="${H-G.sea[1]}" fill="#F7FBFF"/>`;
+    if(!L.gap){ /* direcția: buline din ce în ce mai mari (mic → mare), fără scară */ const ax=W/2-150; for(let i=0;i<5;i++){ const r=up?5+i*3:17-i*3; s+=`<circle cx="${ax+i*60}" cy="${G.arrowY}" r="${r}" fill="#FFC83D" stroke="#E0A800" stroke-width="2"/>`; } s+=`<path d="M${ax+290} ${G.arrowY} l-16 -11 v22 z" fill="#E0A800"/>`; }
+    for(let i=0;i<N;i++){ const [cx,cy]=G.slot(i); s+=`<ellipse cx="${cx}" cy="${cy}" rx="${Math.min(70,G.fw/2-6)}" ry="16" fill="#fff" stroke="${shake&&shake.includes(i)?'#FF5D7A':'#9FD3F5'}" stroke-width="3"/>`;
+      if(slots[i]==null) s+=`<text x="${cx}" y="${cy-33}" font-size="40" text-anchor="middle" fill="#9FB6CC" font-weight="900">${L.gap?'?':'·'}</text>`;
+      else s+=peng(cx,cy,slots[i],'mw-pl'+(shake&&shake.includes(i)?' mw-shake':'')+(i===draw.just?' mw-hop':''),`data-i="${i}"`); }
+    G.pool.forEach((v,i)=>{ const [x,y]=G.pp(i); s+=peng(x,y,v,'mw-pg mw-wad',`data-v="${v}"`,(i*.17).toFixed(2)); });
+    F.stage.innerHTML=s+'</svg>'; draw.just=-1; const svg=F.stage.firstChild;
+    svg.querySelectorAll('.mw-pg').forEach(g=>g.onclick=()=>{ if(busy) return; const v=+g.dataset.v; const i=L.gap?gapAt:slots.indexOf(null); if(i<0) return; slots[i]=v; draw.just=i; pop(L.gap?3:slots.filter(x=>x!=null).length); draw(); if(!slots.includes(null)) check(); });
+    svg.querySelectorAll('.mw-pl').forEach(g=>g.onclick=()=>{ if(busy||L.gap) return; slots[+g.dataset.i]=null; snd(300,.06); draw(); }); }
+  async function check(){ busy=true; const want=[...slots].sort((a,b)=>dir==='up'?a-b:b-a);
+    const bad=L.gap?(slots[gapAt]===nums[gapAt]?[]:[gapAt]):slots.map((v,i)=>v===want[i]?-1:i).filter(i=>i>=0);
+    if(bad.length){ errs++; boing(); draw(bad); sp(X().ordNo); await wait(1300); if(myGen!==gen) return; bad.forEach(i=>slots[i]=null); busy=false; draw(); return; }
+    const svg=F.stage.firstChild, P=[...svg.querySelectorAll('.mw-pl')];
+    /* melodie: fiecare pinguin sare pe rând, tonul urcă */
+    const NOTES=[523,587,659,698,784,880,988];
+    for(let k=0;k<P.length;k++){ const g=P[k]; g.classList.remove('mw-hop'); void g.getBBox(); g.classList.add('mw-hop'); snd(NOTES[k%7],.18,'sine',.12); await wait(230); if(myGen!==gen) return; }
+    chime(); award(); F.dot(ti+1); try{ confetti(10); }catch(e){}
+    P.forEach((g,k)=>{ g.firstElementChild.style.animationDelay=(k*.08)+'s'; g.classList.remove('mw-hop'); g.classList.add('mw-dive'); });
+    svg.insertAdjacentHTML('beforeend',`<text x="${svg.viewBox.baseVal.width/2}" y="120" font-size="46" text-anchor="middle">🐟🎉🐟</text>`);
+    F.set('🎉 '+X().ordOk); await spW(X().ordOk,1300); if(myGen!==gen) return;
     ti++; busy=false; if(ti>=PER) return levelDone('ord',li,errs); show(); }
   show(); }
 

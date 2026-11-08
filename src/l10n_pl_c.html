@@ -66,7 +66,7 @@ S('mw',{title:'🔢 Świat liczb',back:'⬅ Wstecz',allOn:'🔓 Wszystkie: wł.'
  lvAdd:['Dodawanie do 5','Dodawanie do 10','Odejmowanie do 10','Dodawanie do 20','Odejmowanie do 20','Mieszane do 20','Pełne dziesiątki','Do 100'],
  lvCmp:['Porównaj kupki','Znaki < > =','Liczby do 20','Liczby do 100','Porównaj działania'],
  lvNb:['Sąsiad z prawej','Sąsiad z lewej','Obaj sąsiedzi do 20','Obaj sąsiedzi do 100','Liczba w środku'],
- lvOrd:['Trzy liczby, od najmniejszej','Cztery liczby, od największej','Do 20, mieszane','Do 100, od najmniejszej','Do 100, mieszane'],
+ lvOrd:['Trzy pingwiny, rosnąco','Cztery pingwiny, malejąco','Do 20, rosnąco','Brakujący pingwin','Do 20, mieszane','Do 100, rosnąco','Brakujący pingwin do 100','Sześć pingwinów do 100'],
  lvBox:['3 + ? = 7','? + 2 = 5','7 − ? = 4','Mieszane do 20','Mieszane do 100'],
  plus:'dodać',minus:'odjąć',make:'to',addQ:(a,o,b)=>`Ile to jest ${a} ${o} ${b}?`,addA:(a,o,b,c)=>`${a} ${o} ${b} to ${c}!`,
  addStory:(a,b,e)=>`Masz ${a} (${e}). Przychodzi jeszcze ${b}. Ile jest teraz?`,subStory:(a,b)=>`Jest ${a}. ${b} ${P(b,'odchodzi','odchodzą','odchodzi')}. Ile zostało?`,
@@ -75,7 +75,7 @@ S('mw',{title:'🔢 Świat liczb',back:'⬅ Wstecz',allOn:'🔓 Wszystkie: wł.'
  gt:(a,b)=>`${a} jest większe od ${b}.`,lt:(a,b)=>`${a} jest mniejsze od ${b}.`,eq:(a,b)=>`${a} jest równe ${b}.`,chomp:'Mniam!',
  nbR:n=>`Kto mieszka na prawo od ${n}? Sąsiad z prawej to o jeden więcej.`,nbL:n=>`Kto mieszka na lewo od ${n}? Sąsiad z lewej to o jeden mniej.`,nbLR:n=>`Znajdź obu sąsiadów liczby ${n}!`,nbB:(a,b)=>`Jaka liczba mieszka między ${a} a ${b}?`,
  nbOk:s=>`${s}. Brawo, sąsiedzi są na swoich miejscach!`,nbNo:'Ta liczba tu nie mieszka. Spróbuj jeszcze raz!',
- ordUp:'Ustaw pingwiny od najmniejszego do największego. Zrób schody w górę!',ordDown:'Ustaw pingwiny od największego do najmniejszego. Zrób zjeżdżalnię!',
+ ordUp:'Ustaw pingwiny rosnąco!',ordDown:'Ustaw pingwiny malejąco!',ordGap:'Którego pingwina brakuje w rzędzie?',
  ordOk:'Doskonale! Kolejność jest dobra!',ordNo:'Ups, tu kolejność się nie zgadza. Spróbuj jeszcze raz!',up:'🪜 Rosnąco',down:'🛝 Malejąco',
  boxQ:'Ile jabłek jest w tajemniczym pudełku? Wkładaj jabłka do pudełka, aż waga będzie prosta!',boxQ100:'Jaka liczba jest w tajemniczym pudełku? Dokładaj jabłka, aż waga będzie prosta!',boxOk:(e)=>`Waga jest prosta! ${e}`,heavyL:'Lewa strona jest cięższa.',heavyR:'Prawa strona jest cięższa.'});
 S('hm',{title:'Pufi – Szkoła zabaw ⭐',q:'W co się dziś bawimy?',math:'Matematyka',world:'Świat',read:'Czytanie',time:'Czas',shapes:'Kształty',robo:'RoboPufi',chess:'Szachy',pufi:'Pufi',par:'Rodzice',home:'🏠 Start',voice:'Głos',on:'🔊 Głos: wł.',off:'🔇 Głos: wył.',close:'✖ Zamknij',hello:'W co się dziś bawimy? Wybierz kartę!'});
