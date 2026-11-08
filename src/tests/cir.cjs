@@ -28,14 +28,14 @@ for(let i=0;i<3;i++){ await p.mouse.move(P[0],P[1]); await p.mouse.down(); await
 await p.waitForTimeout(3000); console.log('btn won',await won()); await closeOv();
 // ser: întâi o baterie, apoi corect
 await open('ro',13); await wire('M1.b','bat.b'); await wire('M1.a','bat.a'); console.log('ser1:',await bub());
-await p.evaluate(()=>document.querySelectorAll('.rb-wire')[0].dispatchEvent(new MouseEvent('click',{bubbles:true}))); await wire('bat.b','B2.a'); await wire('B2.b','M1.b'); await p.waitForTimeout(300); await p.screenshot({path:__dirname+'/../cir-ser.png'}); await p.waitForTimeout(3000); console.log('ser won',await won()); await closeOv();
+await p.evaluate(()=>document.querySelectorAll('.rb-wire')[0].dispatchEvent(new MouseEvent('click',{bubbles:true}))); await p.waitForTimeout(150); await p.evaluate(()=>document.querySelector('#rb-cut').dispatchEvent(new MouseEvent('click',{bubbles:true}))); await p.waitForTimeout(150); await wire('bat.b','B2.a'); await wire('B2.b','M1.b'); await p.waitForTimeout(300); await p.screenshot({path:__dirname+'/../cir-ser.png'}); await p.waitForTimeout(3000); console.log('ser won',await won()); await closeOv();
 // pot
 await open('ro',14); await wire('bat.b','K1.b'); await wire('K1.a','L1.b'); await wire('L1.a','bat.a'); console.log('pot1:',await bub());
 for(let i=0;i<3;i++){ await clickSel('.rb-pot'); await p.waitForTimeout(150); } console.log('pot2:',await bub()); await clickSel('.rb-pot'); await p.waitForTimeout(150); console.log('pot3:',await bub());
 await clickSel('.rb-pot'); await clickSel('.rb-pot'); await p.waitForTimeout(200); await p.screenshot({path:__dirname+'/../cir-pot.png'}); await p.waitForTimeout(3000); console.log('pot won',await won()); await closeOv();
 // res: întâi LED direct (se arde), apoi corect
 await open('ro',15); await wire('B2.b','D1.b'); await wire('D1.a','bat.a'); await p.waitForTimeout(200); console.log('res1:',await bub()); await p.screenshot({path:__dirname+'/../cir-burn.png'});
-await p.evaluate(()=>document.querySelectorAll('.rb-wire')[1].dispatchEvent(new MouseEvent('click',{bubbles:true}))); await wire('B2.b','R1.b'); await wire('R1.a','D1.b'); await p.waitForTimeout(3000); console.log('res won',await won()); await closeOv();
+await p.evaluate(()=>document.querySelectorAll('.rb-wire')[1].dispatchEvent(new MouseEvent('click',{bubbles:true}))); await p.waitForTimeout(150); await p.evaluate(()=>document.querySelector('#rb-cut').dispatchEvent(new MouseEvent('click',{bubbles:true}))); await p.waitForTimeout(150); await wire('B2.b','R1.b'); await wire('R1.a','D1.b'); await p.waitForTimeout(3000); console.log('res won',await won()); await closeOv();
 // sun
 await open('ro',16); await wire('V1.b','M1.b'); await wire('M1.a','V1.a'); await p.waitForTimeout(200); console.log('sun1:',await bub()); await p.screenshot({path:__dirname+'/../cir-sun.png'});
 await clickSel('#rb-sky'); await p.waitForTimeout(3000); console.log('sun won',await won()); await closeOv();

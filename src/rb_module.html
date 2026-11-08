@@ -112,11 +112,12 @@
 .rb-tray button{font:inherit;font-size:2.2rem;border:3px solid var(--ink);background:#fff;border-radius:18px;padding:2px 12px;cursor:grab;touch-action:none;min-width:84px}
 .rb-tray button b{font-size:1rem;display:block;line-height:1}
 .rb-ghost{position:fixed;z-index:99;font-size:3rem;pointer-events:none;transform:translate(-50%,-60%)}
-.rb-ov{position:absolute;inset:0;background:rgba(36,50,95,.45);display:flex;align-items:center;justify-content:center;z-index:5}
+.rb-ov{position:absolute;top:calc(env(safe-area-inset-top,0px) + 58px);right:10px;display:flex;z-index:5;pointer-events:none;max-width:min(330px,70vw)}
 .rb-ov[hidden]{display:none}
-.rb-ov>div{background:var(--card);border-radius:28px;padding:20px 26px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;animation:saIn .3s;max-width:90%}
-.rb-ov .big{font-size:3.2rem;letter-spacing:6px;color:#F2A900}
-.rb-ov h3{margin:0;font-size:clamp(1.3rem,4vw,1.9rem)}
+.rb-ov>div{pointer-events:auto;background:var(--card);border-radius:22px;padding:10px 12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;animation:saIn .3s;box-shadow:0 8px 24px rgba(36,50,95,.25);border:3px solid #FFD54A}
+.rb-ov .rb-ctrl{gap:6px}.rb-ov .rb-b{font-size:.95rem;padding:8px 12px}
+.rb-ov .big{font-size:1.9rem;letter-spacing:4px;color:#F2A900;line-height:1}
+.rb-ov h3{margin:0;font-size:clamp(.9rem,2.4vw,1.1rem)}
 .rb-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .rb-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;width:100%;max-width:700px;overflow:auto}
 .rb-opt{font:inherit;position:relative;background:#fff;border:3px solid transparent;border-radius:18px;padding:4px;cursor:pointer}
@@ -351,8 +352,8 @@ function home(){
   hero.firstChild.onclick=()=>{ react(hero.firstChild,'happy'); robo2(); sp(X().hello); };
   bub.onclick=()=>sp(X().hello); hero.appendChild(bub);
   const cards=el('div','rb-cards');
-  ['prog','mech','circ','sens','col','gar'].forEach(z=>{ const c=el('button','rb-card',`<span class="ic">${X().zones[z][0]}</span><span class="t">${X().zones[z][1]}</span><span class="p">${zoneScore(z)}</span>`);
-    c.dataset.lk='rb:'+z; c.onclick=()=>{ blip(); ({prog:zoneProg,mech:zoneMech,circ:zoneCirc,sens:zoneSens,col:zoneCol,gar:garage})[z](); sp(X().zoneSay[z]); }; cards.appendChild(c); });
+  ['prog','mech','circ','grid','sens','col','gar'].forEach(z=>{ if(z==='grid'&&!window.openGrid) return; const zn=z==='grid'?window.__gridZone():X().zones[z]; const c=el('button','rb-card',`<span class="ic">${zn[0]}</span><span class="t">${zn[1]}</span><span class="p">${z==='grid'?window.__gridScore():zoneScore(z)}</span>`);
+    c.dataset.lk='rb:'+z; c.onclick=()=>{ blip(); if(z==='grid'){ window.openGrid(()=>home()); sp(window.__gridSay()); return; } ({prog:zoneProg,mech:zoneMech,circ:zoneCirc,sens:zoneSens,col:zoneCol,gar:garage})[z](); sp(X().zoneSay[z]); }; cards.appendChild(c); });
   wrap.append(hero,cards); main.appendChild(wrap);
   if(!data.hello){ data.hello=true; save(); sp(X().hello); }
 }
@@ -988,7 +989,7 @@ function circLevel(li){
   stopAll(); view='circL'; setTop(false); back=zoneCirc; curRestart=()=>circLevel(li); const myGen=gen;
   const L=CL[li], XC=()=>X().cm||{};
   const G=()=>L.k?X().cx[L.k][0]:X().cg[L.o], W=()=>L.k?X().cx[L.k][1]:X().cwhy[L.o];
-  const nFx=(L.fx||[]).length; let wires=(L.fx||[]).map(w=>w.slice()), sw={}, errs=0, done=false, said={}, drag=null, ring=null, phase=0, presses=0, held=null, heldRang=false, placed=null, tested={};
+  const nFx=(L.fx||[]).length; let selW=null, selXY=null; let wires=(L.fx||[]).map(w=>w.slice()), sw={}, errs=0, done=false, said={}, drag=null, ring=null, phase=0, presses=0, held=null, heldRang=false, placed=null, tested={};
   L.c.forEach(([id,t])=>{ if(t==='sw'||t==='btn'||t==='gap') sw[id]=false; if(t==='pot') sw[id]=1; }); if(L.sun) sw.__sun=true;
   const goalTxt=()=>L.chk&&L.chk.seq?XC()[L.chk.seq[phase]]||G():G();
   const dotsN=L.chk&&L.chk.press?L.chk.press:L.chk&&L.chk.mat?MATS.length:L.chk&&L.chk.seq?L.chk.seq.length:0;
@@ -1006,28 +1007,33 @@ function circLevel(li){
     let s='<svg viewBox="0 0 900 520"><rect x="10" y="10" width="880" height="500" rx="26" fill="#2F7D5B"/><rect x="22" y="22" width="856" height="476" rx="20" fill="#3B9B6F"/>';
     for(let i=0;i<16;i++) for(let j=0;j<9;j++) s+=`<circle cx="${60+i*52}" cy="${50+j*52}" r="2.5" fill="rgba(255,255,255,.18)"/>`;
     if(L.sun){ const on=sw.__sun; s+=`<g id="rb-sky" style="cursor:pointer"><circle cx="120" cy="96" r="70" fill="${on?'rgba(255,230,90,.25)':'rgba(255,255,255,.06)'}" class="${on?'rb-goal':''}"/><text x="120" y="122" font-size="78" text-anchor="middle">${on?'☀️':'🌥️'}</text>${on?[0,1,2].map(i=>`<line class="rb-beam" x1="${170+i*12}" y1="${130+i*10}" x2="${222+i*8}" y2="${210+i*14}" stroke="#FFE45C" stroke-width="5" stroke-dasharray="8 10" stroke-linecap="round"/>`).join(''):''}</g>`; }
-    if(L.st){ const lit=done||okNow; s+=`<text x="840" y="80" font-size="58" text-anchor="middle">${lit?L.st[1]:L.st[0]}</text>`; }
+    if(L.st){ const c=L.chk||{}; const lit=okNow||(done&&((c.mat||c.press||c.seq)?true:checkGoal(E).on)); s+=`<text x="840" y="80" font-size="58" text-anchor="middle">${lit?L.st[1]:L.st[0]}</text>`; }
+    const wpath=(p,q)=>{ const mx=(p[0]+q[0])/2, my=Math.max(p[1],q[1])+50; return `M${p[0]} ${p[1]} Q${mx} ${my} ${q[0]} ${q[1]}`; };
+    wires.forEach((w,i)=>{ const d=wpath(T[w[0]],T[w[1]]); const act=!E.short&&wireActive(E,i); const fx=i<nFx;
+      s+=`<g opacity="${act||fx||selW===i?1:.55}"><path d="${d}" stroke="${selW===i?'#FF5D7A':'#1C2A40'}" stroke-width="${selW===i?17:13}" fill="none" stroke-linecap="round"/><path class="rb-wire" data-i="${i}" d="${d}" stroke="${act||E.short?COLS2[i%6]:fx?'#C9D3E0':'#9AA5B8'}" stroke-width="8" fill="none" stroke-linecap="round" style="cursor:${fx?'default':'pointer'}"/></g>`;
+      if(selW===i){ const p=T[w[0]],q=T[w[1]]; selXY=[(p[0]+2*((p[0]+q[0])/2)+q[0])/4,(p[1]+2*(Math.max(p[1],q[1])+50)+q[1])/4]; }
+      if(act) s+=`<path class="rb-flow" d="${d}" stroke="#FFF59A" stroke-width="4" fill="none" stroke-linecap="round" pointer-events="none" style="animation-duration:${(0.9-0.25*Math.min(2,maxI(E))).toFixed(2)}s"/>`; });
     L.c.forEach(([id,type,x,y,col])=>{ const I=E.I[id]||0; let cls=I>=1.5?'on turbo':I>=0.8?'on':I>=0.3?'on dim':I>=0.12?'on faint':''; if(E.burnt.includes(id)) cls='burnt'; if(type==='solar'&&sw.__sun) cls='sunny';
       const st=type==='gap'?placed&&placed[1]:col; s+=`<g class="${cls}">${compSVG(id,type,x,y,sw[id],st)}</g>`;
       if(E.burnt.includes(id)) s+=`<text class="rb-boom" x="${x}" y="${y-10}" font-size="64" text-anchor="middle">💥</text><text class="rb-smoke" x="${x+20}" y="${y-60}" font-size="40" text-anchor="middle">💨</text>`; });
-    const wpath=(p,q)=>{ const mx=(p[0]+q[0])/2, my=Math.max(p[1],q[1])+50; return `M${p[0]} ${p[1]} Q${mx} ${my} ${q[0]} ${q[1]}`; };
-    wires.forEach((w,i)=>{ const d=wpath(T[w[0]],T[w[1]]); const act=!E.short&&wireActive(E,i); const fx=i<nFx;
-      s+=`<g opacity="${act||fx?1:.55}"><path d="${d}" stroke="#1C2A40" stroke-width="13" fill="none" stroke-linecap="round"/><path class="rb-wire" data-i="${i}" d="${d}" stroke="${act||E.short?COLS2[i%6]:fx?'#C9D3E0':'#9AA5B8'}" stroke-width="8" fill="none" stroke-linecap="round" style="cursor:${fx?'default':'pointer'}"/></g>`;
-      if(act) s+=`<path class="rb-flow" d="${d}" stroke="#FFF59A" stroke-width="4" fill="none" stroke-linecap="round" pointer-events="none" style="animation-duration:${(0.9-0.25*Math.min(2,maxI(E))).toFixed(2)}s"/>`; });
     if(E.short){ const sc=L.c.find(c=>c[0]===E.src)||L.c[0]; s=s.replace(`id="rb-c-${sc[0]}"`,`id="rb-c-${sc[0]}" class="rb-hot"`)+`<text x="${sc[2]}" y="${sc[3]-40}" font-size="40" text-anchor="middle">🔥</text>`; }
     for(const k in T){ if(L.chk&&L.chk.mat) break; const [x,y]=T[k]; const plus=srcTerm(k)&&k.endsWith('.b'), minus=srcTerm(k)&&k.endsWith('.a'); s+=`<circle class="rb-term" data-t="${k}" cx="${x}" cy="${y}" r="16" fill="${plus?'#FFB21E':minus?'#C9D3E0':'#fff'}" stroke="#24325F" stroke-width="4"/>`; }
+    if(selW!=null&&selXY) s+=`<g id="rb-cut" style="cursor:pointer"><circle cx="${selXY[0]}" cy="${selXY[1]}" r="30" fill="#FF5D7A" stroke="#fff" stroke-width="5"/><text x="${selXY[0]}" y="${selXY[1]+12}" font-size="34" text-anchor="middle">✂️</text></g>`;
     s+='<path id="rb-tmp" stroke="#fff" stroke-width="7" stroke-dasharray="10 8" fill="none" stroke-linecap="round" pointer-events="none"/><path id="rb-ghost" stroke="#FFF59A" stroke-width="8" stroke-dasharray="4 10" fill="none" stroke-linecap="round" pointer-events="none"/></svg>';
     F.stage.innerHTML=s; const svg=F.stage.firstChild;
-    svg.querySelectorAll('.rb-term').forEach(c=>c.onpointerdown=e=>{ if(done) return; e.preventDefault(); drag={from:c.dataset.t}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} blip(); });
+    svg.querySelectorAll('.rb-term').forEach(c=>c.onpointerdown=e=>{ e.preventDefault(); selW=null; drag={from:c.dataset.t}; try{ svg.setPointerCapture(e.pointerId);}catch(_){} blip(); });
     svg.onpointermove=e=>{ if(!drag) return; const p=pt(svg,e), a=T[drag.from]; svg.querySelector('#rb-tmp').setAttribute('d',`M${a[0]} ${a[1]} L${p.x} ${p.y}`); };
     svg.onpointerup=e=>{ if(!drag) return; const p=pt(svg,e); let best=null,bd=42; for(const k in T){ const d=Math.hypot(T[k][0]-p.x,T[k][1]-p.y); if(d<bd){ bd=d; best=k; } }
       const f=drag.from; drag=null; if(best&&best!==f&&!wires.some(w=>(w[0]===f&&w[1]===best)||(w[1]===f&&w[0]===best))){ wires.push([f,best]); snd(660,.08); after(); } else render(); };
-    svg.querySelectorAll('.rb-wire').forEach(w=>w.onclick=()=>{ if(done||+w.dataset.i<nFx) return; wires.splice(+w.dataset.i,1); snd(300,.08); after(); });
-    svg.querySelectorAll('.rb-sw').forEach(g=>g.onclick=()=>{ if(done) return; const id=g.id.replace('rb-c-',''); sw[id]=!sw[id]; snd(sw[id]?900:500,.06,'square',.08); after(); });
-    svg.querySelectorAll('.rb-pot').forEach(g=>g.onclick=()=>{ if(done) return; const id=g.id.replace('rb-c-',''); sw[id]=((sw[id]|0)+1)%4; [520,600,700,820].slice(0,sw[id]+1).forEach((fq,i)=>setTimeout(()=>snd(fq,.05,'square',.05),i*40)); after(); });
-    svg.querySelectorAll('.rb-btn').forEach(g=>g.onpointerdown=e=>{ if(done) return; e.preventDefault(); e.stopPropagation(); const id=g.id.replace('rb-c-',''); held=id; heldRang=false; sw[id]=true; snd(300,.05,'square',.06);
+    /* firul nu mai dispare dintr-o atingere: prima atingere îl alege, foarfeca ✂️ îl taie */
+    svg.querySelectorAll('.rb-wire').forEach(w=>w.onclick=e=>{ e.stopPropagation(); if(+w.dataset.i<nFx) return; const i=+w.dataset.i; selW=selW===i?null:i; blip(); if(selW!=null) say1('cut',XC().cutH); render(); });
+    const cut=svg.querySelector('#rb-cut'); if(cut) cut.onclick=e=>{ e.stopPropagation(); if(selW==null) return; wires.splice(selW,1); selW=null; snd(300,.08); after(); };
+    svg.addEventListener('click',e=>{ if(selW!=null&&!e.target.closest('.rb-wire,#rb-cut')){ selW=null; render(); } });
+    svg.querySelectorAll('.rb-sw').forEach(g=>g.onclick=e=>{ e.stopPropagation(); if(selW!=null) selW=null; const id=g.id.replace('rb-c-',''); sw[id]=!sw[id]; snd(sw[id]?900:500,.06,'square',.08); after(); });
+    svg.querySelectorAll('.rb-pot').forEach(g=>g.onclick=e=>{ e.stopPropagation(); const id=g.id.replace('rb-c-',''); sw[id]=((sw[id]|0)+1)%4; [520,600,700,820].slice(0,sw[id]+1).forEach((fq,i)=>setTimeout(()=>snd(fq,.05,'square',.05),i*40)); after(); });
+    svg.querySelectorAll('.rb-btn').forEach(g=>g.onpointerdown=e=>{ e.preventDefault(); e.stopPropagation(); const id=g.id.replace('rb-c-',''); held=id; heldRang=false; sw[id]=true; snd(300,.05,'square',.06);
       const up=()=>{ window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up); if(held!==id) return; held=null; sw[id]=false; after(); if(heldRang) onPress(); }; window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up); after(); });
-    const sky=svg.querySelector('#rb-sky'); if(sky) sky.onclick=()=>{ if(done) return; sw.__sun=!sw.__sun; snd(sw.__sun?990:330,.15,'sine',.1); after(); };
+    const sky=svg.querySelector('#rb-sky'); if(sky) sky.onclick=()=>{ sw.__sun=!sw.__sun; snd(sw.__sun?990:330,.15,'sine',.1); after(); };
     return E;
   }
   const maxI=E=>Math.max(0,...Object.values(E.I||{}));
@@ -1112,7 +1118,7 @@ function circLevel(li){
     busyM=false; if(n>=MATS.length) return win(); placed=null; sw.G1=false; render(); F.set(G()); matTray(); }
   render();
   if(L.chk&&L.chk.mat) matTray();
-  else F.ctrl.append(btn(X().hint,'',hint),btn(X().clear,'',()=>{ if(done) return; wires=(L.fx||[]).map(w=>w.slice()); said={}; after(); }));
+  else F.ctrl.append(btn(X().hint,'',hint),btn(X().clear,'',()=>{ selW=null; wires=(L.fx||[]).map(w=>w.slice()); said={}; after(); }));
   sp(G()+(L.o===0?' '+X().circIntro:''));
 }
 

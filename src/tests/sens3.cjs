@@ -3,13 +3,13 @@ const {chromium}=require('playwright');
 await p.goto('file://'+__dirname+'/index.html'); await p.waitForTimeout(900);
 const sens=['light','line','touch','sonar','thermo','sort'];
 const openLv=async(L,si,li)=>{ await p.evaluate(l=>window.__switchLang(l),L); await p.evaluate(()=>{ started=true; window.openRobo(); }); await p.waitForTimeout(80);
-  await p.evaluate(()=>[...document.querySelectorAll('.rb-card')][3].click()); await p.waitForTimeout(80);
+  await p.evaluate(()=>document.querySelector('.rb-card[data-lk="rb:sens"]').click()); await p.waitForTimeout(80);
   await p.evaluate(si=>[...document.querySelectorAll('.rb-card')][si].click(),si); await p.waitForTimeout(80);
   await p.evaluate(()=>{ const a=document.getElementById('rb-all'); if([...document.querySelectorAll('.rb-grid .rb-card')].some(c=>c.classList.contains('lock'))) a.click(); }); await p.waitForTimeout(80);
   await p.evaluate(li=>[...document.querySelectorAll('.rb-grid .rb-card')][li].click(),li); await p.waitForTimeout(250); };
 const bub=()=>p.evaluate(()=>[...document.querySelectorAll('.rb-bubble')].filter(x=>x.offsetParent).map(x=>x.textContent).join('|'));
 const won=()=>p.evaluate(()=>!document.getElementById('rb-ov').hidden);
-const counts=await p.evaluate(()=>{ window.openRobo(); [...document.querySelectorAll('.rb-card')][3].click(); return [...document.querySelectorAll('.rb-card .p')].map(x=>x.textContent); }); console.log('menu',counts.join(' '));
+const counts=await p.evaluate(()=>{ window.openRobo(); document.querySelector('.rb-card[data-lk="rb:sens"]').click(); return [...document.querySelectorAll('.rb-card .p')].map(x=>x.textContent); }); console.log('menu',counts.join(' '));
 for(const L of (process.argv[2]||'ro,de,en,fr,es,it,pt,nl,pl,uk,ru,hu').split(',')){ const bad=[];
   for(let si=0;si<6;si++){ const n=await p.evaluate(si=>({light:11,line:10,touch:6,sonar:8,thermo:6,sort:5})[['light','line','touch','sonar','thermo','sort'][si]],si);
     for(let li=0;li<n;li++){ await openLv(L,si,li); const t=await bub(); if(!t||/undefined|NaN/.test(t)) bad.push(sens[si]+li+':'+t); } }
