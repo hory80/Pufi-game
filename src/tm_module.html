@@ -284,7 +284,7 @@ function frame(task,n,face){ main.innerHTML=''; const head=el('div','rb-head'); 
   const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(fc,bub,dots);
   const stage=el('div','tm-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=fc.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
   return {bub,stage,ctrl,set:t=>bub.textContent=t,say:t=>{ bub.textContent=t; return sp(t); },dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
-function finish(key,s,onNext){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+function finish(key,s,onNext){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
   $('ovNext').textContent=X().next; $('ovNext').hidden=!onNext; curNext=onNext; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
 $('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };

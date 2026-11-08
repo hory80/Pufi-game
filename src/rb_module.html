@@ -323,7 +323,7 @@ function frame(task,dotsN){
   main.append(head,stage,ctrl);
   return {head,face,bub,dots,stage,ctrl,set:t=>{ bub.textContent=t; }, dot:n=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<n))};
 }
-function finish(key,s,txt,onNext){
+function finish(key,s,txt,onNext){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   data.prog[key]=Math.max(data.prog[key]||0,s); save();
   $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=txt||X().done(s);
   $('ovNext').textContent=X().next; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toZone;

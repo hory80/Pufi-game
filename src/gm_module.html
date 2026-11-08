@@ -113,7 +113,7 @@ function frame(task,n){ main.innerHTML=''; const head=el('div','rb-head'); const
 window.__gmTX=TX;
 const XN=()=>X().gx||{};
 let nextFn=null;
-function finish(key,s,next){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); nextFn=next||null; $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+function finish(key,s,next){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} data.prog[key]=Math.max(data.prog[key]||0,s); save(); nextFn=next||null; $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
   $('ovNext').textContent=next?(XN().nextLv||X().next):X().toMenu; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ovBack').hidden=!next; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
 $('ovNext').onclick=()=>{ $('ov').hidden=true; if(nextFn) nextFn(); else (lastGrid||menu)(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };

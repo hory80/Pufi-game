@@ -397,7 +397,7 @@ function scriptCheck(){ const s=scr[si]; if(!s||s.want==null) return; if(sv.val(
 function lesson(i){ L=i; ti=0; errs=0; enter(); newBoard(NR[i]); sv.on=onBeads; $('title').textContent=ICONS[i]+' '+X().les[i]; $('ans').hidden=true; $('task').innerHTML=''; sv.opacity(1);
   dots(TASKS(),0); const scriptedL=i<=1; $('replay').hidden=scriptedL||i===8; $('hint').hidden=scriptedL; $('check').hidden=scriptedL; $('clear').hidden=false;
   if(scriptedL){ phase='script'; $('phase').textContent=X().you; scripted(); } else nextTask(); }
-function finish(){ token++; busy=true; const s=errs===0?3:errs<=2?2:1; const b=best(); b[L]=Math.max(b[L]||0,s); LS.set('sg_best',b); markDay(); try{ stars+=2; renderBar(); }catch(e){} pill(); try{ confetti(40); }catch(e){}
+function finish(){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} token++; busy=true; const s=errs===0?3:errs<=2?2:1; const b=best(); b[L]=Math.max(b[L]||0,s); LS.set('sg_best',b); markDay(); try{ stars+=2; renderBar(); }catch(e){} pill(); try{ confetti(40); }catch(e){}
   const ov=document.createElement('div'); ov.className='sg-ov'; ov.innerHTML=`<div><div class="big">${'★'.repeat(s)}${'☆'.repeat(3-s)}</div><h3>${X().done}</h3><div class="row">${L<8?`<button class="go" data-a="n">${X().next}</button>`:''}<button data-a="a">${X().again}</button><button data-a="m">${X().menu}</button></div></div>`;
   $('play').appendChild(ov); sp(X().done); const go=f=>()=>{ ov.remove(); f(); };
   const n=ov.querySelector('[data-a=n]'); if(n) n.onclick=go(()=>{ if(window.__gate&&window.__gate('sa','g'+(L+1))) return menu(); lesson(L+1); });

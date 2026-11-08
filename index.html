@@ -656,6 +656,9 @@ window.L10N=window.L10N||{};
 const LANG_ALL=[['ro','🇷🇴','Română'],['de','🇩🇪','Deutsch'],['en','🇬🇧','English'],['fr','🇫🇷','Français'],['it','🇮🇹','Italiano'],['es','🇪🇸','Español'],['pt','🇧🇷','Português'],['nl','🇳🇱','Nederlands'],['pl','🇵🇱','Polski'],['hu','🇭🇺','Magyar'],['uk','🇺🇦','Українська'],['ru','🇷🇺','Русский']];
 function TR(mod,TX){ return TX[lang]||((window.L10N[mod]||{})[lang])||TX.en||TX.ro; }
 function langReady(l){ return ['ro','de','en'].includes(l)||!!(window.L10N.main&&window.L10N.main[l]); }
+/* Pufi se câștigă: fiecare nivel terminat în celelalte jocuri adună puncte (pq_earn); un nivel Pufi cere 15 */
+window.PQ_COST=15;
+window.__lvDone=function(w){ try{ if(!document.getElementById('pq-root')||!document.getElementById('pq-root').hidden) return; const v=(+localStorage.getItem('pq_earn')||0)+(w||1); localStorage.setItem('pq_earn',String(Math.round(v*100)/100)); }catch(e){} };
 const SAYFIX={
   ro:{'Dublin':'Dablin','Washington':'Uașington','Bruxelles':'Bruxel','Reykjavík':'Reikiavic','Beijing':'Beigin','Tokyo':'Tokio',
       'New Delhi':'Niu Deli','Ciudad de México':'Siudad de Mehico','Brasília':'Brasilia','Ottawa':'Otaua','Seul':'Seul','Du-l ':'Dul '},
@@ -1141,7 +1144,7 @@ function confetti(n){
     document.body.appendChild(c); setTimeout(()=>c.remove(),2600); }
 }
 function win(firstLine, msgEl, popEl){
-  stars++; renderBar(); beep(true);
+  try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} stars++; renderBar(); beep(true);
   const big=stars%10===0, pr=T().praise, p=pr[rnd(pr.length)];
   msgEl.textContent=big?T().bigMsg:p+' 🎉';
   confetti(big?40:14);
@@ -1252,7 +1255,7 @@ function showMap(c){
   return true;
 }
 function flagWin(bt){
-  stars++; renderBar(); beep(true);
+  try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} stars++; renderBar(); beep(true);
   const big=stars%10===0, pr=T().praise, p=pr[rnd(pr.length)];
   $('fmsg').textContent=big?T().bigMsg:p+' 🎉';
   confetti(big?40:14);
@@ -1889,7 +1892,7 @@ function tone2(){ beep(true); }
 function undo(prev,text){ busy=true; try{beep(false)}catch(e){} shake(); msg(text);
   speak(text).then(()=>{}); setTimeout(()=>{ Bd=prev; last=null; busy=false; render(); },900); }
 function win(text,next=true){
-  busy=true; stars++; renderBar(); updStars(); try{ beep(true); confetti(14); }catch(e){}
+  try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} busy=true; stars++; renderBar(); updStars(); try{ beep(true); confetti(14); }catch(e){}
   const p=praise(); msg(p+' 🎉'); lv[mode]=L(mode)+1; store('ch_lv',JSON.stringify(lv));
   speak(text+' '+p).then(sp=>setTimeout(()=>{ busy=false; if(next&&view==='play') newTask(); }, sp?500:1600));
 }
@@ -2122,7 +2125,7 @@ const spoken=w=>{ const l=w.replace(/-/g,'').toLowerCase(); return LG()==='de'?l
 function speak(t){ return (typeof say==='function')?say(t):Promise.resolve(false); }
 function msg(t){ $('msg').textContent=t||''; }
 function setTask(t,speakText){ $('task').textContent=t; task.say=speakText||t; if(speakText!==false) speak(task.say); }
-function win(text,after){ busy=true; stars++; try{ renderBar(); }catch(e){} $('stars').textContent='⭐ '+stars; try{ beep(true); confetti(12); }catch(e){}
+function win(text,after){ try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} busy=true; stars++; try{ renderBar(); }catch(e){} $('stars').textContent='⭐ '+stars; try{ beep(true); confetti(12); }catch(e){}
   const p=T().praise[rnd2(T().praise.length)]; msg(p+' 🎉');
   speak(text).then(sp=>setTimeout(()=>{ busy=false; if(view==='play'&&after) after(); }, sp?400:1400)); }
 function oops(node,text){ try{ beep(false); }catch(e){} if(node){ node.classList.remove('rd-shake'); void node.offsetWidth; node.classList.add('rd-shake'); } if(text){ msg(text); speak(text); } }
@@ -2895,7 +2898,7 @@ function success(){
   $('board').classList.remove('pop'); void $('board').offsetWidth; $('board').classList.add('pop');
   spW(X().right(tk.n)+' '+p, 1200).then(()=>{ if(view!=='play') return; done>=PER?levelDone():newTask(); });
 }
-function levelDone(){
+function levelDone(){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   const s=errs===0?3:errs<=2?2:1; best[li]=Math.max(best[li]||0,s); saveBest();
   $('ovStars').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovTxt').textContent=X().done(s);
   $('ovNext').hidden=li>=LV.length-1; $('ov').hidden=false; try{ confetti(40); }catch(e){}
@@ -6931,7 +6934,7 @@ function frame(task,dotsN){
   main.append(head,stage,ctrl);
   return {head,face,bub,dots,stage,ctrl,set:t=>{ bub.textContent=t; }, dot:n=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<n))};
 }
-function finish(key,s,txt,onNext){
+function finish(key,s,txt,onNext){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   data.prog[key]=Math.max(data.prog[key]||0,s); save();
   $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=txt||X().done(s);
   $('ovNext').textContent=X().next; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toZone;
@@ -8329,7 +8332,7 @@ function frame(task,n){ main.innerHTML=''; const head=el('div','rb-head'); const
 window.__gmTX=TX;
 const XN=()=>X().gx||{};
 let nextFn=null;
-function finish(key,s,next){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); nextFn=next||null; $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+function finish(key,s,next){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} data.prog[key]=Math.max(data.prog[key]||0,s); save(); nextFn=next||null; $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
   $('ovNext').textContent=next?(XN().nextLv||X().next):X().toMenu; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ovBack').hidden=!next; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
 $('ovNext').onclick=()=>{ $('ov').hidden=true; if(nextFn) nextFn(); else (lastGrid||menu)(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
@@ -9092,7 +9095,7 @@ function frame(task,n){ main.innerHTML=''; const head=el('div','rb-head'); const
   const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(face,bub,dots);
   const stage=el('div','mw-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=face.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
   return {bub,stage,ctrl,set:t=>bub.textContent=t,dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
-function finish(key,s,onNext){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+function finish(key,s,onNext){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
   $('ovNext').textContent=X().next; $('ovNext').hidden=!onNext; curNext=onNext; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
 $('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
@@ -9673,7 +9676,7 @@ function checkEnd(){
   else if(G.hm>=100){ txt=X().fifty; res='draw'; }
   else { const k=key(G); if(K.filter(x=>x===k).length>=2){ txt=X().rep; res='draw'; } }
   if(!txt) return false;
-  over=true; busy=false; status(txt,true); render();
+  over=true; busy=false; status(txt,true); render(); try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   if(res==='win'){ const n={easy:1,mid:2,hard:3}[opp]; D.wins[opp]=(D.wins[opp]||0)+1; stars+=n; try{ renderBar(); confetti(40); beep(true); }catch(e){} }
   else if(res==='w'||res==='draw'){ stars+=1; try{ renderBar(); confetti(14); }catch(e){} }
   else { try{ beep(false); }catch(e){} }
@@ -10020,7 +10023,7 @@ function frame(task,n,face){ main.innerHTML=''; const head=el('div','rb-head'); 
   const dots=el('div','rb-dots'); for(let i=0;i<(n||0);i++) dots.appendChild(el('span')); head.append(fc,bub,dots);
   const stage=el('div','tm-stage'); const ctrl=el('div','rb-ctrl'); ctrl.style.flexDirection='column'; main.append(head,stage,ctrl); bub.onclick=fc.onclick=()=>sp(bub.textContent.replace(/^[^\p{L}\d]+/u,''));
   return {bub,stage,ctrl,set:t=>bub.textContent=t,say:t=>{ bub.textContent=t; return sp(t); },dot:k=>[...dots.children].forEach((d,i)=>d.classList.toggle('on',i<k))}; }
-function finish(key,s,onNext){ data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
+function finish(key,s,onNext){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} data.prog[key]=Math.max(data.prog[key]||0,s); save(); $('ovS').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovT').textContent=X().done(s);
   $('ovNext').textContent=X().next; $('ovNext').hidden=!onNext; curNext=onNext; $('ovAgain').textContent=X().again; $('ovBack').textContent=X().toMenu; $('ov').hidden=false; try{ confetti(36); beep(true); }catch(e){} sp(X().done(s)); }
 $('ovNext').onclick=()=>{ $('ov').hidden=true; curNext&&curNext(); };
 $('ovAgain').onclick=()=>{ $('ov').hidden=true; curRestart&&curRestart(); };
@@ -10499,6 +10502,10 @@ window.__tm={tSay,digi,skyCols,data,play};
 .pq-ov h1{margin:0;font-size:clamp(2rem,6vw,3.6rem);line-height:1.05}
 .pq-ov p{margin:0;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:700}
 .pq-hero{font-size:clamp(2.6rem,9vw,4.6rem);line-height:1}
+.pq-earn{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;box-sizing:border-box;background:rgba(255,255,255,.85);border-radius:999px;padding:6px 14px;box-shadow:0 4px 0 rgba(36,50,95,.15);cursor:pointer;max-width:100%}
+.pq-earn .dots{display:flex;flex-wrap:nowrap;gap:clamp(1px,.5vw,4px);justify-content:center}.pq-earn i{width:clamp(13px,3.6vw,24px);height:clamp(13px,3.6vw,24px);border-radius:50%;background:#E3E7F2;font-style:normal;font-size:clamp(9px,2.4vw,15px);line-height:clamp(13px,3.6vw,24px);text-align:center;flex:none}
+.pq-earn .lk,.pq-earn .tk{font-size:1.25rem;flex:none}.pq-earn.ok{background:#FFF4C2}.pq-earn.ok .tk{font-size:1.8rem;animation:pqTk 1.2s ease-in-out infinite}@keyframes pqTk{50%{transform:scale(1.15)}}
+.pq-map.wait .pq-lv{filter:grayscale(.7);opacity:.7}
 .pq-map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:900px}
 .pq-lv{font:inherit;border:none;border-radius:22px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;box-shadow:0 7px 0 rgba(36,50,95,.2);color:var(--ink);position:relative}
 .pq-lv .ic{font-size:clamp(2rem,6vh,3rem);line-height:1.1}
@@ -10839,7 +10846,7 @@ function showWin(){ if(state!=='won'||root.hidden) return; const last=LI===NLV-1
   $('winHero').textContent=last?'🏆🦊🎉':'🏠🦊🎉'; $('winT').textContent=last?X().allDone:X().won; $('winS').textContent=X().winS(sc,medals.size);
   $('next').textContent=last?X().map:X().next; $('again').textContent=X().again; $('toMap').textContent=X().map; $('winOv').hidden=false; sp((last?X().allDone:X().won)+' '+X().winS(sc,medals.size).replace(/[⭐🌟·]/g,' ')); }
 $('next').onclick=()=>{ if(LI<NLV-1) startLevel(LI+1); else showMap(); };
-$('again').onclick=()=>startLevel(LI); $('toMap').onclick=showMap; $('menu').onclick=showMap;
+$('again').onclick=()=>startLevel(LI); $('toMap').onclick=()=>showMap(); $('menu').onclick=()=>showMap();
 $('mute').onclick=()=>{ muted=!muted; try{ localStorage.setItem('pq_mute',muted?'1':'0'); }catch(e){} $('mute').textContent=muted?'🔇':'🔊'; if(muted) try{ speechSynthesis.cancel(); }catch(e){} };
 $('exit').onclick=()=>{ state='map'; root.hidden=true; try{ speechSynthesis.cancel(); }catch(e){} };
 
@@ -10851,6 +10858,37 @@ function loop(now){ try{ const dt=Math.min(.05,(now-lastT)/1000); lastT=now;
   requestAnimationFrame(loop); }
 resize(); MAIN=W=LV(0).main; P=newP(2*TS,GY*TS); requestAnimationFrame(loop);
 (window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden&&state==='map') showMap(); });
+/* ---------- Pufi se câștigă: un nivel Pufi = 15 niveluri terminate în celelalte jocuri ---------- */
+const EARN={
+ ro:{need:n=>`Ca să te joci cu Pufi, mai termină ${n===1?'un nivel':(n===2?'două':n===12?'douăsprezece':n)+' niveluri'} în celelalte jocuri!`,ready:'Bravo! Ai câștigat un nivel cu Pufi. Alege unde mergi!',more:'Ai mai câștigat un nivel cu Pufi!'},
+ en:{need:n=>`To play with Pufi, finish ${n===1?'one more level':n+' more levels'} in the other games!`,ready:'Well done! You earned a Pufi level. Choose where to go!',more:'You earned another Pufi level!'},
+ de:{need:n=>`Um mit Pufi zu spielen, schaffe noch ${n===1?'ein Level':n+' Level'} in den anderen Spielen!`,ready:'Super! Du hast ein Pufi-Level verdient. Such dir eins aus!',more:'Du hast noch ein Pufi-Level verdient!'},
+ fr:{need:n=>`Pour jouer avec Pufi, termine encore ${n===1?'un niveau':n+' niveaux'} dans les autres jeux !`,ready:'Bravo ! Tu as gagné un niveau avec Pufi. Choisis où aller !',more:'Tu as gagné encore un niveau avec Pufi !'},
+ es:{need:n=>`Para jugar con Pufi, termina ${n===1?'un nivel más':n+' niveles más'} en los otros juegos.`,ready:'¡Muy bien! Has ganado un nivel con Pufi. ¡Elige adónde ir!',more:'¡Has ganado otro nivel con Pufi!'},
+ it:{need:n=>`Per giocare con Pufi, completa ancora ${n===1?'un livello':n+' livelli'} negli altri giochi!`,ready:'Bravo! Hai guadagnato un livello con Pufi. Scegli dove andare!',more:'Hai guadagnato un altro livello con Pufi!'},
+ pt:{need:n=>`Para brincar com o Pufi, termina mais ${n===1?'um nível':n+' níveis'} nos outros jogos!`,ready:'Muito bem! Ganhaste um nível com o Pufi. Escolhe para onde ir!',more:'Ganhaste mais um nível com o Pufi!'},
+ nl:{need:n=>`Om met Pufi te spelen, maak je nog ${n===1?'één level':n+' levels'} af in de andere spelletjes!`,ready:'Goed zo! Je hebt een Pufi-level verdiend. Kies waar je heen gaat!',more:'Je hebt nog een Pufi-level verdiend!'},
+ pl:{need:n=>`Żeby zagrać z Pufim, ukończ jeszcze ${n===1?'jeden poziom':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'poziomy':'poziomów')} w innych grach!`,ready:'Brawo! Zdobyłeś poziom z Pufim. Wybierz, dokąd idziesz!',more:'Zdobyłeś jeszcze jeden poziom z Pufim!'},
+ uk:{need:n=>`Щоб гратися з Пуфі, пройди ще ${n===1?'один рівень':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'рівні':'рівнів')} в інших іграх!`,ready:'Молодець! Ти заробив рівень із Пуфі. Обирай, куди йти!',more:'Ти заробив ще один рівень із Пуфі!'},
+ ru:{need:n=>`Чтобы поиграть с Пуфи, пройди ещё ${n===1?'один уровень':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'уровня':'уровней')} в других играх!`,ready:'Молодец! Ты заработал уровень с Пуфи. Выбирай, куда идти!',more:'Ты заработал ещё один уровень с Пуфи!'},
+ hu:{need:n=>`Ahhoz, hogy Pufival játssz, teljesíts még ${n===1?'egy':n} szintet a többi játékban!`,ready:'Ügyes vagy! Kiérdemeltél egy szintet Pufival. Válaszd ki, hova mész!',more:'Kiérdemeltél még egy szintet Pufival!'}};
+const EX=()=>EARN[(typeof lang!=='undefined'&&EARN[lang])?lang:'ro'];
+const earnGet=()=>{ try{ return +localStorage.getItem('pq_earn')||0; }catch(e){ return 0; } };
+const earnSet=v=>{ try{ localStorage.setItem('pq_earn',String(Math.max(0,Math.round(v*100)/100))); }catch(e){} };
+const paidGet=()=>{ try{ return localStorage.getItem('pq_paid')==='1'; }catch(e){ return false; } };
+const paidSet=b=>{ try{ b?localStorage.setItem('pq_paid','1'):localStorage.removeItem('pq_paid'); }catch(e){} };
+const COST=()=>window.PQ_COST||15;
+const canPlay=()=>paidGet()||earnGet()>=COST();
+const tickets=()=>Math.floor(earnGet()/COST())+(paidGet()?1:0);
+function earnUI(){ let bar=$('earn'); if(!bar){ bar=document.createElement('div'); bar.id='pq-earn'; bar.className='pq-earn'; $('map').before(bar);
+    bar.onclick=()=>sp(canPlay()?EX().ready:EX().need(Math.ceil(COST()-earnGet()))); }
+  const t=tickets(); if(t>0){ bar.innerHTML=`<span class="tk">${'🎟️'.repeat(Math.min(t,5))}${t>5?' ×'+t:''}</span>`; bar.classList.add('ok'); }
+  else { const got=Math.floor(earnGet()), c=COST(); let h=''; for(let i=0;i<c;i++) h+=`<i class="${i<got?'on':''}">${i<got?'⭐':''}</i>`; bar.innerHTML=`<span class="lk">🔒</span><span class="dots">${h}</span><span class="tk">🎟️</span>`; bar.classList.remove('ok'); }
+  $('map').classList.toggle('wait',t<=0); }
+showMap=(f=>(...a)=>{ const r=f(...a); try{ earnUI(); const t=tickets(), seen=+(sessionStorage.getItem('pq_seenT')||-1);
+    if(!root.hidden){ if(t<=0) setTimeout(()=>sp(EX().need(Math.ceil(COST()-earnGet()))),400); else if(t!==seen) setTimeout(()=>sp(t>1&&seen>0?EX().more:EX().ready),400); try{ sessionStorage.setItem('pq_seenT',String(t)); }catch(e){} } }catch(e){} return r; })(showMap);
+startLevel=(f=>(i,...a)=>{ if(!paidGet()){ if(earnGet()<COST()){ showMap(); return; } earnSet(earnGet()-COST()); paidSet(true); } return f(i,...a); })(startLevel);
+showWin=(f=>(...a)=>{ if(state==='won'&&!root.hidden) paidSet(false); return f(...a); })(showWin);
 startLevel=(f=>(i,...a)=>{ if(window.__gate&&window.__gate('pq',i)){ showMap(); return; } return f(i,...a); })(startLevel);
 window.openPufi=lg=>{ root.hidden=false; resize(); $('mute').textContent=muted?'🔇':'🔊'; showMap(); };
 window.__pq={start:startLevel,get P(){return P},get W(){return W},get state(){return state},keys,press:k=>{ if(k==='j') jumpPress=true; if(k==='d') downPress=true; },grow,LV,set hearts(v){hearts=v}};
@@ -11349,7 +11387,7 @@ setInterval(()=>{ if(run&&run.mode==='sprint'&&!run.busy) moveTrack(); },500);
 function timeUp(){ if(!run||run.dead) return; const my=run; run.busy=true; try{ beep(false); }catch(e){}
   if(run.mode==='sprint'){ run.items.length=run.i; run.c.tasks=run.i; } else { for(let k=run.i;k<run.c.tasks;k++){ if(!run.items[k]) run.items[k]=genItem(run.c); run.items[k].given=null; } }
   $('stage').innerHTML=`<div class="sp-cnt" style="font-size:clamp(2.4rem,9vmin,5rem)">⏰ ${X().timeUp}</div>`; sp(X().timeUp); setTimeout(()=>{ if(run===my) finish(true); },1400); }
-function finish(){ if(!run) return; const r=run; clearInterval(r.timer); r.dead=true; document.removeEventListener('keydown',onKey); view='res'; top('🏁 '+X().res);
+function finish(){ if(!run) return; const r=run; if(r.ok>0){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} } clearInterval(r.timer); r.dead=true; document.removeEventListener('keydown',onKey); view='res'; top('🏁 '+X().res);
   const total=r.mode==='sprint'?r.ok:r.c.tasks, secs=(performance.now()-r.t0)/1000; let head='', extra='', stars2=0, speak='';
   if(r.mode==='sprint'){ const recs=LS.get('sp_rec',{}), k='s'+r.lvl, old=recs[k]||0; const isRec=r.ok>old; if(isRec){ recs[k]=r.ok; LS.set('sp_rec',recs); }
     head=`<div class="big">🏁 ${r.ok}</div><h3>${X().solved(r.ok)}</h3>${isRec?`<h3 style="color:#E0A800">${X().newRec}</h3>`:`<p>🏆 ${X().record}: ${old}</p>`}`; stars2=Math.floor(r.ok/5)+(isRec?2:0); speak=X().solved(r.ok)+(isRec?' '+X().newRec:''); if(isRec) try{ confetti(60); }catch(e){} }
@@ -11964,7 +12002,7 @@ function scriptCheck(){ const s=scr[si]; if(!s||s.want==null) return; if(sv.val(
 function lesson(i){ L=i; ti=0; errs=0; enter(); newBoard(NR[i]); sv.on=onBeads; $('title').textContent=ICONS[i]+' '+X().les[i]; $('ans').hidden=true; $('task').innerHTML=''; sv.opacity(1);
   dots(TASKS(),0); const scriptedL=i<=1; $('replay').hidden=scriptedL||i===8; $('hint').hidden=scriptedL; $('check').hidden=scriptedL; $('clear').hidden=false;
   if(scriptedL){ phase='script'; $('phase').textContent=X().you; scripted(); } else nextTask(); }
-function finish(){ token++; busy=true; const s=errs===0?3:errs<=2?2:1; const b=best(); b[L]=Math.max(b[L]||0,s); LS.set('sg_best',b); markDay(); try{ stars+=2; renderBar(); }catch(e){} pill(); try{ confetti(40); }catch(e){}
+function finish(){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} token++; busy=true; const s=errs===0?3:errs<=2?2:1; const b=best(); b[L]=Math.max(b[L]||0,s); LS.set('sg_best',b); markDay(); try{ stars+=2; renderBar(); }catch(e){} pill(); try{ confetti(40); }catch(e){}
   const ov=document.createElement('div'); ov.className='sg-ov'; ov.innerHTML=`<div><div class="big">${'★'.repeat(s)}${'☆'.repeat(3-s)}</div><h3>${X().done}</h3><div class="row">${L<8?`<button class="go" data-a="n">${X().next}</button>`:''}<button data-a="a">${X().again}</button><button data-a="m">${X().menu}</button></div></div>`;
   $('play').appendChild(ov); sp(X().done); const go=f=>()=>{ ov.remove(); f(); };
   const n=ov.querySelector('[data-a=n]'); if(n) n.onclick=go(()=>{ if(window.__gate&&window.__gate('sa','g'+(L+1))) return menu(); lesson(L+1); });

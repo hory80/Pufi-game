@@ -315,7 +315,7 @@ function checkEnd(){
   else if(G.hm>=100){ txt=X().fifty; res='draw'; }
   else { const k=key(G); if(K.filter(x=>x===k).length>=2){ txt=X().rep; res='draw'; } }
   if(!txt) return false;
-  over=true; busy=false; status(txt,true); render();
+  over=true; busy=false; status(txt,true); render(); try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   if(res==='win'){ const n={easy:1,mid:2,hard:3}[opp]; D.wins[opp]=(D.wins[opp]||0)+1; stars+=n; try{ renderBar(); confetti(40); beep(true); }catch(e){} }
   else if(res==='w'||res==='draw'){ stars+=1; try{ renderBar(); confetti(14); }catch(e){} }
   else { try{ beep(false); }catch(e){} }

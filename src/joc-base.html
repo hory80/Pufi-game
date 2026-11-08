@@ -645,6 +645,9 @@ window.L10N=window.L10N||{};
 const LANG_ALL=[['ro','🇷🇴','Română'],['de','🇩🇪','Deutsch'],['en','🇬🇧','English'],['fr','🇫🇷','Français'],['it','🇮🇹','Italiano'],['es','🇪🇸','Español'],['pt','🇧🇷','Português'],['nl','🇳🇱','Nederlands'],['pl','🇵🇱','Polski'],['hu','🇭🇺','Magyar'],['uk','🇺🇦','Українська'],['ru','🇷🇺','Русский']];
 function TR(mod,TX){ return TX[lang]||((window.L10N[mod]||{})[lang])||TX.en||TX.ro; }
 function langReady(l){ return ['ro','de','en'].includes(l)||!!(window.L10N.main&&window.L10N.main[l]); }
+/* Pufi se câștigă: fiecare nivel terminat în celelalte jocuri adună puncte (pq_earn); un nivel Pufi cere 15 */
+window.PQ_COST=15;
+window.__lvDone=function(w){ try{ if(!document.getElementById('pq-root')||!document.getElementById('pq-root').hidden) return; const v=(+localStorage.getItem('pq_earn')||0)+(w||1); localStorage.setItem('pq_earn',String(Math.round(v*100)/100)); }catch(e){} };
 const SAYFIX={
   ro:{'Dublin':'Dablin','Washington':'Uașington','Bruxelles':'Bruxel','Reykjavík':'Reikiavic','Beijing':'Beigin','Tokyo':'Tokio',
       'New Delhi':'Niu Deli','Ciudad de México':'Siudad de Mehico','Brasília':'Brasilia','Ottawa':'Otaua','Seul':'Seul','Du-l ':'Dul '},
@@ -1130,7 +1133,7 @@ function confetti(n){
     document.body.appendChild(c); setTimeout(()=>c.remove(),2600); }
 }
 function win(firstLine, msgEl, popEl){
-  stars++; renderBar(); beep(true);
+  try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} stars++; renderBar(); beep(true);
   const big=stars%10===0, pr=T().praise, p=pr[rnd(pr.length)];
   msgEl.textContent=big?T().bigMsg:p+' 🎉';
   confetti(big?40:14);
@@ -1241,7 +1244,7 @@ function showMap(c){
   return true;
 }
 function flagWin(bt){
-  stars++; renderBar(); beep(true);
+  try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} stars++; renderBar(); beep(true);
   const big=stars%10===0, pr=T().praise, p=pr[rnd(pr.length)];
   $('fmsg').textContent=big?T().bigMsg:p+' 🎉';
   confetti(big?40:14);
@@ -1878,7 +1881,7 @@ function tone2(){ beep(true); }
 function undo(prev,text){ busy=true; try{beep(false)}catch(e){} shake(); msg(text);
   speak(text).then(()=>{}); setTimeout(()=>{ Bd=prev; last=null; busy=false; render(); },900); }
 function win(text,next=true){
-  busy=true; stars++; renderBar(); updStars(); try{ beep(true); confetti(14); }catch(e){}
+  try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} busy=true; stars++; renderBar(); updStars(); try{ beep(true); confetti(14); }catch(e){}
   const p=praise(); msg(p+' 🎉'); lv[mode]=L(mode)+1; store('ch_lv',JSON.stringify(lv));
   speak(text+' '+p).then(sp=>setTimeout(()=>{ busy=false; if(next&&view==='play') newTask(); }, sp?500:1600));
 }
@@ -2111,7 +2114,7 @@ const spoken=w=>{ const l=w.replace(/-/g,'').toLowerCase(); return LG()==='de'?l
 function speak(t){ return (typeof say==='function')?say(t):Promise.resolve(false); }
 function msg(t){ $('msg').textContent=t||''; }
 function setTask(t,speakText){ $('task').textContent=t; task.say=speakText||t; if(speakText!==false) speak(task.say); }
-function win(text,after){ busy=true; stars++; try{ renderBar(); }catch(e){} $('stars').textContent='⭐ '+stars; try{ beep(true); confetti(12); }catch(e){}
+function win(text,after){ try{ window.__lvDone&&window.__lvDone(.2); }catch(_e){} busy=true; stars++; try{ renderBar(); }catch(e){} $('stars').textContent='⭐ '+stars; try{ beep(true); confetti(12); }catch(e){}
   const p=T().praise[rnd2(T().praise.length)]; msg(p+' 🎉');
   speak(text).then(sp=>setTimeout(()=>{ busy=false; if(view==='play'&&after) after(); }, sp?400:1400)); }
 function oops(node,text){ try{ beep(false); }catch(e){} if(node){ node.classList.remove('rd-shake'); void node.offsetWidth; node.classList.add('rd-shake'); } if(text){ msg(text); speak(text); } }
@@ -2884,7 +2887,7 @@ function success(){
   $('board').classList.remove('pop'); void $('board').offsetWidth; $('board').classList.add('pop');
   spW(X().right(tk.n)+' '+p, 1200).then(()=>{ if(view!=='play') return; done>=PER?levelDone():newTask(); });
 }
-function levelDone(){
+function levelDone(){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} 
   const s=errs===0?3:errs<=2?2:1; best[li]=Math.max(best[li]||0,s); saveBest();
   $('ovStars').textContent='★'.repeat(s)+'☆'.repeat(3-s); $('ovTxt').textContent=X().done(s);
   $('ovNext').hidden=li>=LV.length-1; $('ov').hidden=false; try{ confetti(40); }catch(e){}

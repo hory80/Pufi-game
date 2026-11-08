@@ -333,7 +333,7 @@ setInterval(()=>{ if(run&&run.mode==='sprint'&&!run.busy) moveTrack(); },500);
 function timeUp(){ if(!run||run.dead) return; const my=run; run.busy=true; try{ beep(false); }catch(e){}
   if(run.mode==='sprint'){ run.items.length=run.i; run.c.tasks=run.i; } else { for(let k=run.i;k<run.c.tasks;k++){ if(!run.items[k]) run.items[k]=genItem(run.c); run.items[k].given=null; } }
   $('stage').innerHTML=`<div class="sp-cnt" style="font-size:clamp(2.4rem,9vmin,5rem)">⏰ ${X().timeUp}</div>`; sp(X().timeUp); setTimeout(()=>{ if(run===my) finish(true); },1400); }
-function finish(){ if(!run) return; const r=run; clearInterval(r.timer); r.dead=true; document.removeEventListener('keydown',onKey); view='res'; top('🏁 '+X().res);
+function finish(){ if(!run) return; const r=run; if(r.ok>0){ try{ window.__lvDone&&window.__lvDone(1); }catch(_e){} } clearInterval(r.timer); r.dead=true; document.removeEventListener('keydown',onKey); view='res'; top('🏁 '+X().res);
   const total=r.mode==='sprint'?r.ok:r.c.tasks, secs=(performance.now()-r.t0)/1000; let head='', extra='', stars2=0, speak='';
   if(r.mode==='sprint'){ const recs=LS.get('sp_rec',{}), k='s'+r.lvl, old=recs[k]||0; const isRec=r.ok>old; if(isRec){ recs[k]=r.ok; LS.set('sp_rec',recs); }
     head=`<div class="big">🏁 ${r.ok}</div><h3>${X().solved(r.ok)}</h3>${isRec?`<h3 style="color:#E0A800">${X().newRec}</h3>`:`<p>🏆 ${X().record}: ${old}</p>`}`; stars2=Math.floor(r.ok/5)+(isRec?2:0); speak=X().solved(r.ok)+(isRec?' '+X().newRec:''); if(isRec) try{ confetti(60); }catch(e){} }

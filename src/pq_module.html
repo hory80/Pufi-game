@@ -18,6 +18,10 @@
 .pq-ov h1{margin:0;font-size:clamp(2rem,6vw,3.6rem);line-height:1.05}
 .pq-ov p{margin:0;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:700}
 .pq-hero{font-size:clamp(2.6rem,9vw,4.6rem);line-height:1}
+.pq-earn{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;box-sizing:border-box;background:rgba(255,255,255,.85);border-radius:999px;padding:6px 14px;box-shadow:0 4px 0 rgba(36,50,95,.15);cursor:pointer;max-width:100%}
+.pq-earn .dots{display:flex;flex-wrap:nowrap;gap:clamp(1px,.5vw,4px);justify-content:center}.pq-earn i{width:clamp(13px,3.6vw,24px);height:clamp(13px,3.6vw,24px);border-radius:50%;background:#E3E7F2;font-style:normal;font-size:clamp(9px,2.4vw,15px);line-height:clamp(13px,3.6vw,24px);text-align:center;flex:none}
+.pq-earn .lk,.pq-earn .tk{font-size:1.25rem;flex:none}.pq-earn.ok{background:#FFF4C2}.pq-earn.ok .tk{font-size:1.8rem;animation:pqTk 1.2s ease-in-out infinite}@keyframes pqTk{50%{transform:scale(1.15)}}
+.pq-map.wait .pq-lv{filter:grayscale(.7);opacity:.7}
 .pq-map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:900px}
 .pq-lv{font:inherit;border:none;border-radius:22px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;box-shadow:0 7px 0 rgba(36,50,95,.2);color:var(--ink);position:relative}
 .pq-lv .ic{font-size:clamp(2rem,6vh,3rem);line-height:1.1}
@@ -358,7 +362,7 @@ function showWin(){ if(state!=='won'||root.hidden) return; const last=LI===NLV-1
   $('winHero').textContent=last?'🏆🦊🎉':'🏠🦊🎉'; $('winT').textContent=last?X().allDone:X().won; $('winS').textContent=X().winS(sc,medals.size);
   $('next').textContent=last?X().map:X().next; $('again').textContent=X().again; $('toMap').textContent=X().map; $('winOv').hidden=false; sp((last?X().allDone:X().won)+' '+X().winS(sc,medals.size).replace(/[⭐🌟·]/g,' ')); }
 $('next').onclick=()=>{ if(LI<NLV-1) startLevel(LI+1); else showMap(); };
-$('again').onclick=()=>startLevel(LI); $('toMap').onclick=showMap; $('menu').onclick=showMap;
+$('again').onclick=()=>startLevel(LI); $('toMap').onclick=()=>showMap(); $('menu').onclick=()=>showMap();
 $('mute').onclick=()=>{ muted=!muted; try{ localStorage.setItem('pq_mute',muted?'1':'0'); }catch(e){} $('mute').textContent=muted?'🔇':'🔊'; if(muted) try{ speechSynthesis.cancel(); }catch(e){} };
 $('exit').onclick=()=>{ state='map'; root.hidden=true; try{ speechSynthesis.cancel(); }catch(e){} };
 
@@ -370,6 +374,37 @@ function loop(now){ try{ const dt=Math.min(.05,(now-lastT)/1000); lastT=now;
   requestAnimationFrame(loop); }
 resize(); MAIN=W=LV(0).main; P=newP(2*TS,GY*TS); requestAnimationFrame(loop);
 (window.__LR=window.__LR||[]).push(()=>{ if(!root.hidden&&state==='map') showMap(); });
+/* ---------- Pufi se câștigă: un nivel Pufi = 15 niveluri terminate în celelalte jocuri ---------- */
+const EARN={
+ ro:{need:n=>`Ca să te joci cu Pufi, mai termină ${n===1?'un nivel':(n===2?'două':n===12?'douăsprezece':n)+' niveluri'} în celelalte jocuri!`,ready:'Bravo! Ai câștigat un nivel cu Pufi. Alege unde mergi!',more:'Ai mai câștigat un nivel cu Pufi!'},
+ en:{need:n=>`To play with Pufi, finish ${n===1?'one more level':n+' more levels'} in the other games!`,ready:'Well done! You earned a Pufi level. Choose where to go!',more:'You earned another Pufi level!'},
+ de:{need:n=>`Um mit Pufi zu spielen, schaffe noch ${n===1?'ein Level':n+' Level'} in den anderen Spielen!`,ready:'Super! Du hast ein Pufi-Level verdient. Such dir eins aus!',more:'Du hast noch ein Pufi-Level verdient!'},
+ fr:{need:n=>`Pour jouer avec Pufi, termine encore ${n===1?'un niveau':n+' niveaux'} dans les autres jeux !`,ready:'Bravo ! Tu as gagné un niveau avec Pufi. Choisis où aller !',more:'Tu as gagné encore un niveau avec Pufi !'},
+ es:{need:n=>`Para jugar con Pufi, termina ${n===1?'un nivel más':n+' niveles más'} en los otros juegos.`,ready:'¡Muy bien! Has ganado un nivel con Pufi. ¡Elige adónde ir!',more:'¡Has ganado otro nivel con Pufi!'},
+ it:{need:n=>`Per giocare con Pufi, completa ancora ${n===1?'un livello':n+' livelli'} negli altri giochi!`,ready:'Bravo! Hai guadagnato un livello con Pufi. Scegli dove andare!',more:'Hai guadagnato un altro livello con Pufi!'},
+ pt:{need:n=>`Para brincar com o Pufi, termina mais ${n===1?'um nível':n+' níveis'} nos outros jogos!`,ready:'Muito bem! Ganhaste um nível com o Pufi. Escolhe para onde ir!',more:'Ganhaste mais um nível com o Pufi!'},
+ nl:{need:n=>`Om met Pufi te spelen, maak je nog ${n===1?'één level':n+' levels'} af in de andere spelletjes!`,ready:'Goed zo! Je hebt een Pufi-level verdiend. Kies waar je heen gaat!',more:'Je hebt nog een Pufi-level verdiend!'},
+ pl:{need:n=>`Żeby zagrać z Pufim, ukończ jeszcze ${n===1?'jeden poziom':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'poziomy':'poziomów')} w innych grach!`,ready:'Brawo! Zdobyłeś poziom z Pufim. Wybierz, dokąd idziesz!',more:'Zdobyłeś jeszcze jeden poziom z Pufim!'},
+ uk:{need:n=>`Щоб гратися з Пуфі, пройди ще ${n===1?'один рівень':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'рівні':'рівнів')} в інших іграх!`,ready:'Молодець! Ти заробив рівень із Пуфі. Обирай, куди йти!',more:'Ти заробив ще один рівень із Пуфі!'},
+ ru:{need:n=>`Чтобы поиграть с Пуфи, пройди ещё ${n===1?'один уровень':n+' '+((n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'уровня':'уровней')} в других играх!`,ready:'Молодец! Ты заработал уровень с Пуфи. Выбирай, куда идти!',more:'Ты заработал ещё один уровень с Пуфи!'},
+ hu:{need:n=>`Ahhoz, hogy Pufival játssz, teljesíts még ${n===1?'egy':n} szintet a többi játékban!`,ready:'Ügyes vagy! Kiérdemeltél egy szintet Pufival. Válaszd ki, hova mész!',more:'Kiérdemeltél még egy szintet Pufival!'}};
+const EX=()=>EARN[(typeof lang!=='undefined'&&EARN[lang])?lang:'ro'];
+const earnGet=()=>{ try{ return +localStorage.getItem('pq_earn')||0; }catch(e){ return 0; } };
+const earnSet=v=>{ try{ localStorage.setItem('pq_earn',String(Math.max(0,Math.round(v*100)/100))); }catch(e){} };
+const paidGet=()=>{ try{ return localStorage.getItem('pq_paid')==='1'; }catch(e){ return false; } };
+const paidSet=b=>{ try{ b?localStorage.setItem('pq_paid','1'):localStorage.removeItem('pq_paid'); }catch(e){} };
+const COST=()=>window.PQ_COST||15;
+const canPlay=()=>paidGet()||earnGet()>=COST();
+const tickets=()=>Math.floor(earnGet()/COST())+(paidGet()?1:0);
+function earnUI(){ let bar=$('earn'); if(!bar){ bar=document.createElement('div'); bar.id='pq-earn'; bar.className='pq-earn'; $('map').before(bar);
+    bar.onclick=()=>sp(canPlay()?EX().ready:EX().need(Math.ceil(COST()-earnGet()))); }
+  const t=tickets(); if(t>0){ bar.innerHTML=`<span class="tk">${'🎟️'.repeat(Math.min(t,5))}${t>5?' ×'+t:''}</span>`; bar.classList.add('ok'); }
+  else { const got=Math.floor(earnGet()), c=COST(); let h=''; for(let i=0;i<c;i++) h+=`<i class="${i<got?'on':''}">${i<got?'⭐':''}</i>`; bar.innerHTML=`<span class="lk">🔒</span><span class="dots">${h}</span><span class="tk">🎟️</span>`; bar.classList.remove('ok'); }
+  $('map').classList.toggle('wait',t<=0); }
+showMap=(f=>(...a)=>{ const r=f(...a); try{ earnUI(); const t=tickets(), seen=+(sessionStorage.getItem('pq_seenT')||-1);
+    if(!root.hidden){ if(t<=0) setTimeout(()=>sp(EX().need(Math.ceil(COST()-earnGet()))),400); else if(t!==seen) setTimeout(()=>sp(t>1&&seen>0?EX().more:EX().ready),400); try{ sessionStorage.setItem('pq_seenT',String(t)); }catch(e){} } }catch(e){} return r; })(showMap);
+startLevel=(f=>(i,...a)=>{ if(!paidGet()){ if(earnGet()<COST()){ showMap(); return; } earnSet(earnGet()-COST()); paidSet(true); } return f(i,...a); })(startLevel);
+showWin=(f=>(...a)=>{ if(state==='won'&&!root.hidden) paidSet(false); return f(...a); })(showWin);
 startLevel=(f=>(i,...a)=>{ if(window.__gate&&window.__gate('pq',i)){ showMap(); return; } return f(i,...a); })(startLevel);
 window.openPufi=lg=>{ root.hidden=false; resize(); $('mute').textContent=muted?'🔇':'🔊'; showMap(); };
 window.__pq={start:startLevel,get P(){return P},get W(){return W},get state(){return state},keys,press:k=>{ if(k==='j') jumpPress=true; if(k==='d') downPress=true; },grow,LV,set hearts(v){hearts=v}};
