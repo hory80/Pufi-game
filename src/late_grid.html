@@ -351,7 +351,7 @@ function tip(t,btnTxt,fn){ if(!G) return; G.tipEl.innerHTML=''; if(!t&&!btnTxt){
 const SUF={ro:['Trimite curentul în lac!','Trimite curentul în mașini!'],de:['Schick den Strom in den See!','Schick den Strom in die Autos!'],en:['Send the power to the lake!','Send the power to the cars!'],fr:['Envoie l’électricité dans le lac !','Envoie l’électricité dans les voitures !'],es:['¡Manda la electricidad al lago!','¡Manda la electricidad a los coches!'],it:['Manda la corrente nel lago!','Manda la corrente nelle auto!'],pt:['Mande a energia para o lago!','Mande a energia para os carros!'],nl:['Stuur de stroom naar het meer!','Stuur de stroom naar de auto’s!'],pl:['Wyślij prąd do jeziora!','Wyślij prąd do samochodów!'],uk:['Спрямуй струм в озеро!','Спрямуй струм у машини!'],ru:['Направь ток в озеро!','Направь ток в машины!'],hu:['Küldd az áramot a tóba!','Küldd az áramot az autókba!']};
 function why(){ const L=G.L, m=curM(), x=X(); let t=''; if(L.pl.includes('solar')&&!m.sun) t+=x.noSun+' '; if(L.pl.includes('wind')&&!m.wind) t+=x.noWind+' '; return t; }
 /* ajutorul, doar când îl cere copilul: prima dată explică, a doua oară arată butonul */
-function askHelp(){ if(!G||G.lock) { if(G&&G.momT) sp(G.momT); return; } G.idle=0; G.helpB.classList.remove('gr-pulse'); G.help=(G.help||0)+1;
+function askHelp(){ if(!G) return; if(G.waitNext||G.done){ sp(X().ok); return; } if(G.lock){ if(!G.started) { if(G.momT) sp(G.momT); return; } G.lock=false; } /* ❓ în timp ce Pufi citește: oprește citirea și ajută */ G.idle=0; G.helpB.classList.remove('gr-pulse'); G.help=(G.help||0)+1;
   if(G.help===1){ const t=explain(); tip('❓ '+t); sp(t); } else hint(); }
 /* de unde vine curentul acum și ce trebuie făcut */
 function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
@@ -365,7 +365,7 @@ function explain(){ const L=G.L, m=curM(), x=X(); const parts=[];
   else if(P>U){ if(!store) parts.push(x.lessPl(P-U)); else { const both=L.pl.includes('hydro')&&G.cars.length; const e=x.extra(P-U); parts.push(both?e:e.split('. ')[0]+'. '+SUF[(typeof lang!=='undefined'&&SUF[lang])?lang:'en'][L.pl.includes('hydro')?0:1]); } }
   else parts.push(x.exact);
   return parts.join(' '); }
-function startMoment(){ const m=G.L.mo[G.mi]; G.idle=0; G.help=0; if(G.helpB) G.helpB.classList.remove('gr-pulse'); clearHint(); timeline(); scene(); panel(); equation();
+function startMoment(){ G.started=true; const m=G.L.mo[G.mi]; G.idle=0; G.help=0; if(G.helpB) G.helpB.classList.remove('gr-pulse'); clearHint(); timeline(); scene(); panel(); equation();
   const t=`${X().mom[m.m]}. ${X().ev2[m.e]} ${why()}${X().goal}`; msg(MIC[m.m]+' '+t); G.momT=t; tip(''); G.lock=true; snd(880,.1); later(()=>snd(1100,.12),130);
   sp(t).then(()=>{ if(G){ G.lock=false; G.idle=0; check(true); } }); later(()=>{ if(G&&G.lock&&!G.waitNext){ G.lock=false; } },20000); }
 
@@ -464,7 +464,7 @@ function panel(){ if(!G) return; const pan=G.pan; pan.innerHTML=''; const L=G.L;
     G.cars.forEach((car,i)=>{ const b=el('button',car.on?'sel':'',`🚙<small>${'▮'.repeat(car.c)}${'▯'.repeat(CARCAP-car.c)}</small>`); b.dataset.car=i; b.style.width='64px'; b.onclick=()=>toggleCar(i); c.append(b); }); pan.append(c); } }
 function toggleCar(i){ if(!G||G.lock) return; const c=G.cars[i]; if(!c.on&&c.c>=CARCAP){ tip('🔋 '+X().carFull); sp(X().carFull); return; } c.on=!c.on; snd(c.on?900:450,.1); changed(); }
 
-function finish(){ const L=G.L, li=G.li; let s=3; const extra=[]; G.lock=true; timeline();
+function finish(){ const L=G.L, li=G.li; let s=3; const extra=[]; G.lock=true; G.done=true; timeline();
   if(L.smoke){ const n=Math.round(G.smoke); s=n<=4?3:n<=8?2:1; extra.push(X().smokeN(n)); if(s<3) extra.push(X().smoke); }
   const p=prog(); p[li]=Math.max(p[li]||0,s); LS.set('grid_prog',p); award(s); try{ window.__lvDone&&window.__lvDone(1); }catch(e){} try{ confetti(24); }catch(e){}
   const t=X().done[s]+(extra.length?' '+extra.join(' '):''); msg('🎉 '+t); G.momT=t; tip('');
