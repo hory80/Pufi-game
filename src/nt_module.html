@@ -57,10 +57,11 @@ try{ const _sc=speechSynthesis.cancel.bind(speechSynthesis); speechSynthesis.can
 let praiseNext=false, lastPraise=0;
 window.__nativeSay=async(text,opts)=>{ opts=opts||{}; if(typeof voiceOn!=='undefined'&&!voiceOn) return false;
   let t=(typeof fixSpeech==='function')?fixSpeech(text):text; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]);
-  if(praiseNext&&recs.length){ praiseNext=false; lastPraise=Date.now(); await N.call('rec.play',{key:recs[Math.floor(Math.random()*recs.length)]}); }
+  const pr=recs.filter(k=>/^praise/.test(k)); /* doar lauda părintelui, nu înregistrările din benzi desenate */
+  if(praiseNext&&pr.length){ praiseNext=false; lastPraise=Date.now(); await N.call('rec.play',{key:pr[Math.floor(Math.random()*pr.length)]}); }
   return N.call('speak',{text:t,lang,rate:opts.rate||.9,words:!!opts.words}); };
 /* după o reușită (confetti), următoarea frază începe uneori cu lauda înregistrată de părinte */
-const _conf=window.confetti; if(typeof _conf==='function') window.confetti=function(n){ if(recs.length&&Date.now()-lastPraise>15000&&Math.random()<.45) praiseNext=true; return _conf.apply(this,arguments); };
+const _conf=window.confetti; if(typeof _conf==='function') window.confetti=function(n){ if(recs.some(k=>/^praise/.test(k))&&Date.now()-lastPraise>15000&&Math.random()<.45) praiseNext=true; return _conf.apply(this,arguments); };
 
 /* --- karaoke: evidențiere sincronizată cu vocea nativă --- */
 const spoken=s=>{ let t=(typeof fixSpeech==='function')?fixSpeech(s):s; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]); return t; };

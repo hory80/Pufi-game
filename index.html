@@ -2611,7 +2611,7 @@ function updTop(){ $('stars').textContent='⭐ '+stars; $('caseBtn').textContent
 function showMenu(){ view='menu'; busy=false; storyTok++; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='📖 '+R().title; updTop();
   const m=$('menu'); m.innerHTML='';
   MENU.forEach((grp,gi)=>{ m.appendChild(el('div','rd-mhead',R2().groups[gi]));
-    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; b.dataset.lk='rd:'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
+    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; b.dataset.lk='rd:'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); if(window.__comicCard){ const c=window.__comicCard(); m.insertBefore(c,m.children[1]||null); } }
 function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=GN(g)[0]+' '+GN(g)[1]; updTop(); RUN[g](); }
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
@@ -11004,10 +11004,11 @@ try{ const _sc=speechSynthesis.cancel.bind(speechSynthesis); speechSynthesis.can
 let praiseNext=false, lastPraise=0;
 window.__nativeSay=async(text,opts)=>{ opts=opts||{}; if(typeof voiceOn!=='undefined'&&!voiceOn) return false;
   let t=(typeof fixSpeech==='function')?fixSpeech(text):text; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]);
-  if(praiseNext&&recs.length){ praiseNext=false; lastPraise=Date.now(); await N.call('rec.play',{key:recs[Math.floor(Math.random()*recs.length)]}); }
+  const pr=recs.filter(k=>/^praise/.test(k)); /* doar lauda părintelui, nu înregistrările din benzi desenate */
+  if(praiseNext&&pr.length){ praiseNext=false; lastPraise=Date.now(); await N.call('rec.play',{key:pr[Math.floor(Math.random()*pr.length)]}); }
   return N.call('speak',{text:t,lang,rate:opts.rate||.9,words:!!opts.words}); };
 /* după o reușită (confetti), următoarea frază începe uneori cu lauda înregistrată de părinte */
-const _conf=window.confetti; if(typeof _conf==='function') window.confetti=function(n){ if(recs.length&&Date.now()-lastPraise>15000&&Math.random()<.45) praiseNext=true; return _conf.apply(this,arguments); };
+const _conf=window.confetti; if(typeof _conf==='function') window.confetti=function(n){ if(recs.some(k=>/^praise/.test(k))&&Date.now()-lastPraise>15000&&Math.random()<.45) praiseNext=true; return _conf.apply(this,arguments); };
 
 /* --- karaoke: evidențiere sincronizată cu vocea nativă --- */
 const spoken=s=>{ let t=(typeof fixSpeech==='function')?fixSpeech(s):s; if(PUFI[lang]) t=t.replace(/Pufi(?=s?\b)/g,PUFI[lang]); return t; };
@@ -11459,6 +11460,198 @@ window.openArena=()=>{ root.hidden=false; hub(); };
 window.__saArena=m=>{ const b=el('button','sa-arena',`<span class="ic">🏁</span><span><b>${X().title}</b><span class="s">${X().sub}</span></span><span class="bl">${beltSVG(Math.max(0,got-1))}</span>`); if(!got) b.querySelector('.bl').style.opacity='.35'; b.onclick=()=>window.openArena(); m.appendChild(b); };
 (window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; if(view==='hub') hub(); else if(view==='set') settings(); });
 window.__sp={genSeq,genItem,BELT};
+})();
+</script>
+<style>
+#cm-root{position:fixed;inset:0;z-index:56;background:linear-gradient(#FFF6E5,#FFE9C7);color:var(--ink);font-family:var(--display);display:flex;flex-direction:column;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px)}
+#cm-root[hidden]{display:none}
+#cm-root .cm-top{display:flex;align-items:center;gap:8px}
+#cm-root .cm-top h2{flex:1;margin:0;text-align:center;font-size:clamp(1.2rem,3.4vw,1.9rem)}
+#cm-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:980px;margin:0 auto;position:relative}
+.cm-head{display:flex;align-items:center;gap:10px}
+.cm-face{font-size:clamp(34px,6vh,50px);line-height:1}
+.cm-msg{flex:1;background:#fff;border-radius:20px;padding:8px 14px;font-weight:800;font-size:clamp(.95rem,2.4vw,1.3rem);line-height:1.25;cursor:pointer;box-shadow:0 4px 0 #EBCB9B}
+.cm-lib{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,220px),1fr));gap:14px;align-content:start;padding:4px}
+.cm-ep{font:inherit;position:relative;border:none;border-radius:22px;background:#fff;box-shadow:0 7px 0 #EBCB9B;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;color:var(--ink);text-align:center}
+.cm-ep .cv{aspect-ratio:1/1;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:clamp(2.6rem,9vw,4.2rem);letter-spacing:4px}
+.cm-ep .cv img{width:100%;height:100%;object-fit:cover;display:block}
+.cm-ep .t{font-weight:900;font-size:clamp(.95rem,2.4vw,1.15rem)}
+.cm-ep .st{font-weight:800;color:#2FB06A;min-height:1.2em}
+.cm-ep.lock{opacity:.5;filter:grayscale(.6)}.cm-ep.lock::after{content:'🔒';position:absolute;top:10px;right:12px;font-size:1.6rem}
+.cm-ep.soon{opacity:.45;cursor:default}
+.cm-film-b{font:inherit;font-weight:800;border:none;border-radius:14px;background:#24325F;color:#fff;padding:8px 10px;cursor:pointer}
+/* cititorul */
+.cm-dots{display:flex;justify-content:center;gap:6px}
+.cm-dots i{width:14px;height:14px;border-radius:50%;background:#EBCB9B}.cm-dots i.on{background:#FF8A3D}.cm-dots i.ok{background:#2FB06A}
+.cm-cap{background:#FFE45C;border:3px solid #24325F;border-radius:6px;padding:4px 12px;font-weight:800;font-size:clamp(.95rem,2.4vw,1.25rem);align-self:flex-start;box-shadow:3px 3px 0 #24325F;cursor:pointer;max-width:100%}
+.cm-panel{position:relative;flex:1;min-height:0;display:flex;justify-content:center;align-items:center;container-type:size}
+.cm-frame{position:relative;width:min(100cqw,100cqh);height:min(100cqw,100cqh);border:5px solid #24325F;border-radius:10px;overflow:hidden;background:#fff;box-shadow:6px 6px 0 rgba(36,50,95,.25)}
+.cm-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cm-ph{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10%;font-size:clamp(3rem,13vmin,7rem);letter-spacing:.1em;background:linear-gradient(#BDE8FF 0 34%,#FFF2CF 34%)}
+.cm-bub{position:absolute;top:4%;left:50%;transform:translateX(-50%);max-width:88%;background:#fff;border:4px solid #24325F;border-radius:26px;padding:10px 18px;font-weight:900;font-size:clamp(1.15rem,4.2vmin,2rem);line-height:1.3;text-align:center;box-shadow:4px 4px 0 rgba(36,50,95,.2);cursor:pointer}
+.cm-bub::after{content:'';position:absolute;bottom:-22px;left:var(--tx,50%);width:0;height:0;border:12px solid transparent;border-top:18px solid #24325F;transform:translateX(-50%)}
+.cm-bub::before{content:'';position:absolute;bottom:-14px;left:var(--tx,50%);width:0;height:0;border:9px solid transparent;border-top:13px solid #fff;transform:translateX(-50%);z-index:1}
+.cm-key{display:inline-block;border:4px dashed #FF8A3D;border-radius:12px;padding:0 8px;background:#FFF4C2;animation:cmKey 1.2s ease-in-out infinite;cursor:pointer}
+.cm-key.ok{border:4px solid #2FB06A;background:#E6FFF0;animation:none}
+.cm-key.say{background:#FFE45C;animation:none}
+@keyframes cmKey{50%{transform:scale(1.08)}}
+.cm-lc .cm-key,.cm-lc .cm-bub{text-transform:none}
+.cm-uc .cm-key{text-transform:uppercase}
+.cm-ctrl{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.cm-ctrl button{font:inherit;font-weight:900;font-size:clamp(1.1rem,3vw,1.5rem);border:none;border-radius:20px;padding:12px 20px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:0 5px 0 #EBCB9B;touch-action:manipulation}
+.cm-ctrl button.mic{background:#FF5D7A;color:#fff;box-shadow:0 5px 0 #C23A57;padding:14px 28px}
+.cm-ctrl button.mic.rec{animation:cmRec 1s ease-in-out infinite}
+@keyframes cmRec{50%{box-shadow:0 0 0 10px rgba(255,93,122,.35)}}
+.cm-ctrl button.go{background:#2FB06A;color:#fff;box-shadow:0 5px 0 #1E7F4B;animation:cmKey 1.2s ease-in-out infinite}
+.cm-ctrl button.sm{padding:10px 14px}
+.cm-ctrl button:active{transform:translateY(3px)}
+.cm-film .cm-ctrl{display:none}
+@media (max-width:600px){.cm-msg{font-size:.95rem}.cm-ctrl button{padding:10px 14px}.cm-ctrl button.mic{padding:12px 20px}}
+</style>
+<div id="cm-root" hidden>
+  <div class="cm-top"><button class="ch-btn" id="cm-back"></button><h2 id="cm-title"></h2><div class="ch-pill" id="cm-stars">⭐ 0</div></div>
+  <div id="cm-main"></div>
+</div>
+<script>
+/* Citire › Benzi desenate cu Pufi: copilul citește cuvântul din chenar, se înregistrează (în aplicație),
+   iar la final povestea rulează ca un film cu vocea lui. Imaginile vin din benzi/epNN/pN.jpg (Codex); până atunci, emoji. */
+(function(){
+const $=id=>document.getElementById('cm-'+id), root=$('root'), main=$('main');
+const N=window.native||null;
+const sp=t=>{ try{ const r=typeof say==='function'?say(t):null; return r&&r.then?r:Promise.resolve(false); }catch(e){ return Promise.resolve(false); } };
+const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }};
+const el=(t,c,h)=>{ const e=document.createElement(t); if(c) e.className=c; if(h!=null) e.innerHTML=h; return e; };
+const snd=(f,d)=>{ try{ if(typeof tone==='function') tone('sine',f,f*1.2,d||.12,.12); }catch(e){} };
+const L=()=>(typeof lang!=='undefined'&&UI[lang])?lang:'en';
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------------- texte de interfață (12 limbi) ---------------- */
+const UI={
+ro:{title:'💬 Benzi desenate',card:'Benzi desenate',pick:'Alege o poveste! Tu citești cuvintele din chenar.',readKey:'Citește tu cuvântul din chenar! Apasă microfonul și spune-l cu voce tare.',readKeyWeb:'Citește tu cuvântul din chenar, apoi apasă „Am citit”.',mic:'🎤 Citesc',stop:'⏹ Gata',me:'👂 Ascultă-te',read:'✔ Am citit',film:'🎬 Filmul meu',filmSay:'Bravo! Ai citit toată povestea. Acum urmărește filmul tău!',end:'Sfârșit! Vrei să-l mai vezi?',soon:'În curând',locked:'Termină întâi povestea de dinainte.',again:'↺ Încă o dată',back:'⬅ Înapoi',lib:'⬅ Povești',micNo:'Microfonul nu merge acum. Apasă „Am citit”.',done:'✔ Citită'},
+de:{title:'💬 Comics',card:'Comics',pick:'Wähle eine Geschichte! Du liest die Wörter im Kästchen.',readKey:'Lies das Wort im Kästchen! Tippe auf das Mikrofon und sag es laut.',readKeyWeb:'Lies das Wort im Kästchen und tippe dann auf „Gelesen“.',mic:'🎤 Ich lese',stop:'⏹ Fertig',me:'👂 Hör dich an',read:'✔ Gelesen',film:'🎬 Mein Film',filmSay:'Super! Du hast die ganze Geschichte gelesen. Jetzt schau deinen Film!',end:'Ende! Willst du ihn nochmal sehen?',soon:'Bald',locked:'Lies zuerst die Geschichte davor.',again:'↺ Nochmal',back:'⬅ Zurück',lib:'⬅ Geschichten',micNo:'Das Mikrofon geht gerade nicht. Tippe auf „Gelesen“.',done:'✔ Gelesen'},
+en:{title:'💬 Comics',card:'Comics',pick:'Choose a story! You read the words in the box.',readKey:'Read the word in the box! Tap the microphone and say it out loud.',readKeyWeb:'Read the word in the box, then tap “I read it”.',mic:'🎤 I read',stop:'⏹ Done',me:'👂 Hear yourself',read:'✔ I read it',film:'🎬 My movie',filmSay:'Well done! You read the whole story. Now watch your movie!',end:'The end! Do you want to watch it again?',soon:'Coming soon',locked:'Finish the story before this one first.',again:'↺ Again',back:'⬅ Back',lib:'⬅ Stories',micNo:'The microphone is not working right now. Tap “I read it”.',done:'✔ Read'},
+fr:{title:'💬 Bandes dessinées',card:'Bandes dessinées',pick:'Choisis une histoire ! C’est toi qui lis les mots dans le cadre.',readKey:'Lis le mot dans le cadre ! Appuie sur le micro et dis-le à voix haute.',readKeyWeb:'Lis le mot dans le cadre, puis appuie sur « J’ai lu ».',mic:'🎤 Je lis',stop:'⏹ Fini',me:'👂 Écoute-toi',read:'✔ J’ai lu',film:'🎬 Mon film',filmSay:'Bravo ! Tu as lu toute l’histoire. Regarde maintenant ton film !',end:'Fin ! Tu veux le revoir ?',soon:'Bientôt',locked:'Termine d’abord l’histoire d’avant.',again:'↺ Encore',back:'⬅ Retour',lib:'⬅ Histoires',micNo:'Le micro ne marche pas pour l’instant. Appuie sur « J’ai lu ».',done:'✔ Lue'},
+es:{title:'💬 Cómics',card:'Cómics',pick:'¡Elige una historia! Tú lees las palabras del recuadro.',readKey:'¡Lee la palabra del recuadro! Toca el micrófono y dila en voz alta.',readKeyWeb:'Lee la palabra del recuadro y luego toca «Ya la leí».',mic:'🎤 Leo yo',stop:'⏹ Listo',me:'👂 Escúchate',read:'✔ Ya la leí',film:'🎬 Mi película',filmSay:'¡Muy bien! Has leído toda la historia. ¡Ahora mira tu película!',end:'¡Fin! ¿Quieres verla otra vez?',soon:'Pronto',locked:'Primero termina la historia anterior.',again:'↺ Otra vez',back:'⬅ Atrás',lib:'⬅ Historias',micNo:'El micrófono no funciona ahora. Toca «Ya la leí».',done:'✔ Leída'},
+it:{title:'💬 Fumetti',card:'Fumetti',pick:'Scegli una storia! Le parole nel riquadro le leggi tu.',readKey:'Leggi la parola nel riquadro! Tocca il microfono e dilla ad alta voce.',readKeyWeb:'Leggi la parola nel riquadro, poi tocca «Ho letto».',mic:'🎤 Leggo io',stop:'⏹ Fatto',me:'👂 Ascoltati',read:'✔ Ho letto',film:'🎬 Il mio film',filmSay:'Bravo! Hai letto tutta la storia. Ora guarda il tuo film!',end:'Fine! Vuoi rivederlo?',soon:'Presto',locked:'Prima finisci la storia di prima.',again:'↺ Ancora',back:'⬅ Indietro',lib:'⬅ Storie',micNo:'Il microfono ora non funziona. Tocca «Ho letto».',done:'✔ Letta'},
+pt:{title:'💬 Gibis',card:'Gibis',pick:'Escolha uma história! Você lê as palavras do quadrinho.',readKey:'Leia a palavra do quadrinho! Toque no microfone e fale em voz alta.',readKeyWeb:'Leia a palavra do quadrinho e depois toque em “Já li”.',mic:'🎤 Eu leio',stop:'⏹ Pronto',me:'👂 Escute você',read:'✔ Já li',film:'🎬 Meu filme',filmSay:'Muito bem! Você leu a história toda. Agora assista ao seu filme!',end:'Fim! Quer ver de novo?',soon:'Em breve',locked:'Primeiro termine a história anterior.',again:'↺ De novo',back:'⬅ Voltar',lib:'⬅ Histórias',micNo:'O microfone não está funcionando agora. Toque em “Já li”.',done:'✔ Lida'},
+nl:{title:'💬 Stripverhalen',card:'Stripverhalen',pick:'Kies een verhaal! Jij leest de woorden in het kader.',readKey:'Lees het woord in het kader! Tik op de microfoon en zeg het hardop.',readKeyWeb:'Lees het woord in het kader en tik dan op „Gelezen”.',mic:'🎤 Ik lees',stop:'⏹ Klaar',me:'👂 Luister naar jezelf',read:'✔ Gelezen',film:'🎬 Mijn film',filmSay:'Goed zo! Je hebt het hele verhaal gelezen. Kijk nu naar je film!',end:'Einde! Wil je hem nog eens zien?',soon:'Binnenkort',locked:'Lees eerst het verhaal ervoor.',again:'↺ Nog eens',back:'⬅ Terug',lib:'⬅ Verhalen',micNo:'De microfoon werkt nu niet. Tik op „Gelezen”.',done:'✔ Gelezen'},
+pl:{title:'💬 Komiksy',card:'Komiksy',pick:'Wybierz historię! Ty czytasz słowa w ramce.',readKey:'Przeczytaj słowo w ramce! Dotknij mikrofonu i powiedz je głośno.',readKeyWeb:'Przeczytaj słowo w ramce, a potem dotknij „Przeczytane”.',mic:'🎤 Czytam',stop:'⏹ Gotowe',me:'👂 Posłuchaj siebie',read:'✔ Przeczytane',film:'🎬 Mój film',filmSay:'Brawo! Przeczytałeś całą historię. Teraz obejrzyj swój film!',end:'Koniec! Chcesz obejrzeć jeszcze raz?',soon:'Wkrótce',locked:'Najpierw skończ poprzednią historię.',again:'↺ Jeszcze raz',back:'⬅ Wstecz',lib:'⬅ Historie',micNo:'Mikrofon teraz nie działa. Dotknij „Przeczytane”.',done:'✔ Przeczytana'},
+uk:{title:'💬 Комікси',card:'Комікси',pick:'Обери історію! Слова в рамці читаєш ти.',readKey:'Прочитай слово в рамці! Натисни мікрофон і скажи його вголос.',readKeyWeb:'Прочитай слово в рамці, а потім натисни «Прочитав».',mic:'🎤 Читаю',stop:'⏹ Готово',me:'👂 Послухай себе',read:'✔ Прочитав',film:'🎬 Мій фільм',filmSay:'Молодець! Ти прочитав усю історію. Тепер дивись свій фільм!',end:'Кінець! Хочеш подивитися ще раз?',soon:'Скоро',locked:'Спочатку закінчи попередню історію.',again:'↺ Ще раз',back:'⬅ Назад',lib:'⬅ Історії',micNo:'Мікрофон зараз не працює. Натисни «Прочитав».',done:'✔ Прочитано'},
+ru:{title:'💬 Комиксы',card:'Комиксы',pick:'Выбери историю! Слова в рамке читаешь ты.',readKey:'Прочитай слово в рамке! Нажми на микрофон и скажи его вслух.',readKeyWeb:'Прочитай слово в рамке, а потом нажми «Прочитал».',mic:'🎤 Читаю',stop:'⏹ Готово',me:'👂 Послушай себя',read:'✔ Прочитал',film:'🎬 Мой фильм',filmSay:'Молодец! Ты прочитал всю историю. Теперь смотри свой фильм!',end:'Конец! Хочешь посмотреть ещё раз?',soon:'Скоро',locked:'Сначала закончи предыдущую историю.',again:'↺ Ещё раз',back:'⬅ Назад',lib:'⬅ Истории',micNo:'Микрофон сейчас не работает. Нажми «Прочитал».',done:'✔ Прочитано'},
+hu:{title:'💬 Képregények',card:'Képregények',pick:'Válassz egy történetet! A keretben lévő szavakat te olvasod.',readKey:'Olvasd el a keretben lévő szót! Nyomd meg a mikrofont, és mondd ki hangosan.',readKeyWeb:'Olvasd el a keretben lévő szót, aztán nyomd meg: „Elolvastam”.',mic:'🎤 Olvasok',stop:'⏹ Kész',me:'👂 Hallgasd meg magad',read:'✔ Elolvastam',film:'🎬 Az én filmem',filmSay:'Ügyes vagy! Elolvastad az egész történetet. Most nézd meg a filmedet!',end:'Vége! Megnézed még egyszer?',soon:'Hamarosan',locked:'Előbb fejezd be az előző történetet.',again:'↺ Még egyszer',back:'⬅ Vissza',lib:'⬅ Történetek',micNo:'A mikrofon most nem működik. Nyomd meg: „Elolvastam”.',done:'✔ Elolvasva'}
+};
+const U=()=>UI[L()];
+
+/* ---------------- poveștile: [narațiune, balon cu *cuvântul-cheie*] pentru fiecare casetă ---------------- */
+const EPS=[
+ {id:1,ic:'🥚🦕',bg:'#FFE5A8',ph:['🏖️🦊🥚','🦊🥚','🦊💥🦕','🦕🍎🦊','🦕💧👣','🦕💚🦖🦊'],who:['pufi','pufi','pufi','pufi','dino','pufi'],tx:['35%','35%','30%','65%','40%','70%'],
+  t:{ro:['Oul misterios',[['Pufi se plimbă pe plajă.','Uite, un *ou*!'],['Oul se mișcă!','E un ou *mare*!'],['Crac! Oul se sparge.','E un *pui* de dinozaur!'],['Puiul are foame.','Hap! Mănâncă un *măr*.'],['Puiul e trist. Plânge.','Unde e *mama*?'],['Urmele mari duc la mama lui.','*Ura*! Ai găsit-o!']]],
+     en:['The mystery egg',[['Pufi is walking on the beach.','Look, an *egg*!'],['The egg is moving!','It is a *big* egg!'],['Crack! The egg breaks open.','A baby *dino*!'],['The baby is hungry.','Hey! My *apple*!'],['The baby is sad. It cries.','Where is *mom*?'],['The big footprints lead to its mom.','*Yes*! You found her!']]],
+     de:['Das geheimnisvolle Ei',[['Pufi geht am Strand spazieren.','Schau, ein *Ei*!'],['Das Ei bewegt sich!','Das Ei ist *groß*!'],['Krach! Das Ei bricht auf.','Ein kleiner *Dino*!'],['Das Baby hat Hunger.','Mampf! Es isst meinen *Apfel*.'],['Das Baby ist traurig. Es weint.','Wo ist *Mama*?'],['Die großen Spuren führen zu seiner Mama.','*Hurra*! Du hast sie gefunden!']]],
+     fr:['L’œuf mystérieux',[['Pufi se promène sur la plage.','Regarde, un *œuf* !'],['L’œuf bouge !','L’œuf est *gros* !'],['Crac ! L’œuf se casse.','Un bébé *dino* !'],['Le bébé a faim.','Miam ! Il mange ma *pomme*.'],['Le bébé est triste. Il pleure.','Où est *maman* ?'],['Les grandes traces mènent à sa maman.','*Bravo* ! Tu l’as trouvée !']]],
+     es:['El huevo misterioso',[['Pufi pasea por la playa.','¡Mira, un *huevo*!'],['¡El huevo se mueve!','¡Es un huevo *grande*!'],['¡Crac! El huevo se rompe.','¡Un bebé *dino*!'],['El bebé tiene hambre.','¡Ñam! Se come mi *manzana*.'],['El bebé está triste. Llora.','¿Dónde está *mamá*?'],['Las huellas grandes llevan a su mamá.','¡*Sí*! ¡La encontraste!']]],
+     it:['L’uovo misterioso',[['Pufi passeggia sulla spiaggia.','Guarda, un *uovo*!'],['L’uovo si muove!','È un uovo *grande*!'],['Crac! L’uovo si rompe.','Un piccolo *dino*!'],['Il piccolo ha fame.','Gnam! Mangia la mia *mela*.'],['Il piccolo è triste. Piange.','Dov’è la *mamma*?'],['Le grandi impronte portano alla sua mamma.','*Sì*! L’hai trovata!']]],
+     pt:['O ovo misterioso',[['Pufi passeia na praia.','Olha, um *ovo*!'],['O ovo está mexendo!','É um ovo *grande*!'],['Crec! O ovo quebra.','Um bebê *dino*!'],['O bebê está com fome.','Nham! Ele come a minha *maçã*.'],['O bebê está triste. Ele chora.','Cadê a *mamãe*?'],['As pegadas grandes levam até a mamãe dele.','*Oba*! Você achou!']]],
+     nl:['Het geheimzinnige ei',[['Pufi wandelt op het strand.','Kijk, een *ei*!'],['Het ei beweegt!','Het ei is *groot*!'],['Krak! Het ei breekt.','Een kleine *dino*!'],['Het kleintje heeft honger.','Mmm! Hij eet mijn *appel*.'],['Het kleintje is verdrietig. Hij huilt.','Waar is *mama*?'],['De grote sporen gaan naar zijn mama.','*Ja*! Je hebt haar gevonden!']]],
+     pl:['Tajemnicze jajko',[['Pufi spaceruje po plaży.','Patrz, *jajko*!'],['Jajko się rusza!','Jajko jest *duże*!'],['Trach! Jajko pęka.','Mały *dino*!'],['Maluch jest głodny.','Mniam! Je moje *jabłko*.'],['Maluch jest smutny. Płacze.','Gdzie jest *mama*?'],['Wielkie ślady prowadzą do jego mamy.','*Hura*! Znalazłeś ją!']]],
+     uk:['Таємниче яйце',[['Пуфі гуляє пляжем.','Дивись, *яйце*!'],['Яйце рухається!','Яйце *велике*!'],['Трісь! Яйце розбивається.','Маленький *дино*!'],['Малюк голодний.','Ням! Він їсть моє *яблуко*.'],['Малюк сумний. Він плаче.','Де *мама*?'],['Великі сліди ведуть до його мами.','*Ура*! Ти її знайшов!']]],
+     ru:['Таинственное яйцо',[['Пуфи гуляет по пляжу.','Смотри, *яйцо*!'],['Яйцо шевелится!','Яйцо *большое*!'],['Трах! Яйцо раскалывается.','Маленький *дино*!'],['Малыш голодный.','Ням! Он ест моё *яблоко*.'],['Малыш грустит. Он плачет.','Где *мама*?'],['Большие следы ведут к его маме.','*Ура*! Ты её нашёл!']]],
+     hu:['A titokzatos tojás',[['Pufi a tengerparton sétál.','Nézd, egy *tojás*!'],['A tojás mozog!','A tojás *nagy*!'],['Reccs! A tojás feltörik.','Egy kis *dinó*!'],['A kicsi éhes.','Hamm! Ez az én *almám*!'],['A kicsi szomorú. Sír.','Hol van *anya*?'],['A nagy nyomok az anyukájához vezetnek.','*Hurrá*! Megtaláltad!']]]}},
+ {id:2,ic:'🚀👽',bg:'#C9D4FF',ph:['🦊📦✏️','🦊🚀🔥','🚀✨🪐','🌙🦊👽','🦊⭐👽','🛏️📦🦊💤'],who:['pufi','pufi','pufi','pufi','alien','alien'],tx:['40%','45%','55%','35%','65%','75%'],
+  t:{ro:['Racheta din cutie',[['Pufi face o rachetă dintr-o cutie.','Vreau să zbor *sus*!'],['Pufi numără: trei, doi, unu…','*Start*!'],['Racheta zboară printre stele.','Ce multe *stele*!'],['Pe Lună e cineva!','Bună! Eu sunt *Pufi*.'],['Se joacă amândoi cu o stea.','*Hop*! Prinde!'],['Pufi doarme în cutie. A fost un vis?','Noapte *bună*, Pufi!']]],
+     en:['The box rocket',[['Pufi makes a rocket from a box.','I want to fly *up*!'],['Pufi counts: three, two, one…','*Go*!'],['The rocket flies through the stars.','So many *stars*!'],['Someone is on the Moon!','Hello! I am *Pufi*.'],['They play with a star.','*Hop*! Catch!'],['Pufi sleeps in the box. Was it a dream?','Good *night*, Pufi!']]],
+     de:['Die Kisten-Rakete',[['Pufi baut eine Rakete aus einer Kiste.','Ich will nach *oben* fliegen!'],['Pufi zählt: drei, zwei, eins…','*Los*!'],['Die Rakete fliegt durch die Sterne.','So viele *Sterne*!'],['Auf dem Mond ist jemand!','Hallo! Ich bin *Pufi*.'],['Sie spielen mit einem Stern.','*Hopp*! Fang!'],['Pufi schläft in der Kiste. War es ein Traum?','Gute *Nacht*, Pufi!']]],
+     fr:['La fusée en carton',[['Pufi fabrique une fusée avec une boîte.','Je veux voler très *haut* !'],['Pufi compte : trois, deux, un…','*Partez* !'],['La fusée vole entre les étoiles.','Que d’*étoiles* !'],['Il y a quelqu’un sur la Lune !','Bonjour ! Je suis *Pufi*.'],['Ils jouent avec une étoile.','*Hop* ! Attrape !'],['Pufi dort dans la boîte. C’était un rêve ?','Bonne *nuit*, Pufi !']]],
+     es:['El cohete de caja',[['Pufi hace un cohete con una caja.','¡Quiero volar *alto*!'],['Pufi cuenta: tres, dos, uno…','¡*Ya*!'],['El cohete vuela entre las estrellas.','¡Cuántas *estrellas*!'],['¡Hay alguien en la Luna!','¡Hola! Soy *Pufi*.'],['Juegan con una estrella.','¡*Hop*! ¡Atrápala!'],['Pufi duerme en la caja. ¿Fue un sueño?','¡Buenas *noches*, Pufi!']]],
+     it:['Il razzo di cartone',[['Pufi costruisce un razzo con una scatola.','Voglio volare *su*!'],['Pufi conta: tre, due, uno…','*Via*!'],['Il razzo vola tra le stelle.','Quante *stelle*!'],['Sulla Luna c’è qualcuno!','Ciao! Sono *Pufi*.'],['Giocano con una stella.','*Hop*! Prendila!'],['Pufi dorme nella scatola. Era un sogno?','Buona *notte*, Pufi!']]],
+     pt:['O foguete de caixa',[['Pufi faz um foguete com uma caixa.','Quero voar *alto*!'],['Pufi conta: três, dois, um…','*Já*!'],['O foguete voa entre as estrelas.','Quantas *estrelas*!'],['Tem alguém na Lua!','Oi! Eu sou o *Pufi*.'],['Eles brincam com uma estrela.','*Opa*! Pega!'],['Pufi dorme na caixa. Foi um sonho?','Boa *noite*, Pufi!']]],
+     nl:['De dozenraket',[['Pufi maakt een raket van een doos.','Ik wil *hoog* vliegen!'],['Pufi telt: drie, twee, één…','*Start*!'],['De raket vliegt tussen de sterren.','Zoveel *sterren*!'],['Er is iemand op de maan!','Hallo! Ik ben *Pufi*.'],['Ze spelen met een ster.','*Hop*! Vang!'],['Pufi slaapt in de doos. Was het een droom?','Slaap *lekker*, Pufi!']]],
+     pl:['Rakieta z pudełka',[['Pufi robi rakietę z pudełka.','Lecę *wysoko*!'],['Pufi liczy: trzy, dwa, jeden…','*Start*!'],['Rakieta leci między gwiazdami.','Ile *gwiazd*!'],['Na Księżycu ktoś jest!','Cześć! Jestem *Pufi*.'],['Bawią się gwiazdką.','*Hop*! Łap!'],['Pufi śpi w pudełku. Czy to był sen?','Dobrej *nocy*, Pufi!']]],
+     uk:['Ракета з коробки',[['Пуфі робить ракету з коробки.','Я полечу *вгору*!'],['Пуфі рахує: три, два, один…','*Старт*!'],['Ракета летить між зірками.','Скільки *зірок*!'],['На Місяці хтось є!','Привіт! Я *Пуфі*.'],['Вони граються зіркою.','*Гоп*! Лови!'],['Пуфі спить у коробці. Це був сон?','*Добраніч*, Пуфі!']]],
+     ru:['Ракета из коробки',[['Пуфи делает ракету из коробки.','Я полечу *вверх*!'],['Пуфи считает: три, два, один…','*Пуск*!'],['Ракета летит среди звёзд.','Сколько *звёзд*!'],['На Луне кто-то есть!','Привет! Я *Пуфи*.'],['Они играют звёздочкой.','*Гоп*! Лови!'],['Пуфи спит в коробке. Это был сон?','Спокойной *ночи*, Пуфи!']]],
+     hu:['A dobozrakéta',[['Pufi rakétát épít egy dobozból.','Repülök *fel*!'],['Pufi számol: három, kettő, egy…','*Start*!'],['A rakéta a csillagok között repül.','Mennyi *csillag*!'],['Valaki van a Holdon!','Szia! Én *Pufi* vagyok.'],['Egy csillaggal játszanak.','*Hopp*! Kapd el!'],['Pufi a dobozban alszik. Csak álom volt?','Jó *éjt*, Pufi!']]]}},
+ {id:3,ic:'🤖🤧',bg:'#D7F2E3',soon:1,t:{ro:['Robotul care strănută'],en:['The sneezing robot'],de:['Der niesende Roboter'],fr:['Le robot qui éternue'],es:['El robot que estornuda'],it:['Il robot che starnutisce'],pt:['O robô que espirra'],nl:['De niezende robot'],pl:['Kichający robot'],uk:['Робот, що чхає'],ru:['Чихающий робот'],hu:['A tüsszögő robot']}},
+ {id:4,ic:'🦜🗺️',bg:'#FFD6D6',soon:1,t:{ro:['Comoara papagalului'],en:['The parrot’s treasure'],de:['Der Schatz des Papageis'],fr:['Le trésor du perroquet'],es:['El tesoro del loro'],it:['Il tesoro del pappagallo'],pt:['O tesouro do papagaio'],nl:['De schat van de papegaai'],pl:['Skarb papugi'],uk:['Скарб папуги'],ru:['Сокровище попугая'],hu:['A papagáj kincse']}}
+];
+const ET=e=>e.t[L()]||e.t.en;
+const pad=n=>String(n).padStart(2,'0');
+const img=(e,name)=>`benzi/ep${pad(e.id)}/${name}.jpg`;
+/* „*cuvânt*” → părțile: înainte, cuvânt, după */
+const split=s=>{ const m=s.match(/^(.*?)\*(.+?)\*(.*)$/); return m?{a:m[1],k:m[2],b:m[3]}:{a:s,k:'',b:''}; };
+const upperOn=()=>{ try{ return localStorage.getItem('rd_case')!=='lower'; }catch(e){ return true; } };
+const prog=()=>LS.get('cm_prog',{}); const recs=()=>LS.get('cm_recs',{});
+const recKey=(e,i)=>`cm-${L()}-ep${e.id}-p${i+1}`;
+
+let cur=null, tok=0, onBack=null;
+function pill(){ try{ $('stars').textContent='⭐ '+(typeof stars!=='undefined'?stars:0); }catch(e){} }
+function stopAll(){ tok++; try{ if(N){ N.call('rec.stop'); } }catch(e){} try{ speechSynthesis.cancel(); }catch(e){} }
+function open(back){ onBack=back||null; root.hidden=false; $('title').textContent=U().title; $('back').textContent=U().back; pill(); library(); }
+window.openComics=open;
+$('back').onclick=()=>{ if(cur){ stopAll(); cur=null; library(); return; } stopAll(); root.hidden=true; if(onBack) onBack(); };
+
+/* card în meniul Citire */
+window.__comicCard=()=>{ const b=el('button','rd-card new',`<span class="ic">💬</span><span class="nm">${U().card}</span>`); b.id='rd-g-comic'; b.dataset.lk='cm:lib'; b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||(((window.L10N||{}).misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>open(); return b; };
+
+/* ---------------- biblioteca ---------------- */
+function library(){ cur=null; stopAll(); main.innerHTML=''; main.classList.remove('cm-film'); const p=prog();
+  const h=el('div','cm-head'); h.append(el('div','cm-face','🦊')); const m=el('div','cm-msg'); m.textContent=U().pick; m.onclick=()=>sp(U().pick); h.append(m); main.append(h);
+  const g=el('div','cm-lib');
+  EPS.forEach((e,i)=>{ const lock=!e.soon&&i>0&&!p[EPS[i-1].id]; const c=el('button','cm-ep'+(e.soon?' soon':lock?' lock':''));
+    c.dataset.lk='cm:ep'+e.id;
+    const cv=el('div','cv'); cv.style.background=e.bg; cv.textContent=e.ic; if(!e.soon){ const im=new Image(); im.alt=''; im.onload=()=>{ cv.textContent=''; cv.append(im); }; im.src=img(e,'cover'); }
+    c.append(cv, el('div','t',ET(e)[0]), el('div','st',e.soon?U().soon:p[e.id]?U().done:''));
+    if(p[e.id]){ const f=el('button','cm-film-b',U().film); f.onclick=ev=>{ ev.stopPropagation(); if(window.__gate&&window.__gate('cm','ep'+e.id)) return; film(e); }; c.append(f); }
+    c.onclick=()=>{ if(e.soon){ sp(U().soon); return; } if(lock){ sp(U().locked); return; } if(window.__gate&&window.__gate('cm','ep'+e.id)) return; read(e); };
+    g.append(c); });
+  main.append(g); sp(U().pick); }
+
+/* ---------------- cititorul ---------------- */
+function frame(e,i){ const f=el('div','cm-frame'); const ph=el('div','cm-ph',e.ph[i]); ph.style.background=`linear-gradient(${e.bg} 0 36%,#FFF8E6 36%)`; f.append(ph);
+  const im=new Image(); im.alt=''; im.onload=()=>{ ph.remove(); f.prepend(im); }; im.src=img(e,'p'+(i+1)); return f; }
+function bubble(e,i,state){ const s=split(ET(e)[1][i][1]); const b=el('div','cm-bub '+(upperOn()?'cm-uc':'cm-lc')); b.style.setProperty('--tx',e.tx[i]);
+  const pu=(s.b.match(/^[^\s\p{L}]*/u)||[''])[0]; b.innerHTML=`${esc(s.a)}<span style="white-space:nowrap"><span class="cm-key${state?' '+state:''}">${esc(s.k)}</span>${esc(pu)}</span>${esc(s.b.slice(pu.length))}`; return {b,s}; }
+const esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+
+function read(e){ cur={e,i:0,film:false}; panel(); }
+async function panel(){ const my=++tok; const {e,i}=cur; const [nar]=ET(e)[1][i]; main.innerHTML=''; main.classList.remove('cm-film');
+  const dots=el('div','cm-dots'); ET(e)[1].forEach((_,j)=>dots.append(el('i',j<i?'ok':j===i?'on':''))); main.append(dots);
+  const cap=el('div','cm-cap',esc(nar)); cap.onclick=()=>sp(nar); main.append(cap);
+  const pn=el('div','cm-panel'); const fr=frame(e,i); const {b,s}=bubble(e,i,''); fr.append(b); pn.append(fr); main.append(pn);
+  const key=b.querySelector('.cm-key'); key.onclick=()=>sp(s.k.toLowerCase());
+  const ctl=el('div','cm-ctrl'); main.append(ctl);
+  /* Pufi citește narațiunea și balonul până la cuvântul-cheie; cuvântul îl citește copilul */
+  await sp(nar); if(my!==tok) return; if(/\p{L}/u.test(s.a)){ await sp(s.a); if(my!==tok) return; }
+  if(i===0) { await sp(N?U().readKey:U().readKeyWeb); if(my!==tok) return; } else snd(880,.12);
+  const doneRead=async()=>{ key.classList.add('ok'); snd(660,.1); setTimeout(()=>snd(990,.12),120); if(/\p{L}/u.test(s.b)) await sp(s.b); if(my!==tok) return; next(); };
+  const next=()=>{ ctl.innerHTML=''; const rep=el('button','sm','🔁'); rep.onclick=()=>{ panel(); }; const go=el('button','go',i<ET(e)[1].length-1?'▶':'🎬'); go.onclick=()=>{ if(i<ET(e)[1].length-1){ cur.i++; panel(); } else finishEp(e); }; ctl.append(rep);
+    if(N&&recs()[recKey(e,i)]){ const me=el('button','sm',U().me); me.onclick=()=>N.call('rec.play',{key:recKey(e,i)}); ctl.append(me); } ctl.append(go); };
+  const webBtn=()=>{ const r=el('button','go',U().read); r.onclick=doneRead; return r; };
+  const help=el('button','sm','❓'); help.onclick=()=>sp(s.k.toLowerCase());
+  if(N){ const mic=el('button','mic',U().mic); let on=false, t=null;
+    const stopRec=async()=>{ clearTimeout(t); if(!on) return; on=false; mic.classList.remove('rec'); mic.textContent=U().mic; await N.call('rec.stop'); const r=recs(); r[recKey(e,i)]=1; LS.set('cm_recs',r);
+      key.classList.add('say'); await N.call('rec.play',{key:recKey(e,i)}); if(my!==tok) return; key.classList.remove('say'); doneRead(); };
+    mic.onclick=async()=>{ if(on) return stopRec(); let ok=false; try{ ok=!!await N.call('rec.start',{key:recKey(e,i)}); }catch(err){} if(my!==tok) return;
+      if(!ok){ sp(U().micNo); ctl.innerHTML=''; ctl.append(help,webBtn()); return; }
+      on=true; mic.classList.add('rec'); mic.textContent=U().stop; t=setTimeout(stopRec,5000); };
+    ctl.append(help,mic); }
+  else ctl.append(help,webBtn()); }
+
+function finishEp(e){ const p=prog(); const first=!p[e.id]; p[e.id]=1; LS.set('cm_prog',p);
+  if(first){ try{ stars+=3; renderBar(); }catch(err){} pill(); try{ window.__lvDone&&window.__lvDone(1); }catch(err){} }
+  try{ confetti(20); }catch(err){} sp(U().filmSay).then(()=>{ if(cur&&cur.e===e) film(e); }); }
+
+/* ---------------- filmul: povestea cu vocea copilului ---------------- */
+async function film(e){ cur={e,i:0,film:true}; const my=++tok; const R=recs(); const n=ET(e)[1].length;
+  for(let i=0;i<n;i++){ if(my!==tok) return; cur.i=i; const [nar]=ET(e)[1][i]; main.innerHTML=''; main.classList.add('cm-film');
+    const dots=el('div','cm-dots'); ET(e)[1].forEach((_,j)=>dots.append(el('i',j<i?'ok':j===i?'on':''))); main.append(dots);
+    main.append(el('div','cm-cap',esc(nar))); const pn=el('div','cm-panel'); const fr=frame(e,i); const {b,s}=bubble(e,i,'ok'); fr.append(b); pn.append(fr); main.append(pn);
+    await sp(nar); if(my!==tok) return; if(/\p{L}/u.test(s.a)){ await sp(s.a); if(my!==tok) return; }
+    const k=b.querySelector('.cm-key'); k.classList.add('say');
+    if(N&&R[recKey(e,i)]) await N.call('rec.play',{key:recKey(e,i)}); else await sp(s.k.toLowerCase());
+    if(my!==tok) return; k.classList.remove('say'); if(/\p{L}/u.test(s.b)) await sp(s.b); if(my!==tok) return; await wait(700); }
+  main.classList.remove('cm-film'); if(my!==tok) return; const end=el('div','cm-ctrl'); const a=el('button','go',U().again); a.onclick=()=>film(e); const l=el('button','sm',U().lib); l.onclick=()=>library(); end.append(a,l); main.append(end); sp(U().end); }
+
+(window.__LR=window.__LR||[]).push(()=>{ if(root.hidden) return; $('title').textContent=U().title; $('back').textContent=U().back; if(!cur) library(); });
 })();
 </script>
 <style>

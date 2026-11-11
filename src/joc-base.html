@@ -2600,7 +2600,7 @@ function updTop(){ $('stars').textContent='⭐ '+stars; $('caseBtn').textContent
 function showMenu(){ view='menu'; busy=false; storyTok++; $('play').hidden=true; $('menu').hidden=false; $('title').textContent='📖 '+R().title; updTop();
   const m=$('menu'); m.innerHTML='';
   MENU.forEach((grp,gi)=>{ m.appendChild(el('div','rd-mhead',R2().groups[gi]));
-    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; b.dataset.lk='rd:'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); }
+    grp.forEach(g=>{ const b=el('button','rd-card'+(NEWG.includes(g)?' new':''),`<span class="ic">${GN(g)[0]}</span><span class="nm">${GN(g)[1]}</span>`); b.id='rd-g-'+g; b.dataset.lk='rd:'+g; if(NEWG.includes(g)) b.dataset.new=({ro:'NOU',de:'NEU',en:'NEW'})[lang]||((L10N.misc||{})[lang]||{}).newB||'NEW'; b.onclick=()=>openGame(g); m.appendChild(b); }); }); if(window.__comicCard){ const c=window.__comicCard(); m.insertBefore(c,m.children[1]||null); } }
 function openGame(g){ game=g; view='play'; busy=false; storyTok++; $('menu').hidden=true; $('play').hidden=false; $('title').textContent=GN(g)[0]+' '+GN(g)[1]; updTop(); RUN[g](); }
 $('backBtn').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(view==='menu'){ root.hidden=true; } else showMenu(); };
 $('caseBtn').onclick=()=>{ upper=!upper; store('rd_case',upper?'upper':'lower'); updTop(); if(view==='play'&&!busy) RUN[game](); };
