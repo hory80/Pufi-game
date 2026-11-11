@@ -14,14 +14,14 @@ console.log('card:',await p.evaluate(()=>{ const c=document.getElementById('rd-g
 await p.evaluate(()=>document.getElementById('rd-g-comic').click()); await p.waitForTimeout(400);
 await p.screenshot({path:process.env.SC+'/c-lib'+(ph?'p':'')+'.png'});
 console.log('lib:',await p.evaluate(()=>[...document.querySelectorAll('.cm-ep .t')].map(x=>x.textContent).join(' | ')));
-await p.evaluate(()=>document.querySelectorAll('.cm-ep')[0].click());
+const EP=+(process.env.EP||0); if(EP){ await p.evaluate(()=>{ localStorage.setItem('cm_prog','{"1":1}'); window.openComics(); }); await p.waitForTimeout(300); } await p.evaluate(EP=>document.querySelectorAll('.cm-ep')[EP].click(),EP);
 for(let i=0;i<6;i++){ await p.waitForFunction(()=>document.querySelector('.cm-ctrl .mic, .cm-ctrl .go'),null,{timeout:20000});
   if(i===1) await p.screenshot({path:process.env.SC+'/c-p2'+(ph?'p':'')+'.png'});
   const bub=await p.evaluate(()=>document.querySelector('.cm-bub').textContent);
   if(nat){ await p.evaluate(()=>document.querySelector('.cm-ctrl .mic').click()); await p.waitForTimeout(300); await p.evaluate(()=>document.querySelector('.cm-ctrl .mic').click()); }
   else await p.evaluate(()=>document.querySelector('.cm-ctrl .go').click());
   await p.waitForFunction(()=>{ const g=document.querySelector('.cm-ctrl .go'); return g&&(g.textContent==='▶'||g.textContent==='🎬'); },null,{timeout:20000});
-  if(i===2) await p.screenshot({path:process.env.SC+'/c-ok'+(ph?'p':'')+'.png'});
+  if(i===2||(process.env.EP&&i===1)) await p.screenshot({path:process.env.SC+'/c-ok'+(ph?'p':'')+'.png'});
   console.log(i+1,bub); await p.evaluate(()=>document.querySelector('.cm-ctrl .go').click()); await p.waitForTimeout(150); }
 await p.waitForFunction(()=>document.querySelector('#cm-main .cm-ctrl .go')&&!document.querySelector('#cm-main.cm-film'),null,{timeout:60000});
 console.log('film done; prog',await p.evaluate(()=>localStorage.getItem('cm_prog')),'stars',await p.evaluate(()=>stars));
