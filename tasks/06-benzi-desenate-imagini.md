@@ -275,4 +275,15 @@ Comic panel 6. Same clearing, warm glow. The wooden treasure chest is open: it i
 
 ## Raport
 
-(Codex completează aici: imaginile generate, încercările eșuate, instrumentul folosit, transparență reală sau magenta.)
+Etapa 1 finalizată la 11 noiembrie 2026, pe branch-ul `assets/benzi-imagini`.
+
+- Generate 16 imagini originale în `benzi/raw/`, toate PNG 1024×1024. Fișele `chars/dino-baby.png` și `chars/alien.png`, plus `cover.png` și `p1.png`–`p6.png` pentru fiecare dintre `ep01/` și `ep02/`.
+- Adăugate planșele `ep01/_sheet.png` și `ep02/_sheet.png`, 1024×720, cu cele șase cadre în ordine, trei pe rând, numele doar sub miniaturi.
+- Instrument folosit — image_gen integrat. Prompturile sunt blocurile originale din task urmate de Stil comun. Au fost adăugate precizări despre rolul referințelor, spațiul liber de sus și continuitatea decorului/rachetei.
+- `isl/raw/pufi-idle.png` a fost referință în toate imaginile cu Pufi. Fișele de personaj au fost referințe când apar personajele respective. Fiecare cadru p2–p6 folosește și cadrul precedent. Pentru finalul episodului 2 s-a folosit suplimentar dormitorul din p1.
+- Fișele au canal alfa real, verificat cu sips și Pillow, cu valori alfa între 0 și 255. Nu s-a folosit magenta. Copertele și cadrele sunt RGB opace.
+- Exporturile pătrate ale instrumentului au fost redimensionate proporțional cu sips la exact 1024×1024, fără decupare. Planșele sunt asamblate din imaginile generate.
+- Control vizual individual și pe planșe — fără text, litere, cifre, baloane, logo, watermark sau rame. Fundalul superior este simplu, destinat baloanelor, iar acțiunea rămâne în zona de mijloc/jos. Stilul, eșarfa lui Pufi și identitatea personajelor au fost urmărite la fiecare cadru.
+- Două încercări respinse și regenerate. Prima fișă a extraterestrului preluase eșarfa lui Pufi. Prima variantă ep02/p1 avea urechea prea sus. Variantele respinse nu sunt incluse în repo. Celelalte imagini au fost păstrate de la prima încercare.
+- Etapa 2 (robot, papagal, episoadele 3–4) nu a fost începută în această livrare.
+- Verificările au fost pentru fișierele grafice. Integrarea și optimizarea în joc urmează la Claude.
