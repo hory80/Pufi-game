@@ -14,7 +14,7 @@ console.log('card:',await p.evaluate(()=>{ const c=document.getElementById('rd-g
 await p.evaluate(()=>document.getElementById('rd-g-comic').click()); await p.waitForTimeout(400);
 await p.screenshot({path:process.env.SC+'/c-lib'+(ph?'p':'')+'.png'});
 console.log('lib:',await p.evaluate(()=>[...document.querySelectorAll('.cm-ep .t')].map(x=>x.textContent).join(' | ')));
-const EP=+(process.env.EP||0); if(EP){ await p.evaluate(()=>{ localStorage.setItem('cm_prog','{"1":1}'); window.openComics(); }); await p.waitForTimeout(300); } await p.evaluate(EP=>document.querySelectorAll('.cm-ep')[EP].click(),EP);
+const EP=+(process.env.EP||0); if(EP){ await p.evaluate(()=>{ localStorage.setItem('cm_prog','{"1":1,"2":1,"3":1}'); window.openComics(); }); await p.waitForTimeout(300); } await p.evaluate(EP=>document.querySelectorAll('.cm-ep')[EP].click(),EP);
 for(let i=0;i<6;i++){ await p.waitForFunction(()=>document.querySelector('.cm-bub.turn'),null,{timeout:20000}); if(i===0) await p.screenshot({path:process.env.SC+'/c-turn'+(ph?'p':'')+'.png'});
   if(i===1) await p.screenshot({path:process.env.SC+'/c-p2'+(ph?'p':'')+'.png'});
   const bub=await p.evaluate(()=>document.querySelector('.cm-bub').textContent+' | '+document.querySelector('.cm-turn').textContent);
